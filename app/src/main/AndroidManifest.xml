@@ -10,9 +10,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AboutActivity"></activity>
-        <activity android:name=".ProjectActivity" />
-        <activity android:name=".NotesActivity" />
+        <activity android:name=".project.status.ProjectStatusEditActivity"></activity>
+        <activity android:name=".project.status.ProjectStatusActivity" />
+        <activity android:name=".project.ProjectTaskEditActivity" />
+        <activity android:name=".project.ProjectEditActivity" />
+        <activity android:name=".project.ProjectInfoActivity" />
+        <activity android:name=".notes.NotesEditActivity" />
+        <activity android:name=".notes.NotesViewActivity" />
+        <activity android:name=".notes.NotesSubjectActivity" />
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".project.ProjectSelectActivity" />
+        <activity android:name=".notes.NotesSelectActivity" />
         <activity
             android:name=".MenuActivity"
             android:label="@string/title_activity_menu"

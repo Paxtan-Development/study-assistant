@@ -1,13 +1,15 @@
-package com.pcchin.studyassistant;
+package com.pcchin.studyassistant.notes;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class ProjectActivity extends AppCompatActivity {
+import com.pcchin.studyassistant.R;
+
+public class NotesEditActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_project);
+        setContentView(R.layout.activity_notes_edit);
     }
 }

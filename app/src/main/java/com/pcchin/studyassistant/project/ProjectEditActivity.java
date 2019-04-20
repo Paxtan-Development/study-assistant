@@ -1,5 +1,6 @@
 package com.pcchin.studyassistant.project;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -11,5 +12,11 @@ public class ProjectEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_edit);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ProjectInfoActivity.class);
+        startActivity(intent);
     }
 }

@@ -1,5 +1,15 @@
 <resources>
+    <!-- Common values -->
     <string name="app_name">Study Assistant</string>
+    <string name="blank" />
+    <string name="notes">Notes</string>
+    <string name="projects">Projects</string>
+
+    <!-- Values used in the M sections -->
+    <string name="welcome">Welcome!</string>
+    <string name="about">About</string>
+
+    <!-- Temp values -->
     <string name="title_activity_menu">MenuActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

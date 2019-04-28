@@ -1,17 +1,52 @@
 package com.pcchin.studyassistant;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
+
+import com.pcchin.studyassistant.notes.NotesSelectActivity;
+import com.pcchin.studyassistant.project.ProjectSelectActivity;
 
 public class MainActivity extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce;
+    private SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        sharedPref = getSharedPreferences("com.pcchin.studyassistant", MODE_PRIVATE);
+        if (sharedPref.getBoolean("isDark", false)) {
+            setContentView(R.layout.activity_main_dark);
+        } else {
+            setContentView(R.layout.activity_main);
+        }
+
+        // Set button listeners
+        findViewById(R.id.m1_notes).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NotesSelectActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.m1_projects).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ProjectSelectActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.m1_about).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

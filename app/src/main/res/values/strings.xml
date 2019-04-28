@@ -6,8 +6,10 @@
     <string name="projects">Projects</string>
 
     <!-- Values used in the M sections -->
-    <string name="welcome">Welcome!</string>
-    <string name="about">About</string>
+    <string name="m_welcome">Welcome!</string>
+    <string name="m_about">About</string>
+    <string name="m_copyright">© 2019–2019 PC Chin</string>
+    <string name="m_version">Version: </string>
 
     <!-- Temp values -->
     <string name="title_activity_menu">MenuActivity</string>

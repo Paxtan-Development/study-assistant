@@ -5,6 +5,7 @@
     android:id="@+id/m1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context=".MainActivity">
 
     <ImageView
@@ -15,7 +16,7 @@
         android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_menu" />
+        app:srcCompat="@drawable/ic_menu_dark" />
 
     <TextView
         android:id="@+id/m1_title"
@@ -26,6 +27,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="320dp"
         android:text="@string/m_welcome"
+        android:textColor="@android:color/white"
         android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

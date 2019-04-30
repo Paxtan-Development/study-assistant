@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant;
+package com.pcchin.studyassistant.main;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,8 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
+import com.pcchin.studyassistant.R;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    // TODO: Use fragments for every class
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

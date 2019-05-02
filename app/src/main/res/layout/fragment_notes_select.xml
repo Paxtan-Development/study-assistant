@@ -1,14 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/p1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".notes.NotesSelectFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.075" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/p1_notes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:gravity="center"
+        android:paddingStart="20sp"
+        android:paddingEnd="20sp"
+        android:text="@string/notes"
+        android:textSize="36sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.075" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.75">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40sp"
+            android:layout_marginEnd="40sp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/p1_create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@android:color/transparent"
+                android:paddingStart="20sp"
+                android:paddingEnd="20sp"
+                android:text="@string/create_new"
+                android:textColor="@android:color/holo_blue_dark" />
+
+            <Button
+                android:id="@+id/p1_import"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@android:color/transparent"
+                android:paddingStart="20sp"
+                android:paddingEnd="20sp"
+                android:text="@string/data_import"
+                android:textColor="@android:color/holo_blue_dark" />
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

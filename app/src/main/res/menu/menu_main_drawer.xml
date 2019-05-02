@@ -8,10 +8,10 @@
         <menu>
             <item
                 android:id="@+id/m3_notes_create"
-                android:title="@string/new_project" />
+                android:title="@string/m3_new_project" />
             <item
                 android:id="@+id/m3_notes_import"
-                android:title="@string/data_import" />
+                android:title="@string/m3_data_import" />
         </menu>
     </item>
 
@@ -20,10 +20,10 @@
         <menu>
             <item
                 android:id="@+id/m3_project_create"
-                android:title="@string/new_project" />
+                android:title="@string/m3_new_project" />
             <item
                 android:id="@+id/m3_project_import"
-                android:title="@string/data_import" />
+                android:title="@string/m3_data_import" />
         </menu>
     </item>
 
@@ -31,6 +31,6 @@
         android:title="@string/exit" />
 
     <item android:id="@+id/m3_about"
-        android:title="@string/about" />
+        android:title="@string/m_about" />
 
 </menu>

@@ -2,12 +2,19 @@ package com.pcchin.studyassistant.main;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 
 /**
@@ -19,6 +26,7 @@ import com.pcchin.studyassistant.R;
  * create an instance of this fragment.
  */
 public class AboutFragment extends Fragment {
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -62,10 +70,26 @@ public class AboutFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_about, container, false);
+        View returnView = inflater.inflate(R.layout.fragment_about, container, false);
+        // Set version
+        TextView textView = returnView.findViewById(R.id.m2_version);
+        textView.setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
+
+        // Set license text
+        Spanned license;
+        String licenseText = GeneralFunctions.getReadTextFromAssets(inflater.getContext(), "license.txt");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            license = Html.fromHtml(licenseText, Html.FROM_HTML_MODE_LEGACY); // Adds hyperlink to text
+        } else {
+            license = Html.fromHtml(licenseText);
+        }
+        TextView licenseView = returnView.findViewById(R.id.m2_license);
+        licenseView.setText(license);
+        licenseView.setMovementMethod(LinkMovementMethod.getInstance());
+        return returnView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -15,8 +15,6 @@
 <br/>
 <br/><b>Sources Used:</b>
 <br/>
-<br/><a href="https://github.com/vipulasri/Timeline-View">Timeline View</a> - vipularsi
-<br/>
 <br/><u>Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</u>
 <br/>
 <br/>Export icon made by <a href="https://www.flaticon.com/authors/popcic" title="Popcic">Popcic</a> from <a href="https://www.flaticon.com/">Flaticon</a>

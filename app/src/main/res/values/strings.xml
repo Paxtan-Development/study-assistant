@@ -24,11 +24,13 @@
     <string name="m2_copyright">© 2019–2019 PC Chin</string>
     <string name="m2_version">Version: </string>
 
+    <string name="m3_home">Home</string>
     <string name="m3_new_subject">New Subject…</string>
     <string name="m3_new_project">New Project…</string>
     <string name="m3_data_import">Import…</string>
     <string name="m3_nav_open">Open navigation drawer</string>
     <string name="m3_nav_close">Close navigation drawer</string>
+    <string name="m3_exit_confirm">Are you sure that you want to exit?</string>
 
     <!-- Strings used in group N -->
     <string name="n2_new_note">New note</string>
@@ -39,5 +41,23 @@
     <string name="n3_insert_link">Insert link</string>
     <string name="n3_change_subj">Change subject</string>
 
+    <!-- Strings used in group P -->
+    <string name="p_task">Task</string>
+    <string name="p_status">Status</string>
+    <string name="p_num">No.</string>
+    <string name="p_member">Members</string>
+    <string name="p_description">Description</string>
+    <string name="p_progress">Progress</string>
+
+    <string name="p2_task_list">Task List</string>
+
+    <string name="p3_title">Title</string>
+    <string name="p3_id">Project ID</string>
+    <string name="p3_member_input">Use a semicolon ; to separate members.</string>
+    <string name="p3_pass_old">Old password</string>
+    <string name="p3_pass_new1">New password</string>
+    <string name="p3_pass_new2">Re-enter password</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

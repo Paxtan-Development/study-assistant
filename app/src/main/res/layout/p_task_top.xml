@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/p2_top_no"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:background="@drawable/p_tableborder"
+        android:text="@string/p_num"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/p2_top_member"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:background="@drawable/p_tableborder"
+        android:text="@string/p_member"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/p2_top_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:background="@drawable/p_tableborder"
+        android:text="@string/p_description"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/p2_top_progress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:background="@drawable/p_tableborder"
+        android:text="@string/p_progress"
+        android:textSize="18sp" />
+</TableRow>

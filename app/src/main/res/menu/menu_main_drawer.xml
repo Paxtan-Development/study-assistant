@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <item
+        android:id="@+id/m3_home"
+        android:title="@string/m3_home" />
     <item android:id="@+id/m3_notes"
         android:title="@string/notes">
         <menu>

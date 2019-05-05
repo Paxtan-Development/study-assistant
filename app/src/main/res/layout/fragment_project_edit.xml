@@ -1,14 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/p3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".project.ProjectEditFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18sp"
+        android:paddingEnd="18sp">
 
-</FrameLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p3_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_title"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_title_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/blank"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/blank"
+            tools:ignore="Autofill" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p3_id_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_id"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_id_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/blank"
+            android:inputType="textPersonName"
+            android:text="@string/blank"
+            tools:ignore="Autofill" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p3_members_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p_member"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_members_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/blank"
+            android:inputType="textPersonName"
+            android:text="@string/blank"
+            tools:ignore="Autofill" />
+
+        <TextView
+            android:id="@+id/p3_members_guide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_member_input"
+            android:textSize="14sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p3_desc_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p_description"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_desc_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/blank"
+            android:inputType="textMultiLine"
+            tools:ignore="Autofill" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p3_pass_change_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_pass_old"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_pass_change_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/blank"
+            android:inputType="textPassword"
+            tools:ignore="Autofill" />
+
+        <TextView
+            android:id="@+id/p3_pass_input1_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_pass_new1"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_pass_input1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/blank"
+            android:inputType="textPassword"
+            tools:ignore="Autofill" />
+
+        <TextView
+            android:id="@+id/p3_pass_input2_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p3_pass_new2"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/p3_pass_input2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/blank"
+            android:inputType="textPassword"
+            tools:ignore="Autofill" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+    </LinearLayout>
+</ScrollView>

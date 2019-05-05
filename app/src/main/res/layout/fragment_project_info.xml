@@ -29,25 +29,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.1"
-                android:text="TextView" />
+                android:text="@string/blank"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/p2_users"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.3"
-                android:text="TextView" />
+                android:layout_weight="0.2"
+                android:text="@string/blank"
+                android:textSize="24sp" />
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6">
+                android:layout_height="0dp"
+                android:layout_weight="0.7">
 
                 <TextView
                     android:id="@+id/p2_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="@string/blank"
+                    android:textSize="20sp" />
             </ScrollView>
 
         </LinearLayout>
@@ -57,34 +60,43 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.15"
+            android:background="@color/colorPrimaryLight"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/p2_edit"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/edit"
                 android:padding="10sp"
                 app:srcCompat="@drawable/ic_menu_edit" />
 
             <ImageButton
                 android:id="@+id/p2_task"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/p_task"
                 android:padding="10sp"
                 app:srcCompat="@drawable/ic_project_task" />
 
             <ImageButton
                 android:id="@+id/p2_status"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/p_status"
                 android:padding="10sp"
                 app:srcCompat="@drawable/ic_project_status" />
 
             <ImageButton
                 android:id="@+id/p2_export"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/data_export"
                 android:padding="10sp"
                 app:srcCompat="@drawable/ic_menu_export" />
         </LinearLayout>
@@ -95,23 +107,27 @@
         android:id="@+id/p2_task_text"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:text="TextView" />
+        android:layout_weight="0.08"
+        android:text="@string/p2_task_list"
+        android:textSize="24sp" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.52"
         app:layout_constraintBottom_toTopOf="@+id/p2_id">
 
         <TableLayout
             android:id="@+id/p2_tasklist"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
 
-            <TableRow
+            <include
+                layout="@layout/p_task_top"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content" />
 
         </TableLayout>
     </ScrollView>

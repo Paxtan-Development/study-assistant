@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/p4_mini"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/p4_mini_no"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
+        android:background="@drawable/p_tableborder"
+        android:ems="10"
+        android:hint="@string/blank"
+        android:inputType="textPersonName"
+        android:text="@string/blank"
+        tools:ignore="Autofill" />
+
+    <EditText
+        android:id="@+id/p4_mini_member"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:background="@drawable/p_tableborder"
+        android:ems="10"
+        android:hint="@string/blank"
+        android:inputType="textPersonName"
+        android:text="@string/blank"
+        tools:ignore="Autofill" />
+
+    <EditText
+        android:id="@+id/p4_mini_desc"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:background="@drawable/p_tableborder"
+        android:ems="10"
+        android:hint="@string/blank"
+        android:inputType="textPersonName"
+        android:text="@string/blank"
+        tools:ignore="Autofill" />
+
+    <EditText
+        android:id="@+id/p4_mini_progress"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:background="@drawable/p_tableborder"
+        android:ems="10"
+        android:hint="@string/blank"
+        android:inputType="textPersonName"
+        android:text="@string/blank"
+        tools:ignore="Autofill" />
+</TableRow>

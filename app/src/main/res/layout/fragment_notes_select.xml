@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/p1"
+    android:id="@+id/n1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -13,7 +13,7 @@
         android:layout_weight="0.075" />
 
     <TextView
-        android:id="@+id/p1_notes"
+        android:id="@+id/n1_title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"
@@ -34,6 +34,7 @@
         android:layout_weight="0.75">
 
         <LinearLayout
+            android:id="@+id/n1_notes_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="40sp"
@@ -41,7 +42,7 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/p1_create"
+                android:id="@+id/n1_create"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -51,10 +52,11 @@
                 android:paddingStart="20sp"
                 android:paddingEnd="20sp"
                 android:text="@string/create_new"
-                android:textColor="@android:color/holo_blue_dark" />
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="18sp" />
 
             <Button
-                android:id="@+id/p1_import"
+                android:id="@+id/n1_import"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -64,7 +66,8 @@
                 android:paddingStart="20sp"
                 android:paddingEnd="20sp"
                 android:text="@string/data_import"
-                android:textColor="@android:color/holo_blue_dark" />
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="18sp" />
 
         </LinearLayout>
 

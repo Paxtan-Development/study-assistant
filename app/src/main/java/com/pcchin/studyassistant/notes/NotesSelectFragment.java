@@ -1,109 +1,130 @@
 package com.pcchin.studyassistant.notes;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.GeneralFunctions;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.notes.database.NotesSubject;
+import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NotesSelectFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NotesSelectFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class NotesSelectFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private SubjectDatabase subjectDatabase;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
-    public NotesSelectFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NotesSelectFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NotesSelectFragment newInstance(String param1, String param2) {
-        NotesSelectFragment fragment = new NotesSelectFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public NotesSelectFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        if (getContext() != null) {
+            subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
+                    .allowMainThreadQueries().build();
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notes_select, container, false);
-    }
+        View returnView = inflater.inflate(R.layout.fragment_notes_select, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+        // Add existing subjects
+        final List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
+        for (int i = 0; i < subjectList.size(); i++) {
+            @SuppressLint("InflateParams") Button subjectBtn = (Button) getLayoutInflater()
+                    .inflate(R.layout.hyperlink_btn, null);
+            subjectBtn.setText(subjectList.get(i).title);
+            final int finalI = i;
+            subjectBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Go to notesSubjectFragment
+                    if (getActivity() != null) {
+                        subjectDatabase.close();
+                        ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(
+                                subjectList.get(finalI).title
+                        ));
+                    }
+                }
+            });
+            ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, i);
         }
+
+
+        @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
+                .inflate(R.layout.n1_popup_new_subject, null);
+        returnView.findViewById(R.id.n1_create).setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("InflateParams")
+            @Override
+            public void onClick(View v) {
+                // Ask for title
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.n1_new_subject)
+                        .setView(popupView)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String inputText = ((EditText) popupView
+                                        .findViewById(R.id.n1_popup_input)).getText().toString();
+                                TextView errorText = popupView.findViewById(R.id.n1_popup_error);
+
+                                // Preliminary checks if subject name is taken or is empty
+                                if (inputText.replaceAll("\\s+", "").length() == 0) {
+                                    errorText.setText(R.string.n1_error_subject_empty);
+                                } else if (subjectDatabase.SubjectDao().search(inputText) != null) {
+                                    errorText.setText(R.string.n1_error_subject_exists);
+                                } else {
+                                    // Create subject
+                                    if (getActivity() != null) {
+                                        subjectDatabase.SubjectDao().insert(
+                                                new NotesSubject(inputText,
+                                                        GeneralFunctions.arrayToJson(
+                                                                new ArrayList<String>())));
+                                        subjectDatabase.close();
+                                        ((MainActivity) getActivity()).displayFragment(
+                                                NotesSubjectFragment.newInstance(inputText));
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create().show();
+            }
+        });
+
+        returnView.findViewById(R.id.n1_import).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Import
+            }
+        });
+        return returnView;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

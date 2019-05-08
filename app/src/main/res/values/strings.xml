@@ -33,6 +33,11 @@
     <string name="m3_exit_confirm">Are you sure that you want to exit?</string>
 
     <!-- Strings used in group N -->
+    <string name="n1_new_subject">New Subject</string>
+    <string name="n1_subject_title">Subject title</string>
+    <string name="n1_error_subject_exists">Another subject already has this name. Try using another one.</string>
+    <string name="n1_error_subject_empty">Subject name cannot be empty.</string>
+
     <string name="n2_new_note">New note</string>
 
     <string name="n3_bold">Bold</string>

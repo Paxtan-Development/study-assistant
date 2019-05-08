@@ -45,11 +45,21 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        // TODO: Kept sample for reference
+        /*
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+        */
+
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -102,9 +112,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void displayFragment(Fragment fragment) {
+    public void displayFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.base, fragment);
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
     }
 

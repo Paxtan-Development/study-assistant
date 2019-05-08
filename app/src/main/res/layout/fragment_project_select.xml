@@ -13,7 +13,7 @@
         android:layout_weight="0.075" />
 
     <TextView
-        android:id="@+id/p1_notes"
+        android:id="@+id/p1_title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"
@@ -34,6 +34,7 @@
         android:layout_weight="0.75">
 
         <LinearLayout
+            android:id="@+id/p1_notes_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="40sp"

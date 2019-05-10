@@ -1,53 +1,41 @@
 package com.pcchin.studyassistant.notes;
 
-import android.content.Context;
+import android.arch.persistence.room.Room;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.GeneralFunctions;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NotesViewFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NotesViewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+
 public class NotesViewFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_SUBJECT = "notesSubject";
+    private static final String ARG_ORDER = "notesOrder";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<String> notesInfo;
+    private String notesSubject;
+    private int notesOrder;
 
-    private OnFragmentInteractionListener mListener;
+    public NotesViewFragment() { }
 
-    public NotesViewFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NotesViewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NotesViewFragment newInstance(String param1, String param2) {
+    public static NotesViewFragment newInstance(String subject, int order) {
         NotesViewFragment fragment = new NotesViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_SUBJECT, subject);
+        args.putInt(ARG_ORDER, order);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,54 +44,58 @@ public class NotesViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            notesSubject = getArguments().getString(ARG_SUBJECT);
+            notesOrder = getArguments().getInt(ARG_ORDER);
         }
+
+        if (getContext() != null) {
+            // Get notes required from database
+            SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
+                    .allowMainThreadQueries().build();
+            ArrayList<ArrayList<String>> allNotes = GeneralFunctions
+                    .jsonToArray(database.SubjectDao().search(notesSubject).contents);
+
+            // Check if notesOrder exists
+            if (allNotes != null && allNotes.size() >= notesOrder) {
+                notesInfo = allNotes.get(notesOrder);
+                // Error message not shown as it is displayed in NotesSubjectFragment
+                while (notesInfo.size() < 3) {
+                    notesInfo.add("");
+                }
+            } else if (getActivity() != null) {
+                // Return to subject
+                Toast.makeText(getActivity(), getString(R.string.n_error_corrupt), Toast.LENGTH_SHORT).show();
+                ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+                        .newInstance(notesSubject));
+            }
+            database.close();
+        }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notes_view, container, false);
-    }
+        LinearLayout returnView = (LinearLayout) inflater.inflate(
+                R.layout.fragment_notes_view, container, false);
+        ((EditText) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+        // Set title
+        if (getActivity() != null) {
+            getActivity().setTitle(notesInfo.get(0));
         }
+        return returnView;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_n3, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

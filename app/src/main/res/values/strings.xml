@@ -14,9 +14,6 @@
     <string name="cancel">Cancel</string>
     <string name="del">Delete</string>
 
-    <!-- Default values -->
-    <string name="default_title">Title</string>
-
     <!-- Strings used in group M -->
     <string name="m_about">About</string>
     <string name="m1_welcome">Welcome!</string>
@@ -33,12 +30,18 @@
     <string name="m3_exit_confirm">Are you sure that you want to exit?</string>
 
     <!-- Strings used in group N -->
+    <string name="n_error_corrupt">The notes in this subject may be missing</string>
+
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
     <string name="n1_error_subject_exists">Another subject already has this name. Try using another one.</string>
     <string name="n1_error_subject_empty">Subject name cannot be empty.</string>
 
     <string name="n2_new_note">New note</string>
+    <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
+    <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
+    <string name="n2_del_confirm">Delete subject?</string>
+    <string name="n2_deleted">Subject deleted</string>
 
     <string name="n3_bold">Bold</string>
     <string name="n3_italic">Italic</string>
@@ -62,7 +65,4 @@
     <string name="p3_pass_old">Old password</string>
     <string name="p3_pass_new1">New password</string>
     <string name="p3_pass_new2">Re-enter password</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

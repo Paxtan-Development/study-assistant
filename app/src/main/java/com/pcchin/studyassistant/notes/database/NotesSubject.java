@@ -2,6 +2,7 @@ package com.pcchin.studyassistant.notes.database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -16,6 +17,7 @@ public class NotesSubject {
     @ColumnInfo(name = "contents")
     public String contents;
 
+    @Ignore
     NotesSubject() {}
 
     public NotesSubject(@NonNull String title, String contents) {

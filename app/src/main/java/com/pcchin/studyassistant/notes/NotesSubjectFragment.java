@@ -33,6 +33,7 @@ public class NotesSubjectFragment extends Fragment {
 
     public NotesSubjectFragment() {}
 
+    // Subject is the title fo the subject selected
     public static NotesSubjectFragment newInstance(String subject) {
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
@@ -110,7 +111,6 @@ public class NotesSubjectFragment extends Fragment {
                 public void onClick(View v) {
                     if (getActivity() != null) {
                         subjectDatabase.close();
-                        getActivity().setTitle(R.string.app_name);
                         ((MainActivity) getActivity()).displayFragment(NotesViewFragment
                                 .newInstance(notesSubject, finalI));
                     }
@@ -128,7 +128,7 @@ public class NotesSubjectFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_n3, menu);
+        inflater.inflate(R.menu.menu_n2, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

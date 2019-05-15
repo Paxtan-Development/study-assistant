@@ -1,13 +1,11 @@
 package com.pcchin.studyassistant.main;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.EditText;
@@ -55,7 +53,7 @@ public class GeneralFunctions {
     }
 
     /** Converts an ArrayList to a string JSON array. **/
-    public static String arrayToJson(ArrayList<ArrayList<String>> original) {
+    static String arrayToJson(ArrayList<ArrayList<String>> original) {
         return new Gson().toJson(original);
     }
 
@@ -89,7 +87,7 @@ public class GeneralFunctions {
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                       final SubjectDatabase database) {
         @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()
-                .inflate(R.layout.n1_popup_new_subject, null);
+                .inflate(R.layout.popup_new_title, null);
         AlertDialog subjectDialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.n1_new_subject)
                 .setView(popupView)
@@ -101,13 +99,14 @@ public class GeneralFunctions {
         subjectDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
+                ((EditText) popupView.findViewById(R.id.popup_input)).setHint(R.string.n1_subject_title);
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
                         .setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 String inputText = ((EditText) popupView
-                                        .findViewById(R.id.n1_popup_input)).getText().toString();
-                                TextView errorText = popupView.findViewById(R.id.n1_popup_error);
+                                        .findViewById(R.id.popup_input)).getText().toString();
+                                TextView errorText = popupView.findViewById(R.id.popup_error);
 
                                 // Preliminary checks if subject name is taken or is empty
                                 if (inputText.replaceAll("\\s+", "").length() == 0) {
@@ -140,7 +139,7 @@ public class GeneralFunctions {
     }
 
     /** Change whether drawer is enabled **/
-    public static void enableDrawer(boolean enabled, @NonNull MainActivity activity) {
+    static void enableDrawer(boolean enabled, @NonNull MainActivity activity) {
         DrawerLayout drawer = activity.findViewById(R.id.drawer_layout);
         if (enabled) {
             drawer.addDrawerListener(activity.toggle);

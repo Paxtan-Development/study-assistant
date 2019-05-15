@@ -28,9 +28,10 @@ public class NotesSelectFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getContext() != null) {
+        if (getContext() != null && getActivity() != null) {
             subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
                     .allowMainThreadQueries().build();
+            getActivity().setTitle(R.string.app_name);
         }
     }
 

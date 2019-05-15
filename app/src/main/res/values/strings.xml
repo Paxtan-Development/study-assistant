@@ -13,6 +13,7 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="del">Delete</string>
+    <string name="title">Title</string>
 
     <!-- Strings used in group M -->
     <string name="m_about">About</string>
@@ -40,6 +41,7 @@
     <string name="n2_new_note">New note</string>
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
     <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
+    <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
 
@@ -48,6 +50,8 @@
     <string name="n3_underline">Underline</string>
     <string name="n3_insert_link">Insert link</string>
     <string name="n3_change_subj">Change subject</string>
+    <string name="n3_del_confirm">Delete note?</string>
+    <string name="n3_deleted">Note deleted</string>
 
     <!-- Strings used in group P -->
     <string name="p_task">Task</string>
@@ -59,7 +63,6 @@
 
     <string name="p2_task_list">Task List</string>
 
-    <string name="p3_title">Title</string>
     <string name="p3_id">Project ID</string>
     <string name="p3_member_input">Use a semicolon ; to separate members.</string>
     <string name="p3_pass_old">Old password</string>

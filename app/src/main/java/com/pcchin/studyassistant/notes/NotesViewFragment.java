@@ -31,6 +31,7 @@ public class NotesViewFragment extends Fragment {
 
     public NotesViewFragment() { }
 
+    // Subject is the title of the subject, while order is the order of the note in the list
     public static NotesViewFragment newInstance(String subject, int order) {
         NotesViewFragment fragment = new NotesViewFragment();
         Bundle args = new Bundle();
@@ -56,11 +57,18 @@ public class NotesViewFragment extends Fragment {
                     .jsonToArray(database.SubjectDao().search(notesSubject).contents);
 
             // Check if notesOrder exists
-            if (allNotes != null && allNotes.size() >= notesOrder) {
+            if (allNotes != null && notesOrder < allNotes.size()) {
                 notesInfo = allNotes.get(notesOrder);
                 // Error message not shown as it is displayed in NotesSubjectFragment
                 while (notesInfo.size() < 3) {
                     notesInfo.add("");
+                }
+
+                // Send values to MainActivity
+                if (getActivity() != null) {
+                    ((MainActivity) getActivity()).activityVal1 = notesSubject;
+                    ((MainActivity) getActivity()).activityVal2 = String.valueOf(
+                            Integer.valueOf(notesOrder));
                 }
             } else if (getActivity() != null) {
                 // Return to subject

@@ -18,13 +18,14 @@ import com.pcchin.studyassistant.R;
 
 public class AboutFragment extends Fragment {
 
-    public AboutFragment() {
-        // Required empty public constructor
-    }
+    public AboutFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.app_name);
+        }
     }
 
     @Override

@@ -27,7 +27,6 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
-import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
 import java.util.ArrayList;
 
@@ -63,6 +62,8 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.m3_nav_open, R.string.m3_nav_close);
         GeneralFunctions.enableDrawer(true, this);
         navigationView.setNavigationItemSelectedListener(this);
+
+        GeneralFunctions.updateNavView(this);
     }
 
     @Override
@@ -227,43 +228,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Set up database
-        SubjectDatabase database = Room.databaseBuilder(this, SubjectDatabase.class,
-                "notesSubject").allowMainThreadQueries().build();
+        // Note: due to need of dynamic menu, most buttons have been moved to
+        // GeneralFunctions.updateNavView(MainActivity activity)
 
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch(id) {
-            case (R.id.m3_home):
-                displayFragment(new MainFragment());
-                break;
-            case (R.id.m3_notes):
-                displayFragment(new NotesSelectFragment());
-                break;
-            case (R.id.m3_notes_create):
-                GeneralFunctions.showNewSubject(this, this, database);
-                if (database.isOpen()) {
-                    database.close();
-                }
-                break;
-            case (R.id.m3_notes_import):
-                // TODO: Import subject
-                break;
-            case (R.id.m3_project):
-                displayFragment(new ProjectSelectFragment());
-                break;
-            case (R.id.m3_project_create):
-                // TODO: Create project
-                break;
-            case (R.id.m3_project_import):
-                // TODO: Import project
-                break;
-            case (R.id.m3_exit):
-                displayExit();
-                break;
-            case (R.id.m3_about):
-                displayFragment(new AboutFragment());
-                break;
+        if (item.getItemId() == R.id.m3_home) {
+            displayFragment(new MainFragment());
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -276,26 +246,5 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.base, fragment);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
-    }
-
-    private void displayExit() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.exit)
-                .setMessage(R.string.m3_exit_confirm)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        moveTaskToBack(true);
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create().show();
     }
 }

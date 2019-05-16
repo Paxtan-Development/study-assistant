@@ -2,11 +2,16 @@ package com.pcchin.studyassistant.main;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,6 +34,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GeneralFunctions {
     /** Returns a string of text from specific text file in the assets folder **/
@@ -123,6 +129,7 @@ public class GeneralFunctions {
                                     activity.displayFragment(
                                             NotesSubjectFragment.newInstance(inputText));
                                     dialog.dismiss();
+                                    GeneralFunctions.updateNavView(activity);
                                 }
                             }
                         });
@@ -136,6 +143,126 @@ public class GeneralFunctions {
             }
         });
         subjectDialog.show();
+    }
+
+    /** Updates the NavigationView in MainActivity **/
+    static void updateNavView(@NonNull final MainActivity activity) {
+        NavigationView navView = activity.findViewById(R.id.nav_view);
+        // Nuke menu
+        navView.getMenu().clear();
+        navView.inflateMenu(R.menu.menu_main_drawer);
+        Menu currentMenu = navView.getMenu();
+
+        // Add subjects
+        final SubjectDatabase subjectDatabase = Room.databaseBuilder(activity, SubjectDatabase.class,
+                "notesSubject").allowMainThreadQueries().build();
+        SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);
+        List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
+        for (final NotesSubject subject: subjectList) {
+            MenuItem subjItem = subjMenu.add(subject.title);
+            // This is to prevent menu items from disappearing
+            subjItem.setCheckable(true);
+            subjItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    // Opens subject when clicked
+                    activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
+                    return true;
+                }
+            });
+        }
+
+        // Add New Subject button
+        MenuItem newSubj = subjMenu.add(R.string.m3_new_subject);
+        newSubj.setCheckable(true);
+        newSubj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                showNewSubject(activity, activity, subjectDatabase);
+                return true;
+            }
+        });
+
+        // Add Import Subject button
+        MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
+        subjImport.setCheckable(true);
+        subjImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // TODO: Import
+                return false;
+            }
+        });
+
+        // Add projects
+        SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
+        // TODO: Add projects
+
+        // Add New Project Button
+        MenuItem newProj = projMenu.add(R.string.m3_new_project);
+        newProj.setCheckable(true);
+        newProj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // TODO: New Project
+                return false;
+            }
+        });
+
+        // Add Import Subject button
+        MenuItem projImport = projMenu.add(R.string.m3_data_import);
+        projImport.setCheckable(true);
+        projImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // TODO: Import
+                return false;
+            }
+        });
+
+        // Add exit button
+        MenuItem exitItem = currentMenu.add(R.string.exit);
+        exitItem.setCheckable(true);
+        exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                displayExit(activity);
+                return true;
+            }
+        });
+
+        // Add about button
+        MenuItem aboutItem = currentMenu.add(R.string.m_about);
+        aboutItem.setCheckable(true);
+        aboutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                activity.displayFragment(new AboutFragment());
+                return true;
+            }
+        });
+    }
+
+    /** Displays the exit dialog **/
+    private static void displayExit(final MainActivity activity) {
+        new android.support.v7.app.AlertDialog.Builder(activity)
+                .setTitle(R.string.exit)
+                .setMessage(R.string.m3_exit_confirm)
+                .setIcon(R.mipmap.ic_launcher_round)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        activity.moveTaskToBack(true);
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    }
+                }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        })
+                .create().show();
     }
 
     /** Change whether drawer is enabled **/

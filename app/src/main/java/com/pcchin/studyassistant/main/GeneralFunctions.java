@@ -161,11 +161,11 @@ public class GeneralFunctions {
         for (final NotesSubject subject: subjectList) {
             MenuItem subjItem = subjMenu.add(subject.title);
             // This is to prevent menu items from disappearing
-            subjItem.setCheckable(true);
             subjItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     // Opens subject when clicked
+                    activity.closeDrawer();
                     activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
                     return true;
                 }
@@ -174,10 +174,10 @@ public class GeneralFunctions {
 
         // Add New Subject button
         MenuItem newSubj = subjMenu.add(R.string.m3_new_subject);
-        newSubj.setCheckable(true);
         newSubj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                activity.closeDrawer();
                 showNewSubject(activity, activity, subjectDatabase);
                 return true;
             }
@@ -185,11 +185,11 @@ public class GeneralFunctions {
 
         // Add Import Subject button
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
-        subjImport.setCheckable(true);
         subjImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // TODO: Import
+                activity.closeDrawer();
                 return false;
             }
         });
@@ -200,32 +200,32 @@ public class GeneralFunctions {
 
         // Add New Project Button
         MenuItem newProj = projMenu.add(R.string.m3_new_project);
-        newProj.setCheckable(true);
         newProj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // TODO: New Project
+                activity.closeDrawer();
                 return false;
             }
         });
 
         // Add Import Subject button
         MenuItem projImport = projMenu.add(R.string.m3_data_import);
-        projImport.setCheckable(true);
         projImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // TODO: Import
+                activity.closeDrawer();
                 return false;
             }
         });
 
         // Add exit button
         MenuItem exitItem = currentMenu.add(R.string.exit);
-        exitItem.setCheckable(true);
         exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                activity.closeDrawer();
                 displayExit(activity);
                 return true;
             }
@@ -233,10 +233,10 @@ public class GeneralFunctions {
 
         // Add about button
         MenuItem aboutItem = currentMenu.add(R.string.m_about);
-        aboutItem.setCheckable(true);
         aboutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                activity.closeDrawer();
                 activity.displayFragment(new AboutFragment());
                 return true;
             }

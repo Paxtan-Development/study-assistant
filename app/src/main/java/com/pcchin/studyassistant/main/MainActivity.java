@@ -68,16 +68,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        // TODO: Kept sample for reference
-        /*
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-        */
-
         if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
             super.onBackPressed();
             //additional code
@@ -246,5 +236,12 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.base, fragment);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
+    }
+
+    public void closeDrawer() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 }

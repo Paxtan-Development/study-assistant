@@ -90,8 +90,8 @@ public class GeneralFunctions {
     }
 
     /** Show the dialog to add a new subject to the notes list **/
-    public static void showNewSubject(Context context, @NonNull final MainActivity activity,
-                                      final SubjectDatabase database) {
+    static void showNewSubject(Context context, @NonNull final MainActivity activity,
+                               final SubjectDatabase database) {
         @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()
                 .inflate(R.layout.popup_new_title, null);
         AlertDialog subjectDialog = new AlertDialog.Builder(context)

@@ -12,19 +12,39 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.85">
+        android:layout_weight="0.85"
+        android:padding="20dp">
 
-        <EditText
-            android:id="@+id/n4_edit"
+        <LinearLayout
+            android:id="@+id/n4_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/n_edittext_border"
-            android:ems="10"
-            android:hint="@string/blank"
-            android:inputType="textPersonName"
-            android:text="@string/blank"
-            tools:ignore="Autofill" />
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/n4_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:hint="@string/blank"
+                android:background="@drawable/n_edittext_border"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="@string/blank"
+                android:textSize="24sp"
+                tools:ignore="Autofill" />
+
+            <EditText
+                android:id="@+id/n4_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/n_edittext_border"
+                android:ems="10"
+                android:hint="@string/blank"
+                android:inputType="textPersonName"
+                android:text="@string/blank"
+                tools:ignore="Autofill" />
+        </LinearLayout>
     </ScrollView>
 
     <LinearLayout

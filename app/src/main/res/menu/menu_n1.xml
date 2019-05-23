@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/n1_new_subj"
+        android:icon="@drawable/ic_menu_add"
+        android:title="@string/n1_new_subject"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/n1_import"
+        android:icon="@drawable/ic_menu_import"
+        android:title="@string/data_import"
+        app:showAsAction="ifRoom" />
+</menu>

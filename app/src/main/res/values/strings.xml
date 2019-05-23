@@ -19,7 +19,8 @@
     <string name="m_about">About</string>
     <string name="m1_welcome">Welcome!</string>
 
-    <string name="m2_copyright">© 2019–2019 PC Chin</string>
+    <string name="m2_copyright_p1">© 2019–</string>
+    <string name="m2_copyright_p2">PC Chin</string>
     <string name="m2_version">Version: </string>
 
     <string name="m3_home">Home</string>

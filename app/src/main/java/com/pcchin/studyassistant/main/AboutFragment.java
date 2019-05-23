@@ -16,6 +16,9 @@ import android.widget.TextView;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 public class AboutFragment extends Fragment {
 
     public AboutFragment() {}
@@ -37,9 +40,16 @@ public class AboutFragment extends Fragment {
         TextView textView = returnView.findViewById(R.id.m2_version);
         textView.setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
 
+        // Set current year
+        TextView copyrightView = returnView.findViewById(R.id.m2_copyright);
+        copyrightView.setText(String.format(Locale.ENGLISH, "%s%d %s",
+                getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
+                getString(R.string.m2_copyright_p2)));
+
         // Set license text
         Spanned license;
-        String licenseText = GeneralFunctions.getReadTextFromAssets(inflater.getContext(), "license.txt");
+        String licenseText = GeneralFunctions.getReadTextFromAssets(inflater.getContext(),
+                "license.txt");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             license = Html.fromHtml(licenseText, Html.FROM_HTML_MODE_LEGACY); // Adds hyperlink to text
         } else {

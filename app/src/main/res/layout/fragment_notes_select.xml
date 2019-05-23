@@ -39,37 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="40sp"
             android:layout_marginEnd="40sp"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/n1_create"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@android:color/transparent"
-                android:paddingStart="20sp"
-                android:paddingEnd="20sp"
-                android:text="@string/create_new"
-                android:textColor="@android:color/holo_blue_dark"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/n1_import"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@android:color/transparent"
-                android:paddingStart="20sp"
-                android:paddingEnd="20sp"
-                android:text="@string/data_import"
-                android:textColor="@android:color/holo_blue_dark"
-                android:textSize="18sp" />
-
-        </LinearLayout>
+            android:orientation="vertical"/>
 
     </ScrollView>
 </LinearLayout>

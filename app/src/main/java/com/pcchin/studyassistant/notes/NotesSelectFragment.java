@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -33,6 +35,7 @@ public class NotesSelectFragment extends Fragment {
                     .allowMainThreadQueries().build();
             getActivity().setTitle(R.string.app_name);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -62,25 +65,13 @@ public class NotesSelectFragment extends Fragment {
             });
             ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, i);
         }
-
-        returnView.findViewById(R.id.n1_create).setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("InflateParams")
-            @Override
-            public void onClick(View v) {
-                // Ask for title
-                if (getActivity() != null) {
-                    GeneralFunctions.showNewSubject(getContext(), (MainActivity) getActivity(), subjectDatabase);
-                }
-            }
-        });
-
-        returnView.findViewById(R.id.n1_import).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: Import
-            }
-        });
         return returnView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_n1, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public interface OnFragmentInteractionListener {

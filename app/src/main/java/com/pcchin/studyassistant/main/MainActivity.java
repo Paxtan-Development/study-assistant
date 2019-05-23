@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity
     /* These strings are used when passing values to OnOptionsItemSelected
      * All vals usage:
      * NotesSubjectFragment - Val1 is subject title
-     * NotesViewFragment - Val1 is subject title, Val2 is order of note in subject
-     * NotesEditFragment - if Val2 is null,
+     * NotesViewFragment - Val1 is subject title, Val2 is order of note in subject.
+     * NotesEditFragment - If Val2 is null, Val1 is title of note in subject.
+     * If Val2 is not null, then Val1 is the subject of the note, and Val2 is the index of the note.
      */
     public String activityVal1;
     public String activityVal2;
@@ -79,6 +80,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            // When NotesSelectActivity is activated
+            case R.id.n1_new_subj:
+                SubjectDatabase subjectDatabase = Room.databaseBuilder(this,
+                        SubjectDatabase.class, "notesSubject")
+                        .allowMainThreadQueries().build();
+                GeneralFunctions.showNewSubject(this, this, subjectDatabase);
+                break;
+            case R.id.n1_import:
+                // TODO: Import
+                break;
+
             // When NotesSubjectFragment is activated
             case R.id.n2_new_note:
                 @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
@@ -110,6 +122,7 @@ public class MainActivity extends AppCompatActivity
                                                     .setText(R.string.n2_error_note_title_empty);
                                         } else {
                                             // Edit new note
+                                            dialog.dismiss();
                                             displayFragment(NotesEditFragment.newInstance(
                                                     popupInputText));
                                         }
@@ -150,6 +163,7 @@ public class MainActivity extends AppCompatActivity
                                 // Return to NotesSelectFragment
                                 Toast.makeText(MainActivity.this,
                                         getString(R.string.n2_deleted), Toast.LENGTH_SHORT).show();
+                                GeneralFunctions.updateNavView(MainActivity.this);
                                 displayFragment(new NotesSelectFragment());
                             }
                         })
@@ -164,7 +178,7 @@ public class MainActivity extends AppCompatActivity
 
             // When NotesViewFragment is activated
             case R.id.n3_edit:
-                // TODO: Edit note
+                displayFragment(NotesEditFragment.newInstance(activityVal1, activityVal2));
                 break;
 
             case R.id.n3_del:

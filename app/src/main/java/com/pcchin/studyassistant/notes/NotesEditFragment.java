@@ -6,10 +6,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.GeneralFunctions;
@@ -27,6 +31,7 @@ public class NotesEditFragment extends Fragment {
     private SubjectDatabase database;
     private NotesSubject currentSubject;
     private ArrayList<ArrayList<String>> subjContents;
+    private LinearLayout currentView;
 
     private boolean hasParent;
     // Used if note hasParent
@@ -34,6 +39,33 @@ public class NotesEditFragment extends Fragment {
     private int notesOrder;
     // Used if note !hasParent
     private String notesTitle;
+
+    private TextWatcher syncTitleTextWatcher = new TextWatcher() {
+        // A TextWatcher that automatically syncs its text to the title
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // Clears previous error
+            ((TextView) currentView.findViewById(R.id.n4_title_error))
+                    .setText(R.string.blank);
+        }
+
+        @Override
+        public void afterTextChanged(@NonNull Editable s) {
+            if (getActivity() != null) {
+                getActivity().setTitle(s.toString());
+            }
+            if (s.toString().length() == 0) {
+                // Check if title is empty
+                ((TextView) currentView.findViewById(R.id.n4_title_error))
+                        .setText(R.string.n2_error_note_title_empty);
+            }
+        }
+    };
 
     public NotesEditFragment() {}
 
@@ -110,14 +142,18 @@ public class NotesEditFragment extends Fragment {
         if (hasParent && notesOrder < subjContents.size() && subjContents.get(notesOrder).size() >= 3) {
             ((EditText) returnView.findViewById(R.id.n4_edit)).setText(subjContents
                     .get(notesOrder).get(2));
+        } else if (!hasParent) {
+            // Change activity title when note subject changed
+            ((EditText) returnView.findViewById(R.id.n4_title)).addTextChangedListener(syncTitleTextWatcher);
         }
 
-        // Set min height to 80% of screen size
+        // Set min height to 65% of screen size
         if (getActivity() != null) {
             Point endPt = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
-            ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(endPt.y * 7 / 10);
+            ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(endPt.y * 65 / 100);
         }
+        currentView = (LinearLayout) returnView;
         return returnView;
     }
 

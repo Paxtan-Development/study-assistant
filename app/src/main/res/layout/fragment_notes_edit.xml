@@ -1,130 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/n4"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    tools:context=".notes.NotesEditFragment"
-    android:baselineAligned="false">
+    android:layout_margin="20dp"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    tools:context=".notes.NotesEditFragment">
 
-    <LinearLayout
-        android:id="@+id/n4_edittext"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_margin="20dp"
-        android:layout_weight="0.85"
-        android:orientation="vertical">
+    <EditText
+        android:id="@+id/n4_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/blank"
+        android:inputType="textPersonName"
+        android:text="@string/blank"
+        android:textSize="18sp"
+        tools:ignore="Autofill" />
+
+    <TextView
+        android:id="@+id/n4_title_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/blank"
+        android:textColor="@android:color/holo_red_dark" />
+
+    <ScrollView
+        android:id="@+id/n4_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <EditText
-            android:id="@+id/n4_title"
+            android:id="@+id/n4_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/n_edittext_border"
             android:ems="10"
+            android:gravity="start|top"
             android:hint="@string/blank"
-            android:inputType="textPersonName"
+            android:inputType="textMultiLine|textPersonName|textCapSentences"
             android:text="@string/blank"
-            android:textSize="18sp"
             tools:ignore="Autofill" />
+    </ScrollView>
 
-        <TextView
-            android:id="@+id/n4_title_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="@string/blank"
-            android:textColor="@android:color/holo_red_dark" />
-
-        <ScrollView
-            android:id="@+id/n4_scroll"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/n4_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/n_edittext_border"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="@string/blank"
-                android:inputType="textMultiLine|textPersonName|textCapSentences"
-                android:text="@string/blank"
-                tools:ignore="Autofill" />
-        </ScrollView>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/n4_btn_list"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.15"
-        android:background="@color/colorPrimaryLight"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/n4_bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/n3_bold"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_edit_bold" />
-
-        <ImageButton
-            android:id="@+id/n4_ita"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/n3_italic"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_edit_ita" />
-
-        <ImageButton
-            android:id="@+id/n4_und"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/n3_underline"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_edit_und" />
-
-        <ImageButton
-            android:id="@+id/n4_hyp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/n3_insert_link"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_edit_link" />
-
-        <ImageButton
-            android:id="@+id/n4_subj"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/n3_insert_link"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_edit_change_subj" />
-
-        <ImageButton
-            android:id="@+id/n4_save"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/save"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_menu_save" />
-
-        <ImageButton
-            android:id="@+id/n4_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/cancel"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_menu_cancel" />
-    </LinearLayout>
 </LinearLayout>

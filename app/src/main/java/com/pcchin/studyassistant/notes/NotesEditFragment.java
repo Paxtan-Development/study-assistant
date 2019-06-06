@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -123,6 +125,8 @@ public class NotesEditFragment extends Fragment {
                 ((MainActivity) getActivity()).activityVal2 = null;
             }
         }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -155,6 +159,12 @@ public class NotesEditFragment extends Fragment {
         }
         currentView = (LinearLayout) returnView;
         return returnView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_n4, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public interface OnFragmentInteractionListener {

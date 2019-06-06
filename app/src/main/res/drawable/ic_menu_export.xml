@@ -5,8 +5,8 @@
     android:height="24dp">
     <path
         android:pathData="M256.66 0L256.66 42.777 440.6 42.777 177.523 305.853 207.467 335.797 470.543 72.72 470.543 254.521 513.32 254.521 513.32 0Z"
-        android:fillColor="#000000" />
+        android:fillColor="@color/colorDrawable" />
     <path
         android:pathData="M384.99 470.543L42.777 470.543 42.777 128.33 256.66 128.33 299.437 85.553 0 85.553 0 513.32 427.767 513.32 427.767 213.883 384.99 256.66Z"
-        android:fillColor="#000000" />
+        android:fillColor="@color/colorDrawable" />
 </vector>

@@ -59,7 +59,7 @@ public class GeneralFunctions {
     }
 
     /** Converts an ArrayList to a string JSON array. **/
-    static String arrayToJson(ArrayList<ArrayList<String>> original) {
+    public static String arrayToJson(ArrayList<ArrayList<String>> original) {
         return new Gson().toJson(original);
     }
 
@@ -90,7 +90,7 @@ public class GeneralFunctions {
     }
 
     /** Show the dialog to add a new subject to the notes list **/
-    static void showNewSubject(Context context, @NonNull final MainActivity activity,
+    public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()
                 .inflate(R.layout.popup_new_title, null);
@@ -146,7 +146,7 @@ public class GeneralFunctions {
     }
 
     /** Updates the NavigationView in MainActivity **/
-    static void updateNavView(@NonNull final MainActivity activity) {
+    public static void updateNavView(@NonNull final MainActivity activity) {
         NavigationView navView = activity.findViewById(R.id.nav_view);
         // Nuke menu
         navView.getMenu().clear();

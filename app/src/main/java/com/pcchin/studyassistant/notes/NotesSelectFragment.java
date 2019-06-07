@@ -74,6 +74,19 @@ public class NotesSelectFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    public void onNewSubjectPressed() {
+        if (getContext() != null && getActivity() != null) {
+            SubjectDatabase subjectDatabase = Room.databaseBuilder(getContext(),
+                    SubjectDatabase.class, "notesSubject")
+                    .allowMainThreadQueries().build();
+            GeneralFunctions.showNewSubject(getContext(), ((MainActivity) getActivity()), subjectDatabase);
+        }
+    }
+
+    public void onImportPressed() {
+        // TODO: Import
+    }
+
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }

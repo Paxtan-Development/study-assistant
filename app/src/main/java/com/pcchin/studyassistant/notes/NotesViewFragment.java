@@ -1,10 +1,12 @@
 package com.pcchin.studyassistant.notes;
 
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
@@ -63,13 +66,6 @@ public class NotesViewFragment extends Fragment {
                 while (notesInfo.size() < 3) {
                     notesInfo.add("");
                 }
-
-                // Send values to MainActivity
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).activityVal1 = notesSubject;
-                    ((MainActivity) getActivity()).activityVal2 = String.valueOf(
-                            Integer.valueOf(notesOrder));
-                }
             } else if (getActivity() != null) {
                 // Return to subject
                 Toast.makeText(getActivity(), getString(R.string.n_error_corrupt), Toast.LENGTH_SHORT).show();
@@ -101,6 +97,66 @@ public class NotesViewFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n3, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public void onEditPressed() {
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(NotesEditFragment
+                    .newInstance(notesSubject, notesOrder));
+        }
+    }
+
+    public void onExportPressed() {
+        // TODO: Export
+    }
+
+    public void onDeletePressed() {
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.del)
+                    .setMessage(R.string.n3_del_confirm)
+                    .setPositiveButton(R.string.del, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (getContext() != null && getActivity() != null) {
+                                SubjectDatabase database = Room.databaseBuilder(getContext(),
+                                        SubjectDatabase.class, "notesSubject")
+                                        .allowMainThreadQueries().build();
+                                NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
+                                if (notesSubject != null) {
+                                    // Check if contents is valid
+                                    ArrayList<ArrayList<String>> contents = GeneralFunctions
+                                            .jsonToArray(currentSubject.contents);
+                                    if (contents != null) {
+                                        if (notesOrder < contents.size()) {
+                                            contents.remove(notesOrder);
+                                        }
+                                    } else {
+                                        contents = new ArrayList<>();
+                                    }
+                                    // Update value in database
+                                    currentSubject.contents = GeneralFunctions.arrayToJson(contents);
+                                    database.SubjectDao().update(currentSubject);
+                                    database.close();
+                                    ((MainActivity) getActivity()).displayFragment
+                                            (NotesSubjectFragment.newInstance(notesSubject));
+                                } else {
+                                    // In case the note somehow doesn't have a subject
+                                    ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
+                                }
+                                Toast.makeText(getContext(), getString(
+                                        R.string.n3_deleted), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+        }
     }
 
     public interface OnFragmentInteractionListener {

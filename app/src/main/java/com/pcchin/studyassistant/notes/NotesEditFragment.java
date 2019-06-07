@@ -106,10 +106,6 @@ public class NotesEditFragment extends Fragment {
                 notesOrder = getArguments().getInt(ARG_PARAM2);
                 getActivity().setTitle(currentSubject.title);
 
-                // Pass values to MainActivity
-                ((MainActivity) getActivity()).activityVal1 = notesSubject;
-                ((MainActivity) getActivity()).activityVal2 = String.valueOf(notesOrder);
-
                 // Used value to prevent jsonToArray from being called multiple times
                 subjContents = GeneralFunctions
                         .jsonToArray(currentSubject.contents);
@@ -120,16 +116,8 @@ public class NotesEditFragment extends Fragment {
                 // Get values from newInstance
                 notesTitle = getArguments().getString(ARG_PARAM2);
                 getActivity().setTitle(notesTitle);
-
-                // Pass values to MainActivity
-                ((MainActivity) getActivity()).activityVal1 = notesSubject;
-                ((MainActivity) getActivity()).activityVal2 = notesTitle;
             }
-
-            // Pass hasParent to MainActivity
-            ((MainActivity) getActivity()).activityBool1 = hasParent;
         }
-
         setHasOptionsMenu(true);
     }
 
@@ -169,6 +157,21 @@ public class NotesEditFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n4, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public void onSubjPressed() {
+        // TODO: PRIORITY Complete
+    }
+
+    public void onSavePressed() {
+        // TODO: PRIORITY Complete
+    }
+
+    public void onCancelPressed() {
+        // Go back to NotesViewFragment of subject
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(notesSubject));
+        }
     }
 
     public interface OnFragmentInteractionListener {

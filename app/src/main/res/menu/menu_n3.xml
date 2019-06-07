@@ -8,6 +8,11 @@
         android:title="@string/edit"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/n3_export"
+        android:icon="@drawable/ic_menu_export"
+        android:title="@string/data_export"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/n3_del"
         android:icon="@drawable/ic_menu_del"
         android:title="@string/del"

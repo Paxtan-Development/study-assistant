@@ -1,6 +1,8 @@
 package com.pcchin.studyassistant.notes;
 
+import android.app.AlertDialog;
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,8 +15,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
@@ -24,6 +28,8 @@ import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class NotesEditFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,15 +37,20 @@ public class NotesEditFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private SubjectDatabase database;
-    private NotesSubject currentSubject;
     private ArrayList<ArrayList<String>> subjContents;
     private LinearLayout currentView;
 
     private boolean hasParent;
     private String notesSubject;
     private String notesTitle;
+
     // Used only if hasParent
     private int notesOrder;
+
+    private boolean subjModified = false;
+    // Used only if subjModified
+    private String targetNotesSubject;
+    private ArrayList<ArrayList<String>> targetSubjContents;
 
     private TextWatcher syncTitleTextWatcher = new TextWatcher() {
         // A TextWatcher that automatically syncs its text to the title
@@ -100,7 +111,7 @@ public class NotesEditFragment extends Fragment {
                     "notesSubject").allowMainThreadQueries().build();
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
-            currentSubject = database.SubjectDao().search(notesSubject);
+            NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
             if (hasParent) {
                 // Set title
                 notesOrder = getArguments().getInt(ARG_PARAM2);
@@ -140,7 +151,8 @@ public class NotesEditFragment extends Fragment {
                     .get(notesOrder).get(2));
         } else if (!hasParent) {
             // Change activity title when note subject changed
-            ((EditText) returnView.findViewById(R.id.n4_title)).addTextChangedListener(syncTitleTextWatcher);
+            ((EditText) returnView.findViewById(R.id.n4_title))
+                    .addTextChangedListener(syncTitleTextWatcher);
         }
 
         // Set min height to 65% of screen size
@@ -160,7 +172,50 @@ public class NotesEditFragment extends Fragment {
     }
 
     public void onSubjPressed() {
-        // TODO: PRIORITY Complete
+        if (getContext() != null) {
+            final Spinner subjListSpinner = new Spinner(getContext());
+            // Get all subject titles
+            List<String> subjTitleList = new ArrayList<>();
+            if (subjModified) {
+                subjTitleList.add(targetNotesSubject);
+            } else {
+                subjTitleList.add(notesSubject);
+            }
+            List<NotesSubject> allSubjList = database.SubjectDao().getAll();
+            for (NotesSubject subject : allSubjList) {
+                if ((subjModified && !Objects.equals(subject.title, targetNotesSubject))
+                || (!subjModified && !Objects.equals(subject.title, notesSubject))) {
+                    subjTitleList.add(subject.title);
+                }
+            }
+
+            // Set spinner adaptor
+            ArrayAdapter<String> subjAdaptor = new ArrayAdapter<>
+                    (getContext(), android.R.layout.simple_spinner_item, subjTitleList);
+            subjAdaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            subjListSpinner.setAdapter(subjAdaptor);
+
+            // Show dialog
+            new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.n_change_subj)
+                    .setView(subjListSpinner)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            subjModified = true;
+                            targetNotesSubject = subjListSpinner.getSelectedItem().toString();
+                            targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
+                                    .search(targetNotesSubject).contents);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+        }
     }
 
     public void onSavePressed() {
@@ -170,7 +225,8 @@ public class NotesEditFragment extends Fragment {
     public void onCancelPressed() {
         // Go back to NotesViewFragment of subject
         if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(notesSubject));
+            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+                    .newInstance(notesSubject));
         }
     }
 

@@ -54,7 +54,8 @@ public class NotesViewFragment extends Fragment {
 
         if (getContext() != null) {
             // Get notes required from database
-            SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
+            SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class,
+                    "notesSubject")
                     .allowMainThreadQueries().build();
             ArrayList<ArrayList<String>> allNotes = GeneralFunctions
                     .jsonToArray(database.SubjectDao().search(notesSubject).contents);
@@ -68,7 +69,8 @@ public class NotesViewFragment extends Fragment {
                 }
             } else if (getActivity() != null) {
                 // Return to subject
-                Toast.makeText(getActivity(), getString(R.string.n_error_corrupt), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.n_error_corrupt),
+                        Toast.LENGTH_SHORT).show();
                 ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
                         .newInstance(notesSubject));
             }

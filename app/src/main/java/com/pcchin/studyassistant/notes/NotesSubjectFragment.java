@@ -60,7 +60,8 @@ public class NotesSubjectFragment extends Fragment {
             // Check if subject exists in database
             NotesSubject currentSubject = subjectDatabase.SubjectDao().search(notesSubject);
             if (currentSubject == null) {
-                Toast.makeText(getContext(), getString(R.string.n2_error_missing_subject), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.n2_error_missing_subject),
+                        Toast.LENGTH_SHORT).show();
                 // Return to NotesSelectFragment if not
                 subjectDatabase.close();
                 ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
@@ -83,7 +84,8 @@ public class NotesSubjectFragment extends Fragment {
         View returnView = inflater.inflate(R.layout.fragment_notes_subject, container, false);
         // Check if stored data may be corrupt
         if (notesArray == null) {
-            Toast.makeText(getContext(), getString(R.string.n_error_corrupt), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.n_error_corrupt),
+                    Toast.LENGTH_SHORT).show();
             notesArray = new ArrayList<>();
         }
 

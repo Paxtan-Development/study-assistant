@@ -33,6 +33,7 @@
 
     <!-- Strings used in group N -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>
+    <string name="n_change_subj">Change subject</string>
 
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
@@ -50,7 +51,6 @@
     <string name="n3_italic">Italic</string>
     <string name="n3_underline">Underline</string>
     <string name="n3_insert_link">Insert link</string>
-    <string name="n3_change_subj">Change subject</string>
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
 

@@ -51,17 +51,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        // TODO: Implement onBackPressed for fragments
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            super.onBackPressed();
-            // Add additional code if needed
-        } else {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             // When NotesSelectFragment is activated

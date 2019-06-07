@@ -27,6 +27,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
+import com.pcchin.studyassistant.notes.NotesViewFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
@@ -42,11 +43,13 @@ public class MainActivity extends AppCompatActivity
      * All vals usage:
      * NotesSubjectFragment - Val1 is subject title
      * NotesViewFragment - Val1 is subject title, Val2 is order of note in subject.
-     * NotesEditFragment - If Val2 is null, Val1 is title of note in subject.
+     * NotesEditFragment - Val1 is subject title. If bool is true, Val2 is order of note in subject.
+     *                      Else, Val2 is subject title
      * If Val2 is not null, then Val1 is the subject of the note, and Val2 is the index of the note.
      */
     public String activityVal1;
     public String activityVal2;
+    public boolean activityBool1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                                             // Edit new note
                                             dialog.dismiss();
                                             displayFragment(NotesEditFragment.newInstance(
-                                                    popupInputText));
+                                                    activityVal1, popupInputText));
                                         }
                                     }
                                 });
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity
 
             // When NotesViewFragment is activated
             case R.id.n3_edit:
-                displayFragment(NotesEditFragment.newInstance(activityVal1, activityVal2));
+                displayFragment(NotesEditFragment.newInstance(activityVal1, Integer.valueOf(activityVal2)));
                 break;
 
             case R.id.n3_del:
@@ -227,6 +230,20 @@ public class MainActivity extends AppCompatActivity
                             }
                         })
                         .create().show();
+                break;
+
+            // When NotesEditFragment is selected
+            case R.id.n4_subj:
+                // TODO: When change subject selected
+                break;
+
+            case R.id.n4_save:
+                // TODO: When save note selected
+                break;
+
+            case R.id.n4_cancel:
+                // Go back to NotesViewFragment of subject
+                displayFragment(NotesSubjectFragment.newInstance(activityVal1));
                 break;
         }
         return true;

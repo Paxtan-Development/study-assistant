@@ -36,11 +36,10 @@ public class NotesEditFragment extends Fragment {
     private LinearLayout currentView;
 
     private boolean hasParent;
-    // Used if note hasParent
     private String notesSubject;
-    private int notesOrder;
-    // Used if note !hasParent
     private String notesTitle;
+    // Used only if hasParent
+    private int notesOrder;
 
     private TextWatcher syncTitleTextWatcher = new TextWatcher() {
         // A TextWatcher that automatically syncs its text to the title
@@ -72,21 +71,22 @@ public class NotesEditFragment extends Fragment {
     public NotesEditFragment() {}
 
     // Title is the title of the new note, without subject
-    public static NotesEditFragment newInstance(String title) {
+    public static NotesEditFragment newInstance(String subject, String title) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, title);
+        args.putString(ARG_PARAM1, subject);
+        args.putString(ARG_PARAM2, title);
         fragment.hasParent = false;
         fragment.setArguments(args);
         return fragment;
     }
 
     // Subject is the title of the selected subject, order is the order of the note in the subject
-    public static NotesEditFragment newInstance(String subject, String order) {
+    public static NotesEditFragment newInstance(String subject, int order) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, subject);
-        args.putInt(ARG_PARAM2, Integer.valueOf(order));
+        args.putInt(ARG_PARAM2, order);
         fragment.hasParent = false;
         fragment.setArguments(args);
         return fragment;
@@ -98,12 +98,12 @@ public class NotesEditFragment extends Fragment {
         if (getArguments() != null && getActivity() != null) {
             database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                     "notesSubject").allowMainThreadQueries().build();
+            // Get values from newInstance
+            notesSubject = getArguments().getString(ARG_PARAM1);
+            currentSubject = database.SubjectDao().search(notesSubject);
             if (hasParent) {
-                notesSubject = getArguments().getString(ARG_PARAM1);
-                notesOrder = getArguments().getInt(ARG_PARAM2);
-                currentSubject = database.SubjectDao().search(notesSubject);
-
                 // Set title
+                notesOrder = getArguments().getInt(ARG_PARAM2);
                 getActivity().setTitle(currentSubject.title);
 
                 // Pass values to MainActivity
@@ -117,13 +117,17 @@ public class NotesEditFragment extends Fragment {
                     notesTitle = subjContents.get(notesOrder).get(0);
                 }
             } else {
-                notesTitle = getArguments().getString(ARG_PARAM1);
+                // Get values from newInstance
+                notesTitle = getArguments().getString(ARG_PARAM2);
                 getActivity().setTitle(notesTitle);
 
                 // Pass values to MainActivity
-                ((MainActivity) getActivity()).activityVal1 = notesTitle;
-                ((MainActivity) getActivity()).activityVal2 = null;
+                ((MainActivity) getActivity()).activityVal1 = notesSubject;
+                ((MainActivity) getActivity()).activityVal2 = notesTitle;
             }
+
+            // Pass hasParent to MainActivity
+            ((MainActivity) getActivity()).activityBool1 = hasParent;
         }
 
         setHasOptionsMenu(true);

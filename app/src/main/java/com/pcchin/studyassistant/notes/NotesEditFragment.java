@@ -103,7 +103,7 @@ public class NotesEditFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, subject);
         args.putInt(ARG_PARAM2, order);
-        fragment.hasParent = false;
+        fragment.hasParent = true;
         fragment.setArguments(args);
         return fragment;
     }
@@ -111,20 +111,19 @@ public class NotesEditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null && getActivity() != null) {
             database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                     "notesSubject").allowMainThreadQueries().build();
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
+            subjContents = GeneralFunctions.jsonToArray(subject.contents);
             if (hasParent) {
                 // Set title
                 notesOrder = getArguments().getInt(ARG_PARAM2);
                 getActivity().setTitle(subject.title);
 
-                // Used value to prevent jsonToArray from being called multiple times
-                subjContents = GeneralFunctions
-                        .jsonToArray(subject.contents);
                 if (subjContents != null && notesOrder < subjContents.size()) {
                     notesTitle = subjContents.get(notesOrder).get(0);
                 }

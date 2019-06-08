@@ -34,11 +34,12 @@
     <!-- Strings used in group N -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>
     <string name="n_change_subj">Change subject</string>
+    <string name="n_last_edited">Last changed: </string>
 
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
     <string name="n1_error_subject_exists">Another subject already has this name. Try using another one.</string>
-    <string name="n1_error_subject_empty">Subject name cannot be empty.</string>
+    <string name="n1_error_subject_empty">Subject name cannot be empty</string>
 
     <string name="n2_new_note">New note</string>
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>

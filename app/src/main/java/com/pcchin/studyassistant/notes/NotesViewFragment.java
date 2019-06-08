@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
@@ -84,11 +86,11 @@ public class NotesViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        LinearLayout returnView = (LinearLayout) inflater.inflate(
+        ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
         ((EditText) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
-
-        // TODO: Set last edited date
+        ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
+                getString(R.string.n_last_edited), notesInfo.get(1)));
 
         // Set title
         if (getActivity() != null) {

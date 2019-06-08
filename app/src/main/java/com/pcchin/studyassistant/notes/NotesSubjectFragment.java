@@ -81,7 +81,8 @@ public class NotesSubjectFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View returnView = inflater.inflate(R.layout.fragment_notes_subject, container, false);
+        LinearLayout returnView = (LinearLayout) inflater.inflate(R.layout.fragment_notes_subject,
+                container, false);
         // Check if stored data may be corrupt
         if (notesArray == null) {
             Toast.makeText(getContext(), getString(R.string.n_error_corrupt),
@@ -108,8 +109,9 @@ public class NotesSubjectFragment extends Fragment {
             ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(note.get(1));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
 
+            // Set on click listener
             final int finalI = i;
-            miniNote.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener displayNoteListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (getActivity() != null) {
@@ -118,14 +120,17 @@ public class NotesSubjectFragment extends Fragment {
                                 .newInstance(notesSubject, finalI));
                     }
                 }
-            });
+            };
+
+            miniNote.setOnClickListener(displayNoteListener);
+            miniNote.findViewById(R.id.n2_mini_content).setOnClickListener(displayNoteListener);
+            returnView.addView(miniNote);
         }
 
         if (anyCorrupt) {
             Toast.makeText(getContext(), getString(R.string.n2_error_some_corrupt)
                     , Toast.LENGTH_SHORT).show();
         }
-
         return returnView;
     }
 

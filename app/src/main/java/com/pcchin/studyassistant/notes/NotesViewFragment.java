@@ -88,6 +88,8 @@ public class NotesViewFragment extends Fragment {
                 R.layout.fragment_notes_view, container, false);
         ((EditText) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
 
+        // TODO: Set last edited date
+
         // Set title
         if (getActivity() != null) {
             getActivity().setTitle(notesInfo.get(0));

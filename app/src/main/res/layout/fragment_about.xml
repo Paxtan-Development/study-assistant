@@ -1,58 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/m2"
+    android:id="@+id/m2_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".main.AboutFragment" >
+    tools:context=".main.AboutFragment">
 
-    <Space
+    <LinearLayout
+        android:id="@+id/m2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <TextView
-        android:id="@+id/m2_title"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textSize="36sp" />
+        <TextView
+            android:id="@+id/m2_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textSize="36sp" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.1" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
 
-    <TextView
-        android:id="@+id/m2_copyright"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.05"
-        android:gravity="center"
-        android:text="@string/blank"
-        android:textSize="24sp" />
+        <TextView
+            android:id="@+id/m2_copyright"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.05"
+            android:gravity="center"
+            android:text="@string/blank"
+            android:textSize="24sp" />
 
-    <TextView
-        android:id="@+id/m2_version"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.05"
-        android:gravity="center"
-        android:text="@string/m2_version"
-        android:textSize="24sp" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.1" />
+        <TextView
+            android:id="@+id/m2_version"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.05"
+            android:gravity="center"
+            android:text="@string/m2_version"
+            android:textSize="24sp" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.4">
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
 
         <TextView
             android:id="@+id/m2_license"
@@ -62,6 +60,6 @@
             android:layout_marginEnd="20sp"
             android:text="@string/blank"
             android:textSize="18sp" />
-    </ScrollView>
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

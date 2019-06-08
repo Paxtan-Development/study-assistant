@@ -4,16 +4,19 @@
     android:id="@+id/n3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".notes.NotesViewFragment" >
+    android:layout_margin="20dp"
+    android:background="@drawable/n_edittext_border"
+    tools:context=".notes.NotesViewFragment">
+
+    <!-- TODO: Last edited -->
 
     <EditText
         android:id="@+id/n3_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:background="@drawable/n_edittext_border"
-        android:hint="@string/blank"
+        android:background="@android:color/transparent"
         android:ems="10"
+        android:hint="@string/blank"
         android:inputType="none"
         android:text="@string/blank"
         android:textSize="24sp"

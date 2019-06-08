@@ -31,13 +31,14 @@
     <ScrollView
         android:id="@+id/n4_scroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/n_edittext_border">
 
         <EditText
             android:id="@+id/n4_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/n_edittext_border"
+            android:background="@android:color/transparent"
             android:ems="10"
             android:gravity="start|top"
             android:hint="@string/blank"

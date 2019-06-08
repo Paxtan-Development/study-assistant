@@ -47,12 +47,10 @@
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
 
-    <string name="n3_bold">Bold</string>
-    <string name="n3_italic">Italic</string>
-    <string name="n3_underline">Underline</string>
-    <string name="n3_insert_link">Insert link</string>
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
+
+    <string name="n4_note_saved">Note saved</string>
 
     <!-- Strings used in group P -->
     <string name="p_task">Task</string>

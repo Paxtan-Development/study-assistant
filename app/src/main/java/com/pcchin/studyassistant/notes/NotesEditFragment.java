@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.GeneralFunctions;
@@ -27,8 +28,11 @@ import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class NotesEditFragment extends Fragment {
@@ -37,6 +41,7 @@ public class NotesEditFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private SubjectDatabase database;
+    private NotesSubject subject;
     private ArrayList<ArrayList<String>> subjContents;
     private LinearLayout currentView;
 
@@ -111,15 +116,15 @@ public class NotesEditFragment extends Fragment {
                     "notesSubject").allowMainThreadQueries().build();
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
-            NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
+            subject = database.SubjectDao().search(notesSubject);
             if (hasParent) {
                 // Set title
                 notesOrder = getArguments().getInt(ARG_PARAM2);
-                getActivity().setTitle(currentSubject.title);
+                getActivity().setTitle(subject.title);
 
                 // Used value to prevent jsonToArray from being called multiple times
                 subjContents = GeneralFunctions
-                        .jsonToArray(currentSubject.contents);
+                        .jsonToArray(subject.contents);
                 if (subjContents != null && notesOrder < subjContents.size()) {
                     notesTitle = subjContents.get(notesOrder).get(0);
                 }
@@ -219,7 +224,57 @@ public class NotesEditFragment extends Fragment {
     }
 
     public void onSavePressed() {
-        // TODO: PRIORITY Complete
+        // Check if title is empty
+        if (getActivity() != null && getActivity().getTitle().length() > 0 && getView() != null) {
+            // Save original as ArrayList
+            ArrayList<String> updatedNote = new ArrayList<>();
+            updatedNote.add(getActivity().getTitle().toString());
+            updatedNote.add(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH)
+                    .format(new Date()));
+            updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
+
+            // Toast at start as different objects have different displayFragments
+            Toast.makeText(getContext(), getString(R.string.n4_note_saved), Toast.LENGTH_SHORT).show();
+            if (subjModified && !Objects.equals(targetNotesSubject, notesSubject)) {
+                if (hasParent) {
+                    // Delete original
+                    subjContents.remove(notesOrder);
+                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    database.SubjectDao().update(subject);
+                }
+                // Add new note to new subject
+                targetSubjContents.add(updatedNote);
+                NotesSubject targetSubject = database.SubjectDao().search(targetNotesSubject);
+                if (targetSubject != null) {
+                    targetSubject.contents = GeneralFunctions.arrayToJson(targetSubjContents);
+                }
+
+                // Go to NotesViewFragment
+                ((MainActivity) getActivity()).displayFragment(NotesViewFragment
+                        .newInstance(targetNotesSubject, targetSubjContents.size() - 1));
+
+            } else {
+                if (hasParent) {
+                    // Modify original
+                    subjContents.set(notesOrder, updatedNote);
+                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    database.SubjectDao().update(subject);
+                    ((MainActivity) getActivity()).displayFragment(NotesViewFragment
+                        .newInstance(notesSubject, notesOrder));
+                } else {
+                    // Add new note
+                    subjContents.add(updatedNote);
+                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    database.SubjectDao().update(subject);
+                    ((MainActivity) getActivity()).displayFragment(NotesViewFragment
+                        .newInstance(notesSubject, subjContents.size() - 1));
+                }
+            }
+            database.close();
+        } else {
+            Toast.makeText(getContext(), getString(R.string.n2_error_note_title_empty),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onCancelPressed() {

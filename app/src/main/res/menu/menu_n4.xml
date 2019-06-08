@@ -5,7 +5,7 @@
     <item
         android:id="@+id/n4_subj"
         android:icon="@drawable/ic_edit_change_subj"
-        android:title="@string/n3_insert_link"
+        android:title="@string/n_change_subj"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/n4_save"

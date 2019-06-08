@@ -208,6 +208,7 @@ public class NotesEditFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             subjModified = true;
                             targetNotesSubject = subjListSpinner.getSelectedItem().toString();
+                            System.out.println(subjListSpinner.getSelectedItem());
                             targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
                                     .search(targetNotesSubject).contents);
                         }
@@ -224,10 +225,11 @@ public class NotesEditFragment extends Fragment {
 
     public void onSavePressed() {
         // Check if title is empty
-        if (getActivity() != null && getActivity().getTitle().length() > 0 && getView() != null) {
+        if (getActivity() != null && getView() != null && ((EditText) getView()
+                .findViewById(R.id.n4_title)).getText().length() > 0) {
             // Save original as ArrayList
             ArrayList<String> updatedNote = new ArrayList<>();
-            updatedNote.add(getActivity().getTitle().toString());
+            updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
             updatedNote.add(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH)
                     .format(new Date()));
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
@@ -247,6 +249,7 @@ public class NotesEditFragment extends Fragment {
                 if (targetSubject != null) {
                     targetSubject.contents = GeneralFunctions.arrayToJson(targetSubjContents);
                 }
+                database.SubjectDao().update(targetSubject);
 
                 // Go to NotesViewFragment
                 ((MainActivity) getActivity()).displayFragment(NotesViewFragment
@@ -279,8 +282,13 @@ public class NotesEditFragment extends Fragment {
     public void onCancelPressed() {
         // Go back to NotesViewFragment of subject
         if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
-                    .newInstance(notesSubject));
+            if (hasParent) {
+                ((MainActivity) getActivity()).displayFragment(NotesViewFragment
+                        .newInstance(notesSubject, notesOrder));
+            } else {
+                ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+                        .newInstance(notesSubject));
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package com.pcchin.studyassistant.notes;
 
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,14 +88,23 @@ public class NotesViewFragment extends Fragment {
         // Inflate the layout for this fragment
         ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
+        ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
         ((EditText) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
                 getString(R.string.n_last_edited), notesInfo.get(1)));
 
         // Set title
         if (getActivity() != null) {
-            getActivity().setTitle(notesInfo.get(0));
+            getActivity().setTitle(notesSubject);
         }
+
+        // Set min height to 65% of screen size
+        if (getActivity() != null) {
+            Point endPt = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
+            ((EditText) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y * 65 / 100);
+        }
+
         return returnView;
     }
 

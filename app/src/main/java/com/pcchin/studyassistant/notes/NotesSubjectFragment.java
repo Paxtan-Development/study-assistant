@@ -108,7 +108,9 @@ public class NotesSubjectFragment extends Fragment {
             ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.get(0));
             ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(note.get(1));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
-
+            // Conversion formula: px = sp / dpi
+            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setMinHeight((int) (4 *
+                        18 / getResources().getDisplayMetrics().density));
             // Set on click listener
             final int finalI = i;
             View.OnClickListener displayNoteListener = new View.OnClickListener() {

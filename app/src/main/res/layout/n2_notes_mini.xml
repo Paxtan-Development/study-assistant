@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/blank"
-        android:textSize="20sp" />
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/n2_mini_date"
@@ -28,11 +28,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/n_edittext_border"
+        android:ellipsize="end"
         android:ems="10"
+        android:focusable="false"
         android:hint="@string/blank"
         android:inputType="none"
+        android:maxLength="120"
+        android:maxLines="4"
         android:text="@string/blank"
-        android:focusable="false"
         tools:ignore="Autofill" />
 
 </LinearLayout>

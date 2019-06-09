@@ -62,7 +62,8 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
 
     @Override
     public boolean onBackPressed() {
-        return false;
+        GeneralFunctions.displayExit((MainActivity) getActivity());
+        return true;
     }
 
     public interface OnFragmentInteractionListener {

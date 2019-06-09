@@ -1,8 +1,8 @@
 package com.pcchin.studyassistant.project;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.FragmentOnBackPressed;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.main.MainFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,7 +65,7 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_project_select, container, false);
@@ -78,7 +80,9 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
 
     @Override
     public boolean onBackPressed() {
-        // TODO: Complete
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(new MainFragment());
+        }
         return false;
     }
 

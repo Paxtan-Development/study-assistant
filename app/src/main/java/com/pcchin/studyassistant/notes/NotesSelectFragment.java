@@ -18,6 +18,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.main.MainFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
@@ -90,7 +91,9 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
 
     @Override
     public boolean onBackPressed() {
-        // TODO: Complete
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(new MainFragment());
+        }
         return false;
     }
 

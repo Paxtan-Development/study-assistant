@@ -63,7 +63,10 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
     @Override
     public boolean onBackPressed() {
-        // TODO: Complete
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(new MainFragment());
+            return true;
+        }
         return false;
     }
 

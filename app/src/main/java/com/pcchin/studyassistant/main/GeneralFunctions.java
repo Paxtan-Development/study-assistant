@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -244,7 +243,7 @@ public class GeneralFunctions {
     }
 
     /** Displays the exit dialog **/
-    private static void displayExit(final MainActivity activity) {
+    static void displayExit(final MainActivity activity) {
         new android.support.v7.app.AlertDialog.Builder(activity)
                 .setTitle(R.string.exit)
                 .setMessage(R.string.m3_exit_confirm)
@@ -263,16 +262,5 @@ public class GeneralFunctions {
             }
         })
                 .create().show();
-    }
-
-    /** Change whether drawer is enabled **/
-    static void enableDrawer(boolean enabled, @NonNull MainActivity activity) {
-        DrawerLayout drawer = activity.findViewById(R.id.drawer_layout);
-        if (enabled) {
-            drawer.addDrawerListener(activity.toggle);
-        } else {
-            drawer.removeDrawerListener(activity.toggle);
-        }
-        activity.toggle.syncState();
     }
 }

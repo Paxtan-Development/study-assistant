@@ -294,8 +294,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
 
     @Override
     public boolean onBackPressed() {
-        // TODO: Complete
-        return false;
+        onCancelPressed();
+        return true;
     }
 
     public interface OnFragmentInteractionListener {

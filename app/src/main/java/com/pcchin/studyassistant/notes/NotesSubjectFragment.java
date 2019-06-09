@@ -236,7 +236,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
     @Override
     public boolean onBackPressed() {
-        // TODO: Complete
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
+            return true;
+        }
         return false;
     }
 

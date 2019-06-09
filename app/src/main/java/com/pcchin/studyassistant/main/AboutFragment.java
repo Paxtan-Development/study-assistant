@@ -19,7 +19,7 @@ import com.pcchin.studyassistant.R;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AboutFragment extends Fragment {
+public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
     public AboutFragment() {}
 
@@ -59,6 +59,12 @@ public class AboutFragment extends Fragment {
         licenseView.setText(license);
         licenseView.setMovementMethod(LinkMovementMethod.getInstance());
         return returnView;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO: Complete
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

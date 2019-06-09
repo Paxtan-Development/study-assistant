@@ -12,7 +12,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements FragmentOnBackPressed {
 
     public MainFragment() {
     }
@@ -58,6 +58,11 @@ public class MainFragment extends Fragment {
             }
         });
         return returnView;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

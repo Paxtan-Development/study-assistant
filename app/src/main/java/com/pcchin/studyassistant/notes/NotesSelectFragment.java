@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -22,7 +23,7 @@ import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.List;
 
-public class NotesSelectFragment extends Fragment {
+public class NotesSelectFragment extends Fragment implements FragmentOnBackPressed {
     private SubjectDatabase subjectDatabase;
 
     public NotesSelectFragment() {}
@@ -85,6 +86,12 @@ public class NotesSelectFragment extends Fragment {
 
     public void onImportPressed() {
         // TODO: Import
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO: Complete
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

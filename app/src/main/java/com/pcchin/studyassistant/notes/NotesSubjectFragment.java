@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -26,7 +27,7 @@ import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
 
-public class NotesSubjectFragment extends Fragment {
+public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
 
     private SubjectDatabase subjectDatabase;
@@ -231,6 +232,12 @@ public class NotesSubjectFragment extends Fragment {
                     })
                     .create().show();
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO: Complete
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

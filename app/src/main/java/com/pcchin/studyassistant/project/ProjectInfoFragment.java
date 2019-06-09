@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.FragmentOnBackPressed;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +19,7 @@ import com.pcchin.studyassistant.R;
  * Use the {@link ProjectInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProjectInfoFragment extends Fragment {
+public class ProjectInfoFragment extends Fragment implements FragmentOnBackPressed {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -90,6 +91,12 @@ public class ProjectInfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO: Complete
+        return false;
     }
 
     /**

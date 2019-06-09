@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class NotesEditFragment extends Fragment {
+public class NotesEditFragment extends Fragment implements FragmentOnBackPressed {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -208,7 +209,6 @@ public class NotesEditFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             subjModified = true;
                             targetNotesSubject = subjListSpinner.getSelectedItem().toString();
-                            System.out.println(subjListSpinner.getSelectedItem());
                             targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
                                     .search(targetNotesSubject).contents);
                         }
@@ -290,6 +290,12 @@ public class NotesEditFragment extends Fragment {
                         .newInstance(notesSubject));
             }
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO: Complete
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

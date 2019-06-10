@@ -6,5 +6,4 @@
     <item
         android:id="@+id/m3_home"
         android:title="@string/m3_home" />
-
 </menu>

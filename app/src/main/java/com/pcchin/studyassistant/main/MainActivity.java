@@ -24,7 +24,6 @@ import com.pcchin.studyassistant.notes.NotesViewFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    // TODO: Implement status_view_recycler and status_edit_recycler
 
     public ActionBarDrawerToggle toggle;
     private Fragment currentFragment;

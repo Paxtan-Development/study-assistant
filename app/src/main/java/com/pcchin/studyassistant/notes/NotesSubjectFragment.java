@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
+    private static final int MAXLINES = 4;
 
     private SubjectDatabase subjectDatabase;
     private ArrayList<ArrayList<String>> notesArray;
@@ -113,10 +114,12 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
                     getString(R.string.n_last_edited), note.get(1)));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
+            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
+
             // Conversion formula: px = sp / dpi + padding between lines
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setHeight
-                    ((int) (4 * 18 * getResources().getDisplayMetrics().density) +
-                            (int) (3 * 18 * ((EditText) miniNote.findViewById(R.id.n2_mini_content))
+                    ((int) (MAXLINES * 18 * getResources().getDisplayMetrics().density) +
+                            (int) ((MAXLINES - 1)* 18 * ((EditText) miniNote.findViewById(R.id.n2_mini_content))
                                     .getLineSpacingMultiplier()));
             // Set on click listener
             final int finalI = i;

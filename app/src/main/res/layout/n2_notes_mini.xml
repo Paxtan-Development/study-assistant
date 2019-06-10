@@ -35,8 +35,6 @@
         android:gravity="start|top"
         android:hint="@string/blank"
         android:inputType="none"
-        android:maxLength="120"
-        android:maxLines="4"
         android:text="@string/blank"
         tools:ignore="Autofill" />
 

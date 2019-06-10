@@ -240,6 +240,17 @@ public class GeneralFunctions {
                 return true;
             }
         });
+
+        // Add settings button
+        MenuItem settingsItem = currentMenu.add(R.string.m_settings);
+        settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                activity.closeDrawer();
+                activity.displayFragment(new SettingsFragment());
+                return true;
+            }
+        });
     }
 
     /** Displays the exit dialog **/
@@ -262,15 +273,5 @@ public class GeneralFunctions {
             }
         })
                 .create().show();
-    }
-
-    /** Return the line count separated by \n or \r\n in a string **/
-    public static int getLineCount(String original) {
-        if (original == null) {
-            return 0;
-        } else {
-            String[] lines = original.split("\r\n|\n");
-            return lines.length;
-        }
     }
 }

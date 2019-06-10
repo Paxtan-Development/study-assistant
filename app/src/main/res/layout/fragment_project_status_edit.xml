@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".project.status.ProjectStatusEditFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/s2_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

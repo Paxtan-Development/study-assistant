@@ -25,6 +25,7 @@
     <string name="m2_version">Version: </string>
 
     <string name="m3_home">Home</string>
+    <string name="m3_others">Others</string>
     <string name="m3_new_subject">New Subject…</string>
     <string name="m3_new_project">New Project…</string>
     <string name="m3_data_import">Import…</string>

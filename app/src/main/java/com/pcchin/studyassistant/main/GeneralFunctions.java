@@ -2,12 +2,12 @@ package com.pcchin.studyassistant.main;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.navigation.NavigationView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -219,19 +219,11 @@ public class GeneralFunctions {
             }
         });
 
-        // Add exit button
-        MenuItem exitItem = currentMenu.add(R.string.exit);
-        exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                activity.closeDrawer();
-                displayExit(activity);
-                return true;
-            }
-        });
+        // Add subMenu for other buttons
+        SubMenu otherMenu = currentMenu.addSubMenu(R.string.m3_others);
 
         // Add about button
-        MenuItem aboutItem = currentMenu.add(R.string.m_about);
+        MenuItem aboutItem = otherMenu.add(R.string.m_about);
         aboutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -242,7 +234,7 @@ public class GeneralFunctions {
         });
 
         // Add settings button
-        MenuItem settingsItem = currentMenu.add(R.string.m_settings);
+        MenuItem settingsItem = otherMenu.add(R.string.m_settings);
         settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -251,11 +243,22 @@ public class GeneralFunctions {
                 return true;
             }
         });
+
+        // Add exit button
+        MenuItem exitItem = otherMenu.add(R.string.exit);
+        exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                activity.closeDrawer();
+                displayExit(activity);
+                return true;
+            }
+        });
     }
 
     /** Displays the exit dialog **/
     static void displayExit(final MainActivity activity) {
-        new android.support.v7.app.AlertDialog.Builder(activity)
+        new androidx.appcompat.app.AlertDialog.Builder(activity)
                 .setTitle(R.string.exit)
                 .setMessage(R.string.m3_exit_confirm)
                 .setIcon(R.mipmap.ic_launcher_round)

@@ -93,6 +93,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public boolean onBackPressed() {
         if (getActivity() != null) {
             ((MainActivity) getActivity()).displayFragment(new MainFragment());
+            return true;
         }
         return false;
     }

@@ -82,6 +82,7 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
     public boolean onBackPressed() {
         if (getActivity() != null) {
             ((MainActivity) getActivity()).displayFragment(new MainFragment());
+            return true;
         }
         return false;
     }

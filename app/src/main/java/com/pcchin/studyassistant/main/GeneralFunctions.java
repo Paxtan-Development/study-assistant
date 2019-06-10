@@ -263,4 +263,14 @@ public class GeneralFunctions {
         })
                 .create().show();
     }
+
+    /** Return the line count separated by \n or \r\n in a string **/
+    public static int getLineCount(String original) {
+        if (original == null) {
+            return 0;
+        } else {
+            String[] lines = original.split("\r\n|\n");
+            return lines.length;
+        }
+    }
 }

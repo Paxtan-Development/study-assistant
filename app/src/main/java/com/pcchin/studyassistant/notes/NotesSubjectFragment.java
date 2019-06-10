@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,8 +83,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        LinearLayout returnView = (LinearLayout) inflater.inflate(R.layout.fragment_notes_subject,
+        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_notes_subject,
                 container, false);
+        LinearLayout returnView = returnScroll.findViewById(R.id.n2);
+
         // Check if stored data may be corrupt
         if (notesArray == null) {
             Toast.makeText(getContext(), getString(R.string.n_error_corrupt),
@@ -107,11 +110,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             @SuppressLint("InflateParams") LinearLayout miniNote = (LinearLayout) getLayoutInflater()
                     .inflate(R.layout.n2_notes_mini, null);
             ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.get(0));
-            ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(note.get(1));
+            ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
+                    getString(R.string.n_last_edited), note.get(1)));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
-            // Conversion formula: px = sp / dpi
-            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setMinHeight((int) (4 *
-                        18 / getResources().getDisplayMetrics().density));
+            // Conversion formula: px = sp / dpi + padding between lines
+            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setHeight
+                    ((int) (4 * 18 * getResources().getDisplayMetrics().density) +
+                            (int) (3 * 18 * ((EditText) miniNote.findViewById(R.id.n2_mini_content))
+                                    .getLineSpacingMultiplier()));
             // Set on click listener
             final int finalI = i;
             View.OnClickListener displayNoteListener = new View.OnClickListener() {
@@ -134,7 +140,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             Toast.makeText(getContext(), getString(R.string.n2_error_some_corrupt)
                     , Toast.LENGTH_SHORT).show();
         }
-        return returnView;
+        return returnScroll;
     }
 
     @Override

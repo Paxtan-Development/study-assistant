@@ -92,7 +92,7 @@ public class GeneralFunctions {
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()
-                .inflate(R.layout.popup_new_title, null);
+                .inflate(R.layout.popup_edittext, null);
         AlertDialog subjectDialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.n1_new_subject)
                 .setView(popupView)
@@ -115,7 +115,7 @@ public class GeneralFunctions {
 
                                 // Preliminary checks if subject name is taken or is empty
                                 if (inputText.replaceAll("\\s+", "").length() == 0) {
-                                    errorText.setText(R.string.n1_error_subject_empty);
+                                    errorText.setText(R.string.n_error_subject_empty);
                                 } else if (database.SubjectDao().search(inputText) != null) {
                                     errorText.setText(R.string.n1_error_subject_exists);
                                 } else {

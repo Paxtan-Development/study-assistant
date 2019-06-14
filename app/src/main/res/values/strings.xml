@@ -36,18 +36,21 @@
     <string name="n_error_corrupt">The notes in this subject may be missing</string>
     <string name="n_change_subj">Change subject</string>
     <string name="n_last_edited">Last changed: </string>
+    <string name="n_error_subject_empty">Subject name cannot be empty</string>
 
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
     <string name="n1_error_subject_exists">Another subject already has this name. Try using another one.</string>
-    <string name="n1_error_subject_empty">Subject name cannot be empty</string>
 
     <string name="n2_new_note">New note</string>
+    <string name="n2_edit_title">Edit Title</string>
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
     <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
     <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
+    <string name="n2_error_title_taken">That subject title has been taken. Try using another name.</string>
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
+    <string name="n2_title_updated">Title updated</string>
 
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>

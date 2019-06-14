@@ -77,7 +77,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             if (getActivity() != null) {
                 getActivity().setTitle(s.toString());
             }
-            if (s.toString().length() == 0) {
+            if (s.toString().replaceAll("\\s+", "").length() == 0) {
                 // Check if title is empty
                 ((TextView) currentView.findViewById(R.id.n4_title_error))
                         .setText(R.string.n2_error_note_title_empty);
@@ -226,7 +226,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     public void onSavePressed() {
         // Check if title is empty
         if (getActivity() != null && getView() != null && ((EditText) getView()
-                .findViewById(R.id.n4_title)).getText().length() > 0) {
+                .findViewById(R.id.n4_title)).getText().toString()
+                .replaceAll("\\s+", "").length() > 0) {
             // Save original as ArrayList
             ArrayList<String> updatedNote = new ArrayList<>();
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());

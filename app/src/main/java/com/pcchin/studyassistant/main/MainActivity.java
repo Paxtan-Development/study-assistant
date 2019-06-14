@@ -65,6 +65,10 @@ public class MainActivity extends AppCompatActivity
                 ((NotesSubjectFragment) currentFragment).onNewNotePressed();
                 break;
 
+            case R.id.n2_edit_title:
+                ((NotesSubjectFragment) currentFragment).onEditPressed();
+                break;
+
             case R.id.n2_export:
                 ((NotesSubjectFragment) currentFragment).onExportPressed();
                 break;

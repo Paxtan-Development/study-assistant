@@ -115,6 +115,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     getString(R.string.n_last_edited), note.get(1)));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
+            miniNote.findViewById(R.id.n2_mini_content).setVerticalScrollBarEnabled(false);
 
             // Conversion formula: px = sp / dpi + padding between lines
             ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setHeight
@@ -155,7 +156,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     public void onNewNotePressed() {
         if (getContext() != null && getActivity() != null) {
             @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
-                    .inflate(R.layout.popup_new_title, null);
+                    .inflate(R.layout.popup_edittext, null);
             AlertDialog newNoteDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_new_note)
                     .setView(popupView)
@@ -184,6 +185,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     } else if (getActivity() != null){
                                         // Edit new note
                                         dialog.dismiss();
+                                        subjectDatabase.close();
                                         ((MainActivity) getActivity()).displayFragment
                                                 (NotesEditFragment.newInstance(
                                                         notesSubject, popupInputText));
@@ -200,6 +202,62 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 }
             });
             newNoteDialog.show();
+        }
+    }
+
+    public void onEditPressed() {
+        if (getContext() != null) {
+            @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
+                    .inflate(R.layout.popup_edittext, null);
+            AlertDialog editSubjDialog = new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.n2_edit_title)
+                    .setView(popupView)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+            // OnClickListeners implemented separately to prevent
+            // dialog from being dismissed after button click
+            editSubjDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(final DialogInterface dialog) {
+                    final String popupInputText = ((EditText) popupView
+                            .findViewById(R.id.popup_input))
+                            .getText().toString();
+                    ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
+                            .setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    // Check if input is blank
+                                    if (popupInputText.replaceAll("\\s+", "")
+                                            .length() == 0) {
+                                        ((TextView) popupView.findViewById(R.id.popup_error))
+                                                .setText(R.string.n_error_subject_empty);
+                                    } else if (subjectDatabase.SubjectDao().search(notesSubject) == null){
+                                        ((TextView) popupView.findViewById(R.id.popup_error))
+                                                .setText(R.string.n2_error_title_taken);
+                                    } else {
+                                        // Edit Title
+                                        dialog.dismiss();
+                                        NotesSubject subject = subjectDatabase.SubjectDao()
+                                                .search(notesSubject);
+                                        subject.title = popupInputText;
+                                        subjectDatabase.SubjectDao().update(subject);
+                                        Toast.makeText(getContext(),
+                                                getString(R.string.n2_title_updated),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                    ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
+                            .setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.dismiss();
+                                }
+                            });
+                }
+            });
+            editSubjDialog.show();
         }
     }
 
@@ -229,6 +287,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                 Toast.makeText(getContext(),
                                         getString(R.string.n2_deleted), Toast.LENGTH_SHORT).show();
                                 GeneralFunctions.updateNavView((MainActivity) getActivity());
+                                subjectDatabase.close();
                                 ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                             }
                         }
@@ -246,6 +305,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {
+            subjectDatabase.close();
             ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
             return true;
         }

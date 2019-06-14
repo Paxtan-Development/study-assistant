@@ -147,7 +147,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n2, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }

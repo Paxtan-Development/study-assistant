@@ -13,6 +13,13 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <ImageView
+            android:id="@+id/m2_logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/blank"
+            android:src="@mipmap/ic_launcher" />
+
         <TextView
             android:id="@+id/m2_title"
             android:layout_width="match_parent"

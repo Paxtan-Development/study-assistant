@@ -25,7 +25,6 @@ import com.pcchin.studyassistant.notes.NotesViewFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public ActionBarDrawerToggle toggle;
     private Fragment currentFragment;
 
     @Override
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity
         // Set up drawer
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        toggle = new ActionBarDrawerToggle(
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.m3_nav_open, R.string.m3_nav_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
             // When NotesSelectFragment is activated
             case R.id.n1_new_subj:
@@ -151,6 +150,8 @@ public class MainActivity extends AppCompatActivity
         if (view == null) {
             view = new View(this);
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

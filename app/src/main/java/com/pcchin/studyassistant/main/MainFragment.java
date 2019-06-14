@@ -49,11 +49,11 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
             }
         });
 
-        returnView.findViewById(R.id.m1_settings).setOnClickListener(new View.OnClickListener() {
+        returnView.findViewById(R.id.m1_about).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(new SettingsFragment());
+                    ((MainActivity) getActivity()).displayFragment(new AboutFragment());
                 }
             }
         });

@@ -233,17 +233,6 @@ public class GeneralFunctions {
             }
         });
 
-        // Add settings button
-        MenuItem settingsItem = otherMenu.add(R.string.m_settings);
-        settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                activity.closeDrawer();
-                activity.displayFragment(new SettingsFragment());
-                return true;
-            }
-        });
-
         // Add exit button
         MenuItem exitItem = otherMenu.add(R.string.exit);
         exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {

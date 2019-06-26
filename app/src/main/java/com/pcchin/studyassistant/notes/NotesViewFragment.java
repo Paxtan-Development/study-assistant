@@ -1,9 +1,7 @@
 package com.pcchin.studyassistant.notes;
 
 import androidx.room.Room;
-import android.content.DialogInterface;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,6 +20,7 @@ import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
+import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
@@ -58,6 +57,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             // Get notes required from database
             SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class,
                     "notesSubject")
+                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             ArrayList<ArrayList<String>> allNotes = GeneralFunctions
                     .jsonToArray(database.SubjectDao().search(notesSubject).contents);
@@ -130,46 +130,39 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             new AlertDialog.Builder(getContext())
                     .setTitle(R.string.del)
                     .setMessage(R.string.n3_del_confirm)
-                    .setPositiveButton(R.string.del, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (getContext() != null && getActivity() != null) {
-                                SubjectDatabase database = Room.databaseBuilder(getContext(),
-                                        SubjectDatabase.class, "notesSubject")
-                                        .allowMainThreadQueries().build();
-                                NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
-                                if (notesSubject != null) {
-                                    // Check if contents is valid
-                                    ArrayList<ArrayList<String>> contents = GeneralFunctions
-                                            .jsonToArray(currentSubject.contents);
-                                    if (contents != null) {
-                                        if (notesOrder < contents.size()) {
-                                            contents.remove(notesOrder);
-                                        }
-                                    } else {
-                                        contents = new ArrayList<>();
+                    .setPositiveButton(R.string.del, (dialog, which) -> {
+                        if (getContext() != null && getActivity() != null) {
+                            SubjectDatabase database = Room.databaseBuilder(getContext(),
+                                SubjectDatabase.class, "notesSubject")
+                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                                .allowMainThreadQueries().build();
+                            NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
+                            if (notesSubject != null) {
+                                // Check if contents is valid
+                                ArrayList<ArrayList<String>> contents = GeneralFunctions
+                                        .jsonToArray(currentSubject.contents);
+                                if (contents != null) {
+                                    if (notesOrder < contents.size()) {
+                                        contents.remove(notesOrder);
                                     }
-                                    // Update value in database
-                                    currentSubject.contents = GeneralFunctions.arrayToJson(contents);
-                                    database.SubjectDao().update(currentSubject);
-                                    database.close();
-                                    ((MainActivity) getActivity()).displayFragment
-                                            (NotesSubjectFragment.newInstance(notesSubject));
                                 } else {
-                                    // In case the note somehow doesn't have a subject
-                                    ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
+                                    contents = new ArrayList<>();
                                 }
-                                Toast.makeText(getContext(), getString(
-                                        R.string.n3_deleted), Toast.LENGTH_SHORT).show();
+                                // Update value in database
+                                currentSubject.contents = GeneralFunctions.arrayToJson(contents);
+                                database.SubjectDao().update(currentSubject);
+                                database.close();
+                                ((MainActivity) getActivity()).displayFragment
+                                        (NotesSubjectFragment.newInstance(notesSubject));
+                            } else {
+                                // In case the note somehow doesn't have a subject
+                                ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                             }
+                            Toast.makeText(getContext(), getString(
+                                    R.string.n3_deleted), Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .create().show();
         }
     }
@@ -182,9 +175,5 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             return true;
         }
         return false;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

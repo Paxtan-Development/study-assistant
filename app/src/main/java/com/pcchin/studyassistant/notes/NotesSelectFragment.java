@@ -2,7 +2,6 @@ package com.pcchin.studyassistant.notes;
 
 import android.annotation.SuppressLint;
 import androidx.room.Room;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -20,6 +19,7 @@ import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
+import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.List;
@@ -34,6 +34,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
         super.onCreate(savedInstanceState);
         if (getContext() != null && getActivity() != null) {
             subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
+                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             getActivity().setTitle(R.string.app_name);
         }
@@ -53,16 +54,13 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
                     .inflate(R.layout.hyperlink_btn, null);
             subjectBtn.setText(subjectList.get(i).title);
             final int finalI = i;
-            subjectBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Go to notesSubjectFragment
-                    if (getActivity() != null) {
-                        subjectDatabase.close();
-                        ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(
-                                subjectList.get(finalI).title
-                        ));
-                    }
+            subjectBtn.setOnClickListener(v -> {
+                // Go to notesSubjectFragment
+                if (getActivity() != null) {
+                    subjectDatabase.close();
+                    ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(
+                            subjectList.get(finalI).title
+                    ));
                 }
             });
             ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, i);
@@ -79,8 +77,9 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public void onNewSubjectPressed() {
         if (getContext() != null && getActivity() != null) {
             SubjectDatabase subjectDatabase = Room.databaseBuilder(getContext(),
-                    SubjectDatabase.class, "notesSubject")
-                    .allowMainThreadQueries().build();
+                                    SubjectDatabase.class, "notesSubject")
+                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                                    .allowMainThreadQueries().build();
             GeneralFunctions.showNewSubject(getContext(), ((MainActivity) getActivity()), subjectDatabase);
         }
     }
@@ -96,9 +95,5 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
             return true;
         }
         return false;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

@@ -9,13 +9,13 @@ import androidx.annotation.NonNull;
 @Entity
 public class NotesSubject {
     @Ignore
-    public static int SORT_ALPHABETICAL_ASC = 1;
+    public static final int SORT_ALPHABETICAL_ASC = 1;
     @Ignore
-    public static int SORT_ALPHABETICAL_DES = 2;
+    public static final int SORT_ALPHABETICAL_DES = 2;
     @Ignore
-    public static int SORT_DATE_ASC = 3;
+    public static final int SORT_DATE_ASC = 3;
     @Ignore
-    public static int SORT_DATE_DES = 4;
+    public static final int SORT_DATE_DES = 4;
 
     @SuppressWarnings("NullableProblems")
     @PrimaryKey
@@ -32,8 +32,9 @@ public class NotesSubject {
     @Ignore
     NotesSubject() {}
 
-    public NotesSubject(@NonNull String title, String contents) {
+    public NotesSubject(@NonNull String title, String contents, int sortOrder) {
         this.title = title;
         this.contents = contents;
+        this.sortOrder = sortOrder;
     }
 }

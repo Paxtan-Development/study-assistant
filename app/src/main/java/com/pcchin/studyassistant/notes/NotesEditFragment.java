@@ -2,9 +2,7 @@ package com.pcchin.studyassistant.notes;
 
 import android.app.AlertDialog;
 import androidx.room.Room;
-import android.content.DialogInterface;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -27,6 +25,7 @@ import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
+import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     private String targetNotesSubject;
     private ArrayList<ArrayList<String>> targetSubjContents;
 
-    private TextWatcher syncTitleTextWatcher = new TextWatcher() {
+    private final TextWatcher syncTitleTextWatcher = new TextWatcher() {
         // A TextWatcher that automatically syncs its text to the title
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -113,7 +112,9 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
 
         if (getArguments() != null && getActivity() != null) {
             database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                    "notesSubject").allowMainThreadQueries().build();
+                    "notesSubject")
+                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                    .allowMainThreadQueries().build();
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
@@ -202,21 +203,13 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n_change_subj)
                     .setView(subjListSpinner)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            subjModified = true;
-                            targetNotesSubject = subjListSpinner.getSelectedItem().toString();
-                            targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
-                                    .search(targetNotesSubject).contents);
-                        }
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        subjModified = true;
+                        targetNotesSubject = subjListSpinner.getSelectedItem().toString();
+                        targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
+                                .search(targetNotesSubject).contents);
                     })
-                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .create().show();
         }
     }
@@ -295,23 +288,9 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.n4_return)
                 .setMessage(R.string.n4_save_note)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        onSavePressed();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        onCancelPressed();
-                    }
-                })
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> onSavePressed())
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> onCancelPressed())
                 .create().show();
         return true;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

@@ -1,6 +1,5 @@
 package com.pcchin.studyassistant.main;
 
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,30 +32,21 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
         // Inflate the layout for this fragment and set up listeners
         View returnView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        returnView.findViewById(R.id.m1_notes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
-                }
+        returnView.findViewById(R.id.m1_notes).setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
             }
         });
 
-        returnView.findViewById(R.id.m1_projects).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-                }
+        returnView.findViewById(R.id.m1_projects).setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
             }
         });
 
-        returnView.findViewById(R.id.m1_about).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-                }
+        returnView.findViewById(R.id.m1_about).setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).displayFragment(new AboutFragment());
             }
         });
         return returnView;
@@ -66,9 +56,5 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
     public boolean onBackPressed() {
         GeneralFunctions.displayExit((MainActivity) getActivity());
         return true;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

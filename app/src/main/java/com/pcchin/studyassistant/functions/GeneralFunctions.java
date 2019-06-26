@@ -22,6 +22,7 @@ import com.pcchin.studyassistant.main.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
+import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import org.json.JSONArray;
@@ -42,7 +43,7 @@ import java.util.Locale;
 /** General functions used throughout the app **/
 public class GeneralFunctions {
     /** The standard date storage format used in the app **/
-    public static SimpleDateFormat standardDateFormat =
+    public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.ENGLISH);
 
     /** Returns a string of text from specific text file in the assets folder **/
@@ -110,45 +111,35 @@ public class GeneralFunctions {
                 .setCancelable(false)
                 .create();
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
-        subjectDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                ((EditText) popupView.findViewById(R.id.popup_input)).setHint(R.string.n1_subject_title);
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String inputText = ((EditText) popupView
-                                        .findViewById(R.id.popup_input)).getText().toString();
-                                TextView errorText = popupView.findViewById(R.id.popup_error);
+        subjectDialog.setOnShowListener(dialog -> {
+            ((EditText) popupView.findViewById(R.id.popup_input)).setHint(R.string.n1_subject_title);
+            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setOnClickListener(v -> {
+                        String inputText = ((EditText) popupView
+                                .findViewById(R.id.popup_input)).getText().toString();
+                        TextView errorText = popupView.findViewById(R.id.popup_error);
 
-                                // Preliminary checks if subject name is taken or is empty
-                                if (inputText.replaceAll("\\s+", "").length() == 0) {
-                                    errorText.setText(R.string.n_error_subject_empty);
-                                } else if (database.SubjectDao().search(inputText) != null) {
-                                    errorText.setText(R.string.n1_error_subject_exists);
-                                } else {
-                                    // Create subject
-                                    database.SubjectDao().insert(
-                                            new NotesSubject(inputText,
-                                                    GeneralFunctions.arrayToJson(
-                                                            new ArrayList<ArrayList<String>>())));
-                                    database.close();
-                                    activity.displayFragment(
-                                            NotesSubjectFragment.newInstance(inputText));
-                                    dialog.dismiss();
-                                    GeneralFunctions.updateNavView(activity);
-                                }
-                            }
-                        });
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
-                        .setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
-            }
+                        // Preliminary checks if subject name is taken or is empty
+                        if (inputText.replaceAll("\\s+", "").length() == 0) {
+                            errorText.setText(R.string.n_error_subject_empty);
+                        } else if (database.SubjectDao().search(inputText) != null) {
+                            errorText.setText(R.string.n1_error_subject_exists);
+                        } else {
+                            // Create subject
+                            database.SubjectDao().insert(
+                                    new NotesSubject(inputText,
+                                            GeneralFunctions.arrayToJson(
+                                                    new ArrayList<>()),
+                                                    NotesSubject.SORT_ALPHABETICAL_ASC));
+                            database.close();
+                            activity.displayFragment(
+                                    NotesSubjectFragment.newInstance(inputText));
+                            dialog.dismiss();
+                            GeneralFunctions.updateNavView(activity);
+                        }
+                    });
+            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
+                    .setOnClickListener(v -> dialog.dismiss());
         });
         subjectDialog.show();
     }
@@ -163,43 +154,36 @@ public class GeneralFunctions {
 
         // Add subjects
         final SubjectDatabase subjectDatabase = Room.databaseBuilder(activity, SubjectDatabase.class,
-                "notesSubject").allowMainThreadQueries().build();
+                "notesSubject")
+                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                .allowMainThreadQueries().build();
         SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);
         List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
         for (final NotesSubject subject: subjectList) {
             MenuItem subjItem = subjMenu.add(subject.title);
             // This is to prevent menu items from disappearing
-            subjItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    // Opens subject when clicked
-                    activity.closeDrawer();
-                    activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
-                    return true;
-                }
+            subjItem.setOnMenuItemClickListener(item -> {
+                // Opens subject when clicked
+                activity.closeDrawer();
+                activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
+                return true;
             });
         }
 
         // Add New Subject button
         MenuItem newSubj = subjMenu.add(R.string.m3_new_subject);
-        newSubj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                activity.closeDrawer();
-                showNewSubject(activity, activity, subjectDatabase);
-                return true;
-            }
+        newSubj.setOnMenuItemClickListener(item -> {
+            activity.closeDrawer();
+            showNewSubject(activity, activity, subjectDatabase);
+            return true;
         });
 
         // Add Import Subject button
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
-        subjImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // TODO: Import
-                activity.closeDrawer();
-                return false;
-            }
+        subjImport.setOnMenuItemClickListener(item -> {
+            // TODO: Import
+            activity.closeDrawer();
+            return false;
         });
 
         // Add projects
@@ -208,24 +192,18 @@ public class GeneralFunctions {
 
         // Add New Project Button
         MenuItem newProj = projMenu.add(R.string.m3_new_project);
-        newProj.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // TODO: New Project
-                activity.closeDrawer();
-                return false;
-            }
+        newProj.setOnMenuItemClickListener(item -> {
+            // TODO: New Project
+            activity.closeDrawer();
+            return false;
         });
 
         // Add Import Subject button
         MenuItem projImport = projMenu.add(R.string.m3_data_import);
-        projImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // TODO: Import
-                activity.closeDrawer();
-                return false;
-            }
+        projImport.setOnMenuItemClickListener(item -> {
+            // TODO: Import
+            activity.closeDrawer();
+            return false;
         });
 
         // Add subMenu for other buttons
@@ -233,24 +211,18 @@ public class GeneralFunctions {
 
         // Add about button
         MenuItem aboutItem = otherMenu.add(R.string.m_about);
-        aboutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                activity.closeDrawer();
-                activity.displayFragment(new AboutFragment());
-                return true;
-            }
+        aboutItem.setOnMenuItemClickListener(item -> {
+            activity.closeDrawer();
+            activity.displayFragment(new AboutFragment());
+            return true;
         });
 
         // Add exit button
         MenuItem exitItem = otherMenu.add(R.string.exit);
-        exitItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                activity.closeDrawer();
-                displayExit(activity);
-                return true;
-            }
+        exitItem.setOnMenuItemClickListener(item -> {
+            activity.closeDrawer();
+            displayExit(activity);
+            return true;
         });
     }
 
@@ -260,19 +232,11 @@ public class GeneralFunctions {
                 .setTitle(R.string.exit)
                 .setMessage(R.string.m3_exit_confirm)
                 .setIcon(R.mipmap.ic_launcher_round)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        activity.moveTaskToBack(true);
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    activity.moveTaskToBack(true);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                }).setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
                 .create().show();
     }
 }

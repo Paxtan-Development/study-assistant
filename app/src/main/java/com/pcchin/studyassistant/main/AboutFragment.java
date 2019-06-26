@@ -1,6 +1,5 @@
 package com.pcchin.studyassistant.main;
 
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -70,9 +69,5 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
             return true;
         }
         return false;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

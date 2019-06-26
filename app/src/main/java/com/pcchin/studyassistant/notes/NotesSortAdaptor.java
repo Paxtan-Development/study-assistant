@@ -57,8 +57,8 @@ class NotesSortAdaptor extends ArrayAdapter {
     }
 
     @Override
-    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        return super.getDropDownView(position, convertView, parent);
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+        return getView(position, convertView, parent);
     }
 
     private static class ViewHolder {

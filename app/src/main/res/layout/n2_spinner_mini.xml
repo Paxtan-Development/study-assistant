@@ -4,7 +4,9 @@
     android:id="@+id/n2_sorting_mini"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
 
     <ImageView
         android:id="@+id/n2_sorting_img"

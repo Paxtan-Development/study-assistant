@@ -13,7 +13,8 @@ public class SortingComparators {
     public static final Comparator<ArrayList<String>> firstValComparator = (a, b) -> {
                 if (a != null && a.size() > 0
                         && b != null && b.size() > 0) {
-                    return ObjectUtils.compare(a.get(0), b.get(0));
+                    return ObjectUtils.compare(a.get(0).toLowerCase()
+                            , b.get(0).toLowerCase());
                 } else if ((a == null && b != null) ||
                         ((a != null && a.size() == 0) && (b != null && b.size() > 0))) {
                     // Returns -1 if a's value is null or does not have any contents

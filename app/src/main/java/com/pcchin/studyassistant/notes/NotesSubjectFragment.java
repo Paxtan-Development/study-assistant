@@ -88,24 +88,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                 if (notesArray != null) {
                     // Sort notes just in case
-                    int sortOrder = subject.sortOrder;
-                    if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
-                        // Sort by alphabetical order, descending
-                        Collections.sort(notesArray, SortingComparators.firstValComparator);
-                        Collections.reverse(notesArray);
-                    } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
-                        Collections.sort(notesArray, SortingComparators.secondValDateComparator);
-                    } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
-                        Collections.sort(notesArray, SortingComparators.secondValDateComparator);
-                        Collections.reverse(notesArray);
-                    } else {
-                        // Sort by alphabetical order, ascending
-                        if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
-                            // Default to this if sortOrder is invalid
-                            subject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
-                        }
-                        Collections.sort(notesArray, SortingComparators.firstValComparator);
-                    }
+                    sortNotes(subject);
                 }
                 subjectDatabase.SubjectDao().update(subject);
             }
@@ -295,6 +278,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         subject1.sortOrder = sortingList[sortingSpinner.getSelectedItemPosition()];
                         subjectDatabase.SubjectDao().update(subject1);
                         dialogInterface.dismiss();
+                        sortNotes(subject1);
                         if (getFragmentManager() != null) {
                             // Refreshes fragment
                             getFragmentManager().beginTransaction()
@@ -349,5 +333,26 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             return true;
         }
         return false;
+    }
+
+    private void sortNotes(@NonNull NotesSubject subject) {
+        int sortOrder = subject.sortOrder;
+        if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
+            // Sort by alphabetical order, descending
+            Collections.sort(notesArray, SortingComparators.firstValComparator);
+            Collections.reverse(notesArray);
+        } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
+            Collections.sort(notesArray, SortingComparators.secondValDateComparator);
+        } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
+            Collections.sort(notesArray, SortingComparators.secondValDateComparator);
+            Collections.reverse(notesArray);
+        } else {
+            // Sort by alphabetical order, ascending
+            if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
+                // Default to this if sortOrder is invalid
+                subject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
+            }
+            Collections.sort(notesArray, SortingComparators.firstValComparator);
+        }
     }
 }

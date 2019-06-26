@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.main;
+package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.AboutFragment;
+import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
@@ -32,14 +34,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+/** General functions used throughout the app **/
 public class GeneralFunctions {
+    /** The standard date storage format used in the app **/
+    public static SimpleDateFormat standardDateFormat =
+            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.ENGLISH);
+
     /** Returns a string of text from specific text file in the assets folder **/
     @SuppressWarnings("SameParameterValue")
     @NonNull
-    static String getReadTextFromAssets(@NonNull Context context, String textFileName) {
+    public static String getReadTextFromAssets(@NonNull Context context, String textFileName) {
         String text;
         StringBuilder stringBuilder = new StringBuilder();
         InputStream inputStream;
@@ -246,7 +255,7 @@ public class GeneralFunctions {
     }
 
     /** Displays the exit dialog **/
-    static void displayExit(final MainActivity activity) {
+    public static void displayExit(final MainActivity activity) {
         new androidx.appcompat.app.AlertDialog.Builder(activity)
                 .setTitle(R.string.exit)
                 .setMessage(R.string.m3_exit_confirm)

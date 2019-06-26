@@ -8,6 +8,15 @@ import androidx.annotation.NonNull;
 
 @Entity
 public class NotesSubject {
+    @Ignore
+    public static int SORT_ALPHABETICAL_ASC = 1;
+    @Ignore
+    public static int SORT_ALPHABETICAL_DES = 2;
+    @Ignore
+    public static int SORT_DATE_ASC = 3;
+    @Ignore
+    public static int SORT_DATE_DES = 4;
+
     @SuppressWarnings("NullableProblems")
     @PrimaryKey
     @NonNull
@@ -16,6 +25,9 @@ public class NotesSubject {
 
     @ColumnInfo(name = "contents")
     public String contents;
+
+    @ColumnInfo(name = "sortOrder")
+    public int sortOrder;
 
     @Ignore
     NotesSubject() {}

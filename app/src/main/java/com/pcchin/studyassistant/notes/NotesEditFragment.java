@@ -23,17 +23,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.FragmentOnBackPressed;
-import com.pcchin.studyassistant.main.GeneralFunctions;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class NotesEditFragment extends Fragment implements FragmentOnBackPressed {
@@ -231,8 +229,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             // Save original as ArrayList
             ArrayList<String> updatedNote = new ArrayList<>();
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
-            updatedNote.add(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH)
-                    .format(new Date()));
+            updatedNote.add(GeneralFunctions.standardDateFormat.format(new Date()));
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
 
             // Toast at start as different objects have different displayFragments
@@ -295,7 +292,22 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
 
     @Override
     public boolean onBackPressed() {
-        onCancelPressed();
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.n4_return)
+                .setMessage(R.string.n4_save_note)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        onSavePressed();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        onCancelPressed();
+                    }
+                })
+                .create().show();
         return true;
     }
 

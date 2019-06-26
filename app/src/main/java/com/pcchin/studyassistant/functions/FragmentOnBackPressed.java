@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.main;
+package com.pcchin.studyassistant.functions;
 
 public interface FragmentOnBackPressed {
     /**

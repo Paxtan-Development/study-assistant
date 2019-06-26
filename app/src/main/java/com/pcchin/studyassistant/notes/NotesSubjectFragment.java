@@ -20,13 +20,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.FragmentOnBackPressed;
-import com.pcchin.studyassistant.main.GeneralFunctions;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.functions.SortingComparators;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
@@ -72,8 +74,31 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             } else {
                 // Get notes from database
                 getActivity().setTitle(notesSubject);
-                notesArray = GeneralFunctions.jsonToArray(subjectDatabase.SubjectDao()
-                                .search(notesSubject).contents);
+                NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
+                notesArray = GeneralFunctions.jsonToArray(subject.contents);
+
+                if (notesArray != null) {
+                    // Sort notes just in case
+                    int sortOrder = subject.sortOrder;
+                    if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
+                        // Sort by alphabetical order, descending
+                        Collections.sort(notesArray, SortingComparators.firstValComparator);
+                        Collections.reverse(notesArray);
+                    } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
+                        Collections.sort(notesArray, SortingComparators.secondValDateComparator);
+                    } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
+                        Collections.sort(notesArray, SortingComparators.secondValDateComparator);
+                        Collections.reverse(notesArray);
+                    } else {
+                        // Sort by alphabetical order, ascending
+                        if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
+                            // Default to this if sortOrder is invalid
+                            subject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
+                        }
+                        Collections.sort(notesArray, SortingComparators.firstValComparator);
+                    }
+                }
+                subjectDatabase.SubjectDao().update(subject);
             }
         }
 
@@ -113,14 +138,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.get(0));
             ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
                     getString(R.string.n_last_edited), note.get(1)));
-            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
-            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
+            ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
+            ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
             miniNote.findViewById(R.id.n2_mini_content).setVerticalScrollBarEnabled(false);
 
             // Conversion formula: px = sp / dpi + padding between lines
-            ((EditText) miniNote.findViewById(R.id.n2_mini_content)).setHeight
+            ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setHeight
                     ((int) (MAXLINES * 18 * getResources().getDisplayMetrics().density) +
-                            (int) ((MAXLINES - 1)* 18 * ((EditText) miniNote.findViewById(R.id.n2_mini_content))
+                            (int) ((MAXLINES - 1)* 18 * ((TextView) miniNote.findViewById(R.id.n2_mini_content))
                                     .getLineSpacingMultiplier()));
             // Set on click listener
             final int finalI = i;
@@ -259,6 +284,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             });
             editSubjDialog.show();
         }
+    }
+
+    public void onSortPressed() {
+        // TODO: Complete
     }
 
     public void onExportPressed() {

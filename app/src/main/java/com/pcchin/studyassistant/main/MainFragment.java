@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 

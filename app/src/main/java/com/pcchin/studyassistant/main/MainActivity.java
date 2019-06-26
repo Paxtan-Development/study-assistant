@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
@@ -67,6 +69,10 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.n2_edit_title:
                 ((NotesSubjectFragment) currentFragment).onEditPressed();
+                break;
+
+            case R.id.n2_sort:
+                ((NotesSubjectFragment) currentFragment).onSortPressed();
                 break;
 
             case R.id.n2_export:

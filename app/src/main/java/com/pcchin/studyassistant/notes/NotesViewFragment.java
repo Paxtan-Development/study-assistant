@@ -13,14 +13,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.FragmentOnBackPressed;
-import com.pcchin.studyassistant.main.GeneralFunctions;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
@@ -90,7 +89,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
         ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
-        ((EditText) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
+        ((TextView) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
                 getString(R.string.n_last_edited), notesInfo.get(1)));
 
@@ -103,7 +102,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         if (getActivity() != null) {
             Point endPt = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
-            ((EditText) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y * 65 / 100);
+            ((TextView) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y * 65 / 100);
         }
 
         return returnView;

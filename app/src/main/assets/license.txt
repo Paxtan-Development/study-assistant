@@ -18,5 +18,9 @@
 <br/>Export icon made by <a href="https://www.flaticon.com/authors/popcic" title="Popcic">Popcic</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
 <br/>Checklist icon made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon" ></a>
 <br/>User icon made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
+<br/>Sort by Alphabet Icon made by <a href="https://www.flaticon.com/authors/dave-gandy" title="Dave Gandy">Dave Gandy</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
+<br/>Sort by Numeric Order Icon made by <a href="https://www.flaticon.com/authors/dave-gandy" title="Dave Gandy">Dave Gandy</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
+<br/>Sort by Reverse Alphabetical Order Icon made by <a href="https://www.flaticon.com/authors/dave-gandy" title="Dave Gandy">Dave Gandy</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
+<br/>Sort by Order Icon made by <a href="https://www.flaticon.com/authors/dave-gandy" title="Dave Gandy">Dave Gandy</a> from <a href="https://www.flaticon.com/" title="Flaticon">Flaticon</a>
 <br/>
 <br/>The full license can be found at <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons</a>

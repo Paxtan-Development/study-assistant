@@ -44,6 +44,7 @@
 
     <string name="n2_new_note">New note</string>
     <string name="n2_edit_title">Edit Title</string>
+    <string name="n2_sorting_method">Sort By</string>
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
     <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
     <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
@@ -55,6 +56,8 @@
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
 
+    <string name="n4_return">Return</string>
+    <string name="n4_save_note">Save note?</string>
     <string name="n4_note_saved">Note saved</string>
 
     <!-- Strings used in group P -->
@@ -68,7 +71,7 @@
     <string name="p2_task_list">Task List</string>
 
     <string name="p3_id">Project ID</string>
-    <string name="p3_member_input">Use a semicolon ; to separate members.</string>
+    <string name="p3_member_input">Use a semicolon (;) to separate members.</string>
     <string name="p3_pass_old">Old password</string>
     <string name="p3_pass_new1">New password</string>
     <string name="p3_pass_new2">Re-enter password</string>

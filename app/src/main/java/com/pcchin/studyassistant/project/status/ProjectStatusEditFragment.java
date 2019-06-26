@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 
 /**
  * A simple {@link Fragment} subclass.

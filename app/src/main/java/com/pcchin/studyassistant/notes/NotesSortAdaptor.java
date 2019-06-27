@@ -13,11 +13,13 @@ import androidx.annotation.Nullable;
 
 import com.pcchin.studyassistant.R;
 
+/** An adaptor used to sort notes in each subject. **/
 class NotesSortAdaptor extends ArrayAdapter {
     private final int[] titles;
     private final int[] images;
     private final Context context;
 
+    /** Default constructor. Receives the titles and image references. **/
     NotesSortAdaptor(@NonNull Context context, int[] titles, int[] images) {
         super(context, R.layout.n2_sorting_spinner);
         this.titles = titles;
@@ -25,11 +27,13 @@ class NotesSortAdaptor extends ArrayAdapter {
         this.context = context;
     }
 
+    /** Returns the number of sorting methods in the Spinner. **/
     @Override
     public int getCount() {
         return titles.length;
     }
 
+    /** Creates the view for the object when it is selected.  **/
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -56,11 +60,13 @@ class NotesSortAdaptor extends ArrayAdapter {
         }
     }
 
+    /** Creates the view for the object when it is in the list. Same as getView(). **/
     @Override
     public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getView(position, convertView, parent);
     }
 
+    /** Class used by the adaptor to store the ImageView and TextView references. **/
     private static class ViewHolder {
         ImageView sortLogo;
         TextView sortTitle;

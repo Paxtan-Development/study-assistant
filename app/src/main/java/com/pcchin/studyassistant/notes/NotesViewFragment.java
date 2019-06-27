@@ -35,9 +35,12 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     private String notesSubject;
     private int notesOrder;
 
+    /** Default constructor. **/
     public NotesViewFragment() {}
 
-    // Subject is the title of the subject, while order is the order of the note in the list
+    /** Used when viewing a note.
+     * @param subject is the title of the subject.
+     * @param order is the order of the note in the notes list of the subject. **/
     public static NotesViewFragment newInstance(String subject, int order) {
         NotesViewFragment fragment = new NotesViewFragment();
         Bundle args = new Bundle();
@@ -47,6 +50,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         return fragment;
     }
 
+    /** Initializes the fragment. Gets the contents of the notes from the database. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +88,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         setHasOptionsMenu(true);
     }
 
+    /** Creates the fragment. The height of the content is updated based on the screen size. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -119,12 +124,15 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         return returnView;
     }
 
+    /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n3, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /** Edits the note.
+     * @see NotesEditFragment **/
     public void onEditPressed() {
         if (getActivity() != null) {
             ((MainActivity) getActivity()).displayFragment(NotesEditFragment
@@ -132,10 +140,12 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Exports the note to a txt file. **/
     public void onExportPressed() {
         // TODO: Export
     }
 
+    /** Deletes the note from the subject. **/
     public void onDeletePressed() {
         if (getContext() != null) {
             new AlertDialog.Builder(getContext())
@@ -178,6 +188,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Returns to
+     * @see NotesSubjectFragment **/
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {

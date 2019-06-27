@@ -55,8 +55,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     private String targetNotesSubject;
     private ArrayList<ArrayList<String>> targetSubjContents;
 
+    /** A TextWatcher that automatically syncs its text to the title. **/
     private final TextWatcher syncTitleTextWatcher = new TextWatcher() {
-        // A TextWatcher that automatically syncs its text to the title
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -82,9 +82,12 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         }
     };
 
+    /** Default constructor. **/
     public NotesEditFragment() {}
 
-    // Title is the title of the new note, without subject
+    /** Used when creating a new note.
+     * @param title is the title of the new note, without subject.
+     * @param subject is the current subject that the note will save to. **/
     public static NotesEditFragment newInstance(String subject, String title) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
@@ -95,7 +98,9 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         return fragment;
     }
 
-    // Subject is the title of the selected subject, order is the order of the note in the subject
+    /** Used when modifying an existing note.
+     * @param subject is the title of the selected subject.
+     * @param order is the order of the note in the subject. **/
     public static NotesEditFragment newInstance(String subject, int order) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
@@ -106,6 +111,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         return fragment;
     }
 
+    /** Initializes the fragment. Gets the data of the notes from the database. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,12 +142,14 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         setHasOptionsMenu(true);
     }
 
+    /** Closes the database before the fragment exits. **/
     @Override
     public void onDestroy() {
         super.onDestroy();
         database.close();
     }
 
+    /** Creates the fragment. Sets the content and listeners for the note. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -159,7 +167,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                     .addTextChangedListener(syncTitleTextWatcher);
         }
 
-        // Set min height to 65% of screen size
+        // TODO: Set min height to match that of the scrollView
         if (getActivity() != null) {
             Point endPt = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
@@ -169,12 +177,14 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         return returnView;
     }
 
+    /** Sets the menu for the fragment **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n4, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /** Changes the subject that the note will be saved to. **/
     public void onSubjPressed() {
         if (getContext() != null) {
             final Spinner subjListSpinner = new Spinner(getContext());
@@ -214,6 +224,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Saves the note to the subject selected. **/
     public void onSavePressed() {
         // Check if title is empty
         if (getActivity() != null && getView() != null && ((EditText) getView()
@@ -270,6 +281,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Cancel all the changes and return to
+     * @see NotesSubjectFragment **/
     public void onCancelPressed() {
         // Go back to NotesViewFragment of subject
         if (getActivity() != null) {
@@ -283,6 +296,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Checks whether the changes made are to be saved.
+     * If OK is selected calls onSavePressed, or else calls onCancelPressed. **/
     @Override
     public boolean onBackPressed() {
         new AlertDialog.Builder(getContext())

@@ -22,8 +22,10 @@ import java.util.Locale;
 
 public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
+    /** Default Constructor **/
     public AboutFragment() {}
 
+    /** Initializes the fragment. Nothing to see here. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,7 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
         }
     }
 
+    /** Creates the fragment. Sets the version, current year and license text. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,6 +65,8 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
         return returnView;
     }
 
+    /** Go back to
+     * @see MainFragment **/
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {

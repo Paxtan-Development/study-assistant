@@ -48,9 +48,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     private String notesSubject;
     private int previousOrder;
 
+    /** Default constructor. **/
     public NotesSubjectFragment() {}
 
-    // Subject is the title fo the subject selected
+    /** Used in all except when returning from a NotesViewFragment.
+     * @param subject is the subject that is displayed. **/
     public static NotesSubjectFragment newInstance(String subject) {
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
@@ -59,7 +61,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         return fragment;
     }
 
-    // Only used in Notes
+    /** Used when returning from a NotesViewFragment.
+     * @param subject is the subject that is displayed.
+     * @param previousOrder is the order of the note that was shown. **/
     static NotesSubjectFragment newInstance(String subject, int previousOrder) {
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
@@ -69,6 +73,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         return fragment;
     }
 
+    /** Initializes the fragment. Retrieves all of the notes of the subject from the database. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +115,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         setHasOptionsMenu(true);
     }
 
+    /** Creates the fragment.
+     * Display each note and center the note that was previously selected if needed. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -179,12 +186,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         return returnScroll;
     }
 
+    /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n2, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /** Creates a new note with a given title. **/
     public void onNewNotePressed() {
         if (getContext() != null && getActivity() != null) {
             @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
@@ -226,6 +235,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
+    /** Change the method which the notes are sorted. **/
     public void onSortPressed() {
         if (getContext() != null) {
             @SuppressLint("InflateParams") final Spinner sortingSpinner = (Spinner) getLayoutInflater().inflate
@@ -264,10 +274,13 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
+    /** Export all the notes of the subject into a ZIP file. **/
     public void onExportPressed() {
         // TODO: Export
     }
 
+    /** Deletes the current subject and returns to
+     * @see NotesSelectFragment **/
     public void onDeletePressed() {
         if (getContext() != null) {
             new AlertDialog.Builder(getContext())
@@ -298,6 +311,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
+    /** Returns to
+     * @see NotesSelectFragment **/
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {
@@ -308,6 +323,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         return false;
     }
 
+    /** Sort the notes based on the sorting format given.
+     * @see NotesSubject
+     * @see SortingComparators **/
     private void sortNotes(@NonNull NotesSubject subject) {
         int sortOrder = subject.sortOrder;
         if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {

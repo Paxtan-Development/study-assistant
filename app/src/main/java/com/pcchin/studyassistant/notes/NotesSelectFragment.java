@@ -27,8 +27,10 @@ import java.util.List;
 public class NotesSelectFragment extends Fragment implements FragmentOnBackPressed {
     private SubjectDatabase subjectDatabase;
 
+    /** Default constructor. **/
     public NotesSelectFragment() {}
 
+    /** Initializes the fragment and the database. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
         setHasOptionsMenu(true);
     }
 
+    /** Creates the fragment. Add existing subjects to the fragment. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -68,12 +71,14 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
         return returnView;
     }
 
+    /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_n1, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /** Creates a new subject. **/
     public void onNewSubjectPressed() {
         if (getContext() != null && getActivity() != null) {
             SubjectDatabase subjectDatabase = Room.databaseBuilder(getContext(),
@@ -84,10 +89,13 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
         }
     }
 
+    /** Imports an existing zip file. **/
     public void onImportPressed() {
         // TODO: Import
     }
 
+    /** Returns to
+     * @see MainFragment **/
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {

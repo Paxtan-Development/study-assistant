@@ -6,8 +6,8 @@ android {
         applicationId "com.pcchin.studyassistant"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 3
-        versionName "1.11"
+        versionCode 4
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true

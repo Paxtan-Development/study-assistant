@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
 
     private Fragment currentFragment;
 
+    /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity
         GeneralFunctions.updateNavView(this);
     }
 
+    /** Delegates the items that are selected on the menu to the respective fragments. **/
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
@@ -108,6 +110,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /** Handles button presses in the drawer.
+     * Due to need for dynamic menu, most buttons have been moved to
+     * GeneralFunctions.updateNavView(MainActivity activity)
+     * @see GeneralFunctions **/
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Note: due to need of dynamic menu, most buttons have been moved to
@@ -123,6 +129,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /** Delegates each onBackPressed to each Fragment **/
     @Override
     public void onBackPressed() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
@@ -131,6 +138,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /** Displays the fragment that is needed to be displayed.
+     * Keyboard will be hidden between fragments **/
     public void displayFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.base, fragment);
@@ -140,6 +149,7 @@ public class MainActivity extends AppCompatActivity
         hideKeyboard();
     }
 
+    /** Closes the navigation drawer. **/
     public void closeDrawer() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -147,6 +157,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /** Hides the soft input keyboard. Separated for clarity. **/
     private void hideKeyboard() {
         // Hide keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);

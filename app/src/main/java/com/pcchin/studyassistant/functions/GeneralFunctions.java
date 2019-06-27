@@ -46,7 +46,7 @@ public class GeneralFunctions {
     public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.ENGLISH);
 
-    /** Returns a string of text from specific text file in the assets folder **/
+    /** @return a string of text from specific text file in the assets folder **/
     @SuppressWarnings("SameParameterValue")
     @NonNull
     public static String getReadTextFromAssets(@NonNull Context context, String textFileName) {
@@ -73,8 +73,8 @@ public class GeneralFunctions {
     }
 
     /** Converts a string JSON array into an ArrayList.
-     * If the original array is invalid, it would return null,
-     * wheres if the original array is empty, an empty ArrayList would be returned. **/
+     * Returns null if the original array is invalid.
+     * Returns an empty ArrayList if the original array is empty. **/
     @Nullable
     public static ArrayList<ArrayList<String>> jsonToArray(String original) {
         if (isJson(original)) {

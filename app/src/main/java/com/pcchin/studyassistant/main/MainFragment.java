@@ -15,9 +15,10 @@ import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
 public class MainFragment extends Fragment implements FragmentOnBackPressed {
 
-    public MainFragment() {
-    }
+    /** Default constructor. **/
+    public MainFragment() {}
 
+    /** Initialize fragment. Nothing to see here. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +27,7 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
         }
     }
 
+    /** Creates the fragment and sets up the listener for the buttons. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
         return returnView;
     }
 
+    /** Display the exit dialog when the 'Back' button is pressed. **/
     @Override
     public boolean onBackPressed() {
         GeneralFunctions.displayExit((MainActivity) getActivity());

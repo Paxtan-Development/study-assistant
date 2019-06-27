@@ -24,7 +24,8 @@
             android:id="@+id/n3_last_edited"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="15dp"
             android:layout_weight="1"
             android:text="@string/blank"
             android:textSize="18sp" />

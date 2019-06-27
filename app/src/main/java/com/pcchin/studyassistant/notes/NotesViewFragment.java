@@ -6,11 +6,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +35,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     private String notesSubject;
     private int notesOrder;
 
-    public NotesViewFragment() { }
+    public NotesViewFragment() {}
 
     // Subject is the title of the subject, while order is the order of the note in the list
     public static NotesViewFragment newInstance(String subject, int order) {
@@ -98,13 +100,22 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             getActivity().setTitle(notesSubject);
         }
 
-        // Set min height to 65% of screen size
+        // Set min height corresponding to screen height
         if (getActivity() != null) {
             Point endPt = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
-            ((TextView) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y * 65 / 100);
-        }
 
+            // Height is set by Total height - bottom of last edited - navigation header height
+            returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    ((TextView) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y
+                            - returnView.findViewById(R.id.n3_last_edited).getBottom()
+                            - (int) getResources().getDimension(R.dimen.nav_header_height));
+                }
+            });
+        }
         return returnView;
     }
 

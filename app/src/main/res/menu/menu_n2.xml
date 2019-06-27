@@ -7,11 +7,7 @@
         android:icon="@drawable/ic_menu_add"
         android:title="@string/n2_new_note"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/n2_edit_title"
-        android:icon="@drawable/ic_menu_edit"
-        android:title="@string/edit"
-        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/n2_sort"
         android:icon="@drawable/ic_sort"

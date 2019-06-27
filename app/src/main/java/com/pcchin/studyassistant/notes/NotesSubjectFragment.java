@@ -33,6 +33,7 @@ import java.util.Collections;
 
 public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
+    private static final String ARG_PREV = "previousOrder";
     private static final int MAXLINES = 4;
 
     private static final int[] sortingList = new int[]{NotesSubject.SORT_ALPHABETICAL_ASC,
@@ -45,6 +46,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     private SubjectDatabase subjectDatabase;
     private ArrayList<ArrayList<String>> notesArray;
     private String notesSubject;
+    private int previousOrder;
 
     public NotesSubjectFragment() {}
 
@@ -53,6 +55,16 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SUBJECT, subject);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    // Only used in Notes
+    static NotesSubjectFragment newInstance(String subject, int previousOrder) {
+        NotesSubjectFragment fragment = new NotesSubjectFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SUBJECT, subject);
+        args.putInt(ARG_PREV, previousOrder);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,6 +81,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             // Get basic info & set title
             if (getArguments() != null) {
                 notesSubject = getArguments().getString(ARG_SUBJECT);
+                previousOrder = getArguments().getInt(ARG_PREV);
             }
 
             // Check if subject exists in database
@@ -152,6 +165,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             miniNote.setOnClickListener(displayNoteListener);
             miniNote.findViewById(R.id.n2_mini_content).setOnClickListener(displayNoteListener);
             returnView.addView(miniNote);
+
+            if (previousOrder == i) {
+                // Scroll to last seen view
+                returnScroll.post(() -> returnScroll.scrollTo(0, miniNote.getTop()));
+            }
         }
 
         if (anyCorrupt) {
@@ -205,51 +223,6 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         .setOnClickListener(v -> dialog.dismiss());
             });
             newNoteDialog.show();
-        }
-    }
-
-    public void onEditPressed() {
-        if (getContext() != null) {
-            @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
-                    .inflate(R.layout.popup_edittext, null);
-            AlertDialog editSubjDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n2_edit_title)
-                    .setView(popupView)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-            // OnClickListeners implemented separately to prevent
-            // dialog from being dismissed after button click
-            editSubjDialog.setOnShowListener(dialog -> {
-                final String popupInputText = ((EditText) popupView
-                        .findViewById(R.id.popup_input))
-                        .getText().toString();
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setOnClickListener(view -> {
-                            // Check if input is blank
-                            if (popupInputText.replaceAll("\\s+", "")
-                                    .length() == 0) {
-                                ((TextView) popupView.findViewById(R.id.popup_error))
-                                        .setText(R.string.n_error_subject_empty);
-                            } else if (subjectDatabase.SubjectDao().search(notesSubject) == null){
-                                ((TextView) popupView.findViewById(R.id.popup_error))
-                                        .setText(R.string.n2_error_title_taken);
-                            } else {
-                                // Edit Title
-                                dialog.dismiss();
-                                NotesSubject subject = subjectDatabase.SubjectDao()
-                                        .search(notesSubject);
-                                subject.title = popupInputText;
-                                subjectDatabase.SubjectDao().update(subject);
-                                Toast.makeText(getContext(),
-                                        getString(R.string.n2_title_updated),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
-                        .setOnClickListener(view -> dialog.dismiss());
-            });
-            editSubjDialog.show();
         }
     }
 
@@ -354,5 +327,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             }
             Collections.sort(notesArray, SortingComparators.firstValComparator);
         }
+        subject.contents = GeneralFunctions.arrayToJson(notesArray);
+        subjectDatabase.SubjectDao().update(subject);
     }
 }

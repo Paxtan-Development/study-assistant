@@ -56,9 +56,12 @@
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
     <string name="n2_title_updated">Title updated</string>
+    <string name="n2_note_locked">This note has been locked and cannot be edited.</string>
 
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
+    <string name="n3_lock_note">Lock Note</string>
+    <string name="n3_unlock_note">Unlock Note</string>
 
     <string name="n4_return">Return</string>
     <string name="n4_save_note">Save note?</string>

@@ -2,7 +2,6 @@ package com.pcchin.studyassistant.notes;
 
 import android.app.AlertDialog;
 import androidx.room.Room;
-import android.graphics.Point;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -167,11 +167,16 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                     .addTextChangedListener(syncTitleTextWatcher);
         }
 
-        // TODO: Set min height to match that of the scrollView
+        // Set min height to match that of the scrollView
         if (getActivity() != null) {
-            Point endPt = new Point();
-            getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
-            ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(endPt.y * 65 / 100);
+            returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    View scrollView = returnView.findViewById(R.id.n4_scroll);
+                    ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(scrollView.getHeight());
+                }
+            });
         }
         currentView = (LinearLayout) returnView;
         return returnView;
@@ -235,6 +240,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
             updatedNote.add(GeneralFunctions.standardDateFormat.format(new Date()));
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
+            updatedNote.add(null);
 
             // Toast at start as different objects have different displayFragments
             Toast.makeText(getContext(), getString(R.string.n4_note_saved), Toast.LENGTH_SHORT).show();

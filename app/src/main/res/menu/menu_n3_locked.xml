@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/n3_export"
+        android:icon="@drawable/ic_menu_export"
+        android:title="@string/data_export"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/n3_unlock"
+        android:title="@string/n3_unlock_note" />
+    <item
+        android:id="@+id/n3_del"
+        android:icon="@drawable/ic_menu_del"
+        android:title="@string/del"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -90,6 +90,14 @@ public class MainActivity extends AppCompatActivity
                 ((NotesViewFragment) currentFragment).onExportPressed();
                 break;
 
+            case R.id.n3_lock:
+                ((NotesViewFragment) currentFragment).onLockPressed();
+                break;
+
+            case R.id.n3_unlock:
+                ((NotesViewFragment) currentFragment).onUnlockPressed();
+                break;
+
             case R.id.n3_del:
                 ((NotesViewFragment) currentFragment).onDeletePressed();
                 break;

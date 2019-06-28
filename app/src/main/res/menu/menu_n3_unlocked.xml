@@ -13,6 +13,11 @@
         android:title="@string/data_export"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/n3_lock"
+        android:icon="@drawable/ic_menu_lock"
+        android:title="@string/n3_lock_note"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/n3_del"
         android:icon="@drawable/ic_menu_del"
         android:title="@string/del"

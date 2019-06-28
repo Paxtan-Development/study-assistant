@@ -2,6 +2,8 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+
+import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -238,5 +240,14 @@ public class GeneralFunctions {
                     System.exit(0);
                 }).setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
                 .create().show();
+    }
+
+    /** Reloads a fragment. **/
+    public static void reloadFragment(@NonNull Fragment target) {
+        if (target.getFragmentManager() != null) {
+            target.getFragmentManager().beginTransaction()
+                    .detach(target)
+                    .attach(target).commit();
+        }
     }
 }

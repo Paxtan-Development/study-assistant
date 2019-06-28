@@ -143,6 +143,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 }
                 anyCorrupt = true;
             }
+            // Implemented separately for backwards compatibility
+            if (note.size() == 3) {
+                note.add(null);
+            }
 
             // Add note to view
             @SuppressLint("InflateParams") LinearLayout miniNote = (LinearLayout) getLayoutInflater()
@@ -152,6 +156,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     getString(R.string.n_last_edited), note.get(1)));
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setText(note.get(2));
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
+            if (note.get(3) == null) {
+                miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.INVISIBLE);
+            } else {
+                miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.VISIBLE);
+            }
             miniNote.findViewById(R.id.n2_mini_content).setVerticalScrollBarEnabled(false);
 
             // Conversion formula: px = sp / dpi + padding between lines
@@ -262,12 +271,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         subjectDatabase.SubjectDao().update(subject1);
                         dialogInterface.dismiss();
                         sortNotes(subject1);
-                        if (getFragmentManager() != null) {
-                            // Refreshes fragment
-                            getFragmentManager().beginTransaction()
-                                    .detach(NotesSubjectFragment.this)
-                                    .attach(NotesSubjectFragment.this).commit();
-                        }
+                        GeneralFunctions.reloadFragment(this);
                     })
                     .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
                     .create().show();

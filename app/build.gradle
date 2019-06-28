@@ -12,6 +12,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -23,6 +29,10 @@ android {
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
+    }
+    sourceSets {
+        androidTest.assets.srcDirs +=
+                files("$projectDir/schemas".toString())
     }
 }
 
@@ -40,6 +50,7 @@ dependencies {
 
     implementation 'androidx.room:room-runtime:2.1.0'
     annotationProcessor 'androidx.room:room-compiler:2.1.0'
+    androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-lang3:3.9'
 }

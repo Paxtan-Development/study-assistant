@@ -47,4 +47,11 @@ public class NotesSubject {
         this.contents = contents;
         this.sortOrder = sortOrder;
     }
+
+    /** Constructor used in version 1. Only used for testing migrations. **/
+    @Deprecated
+    public NotesSubject(@NonNull String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
 }

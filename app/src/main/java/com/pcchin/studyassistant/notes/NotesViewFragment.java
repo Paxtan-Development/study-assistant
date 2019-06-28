@@ -1,6 +1,8 @@
 package com.pcchin.studyassistant.notes;
 
 import androidx.room.Room;
+
+import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     private ArrayList<String> notesInfo;
     private String notesSubject;
     private int notesOrder;
+    private boolean isLocked;
 
     /** Default constructor. **/
     public NotesViewFragment() {}
@@ -75,6 +79,10 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 while (notesInfo.size() < 3) {
                     notesInfo.add("");
                 }
+                if (notesInfo.size() == 3) {
+                    notesInfo.add(null);
+                }
+                isLocked = (notesInfo.get(3) != null);
             } else if (getActivity() != null) {
                 // Return to subject
                 Toast.makeText(getActivity(), getString(R.string.n_error_corrupt),
@@ -127,7 +135,11 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_n3, menu);
+        if (isLocked) {
+            inflater.inflate(R.menu.menu_n3_locked, menu);
+        } else {
+            inflater.inflate(R.menu.menu_n3_unlocked, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -144,6 +156,28 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     public void onExportPressed() {
         // TODO: Export
     }
+
+    /** Prevents the note from being able to be edited. **/
+    public void onLockPressed() {
+        if (getContext() != null) {
+            @SuppressLint("InflateParams") LinearLayout inputLayout =
+                    (LinearLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            ((TextView) inputLayout.findViewById(R.id.popup_error)).setTextColor(getResources().getColor(android.R.color.black));
+            new AlertDialog.Builder(getContext())
+                    .setTitle(getString(R.string.n3_lock_note))
+                    .setView(inputLayout)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        // TODO: Encrypt notes
+                    })
+                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) ->
+                            dialogInterface.dismiss())
+                    .create().show();
+        }
+    }
+
+    /** Unlocks the note. If there is no password, the note will be unlocked immediately.
+     * Or else, a popup will display asking the user to enter the password. **/
+    public void onUnlockPressed() {}
 
     /** Deletes the note from the subject. **/
     public void onDeletePressed() {

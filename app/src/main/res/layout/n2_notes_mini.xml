@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_weight="0.1"
-            android:contentDescription="@string/n2_note_locked"
+            android:contentDescription="@string/n2_note_locked_details"
             app:srcCompat="@drawable/ic_menu_lock_dark" />
 
     </TableRow>

@@ -56,11 +56,17 @@
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
     <string name="n2_title_updated">Title updated</string>
-    <string name="n2_note_locked">This note has been locked and cannot be edited.</string>
+    <string name="n2_note_locked_details">This note has been locked and cannot be edited.</string>
 
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
     <string name="n3_lock_note">Lock Note</string>
+    <string name="n3_note_locked">Note locked</string>
+    <string name="n3_note_unlocked">Note unlocked</string>
+    <string name="n3_lock_password">Enter Password to Lock Note</string>
+    <string name="n3_password_incorrect">The password that is entered is incorrect.</string>
+    <string name="n3_unlock_password">Enter Password to Unlock Note</string>
+    <string name="n3_password_set">Leave blank to not set a password.</string>
     <string name="n3_unlock_note">Unlock Note</string>
 
     <string name="n4_return">Return</string>

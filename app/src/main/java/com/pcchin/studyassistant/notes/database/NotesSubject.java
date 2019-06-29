@@ -49,6 +49,7 @@ public class NotesSubject {
     }
 
     /** Constructor used in version 1. Only used for testing migrations. **/
+    @Ignore
     @Deprecated
     public NotesSubject(@NonNull String title, String contents) {
         this.title = title;

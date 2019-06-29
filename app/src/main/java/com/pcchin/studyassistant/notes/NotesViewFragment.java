@@ -104,10 +104,13 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
         ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
-        ((TextView) returnView.findViewById(R.id.n3_text)).setText(notesInfo.get(2));
+        String contentText = notesInfo.get(2).replace("\n* ", "\n● ");
+        if (contentText.startsWith("* ")) {
+            contentText = contentText.replaceFirst("\\* ", "● ");
+        }
+        ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
-                getString(R.string.n_last_edited), notesInfo.get(1)));
-
+                                                                          getString(R.string.n_last_edited), notesInfo.get(1)));
         // Set title
         if (getActivity() != null) {
             getActivity().setTitle(notesSubject);
@@ -163,7 +166,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             @SuppressLint("InflateParams") LinearLayout inputLayout =
                     (LinearLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
             ((EditText) inputLayout.findViewById(R.id.popup_input))
-                    .setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             ((TextView) inputLayout.findViewById(R.id.popup_error))
                     .setTextColor(getResources().getColor(android.R.color.black));
             ((TextView) inputLayout.findViewById(R.id.popup_error)).setText(R.string.n3_password_set);
@@ -227,7 +230,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             (LinearLayout) getLayoutInflater()
                                     .inflate(R.layout.popup_edittext, null);
                     ((EditText) inputLayout.findViewById(R.id.popup_input))
-                            .setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            .setInputType(InputType.TYPE_CLASS_TEXT |
+                                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     // Asks user for password
                     AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
                             .setTitle(R.string.n3_unlock_password)

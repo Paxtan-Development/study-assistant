@@ -5,8 +5,6 @@ import androidx.room.Room;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,9 +13,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
@@ -41,7 +37,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     private SubjectDatabase database;
     private NotesSubject subject;
     private ArrayList<ArrayList<String>> subjContents;
-    private LinearLayout currentView;
 
     private boolean hasParent;
     private String notesSubject;
@@ -54,33 +49,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     // Used only if subjModified
     private String targetNotesSubject;
     private ArrayList<ArrayList<String>> targetSubjContents;
-
-    /** A TextWatcher that automatically syncs its text to the title. **/
-    private final TextWatcher syncTitleTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // Clears previous error
-            ((TextView) currentView.findViewById(R.id.n4_title_error))
-                    .setText(R.string.blank);
-        }
-
-        @Override
-        public void afterTextChanged(@NonNull Editable s) {
-            if (getActivity() != null) {
-                getActivity().setTitle(s.toString());
-            }
-            if (s.toString().replaceAll("\\s+", "").length() == 0) {
-                // Check if title is empty
-                ((TextView) currentView.findViewById(R.id.n4_title_error))
-                        .setText(R.string.n2_error_note_title_empty);
-            }
-        }
-    };
 
     /** Default constructor. **/
     public NotesEditFragment() {}
@@ -128,7 +96,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             if (hasParent) {
                 // Set title
                 notesOrder = getArguments().getInt(ARG_PARAM2);
-                getActivity().setTitle(subject.title);
 
                 if (subjContents != null && notesOrder < subjContents.size()) {
                     notesTitle = subjContents.get(notesOrder).get(0);
@@ -136,8 +103,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             } else {
                 // Get values from newInstance
                 notesTitle = getArguments().getString(ARG_PARAM2);
-                getActivity().setTitle(notesTitle);
             }
+            getActivity().setTitle(notesSubject);
         }
         setHasOptionsMenu(true);
     }
@@ -161,10 +128,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         if (hasParent && notesOrder < subjContents.size() && subjContents.get(notesOrder).size() >= 3) {
             ((EditText) returnView.findViewById(R.id.n4_edit)).setText(subjContents
                     .get(notesOrder).get(2));
-        } else if (!hasParent) {
-            // Change activity title when note subject changed
-            ((EditText) returnView.findViewById(R.id.n4_title))
-                    .addTextChangedListener(syncTitleTextWatcher);
         }
 
         // Set min height to match that of the scrollView
@@ -178,7 +141,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                 }
             });
         }
-        currentView = (LinearLayout) returnView;
         return returnView;
     }
 
@@ -221,6 +183,9 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         subjModified = true;
                         targetNotesSubject = subjListSpinner.getSelectedItem().toString();
+                        if (getActivity() != null) {
+                            getActivity().setTitle(targetNotesSubject);
+                        }
                         targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
                                 .search(targetNotesSubject).contents);
                     })

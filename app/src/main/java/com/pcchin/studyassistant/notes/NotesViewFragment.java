@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -74,8 +73,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     "notesSubject")
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
-            ArrayList<ArrayList<String>> allNotes = GeneralFunctions
-                    .jsonToArray(database.SubjectDao().search(notesSubject).contents);
+            ArrayList<ArrayList<String>> allNotes = database
+                    .SubjectDao().search(notesSubject).contents;
 
             // Check if notesOrder exists
             if (allNotes != null && notesOrder < allNotes.size()) {
@@ -182,8 +181,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                 .allowMainThreadQueries().build();
                         NotesSubject subject = database.SubjectDao().search(notesSubject);
-                        ArrayList<ArrayList<String>> contents = GeneralFunctions
-                                .jsonToArray(subject.contents);
+                        ArrayList<ArrayList<String>> contents = subject.contents;
 
                         // Update values to database
                         if (contents != null && contents.size() > notesOrder) {
@@ -193,7 +191,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             } else {
                                 contents.get(notesOrder).set(3, SecurityFunctions.notesHash(inputText));
                             }
-                            subject.contents = GeneralFunctions.arrayToJson(contents);
+                            subject.contents = contents;
                             database.SubjectDao().update(subject);
                             Toast.makeText(getContext(), getString(R.string.n3_note_locked), Toast.LENGTH_SHORT).show();
                         }
@@ -218,8 +216,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             NotesSubject subject = database.SubjectDao().search(notesSubject);
-            ArrayList<ArrayList<String>> contents = GeneralFunctions
-                    .jsonToArray(subject.contents);
+            ArrayList<ArrayList<String>> contents = subject.contents;
 
             if (contents != null && contents.size() > notesOrder) {
                 checkNoteIntegrity(contents.get(notesOrder));
@@ -284,8 +281,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
                             if (notesSubject != null) {
                                 // Check if contents is valid
-                                ArrayList<ArrayList<String>> contents = GeneralFunctions
-                                        .jsonToArray(currentSubject.contents);
+                                ArrayList<ArrayList<String>> contents = currentSubject.contents;
                                 if (contents != null) {
                                     if (notesOrder < contents.size()) {
                                         contents.remove(notesOrder);
@@ -294,7 +290,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                     contents = new ArrayList<>();
                                 }
                                 // Update value in database
-                                currentSubject.contents = GeneralFunctions.arrayToJson(contents);
+                                currentSubject.contents = contents;
                                 database.SubjectDao().update(currentSubject);
                                 database.close();
                                 ((MainActivity) getActivity()).displayFragment
@@ -340,7 +336,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             @NonNull NotesSubject subject) {
         if (getActivity() != null) {
             contents.get(notesOrder).set(3, null);
-            subject.contents = GeneralFunctions.arrayToJson(contents);
+            subject.contents = contents;
             database.SubjectDao().update(subject);
             database.close();
             Toast.makeText(getContext(), getString(R.string.n3_note_unlocked),

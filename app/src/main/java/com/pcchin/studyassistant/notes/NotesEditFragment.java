@@ -92,7 +92,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
-            subjContents = GeneralFunctions.jsonToArray(subject.contents);
+            subjContents = subject.contents;
             if (hasParent) {
                 // Set title
                 notesOrder = getArguments().getInt(ARG_PARAM2);
@@ -186,8 +186,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                         if (getActivity() != null) {
                             getActivity().setTitle(targetNotesSubject);
                         }
-                        targetSubjContents = GeneralFunctions.jsonToArray(database.SubjectDao()
-                                .search(targetNotesSubject).contents);
+                        targetSubjContents = database.SubjectDao()
+                                .search(targetNotesSubject).contents;
                     })
                     .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .create().show();
@@ -213,14 +213,14 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                 if (hasParent) {
                     // Delete original
                     subjContents.remove(notesOrder);
-                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    subject.contents = subjContents;
                     database.SubjectDao().update(subject);
                 }
                 // Add new note to new subject
                 targetSubjContents.add(updatedNote);
                 NotesSubject targetSubject = database.SubjectDao().search(targetNotesSubject);
                 if (targetSubject != null) {
-                    targetSubject.contents = GeneralFunctions.arrayToJson(targetSubjContents);
+                    targetSubject.contents = targetSubjContents;
                 }
                 database.SubjectDao().update(targetSubject);
 
@@ -232,14 +232,14 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                 if (hasParent) {
                     // Modify original
                     subjContents.set(notesOrder, updatedNote);
-                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    subject.contents = subjContents;
                     database.SubjectDao().update(subject);
                     ((MainActivity) getActivity()).displayFragment(NotesViewFragment
                         .newInstance(notesSubject, notesOrder));
                 } else {
                     // Add new note
                     subjContents.add(updatedNote);
-                    subject.contents = GeneralFunctions.arrayToJson(subjContents);
+                    subject.contents = subjContents;
                     database.SubjectDao().update(subject);
                     ((MainActivity) getActivity()).displayFragment(NotesViewFragment
                         .newInstance(notesSubject, subjContents.size() - 1));

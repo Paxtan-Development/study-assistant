@@ -8,7 +8,7 @@ import androidx.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import com.google.android.material.navigation.NavigationView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +17,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
@@ -27,15 +25,10 @@ import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,37 +62,6 @@ public class GeneralFunctions {
         return stringBuilder.toString();
     }
 
-    /** Converts an ArrayList to a string JSON array. **/
-    public static String arrayToJson(ArrayList<ArrayList<String>> original) {
-        return new Gson().toJson(original);
-    }
-
-    /** Converts a string JSON array into an ArrayList.
-     * Returns null if the original array is invalid.
-     * Returns an empty ArrayList if the original array is empty. **/
-    @Nullable
-    public static ArrayList<ArrayList<String>> jsonToArray(String original) {
-        if (isJson(original)) {
-            Type listType = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
-            return new Gson().fromJson(original, listType);
-        }
-        return null;
-    }
-
-    /** Checks if a string is formatted in the JSON format. **/
-    private static boolean isJson(String Json) {
-        try {
-            new JSONObject(Json);
-        } catch (JSONException ex) {
-            try {
-                new JSONArray(Json);
-            } catch (JSONException ex1) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /** Show the dialog to add a new subject to the notes list **/
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                final SubjectDatabase database) {
@@ -130,8 +92,7 @@ public class GeneralFunctions {
                             // Create subject
                             database.SubjectDao().insert(
                                     new NotesSubject(inputText,
-                                            GeneralFunctions.arrayToJson(
-                                                    new ArrayList<>()),
+                                                    new ArrayList<>(),
                                                     NotesSubject.SORT_ALPHABETICAL_ASC));
                             database.close();
                             activity.displayFragment(

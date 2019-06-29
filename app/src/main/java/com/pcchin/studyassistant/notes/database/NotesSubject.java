@@ -6,6 +6,8 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+
 /** The entity for each Subject. **/
 @Entity
 public class NotesSubject {
@@ -29,9 +31,9 @@ public class NotesSubject {
     @ColumnInfo(name = "_title")
     public String title;
 
-    /** The contents of the subject. Contains a JSON array with the values of the notes. **/
+    /** The contents of the subject. Contains the values of the notes. **/
     @ColumnInfo(name = "contents")
-    public String contents;
+    public ArrayList<ArrayList<String>> contents;
 
     /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
     @ColumnInfo(name = "sortOrder")
@@ -41,18 +43,10 @@ public class NotesSubject {
     @Ignore
     NotesSubject() {}
 
-    /** Constructor used. Nothing to see here. **/
-    public NotesSubject(@NonNull String title, String contents, int sortOrder) {
+    /** Constructor used in the current version. **/
+    public NotesSubject(@NonNull String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
         this.title = title;
         this.contents = contents;
         this.sortOrder = sortOrder;
-    }
-
-    /** Constructor used in version 1. Only used for testing migrations. **/
-    @Ignore
-    @Deprecated
-    public NotesSubject(@NonNull String title, String contents) {
-        this.title = title;
-        this.contents = contents;
     }
 }

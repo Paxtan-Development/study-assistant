@@ -2,9 +2,7 @@ package com.pcchin.studyassistant.functions;
 
 import androidx.annotation.NonNull;
 
-import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.engines.BlowfishEngine;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

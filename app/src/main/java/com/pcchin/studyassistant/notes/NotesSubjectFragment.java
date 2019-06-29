@@ -102,7 +102,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 // Get notes from database
                 getActivity().setTitle(notesSubject);
                 NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
-                notesArray = GeneralFunctions.jsonToArray(subject.contents);
+                notesArray = subject.contents;
 
                 if (notesArray != null) {
                     // Sort notes just in case
@@ -353,7 +353,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             }
             Collections.sort(notesArray, SortingComparators.firstValComparator);
         }
-        subject.contents = GeneralFunctions.arrayToJson(notesArray);
+        subject.contents = notesArray;
         subjectDatabase.SubjectDao().update(subject);
     }
 }

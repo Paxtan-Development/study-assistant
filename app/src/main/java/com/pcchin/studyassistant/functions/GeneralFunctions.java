@@ -63,7 +63,7 @@ public class GeneralFunctions {
         return stringBuilder.toString();
     }
 
-    /** Show the dialog to add a new subject to the notes list **/
+    /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()

@@ -92,7 +92,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             // Check if subject exists in database
             NotesSubject currentSubject = subjectDatabase.SubjectDao().search(notesSubject);
             if (currentSubject == null) {
-                Toast.makeText(getContext(), getString(R.string.n2_error_missing_subject),
+                Toast.makeText(getContext(), R.string.n2_error_missing_subject,
                         Toast.LENGTH_SHORT).show();
                 // Return to NotesSelectFragment if not
                 subjectDatabase.close();
@@ -127,8 +127,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
         // Check if stored data may be corrupt
         if (notesArray == null) {
-            Toast.makeText(getContext(), getString(R.string.n_error_corrupt),
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.n_error_corrupt, Toast.LENGTH_SHORT).show();
             notesArray = new ArrayList<>();
         }
 
@@ -193,8 +192,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
 
         if (anyCorrupt) {
-            Toast.makeText(getContext(), getString(R.string.n2_error_some_corrupt)
-                    , Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.n2_error_some_corrupt, Toast.LENGTH_SHORT).show();
         }
         return returnScroll;
     }
@@ -307,8 +305,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             }
                             database.close();
                             // Return to NotesSelectFragment
-                            Toast.makeText(getContext(),
-                                    getString(R.string.n2_deleted), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
                             GeneralFunctions.updateNavView((MainActivity) getActivity());
                             subjectDatabase.close();
                             ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());

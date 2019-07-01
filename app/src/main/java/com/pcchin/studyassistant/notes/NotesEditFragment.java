@@ -208,7 +208,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             updatedNote.add(null);
 
             // Toast at start as different objects have different displayFragments
-            Toast.makeText(getContext(), getString(R.string.n4_note_saved), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.n4_note_saved, Toast.LENGTH_SHORT).show();
             if (subjModified && !Objects.equals(targetNotesSubject, notesSubject)) {
                 if (hasParent) {
                     // Delete original
@@ -247,8 +247,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             }
             database.close();
         } else {
-            Toast.makeText(getContext(), getString(R.string.n2_error_note_title_empty),
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.n2_error_note_title_empty, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -274,8 +273,9 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.n4_return)
                 .setMessage(R.string.n4_save_note)
-                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> onSavePressed())
-                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> onCancelPressed())
+                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> onSavePressed())
+                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> onCancelPressed())
+                .setNeutralButton(android.R.string.cancel, ((dialogInterface, i) -> dialogInterface.dismiss()))
                 .create().show();
         return true;
     }

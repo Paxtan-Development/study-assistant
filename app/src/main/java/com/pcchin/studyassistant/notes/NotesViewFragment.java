@@ -84,7 +84,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 isLocked = (notesInfo.get(3) != null);
             } else if (getActivity() != null) {
                 // Return to subject
-                Toast.makeText(getActivity(), getString(R.string.n_error_corrupt),
+                Toast.makeText(getActivity(), R.string.n_error_corrupt,
                         Toast.LENGTH_SHORT).show();
                 ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
                         .newInstance(notesSubject));
@@ -193,7 +193,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             }
                             subject.contents = contents;
                             database.SubjectDao().update(subject);
-                            Toast.makeText(getContext(), getString(R.string.n3_note_locked), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
                         }
                         database.close();
                         isLocked = true;
@@ -299,8 +299,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                 // In case the note somehow doesn't have a subject
                                 ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                             }
-                            Toast.makeText(getContext(), getString(
-                                    R.string.n3_deleted), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
@@ -339,8 +338,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             subject.contents = contents;
             database.SubjectDao().update(subject);
             database.close();
-            Toast.makeText(getContext(), getString(R.string.n3_note_unlocked),
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.n3_note_unlocked, Toast.LENGTH_SHORT).show();
             isLocked = false;
             getActivity().invalidateOptionsMenu();
         }

@@ -1,8 +1,10 @@
 package com.pcchin.studyassistant.main;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
@@ -10,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
@@ -19,10 +23,12 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -43,6 +49,7 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -50,42 +57,21 @@ import org.jsoup.parser.Parser;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String GITLAB_REPO = "https://gitlab.com/pc.chin/study-assistant/releases/";
+    private static final String GITLAB_REPO = "https://gitlab.com/pc.chin/study-assistant/releases";
     private static final String GITLAB_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
 
+    private int gitlabReleasesStatusCode;
     private Fragment currentFragment;
 
-    /** The runnable that checks for version updates of the app. **/
-    private Runnable updateRunnable = () -> {
-        // Delete any incomplete apk file if present
-        String outputFileName = getFilesDir().getAbsolutePath() + "/apk";
-        File apkInstallDir = new File(outputFileName);
-        if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
-            // Deletes all children in the folder
-            File[] dirFiles = apkInstallDir.listFiles();
-            if (dirFiles != null) {
-                for (File child: dirFiles) {
-                    GeneralFunctions.deleteDir(child);
-                }
-            }
-            outputFileName += "/studyassistant-update.apk";
-        } else if (!apkInstallDir.exists()) {
-            if (apkInstallDir.mkdir()) {
-                outputFileName += "/studyassistant-update.apk";
-            } else {
-                 outputFileName = getNewFileName();
-            }
-        } else {
-            outputFileName = getNewFileName();
-        }
-
+    /** The runnable that checks for version updates of the app.
+     * checkGitlabUpdates() separated for clarity. **/
+    private final Runnable updateRunnable = () -> {
         // Check if network is connected
         boolean isConnected = false;
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -109,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                             Uri.parse("https://play.google.com/store/apps/details?id="
                                     + getPackageName())));
             } else {
-                checkGitlabUpdates(outputFileName);
+                checkGitlabUpdates();
             }
         }
     };
@@ -251,7 +237,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** Hides the soft input keyboard. Separated for clarity. **/
+    /** Hides the soft input keyboard, separated for clarity. **/
     private void hideKeyboard() {
         // Hide keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -266,7 +252,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** Checks if the app is downloaded from the Play Store. **/
+    /** Checks if the app is downloaded from the Play Store, separated for clarity. **/
     private boolean isFromPlayStore() {
         // A list with valid installers package name
         List<String> validInstallers = Arrays.asList("com.android.vending", "com.google.android.feedback");
@@ -277,77 +263,148 @@ public class MainActivity extends AppCompatActivity
     }
 
     /** Checks whether a newer version of the app has been released on GitLab,
-     * separated for clarity. */
-    private void checkGitlabUpdates(String outputFileName) {
-        StringRequest getReleases = new StringRequest(GITLAB_RELEASES, response -> {
-            try {
-                // Get latest version from releases page
-                JSONObject latestVersion = new JSONObject(response)
-                        .getJSONArray("data").getJSONObject(0);
-                if (!Objects.equals(latestVersion.getString("name")
-                        .replace("v", ""), BuildConfig.VERSION_NAME)) {
-                    // Version is not the latest, needs to be updated
-                    // The first link in the description is always the download link for the apk
-                    String downloadLink = GITLAB_REPO + Jsoup.parse(Parser.unescapeEntities(
-                            latestVersion.getString("description_html"), false))
-                            .select("a").first().attr("href");
-                    new AlertDialog.Builder(this)
-                            .setTitle(R.string.a_update_app)
-                            .setMessage(R.string.a_new_version)
-                            .setPositiveButton(android.R.string.yes, (dialogInterface, i) ->
-                                    updateViaGitlab(downloadLink, outputFileName))
-                            .setNegativeButton(android.R.string.no, ((dialogInterface, i) ->
-                                    dialogInterface.dismiss()))
-                            .create().show();
-
+     * separated from UpdateRunnable for clarity,
+     * showGitlabUpdateNotif(JSONArray response) separated for clarity. */
+    private void checkGitlabUpdates() {
+        JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_RELEASES, response -> {
+            SharedPreferences.Editor editor = getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
+            editor.putString("gitlabReleasesJson", response.toString());
+            editor.apply();
+            showGitlabUpdateNotif(response);
+        }, error -> {
+            if (gitlabReleasesStatusCode == 304) {
+                // Error 304 means that the page remains the same, pulls page from old site
+                SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+                String oldResponse = sharedPref.getString("gitlabReleasesJson", "");
+                try {
+                    JSONArray oldArray = new JSONArray(oldResponse);
+                    showGitlabUpdateNotif(oldArray);
+                } catch (JSONException e) {
+                    Log.d("StudyAssistant", "Data Error: former response " + oldResponse
+                            + " is not a JSON array.");
                 }
-            } catch (JSONException e) {
-                Log.d("Network Error", "Response returned by " + GITLAB_RELEASES
-                        + " invalid, response given is " + response + ", error given is "
-                        + e.getMessage());
+            } else {
+                Log.d("StudyAssistant", "Network Error: Volley returned error " +
+                        error.getMessage() + ":" + error.toString() + " from " + GITLAB_RELEASES
+                        + ", stack trace is " + Arrays.toString(error.getStackTrace()));
             }
-        }, error -> Log.d("Network Error", "Volley returned statusCode " +
-                error.networkResponse.statusCode));
+        }) {
+            @Override
+            protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
+                gitlabReleasesStatusCode = response.statusCode;
+                return super.parseNetworkResponse(response);
+            }
+        };
         // Send request
         RequestQueue queue = Volley.newRequestQueue(this);
         queue.add(getReleases);
-        queue.start();
+    }
+
+    /** Show users the update notification,
+     * separated from checkGitlabUpdates() for clarity,
+     * updateViaGitlab(String downloadLink) separated for clarity. **/
+    private void showGitlabUpdateNotif(JSONArray response) {
+        try {
+            // Get latest version from releases page
+            JSONObject latestVersion = response.getJSONObject(0);
+            if (!Objects.equals(latestVersion.getString("name")
+                    .replace("v", ""), BuildConfig.VERSION_NAME)) {
+                // Version is not the latest, needs to be updated
+                // The first link in the description is always the download link for the apk
+                String downloadLink = GITLAB_REPO + Jsoup.parse(Parser.unescapeEntities(
+                        latestVersion.getString("description_html"), false))
+                        .select("a").first().attr("href");
+                // Set up notification
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent pendingIntent = PendingIntent
+                        .getActivity(this, 0, intent, 0);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder
+                        (this, "com.pcchin.studyassistant")
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentTitle(getString(R.string.a_update_app))
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true);
+                NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+                manager.notify(getTaskId(), builder.build());
+
+                // Set up dialog
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.a_update_app)
+                        .setMessage(R.string.a_new_version)
+                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) ->
+                                updateViaGitlab(downloadLink))
+                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) ->
+                                dialogInterface.dismiss()))
+                        .create().show();
+            }
+        } catch (JSONException e) {
+            Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_RELEASES
+                    + " invalid, response given is " + response + ", error given is "
+                    + e.getMessage());
+        }
     }
 
     /** Download and update the newest version of the app via GitLab,
-     * separated for clarity. **/
-    private void updateViaGitlab(String downloadLink, String outputFileName) {
+     * separated from showGitlabUpdateNotif(JSONArray response) for clarity. **/
+    private void updateViaGitlab(String downloadLink) {
+        // Generate output file name
+        // Delete any incomplete apk file if present
+        String outputFileName = getFilesDir().getAbsolutePath() + "/apk";
+        File apkInstallDir = new File(outputFileName);
+        if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
+            // Deletes all children in the folder
+            File[] dirFiles = apkInstallDir.listFiles();
+            if (dirFiles != null) {
+                for (File child: dirFiles) {
+                    GeneralFunctions.deleteDir(child);
+                }
+            }
+            outputFileName += "/studyassistant-update.apk";
+        } else if (!apkInstallDir.exists()) {
+            if (apkInstallDir.mkdir()) {
+                outputFileName += "/studyassistant-update.apk";
+            } else {
+                outputFileName = getNewFileName();
+            }
+        } else {
+            outputFileName = getNewFileName();
+        }
+
+        String finalOutputFileName = outputFileName;
         VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,
                 downloadLink, response -> {
             try {
                 if (response != null) {
+                    Toast.makeText(this, getString(R.string.a_dont_close_app), Toast.LENGTH_SHORT).show();
                     FileOutputStream responseStream;
-                    responseStream = openFileOutput(outputFileName, MODE_PRIVATE);
+                    responseStream = openFileOutput(finalOutputFileName, MODE_PRIVATE);
                     responseStream.write(response);
                     responseStream.close();
                     Toast.makeText(this, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
 
                     // Install app
                     Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                    installIntent.setDataAndType(Uri.fromFile(new File(outputFileName)),
+                    installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),
                             "application/vnd.android.package-archive");
                     startActivity(installIntent);
                 }
             } catch (Exception e) {
-                Log.d("Network Error", "Volley download request failed in middle of operation with error "
-                + Arrays.toString(e.getStackTrace()));
+                Log.d("Study Assistant", "Network Error: Volley download request failed " +
+                        "in middle of operation with error " + Arrays.toString(e.getStackTrace()));
             }
         }, error -> {
-            Log.d("Network Error", "Volley file download request failed with error code"
-                    + error.networkResponse.statusCode + ", response given is "
-                    + error.getMessage(), null);
+            Log.d("StudyAssistant", "Network Error: Volley file download request failed"
+                     + ", response given is " + error.getMessage() + ", stack trace is "
+                    + Arrays.toString(error.getStackTrace()));
             Toast.makeText(MainActivity.this,
                     "Network Error: Please check your internet connection and try again.",
                     Toast.LENGTH_SHORT).show();
         }, null);
         RequestQueue queue = Volley.newRequestQueue(this, new HurlStack());
         queue.add(request);
-        queue.start();
     }
 
     /** @return a file name for the updated apk that is not taken in the Downloads folder. **/

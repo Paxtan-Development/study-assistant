@@ -14,10 +14,13 @@
     <string name="cancel">Cancel</string>
     <string name="del">Delete</string>
     <string name="title">Title</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>
     <string name="a_new_version">A newer version of the app is available. Would you like to update to the latest version?</string>
+    <string name="a_dont_close_app">Please do not close the app until the update is completed.</string>
     <string name="a_app_updating">Updating app…</string>
 
     <!-- Strings used in group M -->

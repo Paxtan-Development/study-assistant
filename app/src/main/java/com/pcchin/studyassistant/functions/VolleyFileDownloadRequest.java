@@ -11,7 +11,7 @@ import java.util.Map;
 /** Request format used by Volley to download a file. **/
 public class VolleyFileDownloadRequest extends Request<byte[]> {
     private final Response.Listener<byte[]> requestResponse;
-    private Map<String, String> dlParams;
+    private final Map<String, String> dlParams;
 
     /** Default constructor. **/
     public VolleyFileDownloadRequest(int method, String mUrl ,Response.Listener<byte[]> listener,

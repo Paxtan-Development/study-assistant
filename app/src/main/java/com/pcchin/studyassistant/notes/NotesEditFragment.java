@@ -273,8 +273,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.n4_return)
                 .setMessage(R.string.n4_save_note)
-                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> onSavePressed())
-                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> onCancelPressed())
+                .setPositiveButton(R.string.yes, (dialogInterface, i) -> onSavePressed())
+                .setNegativeButton(R.string.no, (dialogInterface, i) -> onCancelPressed())
                 .setNeutralButton(android.R.string.cancel, ((dialogInterface, i) -> dialogInterface.dismiss()))
                 .create().show();
         return true;

@@ -213,7 +213,8 @@ public class GeneralFunctions {
         }
     }
 
-    /** For to Delete the directory inside list of files and inner Directory **/
+    /** For deleting the directory inside list of files and inner Directory.
+     * Placed here despite only used once as self calling is needed. **/
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();

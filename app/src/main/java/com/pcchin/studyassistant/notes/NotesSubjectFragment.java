@@ -153,9 +153,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.get(0));
             ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
                     getString(R.string.n_last_edited), note.get(1)));
-            String miniText = note.get(2).replace("\n* ", "\n● ");
+            String miniText = note.get(2).replace("\n* ", "\n ● ");
             if (miniText.startsWith("* ")) {
-                miniText = miniText.replaceFirst("\\* ", "● ");
+                miniText = miniText.replaceFirst("\\* ", " ● ");
             }
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setText(miniText);
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);

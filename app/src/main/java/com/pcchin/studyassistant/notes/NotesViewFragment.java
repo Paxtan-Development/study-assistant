@@ -103,9 +103,9 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
         ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
-        String contentText = notesInfo.get(2).replace("\n* ", "\n● ");
+        String contentText = notesInfo.get(2).replace("\n* ", "\n ● ");
         if (contentText.startsWith("* ")) {
-            contentText = contentText.replaceFirst("\\* ", "● ");
+            contentText = contentText.replaceFirst("\\* ", " ● ");
         }
         ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",

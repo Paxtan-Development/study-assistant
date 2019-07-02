@@ -143,7 +143,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 anyCorrupt = true;
             }
             // Implemented separately for backwards compatibility
-            if (note.size() == 3) {
+            if (note.size() < 6) {
                 note.add(null);
             }
 
@@ -159,10 +159,19 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             }
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setText(miniText);
             ((TextView) miniNote.findViewById(R.id.n2_mini_content)).setMaxLines(MAXLINES);
+
+            // Check if note is locked
             if (note.get(3) == null) {
                 miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.INVISIBLE);
             } else {
                 miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.VISIBLE);
+            }
+
+            // Check if note has a alert attached
+            if (note.get(4) == null) {
+                miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.INVISIBLE);
+            } else {
+                miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.VISIBLE);
             }
             miniNote.findViewById(R.id.n2_mini_content).setVerticalScrollBarEnabled(false);
 
@@ -213,7 +222,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .setTitle(R.string.n2_new_note)
                     .setView(popupView)
                     .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(R.string.cancel, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .create();
             // OnClickListeners implemented separately to prevent
             // dialog from being dismissed after button click
@@ -311,7 +320,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                         }
                     })
-                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .create().show();
         }
     }

@@ -203,7 +203,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             // Save original as ArrayList
             ArrayList<String> updatedNote = new ArrayList<>();
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
-            updatedNote.add(GeneralFunctions.standardDateFormat.format(new Date()));
+            updatedNote.add(GeneralFunctions.standardDateTimeFormat.format(new Date()));
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
             updatedNote.add(null);
 

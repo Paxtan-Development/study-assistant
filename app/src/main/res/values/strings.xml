@@ -11,7 +11,6 @@
     <string name="data_export">Export</string>
     <string name="edit">Edit</string>
     <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
     <string name="del">Delete</string>
     <string name="title">Title</string>
     <string name="yes">Yes</string>
@@ -20,7 +19,9 @@
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>
     <string name="a_new_version">A newer version of the app is available. Would you like to update to the latest version?</string>
-    <string name="a_dont_close_app">Please do not close the app until the update is completed.</string>
+    <string name="a_downloading">Downloading the latest version…</string>
+    <string name="a_network_error">Network Error</string>
+    <string name="a_file_error">File Error</string>
     <string name="a_app_updating">Updating app…</string>
 
     <!-- Strings used in group M -->
@@ -45,6 +46,7 @@
     <string name="n_change_subj">Change subject</string>
     <string name="n_last_edited">Last changed: </string>
     <string name="n_error_subject_empty">Subject name cannot be empty</string>
+    <string name="n_new_alert">New alert</string>
 
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
@@ -62,6 +64,7 @@
     <string name="n2_del_confirm">Delete subject?</string>
     <string name="n2_deleted">Subject deleted</string>
     <string name="n2_note_locked_details">This note has been locked and cannot be edited.</string>
+    <string name="n2_note_has_alert">An alert has been set for the note.</string>
 
     <string name="n3_del_confirm">Delete note?</string>
     <string name="n3_deleted">Note deleted</string>
@@ -73,6 +76,12 @@
     <string name="n3_unlock_password">Enter Password to Unlock Note</string>
     <string name="n3_password_set">Leave blank to not set a password.</string>
     <string name="n3_unlock_note">Unlock Note</string>
+    <string name="n3_set_alert">Set Alert</string>
+    <string name="n3_remove_alert">Remove Alert</string>
+    <string name="n3_set_date">Set the date for the alert</string>
+    <string name="n3_set_time">Set the time for the alert</string>
+    <string name="n3_alert_set">Alert set</string>
+    <string name="n3_alert_cancelled">Alert cancelled</string>
 
     <string name="n4_return">Return</string>
     <string name="n4_save_note">Save note?</string>

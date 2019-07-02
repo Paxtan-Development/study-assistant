@@ -17,7 +17,7 @@
             android:id="@+id/n2_mini_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.9"
+            android:layout_weight="0.8"
             android:ellipsize="end"
             android:maxLines="2"
             android:text="@string/blank"
@@ -31,6 +31,14 @@
             android:layout_weight="0.1"
             android:contentDescription="@string/n2_note_locked_details"
             app:srcCompat="@drawable/ic_menu_lock_dark" />
+
+        <ImageView
+            android:id="@+id/n2_mini_notif"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:contentDescription="@string/n2_note_has_alert"
+            app:srcCompat="@drawable/ic_menu_notif" />
 
     </LinearLayout>
 

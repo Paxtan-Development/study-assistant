@@ -1,10 +1,13 @@
 package com.pcchin.studyassistant.main;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
@@ -27,7 +30,6 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
@@ -37,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.BuildConfig;
@@ -56,14 +59,18 @@ import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String GITLAB_REPO = "https://gitlab.com/pc.chin/study-assistant/releases";
+    private static final String GITLAB = "https://gitlab.com";
     private static final String GITLAB_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
 
     private int gitlabReleasesStatusCode;
@@ -89,12 +96,7 @@ public class MainActivity extends AppCompatActivity
 
         // Check if there is a newer version of the app
         if (isConnected) {
-            if (isFromPlayStore()) {
-                // Check from Play Store
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id="
-                                    + getPackageName())));
-            } else {
+            if (!isFromPlayStore()) {
                 checkGitlabUpdates();
             }
         }
@@ -106,7 +108,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         displayFragment(new MainFragment());
-        new Handler().post(updateRunnable);
+
+        // Only check for updates once a day
+        if (Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+                .getString("lastUpdateCheck", ""),
+                GeneralFunctions.standardDateFormat.format(Calendar.getInstance()))) {
+            new Handler().post(updateRunnable);
+        }
 
         // Set toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -164,6 +172,14 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.n3_lock:
                 ((NotesViewFragment) currentFragment).onLockPressed();
+                break;
+
+            case R.id.n3_notif:
+                ((NotesViewFragment) currentFragment).onAlertPressed();
+                break;
+
+            case R.id.n3_cancel_notif:
+                ((NotesViewFragment) currentFragment).onCancelAlertPressed();
                 break;
 
             case R.id.n3_unlock:
@@ -266,6 +282,7 @@ public class MainActivity extends AppCompatActivity
      * separated from UpdateRunnable for clarity,
      * showGitlabUpdateNotif(JSONArray response) separated for clarity. */
     private void checkGitlabUpdates() {
+        RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_RELEASES, response -> {
             SharedPreferences.Editor editor = getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
             editor.putString("gitlabReleasesJson", response.toString());
@@ -282,11 +299,14 @@ public class MainActivity extends AppCompatActivity
                 } catch (JSONException e) {
                     Log.d("StudyAssistant", "Data Error: former response " + oldResponse
                             + " is not a JSON array.");
+                    queue.stop();
                 }
             } else {
                 Log.d("StudyAssistant", "Network Error: Volley returned error " +
                         error.getMessage() + ":" + error.toString() + " from " + GITLAB_RELEASES
-                        + ", stack trace is " + Arrays.toString(error.getStackTrace()));
+                        + ", stack trace is");
+                error.printStackTrace();
+                queue.stop();
             }
         }) {
             @Override
@@ -296,7 +316,6 @@ public class MainActivity extends AppCompatActivity
             }
         };
         // Send request
-        RequestQueue queue = Volley.newRequestQueue(this);
         queue.add(getReleases);
     }
 
@@ -311,7 +330,7 @@ public class MainActivity extends AppCompatActivity
                     .replace("v", ""), BuildConfig.VERSION_NAME)) {
                 // Version is not the latest, needs to be updated
                 // The first link in the description is always the download link for the apk
-                String downloadLink = GITLAB_REPO + Jsoup.parse(Parser.unescapeEntities(
+                String downloadLink = GITLAB + Jsoup.parse(Parser.unescapeEntities(
                         latestVersion.getString("description_html"), false))
                         .select("a").first().attr("href");
                 // Set up notification
@@ -319,16 +338,19 @@ public class MainActivity extends AppCompatActivity
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 PendingIntent pendingIntent = PendingIntent
                         .getActivity(this, 0, intent, 0);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder
-                        (this, "com.pcchin.studyassistant")
+                Notification notif = new NotificationCompat.Builder
+                        (this, getPackageName())
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(getString(R.string.app_name))
-                        .setContentTitle(getString(R.string.a_update_app))
+                        .setContentText(getString(R.string.a_update_app))
                         .setContentIntent(pendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setAutoCancel(true);
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setLights(Color.BLUE, 2000, 0)
+                        .setVibrate(new long[]{0, 250, 250, 250, 250})
+                        .setAutoCancel(true).build();
                 NotificationManagerCompat manager = NotificationManagerCompat.from(this);
-                manager.notify(getTaskId(), builder.build());
+                manager.notify(getTaskId(), notif);
 
                 // Set up dialog
                 new AlertDialog.Builder(this)
@@ -336,8 +358,14 @@ public class MainActivity extends AppCompatActivity
                         .setMessage(R.string.a_new_version)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) ->
                                 updateViaGitlab(downloadLink))
-                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) ->
-                                dialogInterface.dismiss()))
+                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) -> {
+                                // Update so that it will not ask again on the same day
+                                SharedPreferences.Editor editor =
+                                        getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
+                                editor.putString("lastUpdateCheck", GeneralFunctions
+                                        .standardDateFormat.format(Calendar.getInstance()));
+                                editor.apply();
+                                dialogInterface.dismiss(); }))
                         .create().show();
             }
         } catch (JSONException e) {
@@ -373,38 +401,66 @@ public class MainActivity extends AppCompatActivity
             outputFileName = getNewFileName();
         }
 
+        RequestQueue queue = Volley.newRequestQueue(this);
+        // Boolean used as it is possible for user to cancel the dialog before the download starts
+        AtomicBoolean continueDownload = new AtomicBoolean(true);
+        ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        progressBar.setIndeterminate(true);
+        AlertDialog downloadDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.a_downloading)
+                .setView(progressBar)
+                .setPositiveButton(android.R.string.cancel, null)
+                .setOnDismissListener(dialogInterface -> {
+                    Log.d("StudyAssistant", "Notif: Download cancel");
+                    queue.stop();
+                    continueDownload.set(false);
+                })
+                .create();
+        downloadDialog.show();
+
         String finalOutputFileName = outputFileName;
         VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,
                 downloadLink, response -> {
             try {
+                downloadDialog.dismiss();
+                queue.stop();
                 if (response != null) {
-                    Toast.makeText(this, getString(R.string.a_dont_close_app), Toast.LENGTH_SHORT).show();
                     FileOutputStream responseStream;
-                    responseStream = openFileOutput(finalOutputFileName, MODE_PRIVATE);
-                    responseStream.write(response);
+                    responseStream = new FileOutputStream(new File(finalOutputFileName));
+                    responseStream.flush();
                     responseStream.close();
-                    Toast.makeText(this, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
 
                     // Install app
+                    Toast.makeText(this, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
                     Intent installIntent = new Intent(Intent.ACTION_VIEW);
                     installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),
                             "application/vnd.android.package-archive");
                     startActivity(installIntent);
                 }
+            } catch (FileNotFoundException e) {
+                Log.d("StudyAssistant", "File Error: File" + finalOutputFileName + " not found.");
+                Toast.makeText(this, R.string.a_file_error, Toast.LENGTH_SHORT).show();
+            } catch (IOException e2) {
+                Log.d("StudyAssistant", "File Error: An IOException occurred at " + finalOutputFileName
+                + ", stack trace is");
+                e2.printStackTrace();
+                Toast.makeText(this, R.string.a_file_error, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Log.d("Study Assistant", "Network Error: Volley download request failed " +
-                        "in middle of operation with error " + Arrays.toString(e.getStackTrace()));
+                Log.d("Study Assistant", "Error: Volley download request failed " +
+                        "in middle of operation with error");
+                e.printStackTrace();
+                Toast.makeText(this, R.string.a_network_error, Toast.LENGTH_SHORT).show();
             }
         }, error -> {
+            downloadDialog.dismiss();
             Log.d("StudyAssistant", "Network Error: Volley file download request failed"
-                     + ", response given is " + error.getMessage() + ", stack trace is "
-                    + Arrays.toString(error.getStackTrace()));
-            Toast.makeText(MainActivity.this,
-                    "Network Error: Please check your internet connection and try again.",
-                    Toast.LENGTH_SHORT).show();
+                     + ", response given is " + error.getMessage() + ", stack trace is");
+            error.printStackTrace();
+            Toast.makeText(MainActivity.this, R.string.a_network_error, Toast.LENGTH_SHORT).show();
         }, null);
-        RequestQueue queue = Volley.newRequestQueue(this, new HurlStack());
-        queue.add(request);
+        if (continueDownload.get()) {
+            queue.add(request);
+        }
     }
 
     /** @return a file name for the updated apk that is not taken in the Downloads folder. **/

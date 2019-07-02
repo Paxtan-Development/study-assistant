@@ -13,6 +13,16 @@
         android:title="@string/data_export"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/n3_notif"
+        android:icon="@drawable/ic_menu_notif"
+        android:title="@string/n3_set_alert"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/n3_cancel_notif"
+        android:icon="@drawable/ic_menu_cancel_notif"
+        android:title="@string/n3_remove_alert"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/n3_lock"
         android:icon="@drawable/ic_menu_lock"
         android:title="@string/n3_lock_note"

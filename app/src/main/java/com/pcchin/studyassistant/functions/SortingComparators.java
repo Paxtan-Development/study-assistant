@@ -36,11 +36,11 @@ public class SortingComparators {
                     Date date_a, date_b;
                     // Check if date a is null
                     try {
-                        date_a = GeneralFunctions.standardDateFormat.parse(a.get(1));
+                        date_a = GeneralFunctions.standardDateTimeFormat.parse(a.get(1));
                     } catch (ParseException e) {
                         try {
                             // Date a is null while date b is not
-                            GeneralFunctions.standardDateFormat.parse(b.get(1));
+                            GeneralFunctions.standardDateTimeFormat.parse(b.get(1));
                             return -1;
                         } catch (ParseException e1) {
                             // Date a and date b are both null
@@ -50,7 +50,7 @@ public class SortingComparators {
 
                     // Check if date b is null
                     try {
-                        date_b = GeneralFunctions.standardDateFormat.parse(b.get(1));
+                        date_b = GeneralFunctions.standardDateTimeFormat.parse(b.get(1));
                     } catch (ParseException e) {
                         // Date b is null while date a is not
                         return 1;

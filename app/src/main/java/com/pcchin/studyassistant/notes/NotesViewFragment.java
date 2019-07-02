@@ -3,7 +3,13 @@ package com.pcchin.studyassistant.notes;
 import androidx.room.Room;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -11,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.InputType;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +32,7 @@ import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -32,7 +40,11 @@ import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
+import java.util.Random;
+
+import static android.app.AlarmManager.RTC;
 
 public class NotesViewFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
@@ -42,6 +54,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     private String notesSubject;
     private int notesOrder;
     private boolean isLocked;
+    private boolean hasAlert;
 
     /** Default constructor. **/
     public NotesViewFragment() {}
@@ -82,6 +95,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 // Error message not shown as it is displayed in NotesSubjectFragment
                 checkNoteIntegrity(notesInfo);
                 isLocked = (notesInfo.get(3) != null);
+                hasAlert = (notesInfo.get(4) != null);
             } else if (getActivity() != null) {
                 // Return to subject
                 Toast.makeText(getActivity(), R.string.n_error_corrupt,
@@ -141,6 +155,14 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             inflater.inflate(R.menu.menu_n3_locked, menu);
         } else {
             inflater.inflate(R.menu.menu_n3_unlocked, menu);
+        }
+
+        if (hasAlert) {
+            menu.findItem(R.id.n3_notif).setVisible(true);
+            menu.findItem(R.id.n3_cancel_notif).setVisible(false);
+        } else {
+            menu.findItem(R.id.n3_notif).setVisible(false);
+            menu.findItem(R.id.n3_cancel_notif).setVisible(true);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -266,6 +288,63 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
+    /** Sets up the alert to notify users at a specific time,
+     * separated selectTime(Calendar targetDateTime) for clarity. **/
+    public void onAlertPressed() {
+        // Select date
+        if (getContext() != null) {
+            Toast.makeText(getContext(), R.string.n3_set_date, Toast.LENGTH_SHORT).show();
+            Calendar targetDateTime = Calendar.getInstance();
+            Calendar currentCalendar = Calendar.getInstance();
+            DatePickerDialog dateDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
+                targetDateTime.set(Calendar.YEAR, i);
+                targetDateTime.set(Calendar.MONTH, i1);
+                targetDateTime.set(Calendar.DAY_OF_MONTH, i2);
+                selectTime(targetDateTime);
+            }, currentCalendar.get(Calendar.YEAR), currentCalendar.get(Calendar.MONTH),
+                    currentCalendar.get(Calendar.DAY_OF_MONTH));
+            // Set minimum date so that alert cannot be created for the past
+            // -10000 as minimum time cannot be now/in the future
+            dateDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 10000);
+            dateDialog.show();
+        }
+    }
+
+    /** Cancels the existing alert. **/
+    public void onCancelAlertPressed() {
+        if (getContext() != null) {
+            AlarmManager manager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
+            intent.putExtra("title", notesInfo.get(0));
+            intent.putExtra("message", notesInfo.get(2));
+            PendingIntent cancelIntent = PendingIntent.getBroadcast(getContext(),
+                    Integer.valueOf(notesInfo.get(5)), intent, 0);
+
+            if (manager != null) {
+                manager.cancel(cancelIntent);
+                // Update values in database
+                if (getActivity() != null) {
+                    notesInfo.set(4, null);
+                    notesInfo.set(5, null);
+                    SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
+                            "notesSubject").allowMainThreadQueries()
+                            .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+                    NotesSubject subject = database.SubjectDao().search(notesSubject);
+                    if (subject != null) {
+                        ArrayList<ArrayList<String>> updateArray = subject.contents;
+                        updateArray.set(notesOrder, notesInfo);
+                        database.SubjectDao().update(subject);
+                    }
+                    database.close();
+                    getActivity().invalidateOptionsMenu();
+                }
+                hasAlert = false;
+                Toast.makeText(getContext(), R.string.n3_alert_cancelled, Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
     /** Deletes the note from the subject. **/
     public void onDeletePressed() {
         if (getContext() != null) {
@@ -302,7 +381,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             Toast.makeText(getContext(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .create().show();
         }
     }
@@ -324,7 +403,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         while (original.size() < 3) {
             original.add("");
         }
-        if (original.size() == 3) {
+        if (original.size() < 6) {
             original.add(null);
         }
     }
@@ -342,5 +421,52 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             isLocked = false;
             getActivity().invalidateOptionsMenu();
         }
+    }
+
+    /** Allows the user to choose the time of the alert,
+     * separated from onAlertPressed() for clarity. **/
+    private void selectTime(Calendar targetDateTime) {
+        Toast.makeText(getContext(), R.string.n3_set_time, Toast.LENGTH_SHORT).show();
+        TimePickerDialog timeDialog = new TimePickerDialog(getContext(), (timePicker, i, i1) -> {
+            // Get time from time picker
+            targetDateTime.set(Calendar.HOUR_OF_DAY, i);
+            targetDateTime.set(Calendar.MINUTE, i1);
+            targetDateTime.set(Calendar.SECOND, 0);
+
+            if (getActivity() != null) {
+                // Set alert
+                int requestCode = new Random().nextInt();
+                AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
+                intent.putExtra("title", notesInfo.get(0));
+                intent.putExtra("message", notesInfo.get(2));
+                PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
+
+                // Save value to database
+                notesInfo.set(4, GeneralFunctions.standardDateTimeFormat.format(targetDateTime));
+                notesInfo.set(5, String.valueOf(requestCode));
+                SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
+                        "notesSubject")
+                        .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                        .allowMainThreadQueries().build();
+                NotesSubject subject = database.SubjectDao().search(notesSubject);
+                if (subject != null) {
+                    ArrayList<ArrayList<String>> updateArray = subject.contents;
+                    updateArray.set(notesOrder, notesInfo);
+                    database.SubjectDao().update(subject);
+                }
+                database.close();
+
+                // Insert alarm and reset menu
+                if (manager != null) {
+                    manager.setWindow(RTC, targetDateTime.getTimeInMillis(), 10000, alarmIntent);
+                    hasAlert = true;
+                    Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
+                }
+                getActivity().invalidateOptionsMenu();
+            }
+        }, Calendar.getInstance().get(Calendar.HOUR), Calendar.getInstance().get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(getContext()));
+        timeDialog.show();
     }
 }

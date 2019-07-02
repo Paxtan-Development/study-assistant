@@ -7,11 +7,18 @@
         android:title="@string/data_export"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/n3_unlock"
-        android:title="@string/n3_unlock_note" />
+        android:id="@+id/n3_notif"
+        android:icon="@drawable/ic_menu_notif"
+        android:title="@string/n3_set_alert"
+        app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/n3_del"
-        android:icon="@drawable/ic_menu_del"
-        android:title="@string/del"
+        android:id="@+id/n3_cancel_notif"
+        android:icon="@drawable/ic_menu_cancel_notif"
+        android:title="@string/n3_remove_alert"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/n3_unlock"
+        android:icon="@drawable/ic_menu_unlock"
+        android:title="@string/n3_unlock_note"
         app:showAsAction="ifRoom" />
 </menu>

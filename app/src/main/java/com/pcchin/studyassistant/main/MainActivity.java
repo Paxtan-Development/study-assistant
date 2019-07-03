@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity
         String outputFileName = "/storage/emulated/0/Downloads" + "/studyassistant-update" + "." + "apk";
         int i = 0;
         while (new File(outputFileName).exists()) {
-            outputFileName = "/storage/emulated/0/Downloads"+ "/studyassistant-update" + "." + i + "apk";
+            outputFileName = "/storage/emulated/0/Downloads"+ "/studyassistant-update(" + i + ")." + "apk";
         }
         return outputFileName;
     }

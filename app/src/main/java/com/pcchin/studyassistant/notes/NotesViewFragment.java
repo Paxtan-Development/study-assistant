@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.text.InputType;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +40,9 @@ import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
@@ -178,7 +182,28 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
     /** Exports the note to a txt file. **/
     public void onExportPressed() {
-        // TODO: Export
+        // Check if output file name is taken
+        int i = 0;
+        String outputText = "/storage/emulated/0/Downloads/" + notesInfo.get(0) + ".txt";
+        while (new File(outputText).exists()) {
+            outputText = "/storage/emulated/0/Downloads/" + notesInfo.get(0) + "(" + i + ").txt";
+            i++;
+        }
+
+        // Export file
+        try {
+            FileWriter outputNote = new FileWriter(outputText);
+            outputNote.write(notesInfo.get(2));
+            outputNote.flush();
+            outputNote.close();
+            Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
+                    Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Log.d("StudyAssistant", "File Error: IO Exception occurred when exporting "
+            + "note with title " + notesInfo.get(0) + " order " + notesOrder + "in subject titled"
+            + notesSubject + ", stack trace is");
+            e.printStackTrace();
+        }
     }
 
     /** Prevents the note from being able to be edited. **/

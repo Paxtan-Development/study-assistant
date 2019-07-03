@@ -82,6 +82,7 @@
     <string name="n3_set_time">Set the time for the alert</string>
     <string name="n3_alert_set">Alert set</string>
     <string name="n3_alert_cancelled">Alert cancelled</string>
+    <string name="n3_note_exported">Note exported to </string>
 
     <string name="n4_return">Return</string>
     <string name="n4_save_note">Save note?</string>

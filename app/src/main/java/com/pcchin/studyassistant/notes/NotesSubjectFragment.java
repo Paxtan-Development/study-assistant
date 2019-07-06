@@ -3,6 +3,7 @@ package com.pcchin.studyassistant.notes;
 import android.annotation.SuppressLint;
 import androidx.room.Room;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -34,6 +35,11 @@ import com.pcchin.studyassistant.functions.SortingComparators;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -301,7 +307,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     }
 
     /** Export all the notes of the subject into a ZIP file,
-     * exportZip() and exportSubject() separated for clarity. **/
+     * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
         if (getContext() != null) {
             new AlertDialog.Builder(getContext())
@@ -309,8 +315,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
                             new Handler().post(() -> {
                                 if (i == 0) {
-                                    // TODO: Export ZIP with password
-                                    exportZip();
+                                    askZipPassword();
                                 } else {
                                     exportSubject();
                                 }
@@ -321,22 +326,95 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
+    /** Asks users whether to export the ZIP file with a password.
+     * Separated from onExportPressed() for clarity,
+     * exportZip() separated for clarity. **/
+    private void askZipPassword() {
+        if (getContext() != null) {
+            @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) getLayoutInflater()
+                    .inflate(R.layout.popup_edittext, null);
+            EditText popupInput = inputLayout.findViewById(R.id.popup_input);
+            popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            TextView popupError = inputLayout.findViewById(R.id.popup_error);
+            popupError.setTextColor(Color.BLACK);
+            popupError.setText(R.string.n_password_set);
+
+            AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
+                    .setView(inputLayout)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+            passwordDialog.setOnShowListener(dialogInterface -> {
+                passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                    String inputText = popupInput.getText().toString();
+                    if (inputText.length() == 0 || inputText.length() >= 8) {
+                        exportZip(inputText);
+                    } else {
+                        popupError.setTextColor(Color.RED);
+                        popupError.setText(R.string.n2_error_password_short);
+                    }
+                });
+                passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view -> passwordDialog.dismiss());
+            });
+            passwordDialog.show();
+        }
+    }
+
     /** Export the subject to a ZIP file.
      * Separated from onExportPressed() for clarity. **/
-    private void exportZip() {
+    private void exportZip(String password) {
         if (getContext() != null) {
+            // Generate valid paths for temp storage folder
             String tempExportFolder = FileFunctions.generateValidFile(getContext()
                     .getFilesDir().getAbsolutePath() + "/tempZip", "");
-            if (new File(tempExportFolder).mkdir()) {
-                // TODO: Complete
-                // Export all the current notes to the folder
-                for (ArrayList<String> note: notesArray) {
-                    FileFunctions.exportTxt(FileFunctions.generateValidFile(
-                            tempExportFolder + "/" + note.get(0), ".txt"), note.get(2));
+            try {
+                // Creates ZIP file
+                String exportFilePath = FileFunctions.generateValidFile(
+                        "/storage/emulated/0/Downloads/" + notesSubject, ".zip");
+                ZipFile exportFile;
+                if (password.length() >= 8) {
+                    exportFile = new ZipFile(exportFilePath, password.toCharArray());
+                } else {
+                    exportFile = new ZipFile(exportFilePath);
                 }
-            } else {
-                Log.w("StudyAssistant", "File Error: Folder " + tempExportFolder
-                    + " cannot be created.");
+
+                if (new File(tempExportFolder).mkdir()) {
+                    ArrayList<File> exportNotesList = new ArrayList<>();
+
+                    // Export all the current notes to the folder
+                    for (ArrayList<String> note : notesArray) {
+                        String currentPath = FileFunctions.generateValidFile(
+                                tempExportFolder + "/" + note.get(0), ".txt");
+                        FileFunctions.exportTxt(currentPath, note.get(2));
+                        exportNotesList.add(new File(currentPath));
+                    }
+
+                    if (password.length() >= 8) {
+                        // Encrypts ZIP file with password
+                        ZipParameters passwordParams = new ZipParameters();
+                        passwordParams.setEncryptFiles(true);
+                        passwordParams.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
+                        exportFile.addFiles(exportNotesList, passwordParams);
+                    } else {
+                        // Adds files to ZIP file
+                        exportFile.addFiles(exportNotesList);
+                    }
+
+                    // Delete temp folder
+                    if (!new File(tempExportFolder).delete()) {
+                        Log.w("StudyAssistant", "File Error: Temporary folder "
+                                + tempExportFolder + " could not be deleted.");
+                    }
+                    Toast.makeText(getContext(), getString(R.string.subject_exported)
+                            + exportFilePath, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("StudyAssistant", "File Error: Folder " + tempExportFolder
+                            + " cannot be created.");
+                    Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+                }
+            } catch (ZipException e) {
+                Log.e("StudyAssistant", "File error: ZIP processing error occurred. Stack trace is ");
+                e.printStackTrace();
                 Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
             }
         }
@@ -394,7 +472,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     outputStream.flush();
                                     outputStream.close();
 
-                                    Toast.makeText(getContext(), getString(R.string.n2_subject_exported)
+                                    Toast.makeText(getContext(), getString(R.string.subject_exported)
                                             + outputFile, Toast.LENGTH_SHORT).show();
                                 } else {
                                     Log.e("StudyAssistant", "File Error: File "

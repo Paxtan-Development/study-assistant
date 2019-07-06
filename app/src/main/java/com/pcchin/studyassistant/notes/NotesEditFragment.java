@@ -266,8 +266,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         }
     }
 
-    /** Checks whether the changes made are to be saved.
-     * If OK is selected calls onSavePressed, or else calls onCancelPressed. **/
+    /** Forwards to onSavePressed() to ensure consistency when dealing with AlertDialogs.
+     * @see MainActivity showGitlabUpdateNotif(JSONArray response) **/
     @Override
     public boolean onBackPressed() {
         new AlertDialog.Builder(getContext())

@@ -125,7 +125,7 @@ public class GeneralFunctions {
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
         subjImport.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            FileFunctions.importSubject();
+            FileFunctions.importSubject(activity);
             return false;
         });
 

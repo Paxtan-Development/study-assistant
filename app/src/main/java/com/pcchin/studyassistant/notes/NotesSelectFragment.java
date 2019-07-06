@@ -93,7 +93,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
 
     /** Imports an existing zip/.subject file. **/
     public void onImportPressed() {
-        FileFunctions.importSubject();
+        FileFunctions.importSubject((MainActivity) getActivity());
     }
 
     /** Returns to

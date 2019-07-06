@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Random;
 
-/** Test functions that do not require context or activities to work. **/
+/** Test the converters and whether they are working. **/
 public class ConverterTest {
     private static final int TEST_COUNT = 5000;
 

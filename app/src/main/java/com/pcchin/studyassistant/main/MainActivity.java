@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.VolleyFileDownloadRequest;
@@ -63,7 +64,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,7 +72,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String GITLAB = "https://gitlab.com";
-    private static final String GITLAB_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
+    private static final String GITLAB_API_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
+    private static final String GITLAB_RELEASES = "https://gitlab.com/pc.chin/study-assistant/releases";
 
     private int gitlabReleasesStatusCode;
     private Fragment currentFragment;
@@ -110,9 +112,9 @@ public class MainActivity extends AppCompatActivity
         displayFragment(new MainFragment());
 
         // Only check for updates once a day
-        if (Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+        if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
                 .getString("lastUpdateCheck", ""),
-                GeneralFunctions.standardDateFormat.format(Calendar.getInstance()))) {
+                GeneralFunctions.standardDateFormat.format(new Date()))) {
             new Handler().post(updateRunnable);
         }
 
@@ -283,7 +285,7 @@ public class MainActivity extends AppCompatActivity
      * showGitlabUpdateNotif(JSONArray response) separated for clarity. */
     private void checkGitlabUpdates() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_RELEASES, response -> {
+        JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_API_RELEASES, response -> {
             SharedPreferences.Editor editor = getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
             editor.putString("gitlabReleasesJson", response.toString());
             editor.apply();
@@ -303,7 +305,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else {
                 Log.d("StudyAssistant", "Network Error: Volley returned error " +
-                        error.getMessage() + ":" + error.toString() + " from " + GITLAB_RELEASES
+                        error.getMessage() + ":" + error.toString() + " from " + GITLAB_API_RELEASES
                         + ", stack trace is");
                 error.printStackTrace();
                 queue.stop();
@@ -324,10 +326,18 @@ public class MainActivity extends AppCompatActivity
      * updateViaGitlab(String downloadLink) separated for clarity. **/
     private void showGitlabUpdateNotif(JSONArray response) {
         try {
+            // Update so that it will not ask again on the same day
+            SharedPreferences.Editor editor =
+                    getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
+            editor.putString("lastUpdateCheck", GeneralFunctions
+                    .standardDateFormat.format(new Date()));
+            editor.apply();
+
             // Get latest version from releases page
             JSONObject latestVersion = response.getJSONObject(0);
             if (!Objects.equals(latestVersion.getString("name")
                     .replace("v", ""), BuildConfig.VERSION_NAME)) {
+
                 // Version is not the latest, needs to be updated
                 // The first link in the description is always the download link for the apk
                 String downloadLink = GITLAB + Jsoup.parse(Parser.unescapeEntities(
@@ -358,18 +368,17 @@ public class MainActivity extends AppCompatActivity
                         .setMessage(R.string.a_new_version)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) ->
                                 updateViaGitlab(downloadLink))
-                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) -> {
-                                // Update so that it will not ask again on the same day
-                                SharedPreferences.Editor editor =
-                                        getSharedPreferences(getPackageName(), MODE_PRIVATE).edit();
-                                editor.putString("lastUpdateCheck", GeneralFunctions
-                                        .standardDateFormat.format(Calendar.getInstance()));
-                                editor.apply();
-                                dialogInterface.dismiss(); }))
+                        .setNeutralButton(R.string.a_learn_more, (dialogInterface, i) -> {
+                                Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(GITLAB_RELEASES));
+                                startActivity(gitlabReleaseSite);
+                        })
+                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) ->
+                                dialogInterface.dismiss()))
                         .create().show();
             }
         } catch (JSONException e) {
-            Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_RELEASES
+            Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_API_RELEASES
                     + " invalid, response given is " + response + ", error given is "
                     + e.getMessage());
         }
@@ -387,7 +396,7 @@ public class MainActivity extends AppCompatActivity
             File[] dirFiles = apkInstallDir.listFiles();
             if (dirFiles != null) {
                 for (File child: dirFiles) {
-                    GeneralFunctions.deleteDir(child);
+                    FileFunctions.deleteDir(child);
                 }
             }
             outputFileName += "/studyassistant-update.apk";
@@ -395,10 +404,12 @@ public class MainActivity extends AppCompatActivity
             if (apkInstallDir.mkdir()) {
                 outputFileName += "/studyassistant-update.apk";
             } else {
-                outputFileName = getNewFileName();
+                outputFileName = FileFunctions.generateValidFile(
+                        "/storage/emulated/0/Downloads/studyassistant-update", ".apk");
             }
         } else {
-            outputFileName = getNewFileName();
+            outputFileName = FileFunctions.generateValidFile(
+                    "/storage/emulated/0/Downloads/studyassistant-update", ".apk");
         }
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -411,7 +422,7 @@ public class MainActivity extends AppCompatActivity
                 .setView(progressBar)
                 .setPositiveButton(android.R.string.cancel, null)
                 .setOnDismissListener(dialogInterface -> {
-                    Log.d("StudyAssistant", "Notif: Download cancel");
+                    Log.d("StudyAssistant", "Notification: Download of latest APK cancelled");
                     queue.stop();
                     continueDownload.set(false);
                 })
@@ -426,25 +437,34 @@ public class MainActivity extends AppCompatActivity
                 queue.stop();
                 if (response != null) {
                     FileOutputStream responseStream;
-                    responseStream = new FileOutputStream(new File(finalOutputFileName));
-                    responseStream.flush();
-                    responseStream.close();
+                    File outputFile = new File(finalOutputFileName);
+                    if (outputFile.createNewFile()) {
+                        responseStream = new FileOutputStream(outputFile);
+                        responseStream.flush();
+                        responseStream.close();
 
-                    // Install app
-                    Toast.makeText(this, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
-                    Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                    installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),
-                            "application/vnd.android.package-archive");
-                    startActivity(installIntent);
+                        // Install app
+                        Toast.makeText(this, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
+                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                        installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),
+                                "application/vnd.android.package-archive");
+                        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(installIntent);
+                    } else {
+                        Log.d("StudyAssistant", "File Error: File " + finalOutputFileName
+                        + " could not be created.");
+                        Toast.makeText(this, R.string.file_error, Toast.LENGTH_SHORT).show();
+                    }
                 }
             } catch (FileNotFoundException e) {
-                Log.d("StudyAssistant", "File Error: File" + finalOutputFileName + " not found.");
-                Toast.makeText(this, R.string.a_file_error, Toast.LENGTH_SHORT).show();
+                Log.d("StudyAssistant", "File Error: File" + finalOutputFileName + " not found, stack trace is ");
+                e.printStackTrace();
+                Toast.makeText(this, R.string.file_error, Toast.LENGTH_SHORT).show();
             } catch (IOException e2) {
                 Log.d("StudyAssistant", "File Error: An IOException occurred at " + finalOutputFileName
                 + ", stack trace is");
                 e2.printStackTrace();
-                Toast.makeText(this, R.string.a_file_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.file_error, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Log.d("Study Assistant", "Error: Volley download request failed " +
                         "in middle of operation with error");
@@ -458,19 +478,9 @@ public class MainActivity extends AppCompatActivity
             error.printStackTrace();
             Toast.makeText(MainActivity.this, R.string.a_network_error, Toast.LENGTH_SHORT).show();
         }, null);
+
         if (continueDownload.get()) {
             queue.add(request);
         }
-    }
-
-    /** @return a file name for the updated apk that is not taken in the Downloads folder. **/
-    private String getNewFileName() {
-        // Download to Downloads folder as a file with the same name exists
-        String outputFileName = "/storage/emulated/0/Downloads" + "/studyassistant-update" + "." + "apk";
-        int i = 0;
-        while (new File(outputFileName).exists()) {
-            outputFileName = "/storage/emulated/0/Downloads"+ "/studyassistant-update(" + i + ")." + "apk";
-        }
-        return outputFileName;
     }
 }

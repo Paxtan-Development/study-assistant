@@ -24,6 +24,8 @@ import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.List;
 
+import com.pcchin.studyassistant.functions.FileFunctions;
+
 public class NotesSelectFragment extends Fragment implements FragmentOnBackPressed {
     private SubjectDatabase subjectDatabase;
 
@@ -89,9 +91,9 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
         }
     }
 
-    /** Imports an existing zip file. **/
+    /** Imports an existing zip/.subject file. **/
     public void onImportPressed() {
-        // TODO: Import
+        FileFunctions.importSubject();
     }
 
     /** Returns to

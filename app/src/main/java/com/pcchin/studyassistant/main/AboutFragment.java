@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -52,7 +52,7 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
         // Set license text
         Spanned license;
-        String licenseText = GeneralFunctions.getReadTextFromAssets(inflater.getContext(),
+        String licenseText = FileFunctions.getTxt(inflater.getContext(),
                 "license.txt");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             license = Html.fromHtml(licenseText, Html.FROM_HTML_MODE_LEGACY); // Adds hyperlink to text

@@ -36,6 +36,7 @@ public class NotesDatabaseTest {
     }
 
     /** Check the data integrity between versions 1 to 2. **/
+    // FIXME: Test always fail
     @Test
     public void migration_1to2_data_integrity() throws NoSuchFieldException, IOException {
         SupportSQLiteDatabase db_v1 = testHelper.createDatabase(TEST_DB_NAME, 1);

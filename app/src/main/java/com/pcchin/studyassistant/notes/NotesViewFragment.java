@@ -10,6 +10,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.text.InputType;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -40,15 +41,10 @@ import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.Random;
-
-import static android.app.AlarmManager.RTC;
 
 public class NotesViewFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_SUBJECT = "notesSubject";
@@ -182,28 +178,11 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
     /** Exports the note to a txt file. **/
     public void onExportPressed() {
-        // Check if output file name is taken
-        int i = 0;
-        String outputText = "/storage/emulated/0/Downloads/" + notesInfo.get(0) + ".txt";
-        while (new File(outputText).exists()) {
-            outputText = "/storage/emulated/0/Downloads/" + notesInfo.get(0) + "(" + i + ").txt";
-            i++;
-        }
-
-        // Export file
-        try {
-            FileWriter outputNote = new FileWriter(outputText);
-            outputNote.write(notesInfo.get(2));
-            outputNote.flush();
-            outputNote.close();
-            Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
-                    Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Log.d("StudyAssistant", "File Error: IO Exception occurred when exporting "
-            + "note with title " + notesInfo.get(0) + " order " + notesOrder + "in subject titled"
-            + notesSubject + ", stack trace is");
-            e.printStackTrace();
-        }
+        String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Downloads/"
+            + notesInfo.get(0), ".txt");
+        FileFunctions.exportTxt(outputText, notesInfo.get(2));
+        Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
+                Toast.LENGTH_SHORT).show();
     }
 
     /** Prevents the note from being able to be edited. **/
@@ -214,8 +193,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             ((EditText) inputLayout.findViewById(R.id.popup_input))
                     .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             ((TextView) inputLayout.findViewById(R.id.popup_error))
-                    .setTextColor(getResources().getColor(android.R.color.black));
-            ((TextView) inputLayout.findViewById(R.id.popup_error)).setText(R.string.n3_password_set);
+                    .setTextColor(Color.BLACK);
+            ((TextView) inputLayout.findViewById(R.id.popup_error)).setText(R.string.n_password_set);
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.n3_lock_password))
                     .setView(inputLayout)
@@ -484,7 +463,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
                 // Insert alarm and reset menu
                 if (manager != null) {
-                    manager.setWindow(RTC, targetDateTime.getTimeInMillis(), 10000, alarmIntent);
+                    manager.setWindow(AlarmManager.RTC, targetDateTime.getTimeInMillis(), 10000, alarmIntent);
                     hasAlert = true;
                     Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
                 }

@@ -57,7 +57,9 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
     /** Display the exit dialog when the 'Back' button is pressed. **/
     @Override
     public boolean onBackPressed() {
-        GeneralFunctions.displayExit((MainActivity) getActivity());
+        if (getActivity() != null) {
+            GeneralFunctions.displayExit(getActivity());
+        }
         return true;
     }
 }

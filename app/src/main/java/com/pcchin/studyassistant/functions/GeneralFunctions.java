@@ -1,6 +1,7 @@
 package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +11,7 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.navigation.NavigationView;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -25,12 +27,6 @@ import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,27 +41,6 @@ public class GeneralFunctions {
     /** The standard date storage format used in the app. **/
     public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-
-    /** @return a string of text from specific text file in the assets folder **/
-    @SuppressWarnings("SameParameterValue")
-    @NonNull
-    public static String getReadTextFromAssets(@NonNull Context context, String textFileName) {
-        String text;
-        StringBuilder stringBuilder = new StringBuilder();
-        InputStream inputStream;
-        try {
-            inputStream = context.getAssets().open(textFileName);
-            BufferedReader bufferedReader =
-                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            while ((text = bufferedReader.readLine()) != null) {
-                stringBuilder.append(text);
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return stringBuilder.toString();
-    }
 
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
@@ -149,8 +124,8 @@ public class GeneralFunctions {
         // Add Import Subject button
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
         subjImport.setOnMenuItemClickListener(item -> {
-            // TODO: Import
             activity.closeDrawer();
+            FileFunctions.importSubject();
             return false;
         });
 
@@ -166,10 +141,10 @@ public class GeneralFunctions {
             return false;
         });
 
-        // Add Import Subject button
+        // Add Import Project button
         MenuItem projImport = projMenu.add(R.string.m3_data_import);
         projImport.setOnMenuItemClickListener(item -> {
-            // TODO: Import
+            // TODO: Import projects
             activity.closeDrawer();
             return false;
         });
@@ -194,18 +169,11 @@ public class GeneralFunctions {
         });
     }
 
-    /** Displays the exit dialog **/
-    public static void displayExit(final MainActivity activity) {
-        new androidx.appcompat.app.AlertDialog.Builder(activity)
-                .setTitle(R.string.exit)
-                .setMessage(R.string.m3_exit_confirm)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    activity.moveTaskToBack(true);
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(0);
-                }).setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
-                .create().show();
+    /** Exits the app.**/
+    public static void displayExit(Activity activity) {
+        activity.moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0);
     }
 
     /** Reloads a fragment. **/
@@ -217,22 +185,4 @@ public class GeneralFunctions {
         }
     }
 
-    /** For deleting the directory inside list of files and inner Directory.
-     * Placed here despite only used once as self calling is needed. **/
-    public static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            if (children != null) {
-                for (String child : children) {
-                    boolean success = deleteDir(new File(dir, child));
-                    if (!success) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        // The directory is now empty so delete it
-        return dir.delete();
-    }
 }

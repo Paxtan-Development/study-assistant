@@ -7,6 +7,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.os.Handler;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +24,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.functions.SortingComparators;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -289,9 +300,127 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
-    /** Export all the notes of the subject into a ZIP file. **/
+    /** Export all the notes of the subject into a ZIP file,
+     * exportZip() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
-        // TODO: Export
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.n2_export_format)
+                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
+                            new Handler().post(() -> {
+                                if (i == 0) {
+                                    // TODO: Export ZIP with password
+                                    exportZip();
+                                } else {
+                                    exportSubject();
+                                }
+                            }))
+                    .setNegativeButton(android.R.string.cancel,
+                            (dialogInterface, i) -> dialogInterface.dismiss())
+                    .create().show();
+        }
+    }
+
+    /** Export the subject to a ZIP file.
+     * Separated from onExportPressed() for clarity. **/
+    private void exportZip() {
+        if (getContext() != null) {
+            String tempExportFolder = FileFunctions.generateValidFile(getContext()
+                    .getFilesDir().getAbsolutePath() + "/tempZip", "");
+            if (new File(tempExportFolder).mkdir()) {
+                // TODO: Complete
+                // Export all the current notes to the folder
+                for (ArrayList<String> note: notesArray) {
+                    FileFunctions.exportTxt(FileFunctions.generateValidFile(
+                            tempExportFolder + "/" + note.get(0), ".txt"), note.get(2));
+                }
+            } else {
+                Log.w("StudyAssistant", "File Error: Folder " + tempExportFolder
+                    + " cannot be created.");
+                Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /** Export the subject as a password-protected byte[] as a .subject file,
+     * separated from onExportSubject() for clarity. **/
+    private void exportSubject() {
+        if (getContext() != null) {
+            @SuppressLint("InflateParams") LinearLayout inputText = (LinearLayout) getLayoutInflater()
+                    .inflate(R.layout.popup_edittext, null);
+            EditText popupInput = inputText.findViewById(R.id.popup_input);
+            popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+            AlertDialog exportDialog = new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.n2_password_export)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+            exportDialog.setOnShowListener(dialogInterface -> {
+                exportDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                    // Check if password is too short, must be 8 characters in length
+                    String responseText = popupInput.getText().toString();
+                    if (responseText.length() >= 8) {
+                        // Set output file name
+                        String outputFileName = "/storage/emulated/0/Downloads/" + notesSubject
+                                + ".subject";
+                        int count = 0;
+                        while (new File(outputFileName).exists()) {
+                            outputFileName = "/storage/emulated/0/Downloads/" + notesSubject
+                                    + "(" + count + ").subject";
+                        }
+
+                        // Check if the file can be created
+                        String finalOutputFileName = outputFileName;
+                        new Handler().post(() -> {
+                            try {
+                                File outputFile = new File(finalOutputFileName);
+                                if (outputFile.createNewFile()) {
+                                    Toast.makeText(getContext(), R.string.n2_exporting_subject,
+                                            Toast.LENGTH_SHORT).show();
+
+                                    // Export the file
+                                    // The length of the title is exported first, followed by the title.
+                                    // Then, the subject's sort order is listed
+                                    // and the encrypted contents are stored.
+                                    FileOutputStream outputStream = new FileOutputStream(outputFile);
+                                    outputStream.write(ConverterFunctions.intToBytes(notesSubject.length()));
+                                    outputStream.write(notesSubject.getBytes());
+                                    outputStream.write(ConverterFunctions
+                                            .intToBytes(subjectDatabase.SubjectDao()
+                                                    .search(notesSubject).sortOrder));
+                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
+                                            responseText, notesArray));
+                                    outputStream.flush();
+                                    outputStream.close();
+
+                                    Toast.makeText(getContext(), getString(R.string.n2_subject_exported)
+                                            + outputFile, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.e("StudyAssistant", "File Error: File "
+                                            + finalOutputFileName + " cannot be created.");
+                                    Toast.makeText(getContext(), R.string.n2_error_file_not_created,
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (FileNotFoundException e) {
+                                Log.e("StudyAssistant", "File Error: File "
+                                        + finalOutputFileName + " not found, stack trace is");
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                Log.e("StudyAssistant", "File Error: An IO Exception"
+                                        + " occurred on file " + finalOutputFileName + ", stack trace is");
+                                e.printStackTrace();
+                            }
+                        });
+                    } else {
+                        ((TextView) inputText.findViewById(R.id.popup_error)).setText(R.string.n2_error_password_short);
+                    }
+                });
+                exportDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
+                        exportDialog.dismiss());
+            });
+            exportDialog.show();
+        }
     }
 
     /** Deletes the current subject and returns to

@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.functions;
+package com.pcchin.studyassistant.misc;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;

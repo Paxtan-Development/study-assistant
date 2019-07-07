@@ -1,50 +1,22 @@
 package com.pcchin.studyassistant.functions;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
-import com.obsez.android.lib.filechooser.ChooserDialog;
-import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 /** Functions used in managing files. **/
 public class FileFunctions {
-    /** The function used to import subjects, either via a ZIP file or a .subject file. **/
-    public static void importSubject(MainActivity activity) {
-        // TODO: Implement AndroidFilePicker
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.import_from)
-                .setItems(R.array.n_import_subject_format, (dialogInterface, i) -> {
-                    // Set up file chooser
-                    ChooserDialog importFileDialog = new ChooserDialog(activity)
-                            .withStartFile("/storage/emulated/0");
-                    if (i == 0) {
-                        importFileDialog = importFileDialog.withFilter(true, "zip")
-                            .withChosenListener((s, file) -> {
-
-                            });
-                    } else {
-                        importFileDialog = importFileDialog.withFilter(true, "subject")
-                            .withChosenListener((s, file) -> {
-
-                            });
-                    }
-                    importFileDialog.build().show();
-                })
-                .create().show();
-    }
 
     /** Generates a .txt file based on a path and its contents. **/
     public static void exportTxt(String path, String contents) {
@@ -67,15 +39,15 @@ public class FileFunctions {
     public static String generateValidFile(String filename, String extension) {
         String returnFile = filename + extension;
         int i = 0;
-        while (new File(returnFile).exists()) {
+        while (new File(returnFile).exists() && i < Integer.MAX_VALUE) {
             returnFile = filename + "(" + i + ")" + extension;
-
+            i++;
         }
         return returnFile;
     }
 
     /** For deleting the directory inside list of files and inner Directory.
-     * Placed here despite only used once as self calling is needed. **/
+     * Placed here despite only used once as recursion is needed. **/
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
@@ -112,5 +84,32 @@ public class FileFunctions {
             e.printStackTrace();
         }
         return stringBuilder.toString();
+    }
+
+    /** Checks the integrity of a note. **/
+    public static void checkNoteIntegrity(@NonNull ArrayList<String> original) {
+        while (original.size() < 3) {
+            original.add("");
+        }
+        if (original.size() < 6) {
+            original.add(null);
+        }
+    }
+
+    /** Gets the number of bytes required of data from a file.
+     * A Toast is created when it fails and it returns an empty array. **/
+    @NonNull
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static byte[] getBytesFromFile(int byteAmt, FileInputStream stream) {
+        byte[] returnByte = new byte[byteAmt];
+        try {
+            stream.read(returnByte);
+            return returnByte;
+        } catch (IOException e) {
+            Log.w("StudyAssistant", "File Error: byte[] of size " + byteAmt + " could not "
+                    + "be retrieved from input stream of file " + stream + ". Stack trace is");
+            e.printStackTrace();
+            return new byte[0];
+        }
     }
 }

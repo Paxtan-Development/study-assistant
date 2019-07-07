@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.functions;
+package com.pcchin.studyassistant.misc;
 
 /** Added to allow OnBackPressed to be implement in Fragments **/
 public interface FragmentOnBackPressed {

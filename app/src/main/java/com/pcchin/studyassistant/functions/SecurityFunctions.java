@@ -47,14 +47,20 @@ public class SecurityFunctions {
     public static byte[] subjectEncrypt(String title, String password,
                                         ArrayList<ArrayList<String>> content) {
         byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
-        // 1) PBKDF encryption for password with title as salt
         byte[] passwordByte = pbkdf2(password, title.getBytes());
-        // 2) AES encryption with PBKDF2 password as salt
         aes(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
-        // 3) Blowfish encryption with PBKDF2 password as salt
         blowfish(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
 
         return responseByte;
+    }
+
+    /** Decryption method used to protect subject contents in .subject files. **/
+    public static ArrayList<ArrayList<String>> subjectDecrypt(String title,
+                                                       String password, byte[] content) {
+        byte[] passwordByte = pbkdf2(password, title.getBytes());
+        aes(content, passwordByte, Cipher.DECRYPT_MODE);
+        blowfish(content, passwordByte, Cipher.DECRYPT_MODE);
+        return ConverterFunctions.jsonToArray(new String(content));
     }
 
     /** AES encryption/decryption via Cipher.getInstance().

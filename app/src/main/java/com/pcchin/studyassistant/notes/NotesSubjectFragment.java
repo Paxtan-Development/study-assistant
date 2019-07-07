@@ -2,7 +2,12 @@ package com.pcchin.studyassistant.notes;
 
 import android.annotation.SuppressLint;
 import androidx.room.Room;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -27,14 +32,16 @@ import android.widget.Toast;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.functions.SortingComparators;
+import com.pcchin.studyassistant.misc.SortingComparators;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.notes.misc.NotesNotifyReceiver;
+import com.pcchin.studyassistant.notes.misc.NotesSortAdaptor;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -44,6 +51,7 @@ import net.lingala.zip4j.model.enums.EncryptionMethod;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -366,11 +374,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         if (getContext() != null) {
             // Generate valid paths for temp storage folder
             String tempExportFolder = FileFunctions.generateValidFile(getContext()
-                    .getFilesDir().getAbsolutePath() + "/tempZip", "");
+                    .getFilesDir().getAbsolutePath() + "/.tempZip", "");
             try {
                 // Creates ZIP file
                 String exportFilePath = FileFunctions.generateValidFile(
-                        "/storage/emulated/0/Downloads/" + notesSubject, ".zip");
+                        "/storage/emulated/0/Download/" + notesSubject, ".zip");
                 ZipFile exportFile;
                 if (password.length() >= 8) {
                     exportFile = new ZipFile(exportFilePath, password.toCharArray());
@@ -379,14 +387,36 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 }
 
                 if (new File(tempExportFolder).mkdir()) {
-                    ArrayList<File> exportNotesList = new ArrayList<>();
+                    ArrayList<File> exportFilesList = new ArrayList<>();
 
-                    // Export all the current notes to the folder
-                    for (ArrayList<String> note : notesArray) {
-                        String currentPath = FileFunctions.generateValidFile(
-                                tempExportFolder + "/" + note.get(0), ".txt");
-                        FileFunctions.exportTxt(currentPath, note.get(2));
-                        exportNotesList.add(new File(currentPath));
+                    // Export all the note's data to a text .subj file
+                    try {
+                        FileWriter infoOutput = new FileWriter(FileFunctions.generateValidFile(
+                                notesSubject, ".subj"));
+                        NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
+                        infoOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
+
+                        for (int i = 0; i < notesArray.size(); i++) {
+                            // Export the note to the output folder
+                            String currentPath = FileFunctions.generateValidFile(
+                                    tempExportFolder + "/" + notesArray.get(i).get(0),
+                                    ".txt");
+                            FileFunctions.exportTxt(currentPath, notesArray.get(i).get(2));
+                            exportFilesList.add(new File(currentPath));
+
+                            // Record info about the note to the .subj file
+                            FileFunctions.checkNoteIntegrity(notesArray.get(i));
+                            infoOutput.write(new File(currentPath).getName()
+                                    + "\n" + notesArray.get(i).get(0) + "\n"
+                            + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
+                            + notesArray.get(i).get(5) + "\n");
+                        }
+                        infoOutput.flush();
+                        infoOutput.close();
+                    } catch (IOException e) {
+                        Log.w("StudyAssistant", "File Error: Writing subject " + notesSubject
+                            + " failed. Stack trace is");
+                        e.printStackTrace();
                     }
 
                     if (password.length() >= 8) {
@@ -394,14 +424,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         ZipParameters passwordParams = new ZipParameters();
                         passwordParams.setEncryptFiles(true);
                         passwordParams.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
-                        exportFile.addFiles(exportNotesList, passwordParams);
+                        exportFile.addFiles(exportFilesList, passwordParams);
                     } else {
                         // Adds files to ZIP file
-                        exportFile.addFiles(exportNotesList);
+                        exportFile.addFiles(exportFilesList);
                     }
 
                     // Delete temp folder
-                    if (!new File(tempExportFolder).delete()) {
+                    if (!FileFunctions.deleteDir(new File(tempExportFolder))) {
                         Log.w("StudyAssistant", "File Error: Temporary folder "
                                 + tempExportFolder + " could not be deleted.");
                     }
@@ -413,7 +443,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
                 }
             } catch (ZipException e) {
-                Log.e("StudyAssistant", "File error: ZIP processing error occurred. Stack trace is ");
+                Log.e("StudyAssistant", "File error: ZIP processing error occurred while " +
+                        "exporting a subject. Stack trace is ");
                 e.printStackTrace();
                 Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
             }
@@ -440,11 +471,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     String responseText = popupInput.getText().toString();
                     if (responseText.length() >= 8) {
                         // Set output file name
-                        String outputFileName = "/storage/emulated/0/Downloads/" + notesSubject
+                        String outputFileName = "/storage/emulated/0/Download/" + notesSubject
                                 + ".subject";
                         int count = 0;
                         while (new File(outputFileName).exists()) {
-                            outputFileName = "/storage/emulated/0/Downloads/" + notesSubject
+                            outputFileName = "/storage/emulated/0/Download/" + notesSubject
                                     + "(" + count + ").subject";
                         }
 
@@ -462,7 +493,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     // Then, the subject's sort order is listed
                                     // and the encrypted contents are stored.
                                     FileOutputStream outputStream = new FileOutputStream(outputFile);
-                                    outputStream.write(ConverterFunctions.intToBytes(notesSubject.length()));
+                                    outputStream.write(ConverterFunctions.intToBytes(notesSubject
+                                            .getBytes().length));
                                     outputStream.write(notesSubject.getBytes());
                                     outputStream.write(ConverterFunctions
                                             .intToBytes(subjectDatabase.SubjectDao()
@@ -510,6 +542,23 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .setMessage(R.string.n2_del_confirm)
                     .setPositiveButton(R.string.del, (dialog, which) -> {
                         if (getContext() != null && getActivity() != null) {
+                            // Delete phantom alerts
+                            for (ArrayList<String> note: notesArray) {
+                                AlarmManager manager = (AlarmManager) getContext()
+                                        .getSystemService(Context.ALARM_SERVICE);
+                                if (manager != null && note.size() > 6 && note.get(5) != null
+                                    && note.get(0) != null && note.get(2) != null) {
+                                    // Get PendingIntent for note alert
+                                    Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
+                                    intent.putExtra("title", note.get(0));
+                                    intent.putExtra("message", note.get(2));
+                                    PendingIntent alertIntent = PendingIntent.getBroadcast(
+                                            getActivity(), Integer.valueOf(note.get(5)), intent, 0);
+
+                                    manager.cancel(alertIntent);
+                                }
+                            }
+
                             // Delete subject
                             SubjectDatabase database = Room.databaseBuilder(getContext(),
                                     SubjectDatabase.class, "notesSubject")

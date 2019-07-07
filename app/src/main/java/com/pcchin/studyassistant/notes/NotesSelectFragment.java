@@ -5,6 +5,8 @@ import androidx.room.Room;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,7 +16,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
@@ -24,7 +26,7 @@ import com.pcchin.studyassistant.notes.database.SubjectDatabase;
 
 import java.util.List;
 
-import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.notes.misc.ImportSubject;
 
 public class NotesSelectFragment extends Fragment implements FragmentOnBackPressed {
     private SubjectDatabase subjectDatabase;
@@ -93,7 +95,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
 
     /** Imports an existing zip/.subject file. **/
     public void onImportPressed() {
-        FileFunctions.importSubject((MainActivity) getActivity());
+        new Handler().post(() -> new ImportSubject((MainActivity) getActivity()));
     }
 
     /** Returns to

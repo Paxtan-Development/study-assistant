@@ -1,4 +1,6 @@
-package com.pcchin.studyassistant.functions;
+package com.pcchin.studyassistant.misc;
+
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 
 import org.apache.commons.lang3.ObjectUtils;
 

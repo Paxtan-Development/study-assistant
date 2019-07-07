@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 
 import java.util.Calendar;
 import java.util.Locale;

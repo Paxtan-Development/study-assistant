@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.notes;
+package com.pcchin.studyassistant.notes.misc;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -17,7 +17,7 @@ import com.pcchin.studyassistant.main.MainActivity;
 import java.util.Random;
 
 /** Notification receiver when the alert of a note is triggered. **/
-class NotesNotifyReceiver extends BroadcastReceiver {
+public class NotesNotifyReceiver extends BroadcastReceiver {
     /** Displays a notification with the message of the note as the title. **/
     @Override
     public void onReceive(Context context, Intent intent) {

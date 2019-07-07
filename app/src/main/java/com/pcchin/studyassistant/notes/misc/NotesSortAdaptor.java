@@ -1,4 +1,4 @@
-package com.pcchin.studyassistant.notes;
+package com.pcchin.studyassistant.notes.misc;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,13 +14,13 @@ import androidx.annotation.Nullable;
 import com.pcchin.studyassistant.R;
 
 /** An adaptor used to sort notes in each subject. **/
-class NotesSortAdaptor extends ArrayAdapter {
+public class NotesSortAdaptor extends ArrayAdapter {
     private final int[] titles;
     private final int[] images;
     private final Context context;
 
     /** Default constructor. Receives the titles and image references. **/
-    NotesSortAdaptor(@NonNull Context context, int[] titles, int[] images) {
+    public NotesSortAdaptor(@NonNull Context context, int[] titles, int[] images) {
         super(context, R.layout.n2_sorting_spinner);
         this.titles = titles;
         this.images = images;

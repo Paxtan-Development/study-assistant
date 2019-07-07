@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.navigation.NavigationView;
 
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -26,6 +27,7 @@ import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
 import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.notes.misc.ImportSubject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,7 +69,7 @@ public class GeneralFunctions {
                         if (inputText.replaceAll("\\s+", "").length() == 0) {
                             errorText.setText(R.string.n_error_subject_empty);
                         } else if (database.SubjectDao().search(inputText) != null) {
-                            errorText.setText(R.string.n1_error_subject_exists);
+                            errorText.setText(R.string.error_subject_exists);
                         } else {
                             // Create subject
                             database.SubjectDao().insert(
@@ -125,7 +127,7 @@ public class GeneralFunctions {
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
         subjImport.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            FileFunctions.importSubject(activity);
+            new Handler().post(() -> new ImportSubject(activity));
             return false;
         });
 
@@ -184,5 +186,4 @@ public class GeneralFunctions {
                     .attach(target).commit();
         }
     }
-
 }

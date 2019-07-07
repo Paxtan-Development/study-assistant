@@ -20,7 +20,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.functions.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 
     /** Triggers the onBackPressed for key fragments (eg. when files are not saved)
      * when a function redirects to an external app/fragment. **/
-    void safeOnBackPressed() {
+    public void safeOnBackPressed() {
         if (currentFragment instanceof NotesEditFragment) {
             ((NotesEditFragment) currentFragment).onBackPressed();
         }

@@ -17,7 +17,22 @@
     <string name="no">No</string>
     <string name="import_from">Import from</string>
     <string name="file_error">File Error</string>
+    <string name="importing_subject">Importing Subject…</string>
     <string name="subject_exported">Subject exported to </string>
+    <string name="enter_password">Enter Password</string>
+    <string name="subject_conflict">Subject Conflict</string>
+    <string name="merge">Merge</string>
+    <string name="rename">Rename</string>
+    <string name="rename_subject">Rename Subject</string>
+    <string name="subject_imported">Subject Imported</string>
+    <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
+
+    <!-- String used in general errors -->
+    <string name="error_password_incorrect">The password that is entered is incorrect.</string>
+    <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
+    <string name="error_zip_corrupt">The ZIP file that is selected appears to be invalid.</string>
+    <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
+    <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
 
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>
@@ -54,7 +69,6 @@
 
     <string name="n1_new_subject">New Subject</string>
     <string name="n1_subject_title">Subject title</string>
-    <string name="n1_error_subject_exists">Another subject already has this name. Try using another one.</string>
 
     <!-- Sorting methods used in Fragment n2 -->
     <string name="n2_sorting_method">Sort By</string>
@@ -86,7 +100,6 @@
     <string name="n3_note_locked">Note locked</string>
     <string name="n3_note_unlocked">Note unlocked</string>
     <string name="n3_lock_password">Enter Password to Lock Note</string>
-    <string name="n3_password_incorrect">The password that is entered is incorrect.</string>
     <string name="n3_unlock_password">Enter Password to Unlock Note</string>
     <string name="n3_unlock_note">Unlock Note</string>
     <string name="n3_set_alert">Set Alert</string>

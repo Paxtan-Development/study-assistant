@@ -21,6 +21,4 @@ public class Log {
         System.out.println("ERROR: " + tag + ": " + msg);
         return 0;
     }
-
-    // add other methods if required...
 }

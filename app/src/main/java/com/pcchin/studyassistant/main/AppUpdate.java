@@ -29,7 +29,7 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.functions.VolleyFileDownloadRequest;
+import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -230,11 +230,11 @@ class AppUpdate {
                 outputFileName += "/studyassistant-update.apk";
             } else {
                 outputFileName = FileFunctions.generateValidFile(
-                        "/storage/emulated/0/Downloads/studyassistant-update", ".apk");
+                        "/storage/emulated/0/Download/studyassistant-update", ".apk");
             }
         } else {
             outputFileName = FileFunctions.generateValidFile(
-                    "/storage/emulated/0/Downloads/studyassistant-update", ".apk");
+                    "/storage/emulated/0/Download/studyassistant-update", ".apk");
         }
 
         RequestQueue queue = Volley.newRequestQueue(activity);

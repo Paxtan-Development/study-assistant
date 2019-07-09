@@ -187,14 +187,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
             // Check if note is locked
             if (note.get(3) == null) {
-                miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.INVISIBLE);
+                miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.GONE);
             } else {
                 miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.VISIBLE);
             }
 
             // Check if note has a alert attached
             if (note.get(4) == null) {
-                miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.INVISIBLE);
+                miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.GONE);
             } else {
                 miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.VISIBLE);
             }
@@ -348,6 +348,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             popupError.setText(R.string.n_password_set);
 
             AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.enter_password)
                     .setView(inputLayout)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
@@ -391,8 +392,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                     // Export all the note's data to a text .subj file
                     try {
-                        FileWriter infoOutput = new FileWriter(FileFunctions.generateValidFile(
-                                notesSubject, ".subj"));
+                        String infoOutputPath = FileFunctions.generateValidFile(
+                                tempExportFolder + notesSubject, ".subj");
+                        FileWriter infoOutput = new FileWriter(infoOutputPath);
                         NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
                         infoOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
 
@@ -413,6 +415,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         }
                         infoOutput.flush();
                         infoOutput.close();
+                        exportFilesList.add(new File(infoOutputPath));
                     } catch (IOException e) {
                         Log.w("StudyAssistant", "File Error: Writing subject " + notesSubject
                             + " failed. Stack trace is");
@@ -425,7 +428,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         passwordParams.setEncryptFiles(true);
                         passwordParams.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
                         exportFile.addFiles(exportFilesList, passwordParams);
-                    } else {
+                    } else if (exportFilesList.size() > 0) {
                         // Adds files to ZIP file
                         exportFile.addFiles(exportFilesList);
                     }
@@ -462,6 +465,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
+                    .setView(inputText)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
                     .create();

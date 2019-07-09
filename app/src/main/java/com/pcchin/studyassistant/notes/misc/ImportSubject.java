@@ -38,7 +38,7 @@ import java.util.Scanner;
 /** Functions used to import subjects from .subject files and ZIP files.
  * Cannot be made static as MainActivity activity needs to be separated for clarity. **/
 public class ImportSubject {
-    private MainActivity activity;
+    private final MainActivity activity;
 
     /** The function used to import subjects, either via a ZIP file or a .subject file.
      * Also serves as the constructor for the class as activity needs to be passed on
@@ -236,6 +236,7 @@ public class ImportSubject {
                             }
                         }
                     } catch (FileNotFoundException e) {
+                        Log.e("StudyAssistant", "File Error: ");
                         e.printStackTrace();
                     }
                 }

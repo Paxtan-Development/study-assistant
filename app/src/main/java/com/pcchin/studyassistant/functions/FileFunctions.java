@@ -38,7 +38,7 @@ public class FileFunctions {
      * @param extension needs to include the . at the front.**/
     public static String generateValidFile(String filename, String extension) {
         String returnFile = filename + extension;
-        int i = 0;
+        int i = 1;
         while (new File(returnFile).exists() && i < Integer.MAX_VALUE) {
             returnFile = filename + "(" + i + ")" + extension;
             i++;

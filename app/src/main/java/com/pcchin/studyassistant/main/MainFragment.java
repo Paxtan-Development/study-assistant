@@ -3,9 +3,12 @@ package com.pcchin.studyassistant.main;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -14,6 +17,7 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
 public class MainFragment extends Fragment implements FragmentOnBackPressed {
+    private boolean doubleBackToExitPressedOnce;
 
     /** Default constructor. **/
     public MainFragment() {}
@@ -23,7 +27,7 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name);
+            getActivity().setTitle(R.string.app_name_release);
         }
     }
 
@@ -58,7 +62,14 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
     @Override
     public boolean onBackPressed() {
         if (getActivity() != null) {
-            GeneralFunctions.displayExit(getActivity());
+            // Press back to exit
+            if (doubleBackToExitPressedOnce) {
+                GeneralFunctions.displayExit(getActivity());
+            } else {
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(getContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 1500);
+            }
         }
         return true;
     }

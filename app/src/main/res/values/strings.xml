@@ -1,6 +1,7 @@
 <resources>
     <!-- General strings -->
-    <string name="app_name">Study Assistant</string>
+    <string name="app_name_debug">SA Assistant</string>
+    <string name="app_name_release">Study Assistant</string>
     <string name="notes">Notes</string>
     <string name="projects">Projects</string>
     <string name="exit">Exit</string>
@@ -57,7 +58,6 @@
     <string name="m3_data_import">Import…</string>
     <string name="m3_nav_open">Open navigation drawer</string>
     <string name="m3_nav_close">Close navigation drawer</string>
-    <string name="m3_exit_confirm">Are you sure that you want to exit?</string>
 
     <!-- Strings used in group N -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>

@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
@@ -27,6 +28,7 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Objects;
 
@@ -49,6 +51,24 @@ public class MainActivity extends AppCompatActivity
                 GeneralFunctions.standardDateFormat.format(new Date()))) {
             new Handler().post(() -> new AppUpdate(MainActivity.this, false));
         }
+
+        // Delete any past export files
+        new Handler().post(() -> {
+            String outputFileName = getFilesDir().getAbsolutePath() + "/files";
+            File apkInstallDir = new File(outputFileName);
+            if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
+                // Deletes all children in the folder
+                File[] dirFiles = apkInstallDir.listFiles();
+                if (dirFiles != null) {
+                    for (File child : dirFiles) {
+                        FileFunctions.deleteDir(child);
+                    }
+                }
+            } else if (!apkInstallDir.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                apkInstallDir.mkdir();
+            }
+        });
 
         // Set toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);

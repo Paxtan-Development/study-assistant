@@ -30,7 +30,7 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name);
+            getActivity().setTitle(R.string.app_name_release);
         }
     }
 

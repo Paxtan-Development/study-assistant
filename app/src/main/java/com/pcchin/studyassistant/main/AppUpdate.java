@@ -56,8 +56,8 @@ class AppUpdate {
     private static final String GITLAB_RELEASES = "https://gitlab.com/pc.chin/study-assistant/releases";
 
     private int gitlabReleasesStatusCode;
-    private boolean calledFromNotif;
-    private MainActivity activity;
+    private final boolean calledFromNotif;
+    private final MainActivity activity;
 
     /** Checks for version updates of the app, doubles as the constructor.
      * checkGitlabUpdates() separated for clarity. **/
@@ -174,7 +174,7 @@ class AppUpdate {
                     Notification notif = new NotificationCompat.Builder
                             (activity, activity.getPackageName())
                             .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(activity.getString(R.string.app_name))
+                            .setContentTitle(activity.getString(R.string.app_name_release))
                             .setContentText(activity.getString(R.string.a_update_app))
                             .setContentIntent(pendingIntent)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -269,6 +269,7 @@ class AppUpdate {
                         responseStream.close();
 
                         // Install app
+                        activity.safeOnBackPressed();
                         Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
                         Intent installIntent = new Intent(Intent.ACTION_VIEW);
                         installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),

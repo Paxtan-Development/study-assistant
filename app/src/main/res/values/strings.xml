@@ -33,6 +33,7 @@
     <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
     <string name="error_zip_corrupt">The ZIP file that is selected appears to be invalid.</string>
     <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
+    <string name="error_password_short">Password must be 8 characters or longer.</string>
     <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
 
     <!-- Strings used in MainActivity -->
@@ -81,7 +82,6 @@
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
     <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
     <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
-    <string name="n2_error_password_short">Password must be 8 characters or longer.</string>
     <string name="n2_error_file_not_created">The file could not be created.</string>
 
     <!-- General notes used in Fragment n2 -->

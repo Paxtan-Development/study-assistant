@@ -360,8 +360,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         exportZip(inputText);
                     } else {
                         popupError.setTextColor(Color.RED);
-                        popupError.setText(R.string.n2_error_password_short);
+                        popupError.setText(R.string.error_password_short);
                     }
+                    passwordDialog.dismiss();
                 });
                 passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view -> passwordDialog.dismiss());
             });
@@ -462,7 +463,6 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .inflate(R.layout.popup_edittext, null);
             EditText popupInput = inputText.findViewById(R.id.popup_input);
             popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
                     .setView(inputText)
@@ -516,24 +516,29 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     Toast.makeText(getContext(), R.string.n2_error_file_not_created,
                                             Toast.LENGTH_SHORT).show();
                                 }
+                                exportDialog.dismiss();
                             } catch (FileNotFoundException e) {
                                 Log.e("StudyAssistant", "File Error: File "
                                         + finalOutputFileName + " not found, stack trace is");
                                 e.printStackTrace();
+                                exportDialog.dismiss();
                             } catch (IOException e) {
                                 Log.e("StudyAssistant", "File Error: An IO Exception"
                                         + " occurred on file " + finalOutputFileName + ", stack trace is");
                                 e.printStackTrace();
+                                exportDialog.dismiss();
                             }
                         });
                     } else {
-                        ((TextView) inputText.findViewById(R.id.popup_error)).setText(R.string.n2_error_password_short);
+                        ((TextView) inputText.findViewById(R.id.popup_error)).setText(R.string.error_password_short);
                     }
                 });
                 exportDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
                         exportDialog.dismiss());
             });
+            Log.d("Log", "E");
             exportDialog.show();
+            Log.d("Log", "F");
         }
     }
 

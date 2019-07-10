@@ -46,10 +46,15 @@ public class SecurityFunctions {
     /** Encryption method used to protect subject contents in .subject files **/
     public static byte[] subjectEncrypt(String title, String password,
                                         ArrayList<ArrayList<String>> content) {
+        Log.d("Log", "S1");
         byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
+        Log.d("Log", "S2");
         byte[] passwordByte = pbkdf2(password, title.getBytes());
+        Log.d("Log", "S3");
         aes(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
+        Log.d("Log", "S4");
         blowfish(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
+        Log.d("Log", "S5");
 
         return responseByte;
     }
@@ -178,7 +183,7 @@ public class SecurityFunctions {
             pbkdfSalt[i] = salt[referenceVal];
         }
         PBKDF2Parameters params = new PBKDF2Parameters(
-                "HmacSHA256", "UTF-8", pbkdfSalt, 20000);
+                "HmacSHA256", "UTF-8", pbkdfSalt, 10000);
         return new PBKDF2Engine(params).deriveKey(original);
     }
 }

@@ -2,6 +2,7 @@ package com.pcchin.studyassistant.notes.misc;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -73,6 +74,7 @@ public class ImportSubject {
                     @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) activity
                             .getLayoutInflater().inflate(R.layout.popup_edittext, null);
                     EditText popupInput = inputLayout.findViewById(R.id.popup_input);
+                    popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     TextView popupError = inputLayout.findViewById(R.id.popup_error);
 
                     // Asks for password
@@ -86,26 +88,43 @@ public class ImportSubject {
                         passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
                                     String password = popupInput.getText().toString();
-                                    try {
-                                        ZipFile inputFile = new ZipFile(path, password.toCharArray());
-                                        importZipFile(inputFile);
-                                    } catch (ZipException e) {
-                                        if (e.getType() == ZipException.Type.WRONG_PASSWORD) {
-                                            Log.w("StudyAssistant", "File Error: Password for ZIP file "
-                                                    + path + " incorrect.");
-                                            popupError.setText(R.string.error_password_incorrect);
-                                        } else {
-                                            // Same way of handling the error as the
-                                            // external catch block
-                                            Log.e("StudyAssistant", "File Error: " +
-                                                    "ZIP processing error occurred while "
-                                                    + " importing a subject, stack trace is");
-                                            Toast.makeText(activity, R.string.error_zip_import,
-                                                    Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
+                                    if (password.length() >= 8) {
+                                        try {
+                                            ZipFile inputFile = new ZipFile(path, password.toCharArray());
+                                            importZipFile(inputFile);
+                                        } catch (ZipException e) {
+                                            Log.d("Temp", e.getType().toString());
+                                            if (e.getCause() != null) {
+                                                Log.d("TempCause", e.getCause().toString());
+                                                if (e.getCause().getMessage() != null) {
+                                                    Log.d("TempCauseMessage", e.getCause().getMessage());
+                                                }
+                                                if (e.getCause().getCause() != null) {
+                                                    Log.d("TempCauseCause", e.getCause().getCause().toString());
+                                                }
+                                            }
+                                            if (e.getMessage() != null) {
+                                                Log.d("TempMessage", e.getMessage());
+                                            }
+                                            if (e.getType() == ZipException.Type.WRONG_PASSWORD) {
+                                                Log.w("StudyAssistant", "File Error: Password for ZIP file "
+                                                        + path + " incorrect.");
+                                                popupError.setText(R.string.error_password_incorrect);
+                                            } else {
+                                                // Same way of handling the error as the
+                                                // external catch block
+                                                Log.e("StudyAssistant", "File Error: " +
+                                                        "ZIP processing error occurred while "
+                                                        + " importing a subject, stack trace is");
+                                                Toast.makeText(activity, R.string.error_zip_import,
+                                                        Toast.LENGTH_SHORT).show();
+                                                e.printStackTrace();
+                                            }
                                         }
+                                        passwordDialog.dismiss();
+                                    } else {
+                                        popupError.setText(R.string.error_password_short);
                                     }
-                                    passwordDialog.dismiss();
                                 });
                         passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
                                 .setOnClickListener(view -> passwordDialog.dismiss());
@@ -282,6 +301,7 @@ public class ImportSubject {
                 @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) activity
                         .getLayoutInflater().inflate(R.layout.popup_edittext, null);
                 EditText popupInput = inputLayout.findViewById(R.id.popup_input);
+                popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 TextView popupError = inputLayout.findViewById(R.id.popup_error);
 
                 AlertDialog importDialog = new AlertDialog.Builder(activity)
@@ -336,8 +356,10 @@ public class ImportSubject {
                 new AlertDialog.Builder(activity)
                         .setTitle(R.string.subject_conflict)
                         .setMessage(R.string.error_subject_same_name)
-                        .setPositiveButton(R.string.merge, (dialogInterface, i) ->
-                                mergeSubjects(title, contents))
+                        .setPositiveButton(R.string.merge, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            mergeSubjects(title, contents);
+                        })
                         .setNegativeButton(R.string.rename, (dialogInterface, i) -> {
                             dialogInterface.dismiss();
                             showRenameDialog(title, contents, sortOrder);
@@ -378,21 +400,23 @@ public class ImportSubject {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
-        renameDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            String inputText = popupInput.getText().toString();
-            if (database.SubjectDao().search(inputText) == null) {
-                // Import subject into database
-                database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
-                renameDialog.dismiss();
-                Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
-                activity.safeOnBackPressed();
-                activity.displayFragment(NotesSubjectFragment.newInstance(inputText));
-            } else {
-                popupError.setText(R.string.error_subject_exists);
-            }
+        renameDialog.setOnShowListener(dialogInterface -> {
+            renameDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                String inputText = popupInput.getText().toString();
+                if (database.SubjectDao().search(inputText) == null) {
+                    // Import subject into database
+                    database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
+                    renameDialog.dismiss();
+                    Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
+                    activity.safeOnBackPressed();
+                    activity.displayFragment(NotesSubjectFragment.newInstance(inputText));
+                } else {
+                    popupError.setText(R.string.error_subject_exists);
+                }
+            });
+            renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                    .setOnClickListener(view -> renameDialog.dismiss());
         });
-        renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-                .setOnClickListener(view -> renameDialog.dismiss());
         renameDialog.setOnDismissListener(dialogInterface -> database.close());
         renameDialog.show();
     }

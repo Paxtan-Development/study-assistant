@@ -158,7 +158,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             inflater.inflate(R.menu.menu_n3_unlocked, menu);
         }
 
-        if (hasAlert) {
+        if (!hasAlert) {
             menu.findItem(R.id.n3_notif).setVisible(true);
             menu.findItem(R.id.n3_cancel_notif).setVisible(false);
         } else {

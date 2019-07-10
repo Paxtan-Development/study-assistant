@@ -1,3 +1,16 @@
+/*
+ * Copyright 2019 PC Chin. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pcchin.studyassistant.notes;
 
 import android.annotation.SuppressLint;
@@ -16,6 +29,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.os.Handler;
 import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -343,6 +357,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .inflate(R.layout.popup_edittext, null);
             EditText popupInput = inputLayout.findViewById(R.id.popup_input);
             popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            popupInput.setTransformationMethod(new PasswordTransformationMethod());
             TextView popupError = inputLayout.findViewById(R.id.popup_error);
             popupError.setTextColor(Color.BLACK);
             popupError.setText(R.string.n_password_set);
@@ -393,6 +408,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                     // Export all the note's data to a text .subj file
                     try {
+                        // FIXME: SUBJ FILE NOT EXPORTED
                         String infoOutputPath = FileFunctions.generateValidFile(
                                 tempExportFolder + notesSubject, ".subj");
                         FileWriter infoOutput = new FileWriter(infoOutputPath);
@@ -463,6 +479,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .inflate(R.layout.popup_edittext, null);
             EditText popupInput = inputText.findViewById(R.id.popup_input);
             popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            popupInput.setTransformationMethod(new PasswordTransformationMethod());
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
                     .setView(inputText)

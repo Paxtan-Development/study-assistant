@@ -1,8 +1,22 @@
+/*
+ * Copyright 2019 PC Chin. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pcchin.studyassistant.notes.misc;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -75,6 +89,7 @@ public class ImportSubject {
                             .getLayoutInflater().inflate(R.layout.popup_edittext, null);
                     EditText popupInput = inputLayout.findViewById(R.id.popup_input);
                     popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    popupInput.setTransformationMethod(new PasswordTransformationMethod());
                     TextView popupError = inputLayout.findViewById(R.id.popup_error);
 
                     // Asks for password
@@ -92,6 +107,7 @@ public class ImportSubject {
                                         try {
                                             ZipFile inputFile = new ZipFile(path, password.toCharArray());
                                             importZipFile(inputFile);
+                                            passwordDialog.dismiss();
                                         } catch (ZipException e) {
                                             Log.d("Temp", e.getType().toString());
                                             if (e.getCause() != null) {
@@ -103,25 +119,8 @@ public class ImportSubject {
                                                     Log.d("TempCauseCause", e.getCause().getCause().toString());
                                                 }
                                             }
-                                            if (e.getMessage() != null) {
-                                                Log.d("TempMessage", e.getMessage());
-                                            }
-                                            if (e.getType() == ZipException.Type.WRONG_PASSWORD) {
-                                                Log.w("StudyAssistant", "File Error: Password for ZIP file "
-                                                        + path + " incorrect.");
-                                                popupError.setText(R.string.error_password_incorrect);
-                                            } else {
-                                                // Same way of handling the error as the
-                                                // external catch block
-                                                Log.e("StudyAssistant", "File Error: " +
-                                                        "ZIP processing error occurred while "
-                                                        + " importing a subject, stack trace is");
-                                                Toast.makeText(activity, R.string.error_zip_import,
-                                                        Toast.LENGTH_SHORT).show();
-                                                e.printStackTrace();
-                                            }
+                                            popupError.setText(R.string.error_password_incorrect);
                                         }
-                                        passwordDialog.dismiss();
                                     } else {
                                         popupError.setText(R.string.error_password_short);
                                     }
@@ -150,11 +149,18 @@ public class ImportSubject {
     /** Function used to import/convert a ZIP file,
      * separated from importZipConfirm(String path) for clarity.  **/
     private void importZipFile(ZipFile inputFile) throws ZipException {
-        Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
         String tempInputDirPath = FileFunctions.generateValidFile(
                 "/storage/emulated/0/Download/.tempZip", "");
-        inputFile.extractAll(tempInputDirPath);
+        try {
+            inputFile.extractAll(tempInputDirPath);
+        } catch (ZipException e) {
+            // Clears download directory before rethrowing error
+            // New File used to prevent tempInputDir.exists() from returning false
+            FileFunctions.deleteDir(new File(tempInputDirPath));
+            throw e;
+        }
 
+        Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
         File tempInputDir = new File(tempInputDirPath);
         if (tempInputDir.exists() && tempInputDir.isDirectory()) {
             File[] fileList = tempInputDir.listFiles();
@@ -302,6 +308,7 @@ public class ImportSubject {
                         .getLayoutInflater().inflate(R.layout.popup_edittext, null);
                 EditText popupInput = inputLayout.findViewById(R.id.popup_input);
                 popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                popupInput.setTransformationMethod(new PasswordTransformationMethod());
                 TextView popupError = inputLayout.findViewById(R.id.popup_error);
 
                 AlertDialog importDialog = new AlertDialog.Builder(activity)

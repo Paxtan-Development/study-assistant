@@ -23,7 +23,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -38,12 +37,11 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -202,20 +200,25 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     /** Prevents the note from being able to be edited. **/
     public void onLockPressed() {
         if (getContext() != null) {
-            @SuppressLint("InflateParams") LinearLayout inputLayout =
-                    (LinearLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            ((EditText) inputLayout.findViewById(R.id.popup_input))
-                    .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            ((TextView) inputLayout.findViewById(R.id.popup_error))
-                    .setTextColor(Color.BLACK);
-            ((TextView) inputLayout.findViewById(R.id.popup_error)).setText(R.string.n_password_set);
+            @SuppressLint("InflateParams") TextInputLayout inputLayout =
+                    (TextInputLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            if (inputLayout.getEditText() != null) {
+                inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            inputLayout.setEndIconActivated(true);
+            inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+            inputLayout.setHintEnabled(true);
+            inputLayout.setHint(getString(R.string.n_password_set));
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.n3_lock_password))
                     .setView(inputLayout)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                         // Get values from database
-                        String inputText = ((EditText) inputLayout.findViewById(R.id.popup_input))
-                                .getText().toString();
+                        String inputText = "";
+                        if (inputLayout.getEditText() != null) {
+                            inputText = inputLayout.getEditText().getText().toString();
+                        }
                         SubjectDatabase database = Room.databaseBuilder(getContext(),
                                 SubjectDatabase.class, "notesSubject")
                                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -263,12 +266,15 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 if (contents.get(notesOrder).get(3) != null &&
                         contents.get(notesOrder).get(3).length() > 0) {
                     // Set up input layout
-                    @SuppressLint("InflateParams") LinearLayout inputLayout =
-                            (LinearLayout) getLayoutInflater()
+                    @SuppressLint("InflateParams") TextInputLayout inputLayout =
+                            (TextInputLayout) getLayoutInflater()
                                     .inflate(R.layout.popup_edittext, null);
-                    ((EditText) inputLayout.findViewById(R.id.popup_input))
-                            .setInputType(InputType.TYPE_CLASS_TEXT |
-                                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    if (inputLayout.getEditText() != null) {
+                        inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    }
+                    inputLayout.setEndIconActivated(true);
+                    inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
                     // Asks user for password
                     AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
                             .setTitle(R.string.n3_unlock_password)
@@ -281,8 +287,10 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     passwordDialog.setOnShowListener(dialogInterface -> {
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
-                            String inputText = ((EditText) inputLayout.findViewById(R.id.popup_input))
-                                    .getText().toString();
+                            String inputText = "";
+                            if (inputLayout.getEditText() != null) {
+                                inputText = inputLayout.getEditText().getText().toString();
+                            }
                             if (Objects.equals(SecurityFunctions.notesHash(inputText),
                                     contents.get(notesOrder).get(3))) {
                                 // Removes password
@@ -290,8 +298,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                 removeLock(contents, database, subject);
                             } else {
                                 // Show error dialog
-                                ((TextView) inputLayout.findViewById(R.id.popup_error))
-                                        .setText(R.string.error_password_incorrect);
+                                inputLayout.setErrorEnabled(true);
+                                inputLayout.setError(getString(R.string.error_password_incorrect));
                             }
                         });
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(

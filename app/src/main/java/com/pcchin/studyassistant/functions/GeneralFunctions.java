@@ -29,10 +29,8 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
@@ -60,8 +58,10 @@ public class GeneralFunctions {
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(Context context, @NonNull final MainActivity activity,
                                final SubjectDatabase database) {
-        @SuppressLint("InflateParams") final View popupView = activity.getLayoutInflater()
-                .inflate(R.layout.popup_edittext, null);
+        @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
+                .getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        popupView.setEndIconActivated(true);
+        popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
         AlertDialog subjectDialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.n1_new_subject)
                 .setView(popupView)
@@ -71,18 +71,21 @@ public class GeneralFunctions {
                 .create();
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
         subjectDialog.setOnShowListener(dialog -> {
-            ((EditText) popupView.findViewById(R.id.popup_input)).setHint(R.string.n1_subject_title);
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
+            popupView.setHint(activity.getString(R.string.n1_subject_title));
+            subjectDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setOnClickListener(v -> {
-                        String inputText = ((EditText) popupView
-                                .findViewById(R.id.popup_input)).getText().toString();
-                        TextView errorText = popupView.findViewById(R.id.popup_error);
+                        String inputText = "";
+                        if (popupView.getEditText() != null) {
+                            inputText = popupView.getEditText().getText().toString();
+                        }
 
                         // Preliminary checks if subject name is taken or is empty
                         if (inputText.replaceAll("\\s+", "").length() == 0) {
-                            errorText.setText(R.string.n_error_subject_empty);
+                            popupView.setErrorEnabled(true);
+                            popupView.setError(activity.getString(R.string.n_error_subject_empty));
                         } else if (database.SubjectDao().search(inputText) != null) {
-                            errorText.setText(R.string.error_subject_exists);
+                            popupView.setErrorEnabled(true);
+                            popupView.setError(activity.getString(R.string.error_subject_exists));
                         } else {
                             // Create subject
                             database.SubjectDao().insert(
@@ -96,7 +99,7 @@ public class GeneralFunctions {
                             GeneralFunctions.updateNavView(activity);
                         }
                     });
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
+            subjectDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
                     .setOnClickListener(v -> dialog.dismiss());
         });
         subjectDialog.show();

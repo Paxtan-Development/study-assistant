@@ -16,6 +16,7 @@ package com.pcchin.studyassistant.main;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -200,20 +201,29 @@ class AppUpdate {
                 }
 
                 // Set up dialog
-                new AlertDialog.Builder(activity)
+                AlertDialog updateDialog = new AlertDialog.Builder(activity)
                         .setTitle(R.string.a_update_app)
                         .setMessage(R.string.a_new_version)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) ->
-                                updateViaGitlab(downloadLink))
-                        .setNeutralButton(R.string.a_learn_more, (dialogInterface, i) -> {
-                            activity.safeOnBackPressed();
-                            Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(GITLAB_RELEASES));
-                            activity.startActivity(gitlabReleaseSite);
-                        })
-                        .setNegativeButton(android.R.string.no, ((dialogInterface, i) ->
-                                dialogInterface.dismiss()))
-                        .create().show();
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setNeutralButton(R.string.a_learn_more, null)
+                        .setNegativeButton(android.R.string.no, null)
+                        .create();
+                updateDialog.setOnShowListener(dialogInterface -> {
+                    updateDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                        updateDialog.dismiss();
+                        updateViaGitlab(downloadLink);
+                    });
+                    updateDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
+                        // The user should be able to update after coming back from the website
+                        activity.safeOnBackPressed();
+                        Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(GITLAB_RELEASES));
+                        activity.startActivity(gitlabReleaseSite);
+                    });
+                    updateDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
+                            view -> updateDialog.dismiss());
+                });
+                updateDialog.show();
             }
         } catch (JSONException e) {
             Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_API_RELEASES

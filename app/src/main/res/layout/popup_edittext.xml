@@ -12,27 +12,19 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/edittext_popup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/popup_input"
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/edittext_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/blank"
         android:inputType="textPersonName"
-        android:text="@string/blank"
-        tools:ignore="Autofill" />
+        android:text="@string/blank" />
 
-    <TextView
-        android:id="@+id/popup_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/blank"
-        android:textColor="@android:color/holo_red_dark" />
-</LinearLayout>
+</com.google.android.material.textfield.TextInputLayout>

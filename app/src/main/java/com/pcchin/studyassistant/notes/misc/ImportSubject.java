@@ -16,16 +16,13 @@ package com.pcchin.studyassistant.notes.misc;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.room.Room;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
@@ -85,12 +82,14 @@ public class ImportSubject {
         try {
             if (new ZipFile(path).isValidZipFile()) {
                 if (new ZipFile(path).isEncrypted()) {
-                    @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) activity
-                            .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-                    EditText popupInput = inputLayout.findViewById(R.id.popup_input);
-                    popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    popupInput.setTransformationMethod(new PasswordTransformationMethod());
-                    TextView popupError = inputLayout.findViewById(R.id.popup_error);
+                    @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
+                            activity.getLayoutInflater().inflate(R.layout.popup_edittext, null);
+                    if (inputLayout.getEditText() != null) {
+                        inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    }
+                    inputLayout.setEndIconActivated(true);
+                    inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
                     // Asks for password
                     AlertDialog passwordDialog = new AlertDialog.Builder(activity)
@@ -102,27 +101,24 @@ public class ImportSubject {
                     passwordDialog.setOnShowListener(dialogInterface -> {
                         passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
-                                    String password = popupInput.getText().toString();
+                                    String password = "";
+                                    if (inputLayout.getEditText() != null) {
+                                        password = inputLayout.getEditText().getText().toString();
+                                    }
                                     if (password.length() >= 8) {
                                         try {
                                             ZipFile inputFile = new ZipFile(path, password.toCharArray());
                                             importZipFile(inputFile);
                                             passwordDialog.dismiss();
                                         } catch (ZipException e) {
-                                            Log.d("Temp", e.getType().toString());
-                                            if (e.getCause() != null) {
-                                                Log.d("TempCause", e.getCause().toString());
-                                                if (e.getCause().getMessage() != null) {
-                                                    Log.d("TempCauseMessage", e.getCause().getMessage());
-                                                }
-                                                if (e.getCause().getCause() != null) {
-                                                    Log.d("TempCauseCause", e.getCause().getCause().toString());
-                                                }
-                                            }
-                                            popupError.setText(R.string.error_password_incorrect);
+                                            inputLayout.setErrorEnabled(true);
+                                            inputLayout.setError(activity.getString(R.string
+                                                    .error_password_incorrect));
                                         }
                                     } else {
-                                        popupError.setText(R.string.error_password_short);
+                                        inputLayout.setErrorEnabled(true);
+                                        inputLayout.setError(activity.getString(R.string
+                                                .error_password_short));
                                     }
                                 });
                         passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
@@ -304,12 +300,14 @@ public class ImportSubject {
                 byte[] content = FileFunctions.getBytesFromFile(fileSize - titleLength - 8, inputStream);
                 inputStream.close();
 
-                @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) activity
+                @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout) activity
                         .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-                EditText popupInput = inputLayout.findViewById(R.id.popup_input);
-                popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                popupInput.setTransformationMethod(new PasswordTransformationMethod());
-                TextView popupError = inputLayout.findViewById(R.id.popup_error);
+                if (inputLayout.getEditText() != null) {
+                    inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                            InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                }
+                inputLayout.setEndIconActivated(true);
+                inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
                 AlertDialog importDialog = new AlertDialog.Builder(activity)
                         .setTitle(R.string.enter_password)
@@ -321,11 +319,15 @@ public class ImportSubject {
                     importDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                         Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
 
-                        String password = popupInput.getText().toString();
+                        String password = "";
+                        if (inputLayout.getEditText() != null) {
+                            password = inputLayout.getEditText().getText().toString();
+                        }
                         ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
                                 .subjectDecrypt(title, password, content);
                         if (subjectContents == null) {
-                            popupError.setText(R.string.error_password_incorrect);
+                            inputLayout.setErrorEnabled(true);
+                            inputLayout.setError(activity.getString(R.string.error_password_incorrect));
                         } else {
                             importSubjectToDatabase(title, subjectContents, sortOrder);
                             importDialog.dismiss();
@@ -391,11 +393,11 @@ public class ImportSubject {
      * Separated from importSubjectToDatabase(String title,
      * ArrayList<ArrayList<String>> contents, int sortOrder) for clarity. **/
     private void showRenameDialog(String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
-        @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) activity
+        @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-        TextView popupInput = inputLayout.findViewById(R.id.popup_input);
-        popupInput.setText(title);
-        TextView popupError = inputLayout.findViewById(R.id.popup_error);
+        if (inputLayout.getEditText() != null) {
+            inputLayout.getEditText().setText(title);
+        }
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
                 "notesSubject")
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -409,16 +411,23 @@ public class ImportSubject {
                 .create();
         renameDialog.setOnShowListener(dialogInterface -> {
             renameDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                String inputText = popupInput.getText().toString();
-                if (database.SubjectDao().search(inputText) == null) {
+                String inputText = "";
+                if (inputLayout.getEditText() != null) {
+                    inputText = inputLayout.getEditText().getText().toString();
+                }
+                if (inputText.length() == 0 && database.SubjectDao().search(inputText) == null) {
                     // Import subject into database
                     database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
                     renameDialog.dismiss();
                     Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
                     activity.safeOnBackPressed();
                     activity.displayFragment(NotesSubjectFragment.newInstance(inputText));
+                } else if (inputText.length() > 0) {
+                    inputLayout.setErrorEnabled(true);
+                    inputLayout.setError(activity.getString(R.string.error_subject_exists));
                 } else {
-                    popupError.setText(R.string.error_subject_exists);
+                    Log.w("StudyAssistant", "TextInputLayout Error: getEditText() for " +
+                            "AlertDialog in ImportSubject.showRenameDialog not found.");
                 }
             });
             renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)

@@ -21,7 +21,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -29,20 +28,19 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.os.Handler;
 import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
@@ -255,8 +253,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     /** Creates a new note with a given title. **/
     public void onNewNotePressed() {
         if (getContext() != null && getActivity() != null) {
-            @SuppressLint("InflateParams") final View popupView = getLayoutInflater()
-                    .inflate(R.layout.popup_edittext, null);
+            @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
+                    getLayoutInflater().inflate(R.layout.popup_edittext, null);
             AlertDialog newNoteDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_new_note)
                     .setView(popupView)
@@ -266,18 +264,19 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             // OnClickListeners implemented separately to prevent
             // dialog from being dismissed after button click
             newNoteDialog.setOnShowListener(dialog -> {
-                ((EditText) popupView.findViewById(R.id.popup_input)).setHint(R.string.title);
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
+                popupView.setHint(getString(R.string.title));
+                newNoteDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                         .setOnClickListener(v -> {
-                            String popupInputText = ((EditText) popupView
-                                    .findViewById(R.id.popup_input))
-                                    .getText().toString();
+                            String popupInputText = "";
+                            if (popupView.getEditText() != null) {
+                                popupInputText = popupView.getEditText().getText().toString();
+                            }
 
                             // Check if input is blank
                             if (popupInputText.replaceAll("\\s+", "")
                                     .length() == 0) {
-                                ((TextView) popupView.findViewById(R.id.popup_error))
-                                        .setText(R.string.n2_error_note_title_empty);
+                                popupView.setErrorEnabled(true);
+                                popupView.setError(getString(R.string.n2_error_note_title_empty));
                             } else if (getActivity() != null){
                                 // Edit new note
                                 dialog.dismiss();
@@ -287,7 +286,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                                 notesSubject, popupInputText));
                             }
                         });
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
+                newNoteDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
                         .setOnClickListener(v -> dialog.dismiss());
             });
             newNoteDialog.show();
@@ -353,14 +352,16 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
      * exportZip() separated for clarity. **/
     private void askZipPassword() {
         if (getContext() != null) {
-            @SuppressLint("InflateParams") LinearLayout inputLayout = (LinearLayout) getLayoutInflater()
-                    .inflate(R.layout.popup_edittext, null);
-            EditText popupInput = inputLayout.findViewById(R.id.popup_input);
-            popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            popupInput.setTransformationMethod(new PasswordTransformationMethod());
-            TextView popupError = inputLayout.findViewById(R.id.popup_error);
-            popupError.setTextColor(Color.BLACK);
-            popupError.setText(R.string.n_password_set);
+            @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
+                    getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            if (inputLayout.getEditText() != null) {
+                inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            inputLayout.setEndIconActivated(true);
+            inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+            inputLayout.setHintEnabled(true);
+            inputLayout.setHint(getString(R.string.n_password_set));
 
             AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.enter_password)
@@ -370,12 +371,15 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     .create();
             passwordDialog.setOnShowListener(dialogInterface -> {
                 passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                    String inputText = popupInput.getText().toString();
+                    String inputText = "";
+                    if (inputLayout.getEditText() != null) {
+                        inputText = inputLayout.getEditText().getText().toString();
+                    }
                     if (inputText.length() == 0 || inputText.length() >= 8) {
                         exportZip(inputText);
                     } else {
-                        popupError.setTextColor(Color.RED);
-                        popupError.setText(R.string.error_password_short);
+                        inputLayout.setErrorEnabled(true);
+                        inputLayout.setError(getString(R.string.error_password_short));
                     }
                     passwordDialog.dismiss();
                 });
@@ -425,6 +429,12 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                             // Record info about the note to the .subj file
                             FileFunctions.checkNoteIntegrity(notesArray.get(i));
+                            for (int j = 0; j < notesArray.get(i).size(); j++) {
+                                // Convert null to "NULL" string for them to be understood when read
+                                if (notesArray.get(i).get(j) == null) {
+                                    notesArray.get(i).set(j, "NULL");
+                                }
+                            }
                             infoOutput.write(new File(currentPath).getName()
                                     + "\n" + notesArray.get(i).get(0) + "\n"
                             + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
@@ -475,11 +485,12 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
      * separated from onExportSubject() for clarity. **/
     private void exportSubject() {
         if (getContext() != null) {
-            @SuppressLint("InflateParams") LinearLayout inputText = (LinearLayout) getLayoutInflater()
+            @SuppressLint("InflateParams") TextInputLayout inputText = (TextInputLayout) getLayoutInflater()
                     .inflate(R.layout.popup_edittext, null);
-            EditText popupInput = inputText.findViewById(R.id.popup_input);
-            popupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            popupInput.setTransformationMethod(new PasswordTransformationMethod());
+            if (inputText.getEditText() != null) {
+                inputText.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
                     .setView(inputText)
@@ -489,7 +500,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             exportDialog.setOnShowListener(dialogInterface -> {
                 exportDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                     // Check if password is too short, must be 8 characters in length
-                    String responseText = popupInput.getText().toString();
+                    String responseText = "";
+                    if (inputText.getEditText() != null) {
+                        responseText = inputText.getEditText().getText().toString();
+                    }
                     if (responseText.length() >= 8) {
                         // Set output file name
                         String outputFileName = "/storage/emulated/0/Download/" + notesSubject
@@ -502,6 +516,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                         // Check if the file can be created
                         String finalOutputFileName = outputFileName;
+                        String finalResponseText = responseText;
                         new Handler().post(() -> {
                             try {
                                 File outputFile = new File(finalOutputFileName);
@@ -521,7 +536,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                             .intToBytes(subjectDatabase.SubjectDao()
                                                     .search(notesSubject).sortOrder));
                                     outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
-                                            responseText, notesArray));
+                                            finalResponseText, notesArray));
                                     outputStream.flush();
                                     outputStream.close();
 
@@ -547,15 +562,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             }
                         });
                     } else {
-                        ((TextView) inputText.findViewById(R.id.popup_error)).setText(R.string.error_password_short);
+                        inputText.setErrorEnabled(true);
+                        inputText.setError(getString(R.string.error_password_short));
                     }
                 });
                 exportDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
                         exportDialog.dismiss());
             });
-            Log.d("Log", "E");
             exportDialog.show();
-            Log.d("Log", "F");
         }
     }
 

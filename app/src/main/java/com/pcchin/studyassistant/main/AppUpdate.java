@@ -236,29 +236,10 @@ class AppUpdate {
      * separated from showGitlabUpdateNotif(JSONArray response) for clarity. **/
     private void updateViaGitlab(String downloadLink) {
         // Generate output file name
-        // Delete any incomplete apk file if present
-        String outputFileName = activity.getFilesDir().getAbsolutePath() + "/apk";
-        File apkInstallDir = new File(outputFileName);
-        if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
-            // Deletes all children in the folder
-            File[] dirFiles = apkInstallDir.listFiles();
-            if (dirFiles != null) {
-                for (File child: dirFiles) {
-                    FileFunctions.deleteDir(child);
-                }
-            }
-            outputFileName += "/studyassistant-update.apk";
-        } else if (!apkInstallDir.exists()) {
-            if (apkInstallDir.mkdir()) {
-                outputFileName += "/studyassistant-update.apk";
-            } else {
-                outputFileName = FileFunctions.generateValidFile(
-                        "/storage/emulated/0/Download/studyassistant-update", ".apk");
-            }
-        } else {
-            outputFileName = FileFunctions.generateValidFile(
-                    "/storage/emulated/0/Download/studyassistant-update", ".apk");
-        }
+        // Ask other APK files is deleted on startup, leftover files would not be checked here
+        String outputFileName = "/storage/emulated/0/Download";
+        outputFileName = FileFunctions.generateValidFile(outputFileName +
+                "/.studyassistant-update", ".apk");
 
         RequestQueue queue = Volley.newRequestQueue(activity);
         // Boolean used as it is possible for user to cancel the dialog before the download starts
@@ -287,6 +268,10 @@ class AppUpdate {
                     FileOutputStream responseStream;
                     File outputFile = new File(finalOutputFileName);
                     if (outputFile.createNewFile()) {
+                        SharedPreferences.Editor editor = activity.getSharedPreferences(
+                                activity.getPackageName(), Context.MODE_PRIVATE).edit();
+                        editor.putString("AppUpdatePath", finalOutputFileName);
+                        editor.apply();
                         responseStream = new FileOutputStream(outputFile);
                         responseStream.flush();
                         responseStream.close();

@@ -14,6 +14,7 @@
 package com.pcchin.studyassistant.main;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,6 +23,7 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -56,15 +58,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         displayFragment(new MainFragment());
 
-        // Only check for updates once a day
-        if (getIntent().getBooleanExtra("displayUpdate", false)) {
-            new Handler().post(() -> new AppUpdate(MainActivity.this, true));
-        } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                .getString("lastUpdateCheck", ""),
-                GeneralFunctions.standardDateFormat.format(new Date()))) {
-            new Handler().post(() -> new AppUpdate(MainActivity.this, false));
-        }
-
         // Delete any past export files
         new Handler().post(() -> {
             String outputFileName = getFilesDir().getAbsolutePath() + "/files";
@@ -81,7 +74,37 @@ public class MainActivity extends AppCompatActivity
                 //noinspection ResultOfMethodCallIgnored
                 apkInstallDir.mkdir();
             }
+
+            SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+            String pastUpdateFilePath = sharedPref.getString("AppUpdatePath", "");
+            if (pastUpdateFilePath.length() != 0) {
+                File pastUpdateFile = new File(pastUpdateFilePath);
+                if (pastUpdateFile.exists()) {
+                    if (pastUpdateFile.delete()) {
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("AppUpdatePath", "");
+                        editor.apply();
+                    } else {
+                        Log.w("StudyAssistant", "File Error: File "
+                            + pastUpdateFilePath + " could not be deleted.");
+                    }
+                } else {
+                    // File has already been removed
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("AppUpdatePath", "");
+                    editor.apply();
+                }
+            }
         });
+
+        // Only check for updates once a day
+        if (getIntent().getBooleanExtra("displayUpdate", false)) {
+            new Handler().post(() -> new AppUpdate(MainActivity.this, true));
+        } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+                        .getString("lastUpdateCheck", ""),
+                GeneralFunctions.standardDateFormat.format(new Date()))) {
+            new Handler().post(() -> new AppUpdate(MainActivity.this, false));
+        }
 
         // Set toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);

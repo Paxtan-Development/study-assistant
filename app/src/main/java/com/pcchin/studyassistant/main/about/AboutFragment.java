@@ -11,15 +11,12 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.main;
+package com.pcchin.studyassistant.main.about;
 
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import android.text.Html;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +25,9 @@ import android.widget.TextView;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.main.MainFragment;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 
 import java.util.Calendar;
@@ -35,7 +35,7 @@ import java.util.Locale;
 
 public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
-    /** Default Constructor **/
+    /** Default Constructor. **/
     public AboutFragment() {}
 
     /** Initializes the fragment. Nothing to see here. **/
@@ -43,7 +43,7 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name_release);
+            getActivity().setTitle(R.string.app_name);
         }
     }
 
@@ -63,18 +63,22 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
                 getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
                 getString(R.string.m2_copyright_p2)));
 
+        returnView.findViewById(R.id.m2_library_license).setOnClickListener(view -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).displayFragment(new LicenseFragment());
+            }
+        });
+        returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).displayFragment(new RssLicenseFragment());
+            }
+        });
+
         // Set license text
-        Spanned license;
-        String licenseText = FileFunctions.getTxt(inflater.getContext(),
-                "license.txt");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            license = Html.fromHtml(licenseText, Html.FROM_HTML_MODE_LEGACY); // Adds hyperlink to text
-        } else {
-            license = Html.fromHtml(licenseText);
-        }
-        TextView licenseView = returnView.findViewById(R.id.m2_license);
-        licenseView.setText(license);
-        licenseView.setMovementMethod(LinkMovementMethod.getInstance());
+        GeneralFunctions.setHtml(returnView.findViewById(R.id.m2_apache), getString(
+                R.string.license_self_copyright) + FileFunctions.getTxt(inflater.getContext(),
+                "apache_2_license.txt"));
+
         return returnView;
     }
 

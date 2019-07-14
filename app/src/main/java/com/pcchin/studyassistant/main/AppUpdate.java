@@ -51,10 +51,13 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -188,7 +191,7 @@ class AppUpdate {
                     Notification notif = new NotificationCompat.Builder
                             (activity, activity.getPackageName())
                             .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(activity.getString(R.string.app_name_release))
+                            .setContentTitle(activity.getString(R.string.app_name))
                             .setContentText(activity.getString(R.string.a_update_app))
                             .setContentIntent(pendingIntent)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -265,16 +268,24 @@ class AppUpdate {
                 downloadDialog.dismiss();
                 queue.stop();
                 if (response != null) {
-                    FileOutputStream responseStream;
                     File outputFile = new File(finalOutputFileName);
                     if (outputFile.createNewFile()) {
                         SharedPreferences.Editor editor = activity.getSharedPreferences(
                                 activity.getPackageName(), Context.MODE_PRIVATE).edit();
                         editor.putString("AppUpdatePath", finalOutputFileName);
                         editor.apply();
-                        responseStream = new FileOutputStream(outputFile);
-                        responseStream.flush();
-                        responseStream.close();
+
+                        // Write output file with buffer
+                        InputStream input = new ByteArrayInputStream(response);
+                        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
+                        byte[] data = new byte[1024];
+                        int count;
+                        while ((count = input.read(data)) != -1) {
+                            output.write(data, 0, count);
+                        }
+                        output.flush();
+                        output.close();
+                        input.close();
 
                         // Install app
                         activity.safeOnBackPressed();

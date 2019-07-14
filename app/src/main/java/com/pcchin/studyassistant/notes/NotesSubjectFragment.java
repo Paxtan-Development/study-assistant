@@ -158,9 +158,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_notes_subject,
+        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.blank_list,
                 container, false);
-        LinearLayout returnView = returnScroll.findViewById(R.id.n2);
+        LinearLayout returnView = returnScroll.findViewById(R.id.blank_linear);
 
         // Check if stored data may be corrupt
         if (notesArray == null) {
@@ -535,7 +535,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     outputStream.write(ConverterFunctions
                                             .intToBytes(subjectDatabase.SubjectDao()
                                                     .search(notesSubject).sortOrder));
-                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
+                                    outputStream.write(SecurityFunctions.subjectEncrypt(
                                             finalResponseText, notesArray));
                                     outputStream.flush();
                                     outputStream.close();

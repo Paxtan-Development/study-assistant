@@ -1,3 +1,16 @@
+/*
+ * Copyright 2019 PC Chin. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pcchin.studyassistant;
 
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -11,19 +24,19 @@ import javax.crypto.Cipher;
 
 /** Test local hashing & encryption/decryption functions. **/
 public class SecurityTest {
+    // TODO: PBKDF2
     private static final int TEST_COUNT = 10000;
 
     /** Check if the encryption function for the .subject files work. **/
     @Test
     public void testSubjectEncrypt() {
         // Normal input
-        String responseString = TestFunctions.randomString(TEST_COUNT);
-        byte[] responseArray = SecurityFunctions.subjectEncrypt(responseString,
+        byte[] responseArray = SecurityFunctions.subjectEncrypt(
                 TestFunctions.randomString(TEST_COUNT), TestFunctions.randomArray(TEST_COUNT));
         Assert.assertNotNull(responseArray);
 
         // Minimal input
-        responseArray = SecurityFunctions.subjectEncrypt(TestFunctions.randomString(2),
+        responseArray = SecurityFunctions.subjectEncrypt(
                 TestFunctions.randomString(2), null);
         Assert.assertNotNull(responseArray);
     }
@@ -32,28 +45,14 @@ public class SecurityTest {
     @Test
     public void testSubjectEncryptDecrypt() {
         // Normal input
-        String testTitle = TestFunctions.randomString(TEST_COUNT);
         String testPassword = TestFunctions.randomString(TEST_COUNT);
         ArrayList<ArrayList<String>> testContents = TestFunctions.randomArray(TEST_COUNT);
-        byte[] testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
+        byte[] testOutput = SecurityFunctions.subjectEncrypt(testPassword, testContents);
         Assert.assertNotNull(testOutput);
 
-        ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testTitle,
-                testPassword, testOutput);
+        ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testPassword,
+                testOutput);
         Assert.assertEquals(testContents, testResponse);
-    }
-
-    /** Check if the PBKDF2 algorithm is working. **/
-    @Test
-    public void testPbkdf2() {
-        byte[] responseByte = SecurityFunctions.pbkdf2(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT).getBytes());
-        Assert.assertNotNull(responseByte);
-
-        // Minimal input
-        responseByte = SecurityFunctions.pbkdf2(TestFunctions.randomString(2),
-                TestFunctions.randomString(2).getBytes());
-        Assert.assertNotNull(responseByte);
     }
 
     /** Check if the hashing function for locking notes works. **/

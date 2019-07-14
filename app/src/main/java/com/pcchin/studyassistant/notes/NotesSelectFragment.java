@@ -55,7 +55,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
             subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
-            getActivity().setTitle(R.string.app_name_release);
+            getActivity().setTitle(R.string.app_name);
         }
         setHasOptionsMenu(true);
     }

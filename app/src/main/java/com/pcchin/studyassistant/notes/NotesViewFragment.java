@@ -461,7 +461,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 
                 // Save value to database
-                notesInfo.set(4, GeneralFunctions.standardDateTimeFormat.format(targetDateTime));
+                notesInfo.set(4, GeneralFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                 notesInfo.set(5, String.valueOf(requestCode));
                 SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                         "notesSubject")

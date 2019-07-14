@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Resources used when displaying all sorts of licenses. -->
+<resources>
+    <string name="license_apache_2">Apache 2.0</string>
+    <string name="license_mit">MIT</string>
+    <string name="license_cc_3_unported">Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</string>
+    <string name="license_self_copyright">Copyright 2019 PC Chin. All rights reserved.</string>
+
+    <string-array name="filechooser_license">
+        <item>@string/license_apache_2</item>
+        <item>Android FileChooser</item>
+        <item>&lt;a href=&quot;https://github.com/hedzr/android-file-chooser&quot;&gt;android-file-chooser&lt;/a&gt; library
+            - © 2015-2019 &lt;a href=&quot;https://github.com/hedzr&quot;&gt;Hedzr Yeh&lt;/a&gt;</item>
+    </string-array>
+
+    <string-array name="zip4j_license">
+        <item>@string/license_apache_2</item>
+        <item>Zip4j</item>
+        <item>&lt;a href=&quot;https://github.com/srikanth-lingala/zip4j&gt;Zip4j&lt;/a&gt; library
+            - © 2008-2019 &lt;a href=&quot;http://www.lingala.net/&quot;&gt;Srikanth Reddy Lingala&lt;/a&gt;</item>
+    </string-array>
+
+    <string-array name="jsoup_license">
+        <item>@string/license_mit</item>
+        <item>jsoup</item>
+        <item><![CDATA[Copyright © 2009 – 2019 <a href="https://jhy.io">
+            Jonathan Hedley</a> (<a href="mailto:jonathan@hedley.ney">jonathan@hedley.net</a>)]]></item>
+    </string-array>
+</resources>

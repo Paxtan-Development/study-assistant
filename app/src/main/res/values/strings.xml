@@ -13,8 +13,7 @@
 
 <resources>
     <!-- General strings -->
-    <string name="app_name_debug">SA Assistant</string>
-    <string name="app_name_release">Study Assistant</string>
+    <string name="app_name">Study Assistant</string>
     <string name="notes">Notes</string>
     <string name="projects">Projects</string>
     <string name="exit">Exit</string>
@@ -26,6 +25,7 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="del">Delete</string>
+    <string name="close">Close</string>
     <string name="title">Title</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -64,6 +64,8 @@
     <string name="m2_copyright_p1">© 2019–</string>
     <string name="m2_copyright_p2">PC Chin</string>
     <string name="m2_version">Version: </string>
+    <string name="m2_libraries_used">Libraries Used</string>
+    <string name="m2_rss_used">Resources Used</string>
 
     <string name="m3_home">Home</string>
     <string name="m3_others">Others</string>
@@ -148,4 +150,7 @@
     <string name="p3_pass_old">Old password</string>
     <string name="p3_pass_new1">New password</string>
     <string name="p3_pass_new2">Re-enter password</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -13,6 +13,7 @@
 
 package com.pcchin.studyassistant.functions;
 
+import android.util.Base64;
 import android.util.Log;
 
 import java.security.InvalidKeyException;
@@ -26,10 +27,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-
-import de.rtner.misc.BinTools;
-import de.rtner.security.auth.spi.PBKDF2Engine;
-import de.rtner.security.auth.spi.PBKDF2Parameters;
 
 /** Functions used in hashing, encryption etc. **/
 public class SecurityFunctions {
@@ -49,33 +46,24 @@ public class SecurityFunctions {
         // 2) Blowfish
         blowfish(originalByte, original.getBytes(), Cipher.ENCRYPT_MODE);
 
-        if (originalByte == null) {
-            return null;
-        } else {
-            return BinTools.bin2hex(originalByte);
-        }
+        return Base64.encodeToString(originalByte, Base64.DEFAULT);
     }
 
     /** Encryption method used to protect subject contents in .subject files **/
-    public static byte[] subjectEncrypt(String title, String password,
+    public static byte[] subjectEncrypt(String password,
                                         ArrayList<ArrayList<String>> content) {
-        Log.d("Log", "S1");
+        // TODO: PBKDF2 (Encrypt & Decrypt)
         byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
-        Log.d("Log", "S2");
-        byte[] passwordByte = pbkdf2(password, title.getBytes());
-        Log.d("Log", "S3");
+        byte[] passwordByte = password.getBytes();
         aes(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
-        Log.d("Log", "S4");
         blowfish(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
-        Log.d("Log", "S5");
 
         return responseByte;
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<ArrayList<String>> subjectDecrypt(String title,
-                                                       String password, byte[] content) {
-        byte[] passwordByte = pbkdf2(password, title.getBytes());
+    public static ArrayList<ArrayList<String>> subjectDecrypt(String password, byte[] content) {
+        byte[] passwordByte = password.getBytes();
         aes(content, passwordByte, Cipher.DECRYPT_MODE);
         blowfish(content, passwordByte, Cipher.DECRYPT_MODE);
         return ConverterFunctions.jsonToArray(new String(content));
@@ -179,24 +167,5 @@ public class SecurityFunctions {
                     + " algorithm BLOWFISH/CBC/PKCS5Padding of " + Arrays.toString(key) + " is not valid.");
             e.printStackTrace();
         }
-    }
-
-    /** PBKDF2 encryption/decryption. An external library has been used
-     * instead of BouncyCastle to save space. The value of the salt is used in multiples of 3,
-     * unless it is too short, in which cased it is recursively divided by 2 and minus 1
-     * until a valid response is obtained. **/
-    public static byte[] pbkdf2(String original, byte[] salt) {
-        byte[] pbkdfSalt = new byte[64];
-        for (int i = 0; i < 64; i++) {
-            int referenceVal = i * 3;
-            while (salt.length > referenceVal) {
-                referenceVal /= 2;
-                referenceVal -= 1;
-            }
-            pbkdfSalt[i] = salt[referenceVal];
-        }
-        PBKDF2Parameters params = new PBKDF2Parameters(
-                "HmacSHA256", "UTF-8", pbkdfSalt, 10000);
-        return new PBKDF2Engine(params).deriveKey(original);
     }
 }

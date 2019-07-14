@@ -25,14 +25,19 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.navigation.NavigationView;
 
+import android.os.Build;
 import android.os.Handler;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.main.AboutFragment;
+import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -201,5 +206,17 @@ public class GeneralFunctions {
                     .detach(target)
                     .attach(target).commit();
         }
+    }
+
+    /** Inserts a HTML text into a TextView. **/
+    public static void setHtml(TextView view, String htmlText) {
+        Spanned output;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            output = Html.fromHtml(htmlText, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            output = Html.fromHtml(htmlText);
+        }
+        view.setText(output);
+        view.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }

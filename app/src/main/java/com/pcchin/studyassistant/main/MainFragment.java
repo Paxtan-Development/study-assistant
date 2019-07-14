@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
@@ -40,7 +41,7 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name_release);
+            getActivity().setTitle(R.string.app_name);
         }
     }
 

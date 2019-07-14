@@ -17,7 +17,7 @@
     android:id="@+id/m2_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.AboutFragment">
+    tools:context=".main.about.AboutFragment">
 
     <LinearLayout
         android:id="@+id/m2"
@@ -36,48 +36,66 @@
         <TextView
             android:id="@+id/m2_title"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:text="@string/app_name_release"
+            android:text="@string/app_name"
             android:textSize="36sp" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
 
         <TextView
             android:id="@+id/m2_copyright"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.05"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="@string/blank"
             android:textSize="24sp" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
         <TextView
             android:id="@+id/m2_version"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.05"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="@string/m2_version"
             android:textSize="24sp" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+        <Button
+            android:id="@+id/m2_library_license"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:text="@string/m2_libraries_used"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/m2_rss_license"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:text="@string/m2_rss_used"
+            android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/m2_license"
+            android:id="@+id/m2_apache"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20sp"
-            android:layout_marginEnd="20sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:text="@string/blank"
             android:textSize="18sp" />
 

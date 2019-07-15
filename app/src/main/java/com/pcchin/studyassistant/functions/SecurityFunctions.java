@@ -16,6 +16,10 @@ package com.pcchin.studyassistant.functions;
 import android.util.Base64;
 import android.util.Log;
 
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
+
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -50,11 +54,10 @@ public class SecurityFunctions {
     }
 
     /** Encryption method used to protect subject contents in .subject files **/
-    public static byte[] subjectEncrypt(String password,
+    public static byte[] subjectEncrypt(String title, String password,
                                         ArrayList<ArrayList<String>> content) {
-        // TODO: PBKDF2 (Encrypt & Decrypt)
         byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
-        byte[] passwordByte = password.getBytes();
+        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 120000);
         aes(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
         blowfish(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
 
@@ -62,8 +65,9 @@ public class SecurityFunctions {
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<ArrayList<String>> subjectDecrypt(String password, byte[] content) {
-        byte[] passwordByte = password.getBytes();
+    public static ArrayList<ArrayList<String>> subjectDecrypt(String title, String password,
+                                                              byte[] content) {
+        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 120000);
         aes(content, passwordByte, Cipher.DECRYPT_MODE);
         blowfish(content, passwordByte, Cipher.DECRYPT_MODE);
         return ConverterFunctions.jsonToArray(new String(content));
@@ -167,5 +171,15 @@ public class SecurityFunctions {
                     + " algorithm BLOWFISH/CBC/PKCS5Padding of " + Arrays.toString(key) + " is not valid.");
             e.printStackTrace();
         }
+    }
+
+    /** PBKDF2 hashing method with SHA 256.
+     * @param iterations should be >=100000 to ensure that the hash is secure.
+     * @return A byte[] of the hashed String. If an cryptography error occurs during encryption,
+     * original.getBytes() would be returned. **/
+    public static byte[] pbkdf2(byte[] original, byte[] salt, int iterations) {
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA256Digest());
+        pbkdf2.init(original, salt, iterations);
+        return ((KeyParameter) pbkdf2.generateDerivedParameters(original.length)).getKey();
     }
 }

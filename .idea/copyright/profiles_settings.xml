@@ -2,6 +2,7 @@
   <settings default="pcchin-apache2">
     <module2copyright>
       <element module="Project Source Files" copyright="pcchin-apache2" />
+      <element module="Tests" copyright="pcchin-apache2" />
     </module2copyright>
   </settings>
 </component>

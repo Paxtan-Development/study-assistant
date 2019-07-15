@@ -5,7 +5,9 @@
       <w>abcdefghijklmnopqrstuvwxyz</w>
       <w>autofill</w>
       <w>bbabea</w>
+      <w>bouncycastle</w>
       <w>btns</w>
+      <w>deiss</w>
       <w>dont</w>
       <w>edittext</w>
       <w>etag</w>
@@ -44,6 +46,7 @@
       <w>unported</w>
       <w>vals</w>
       <w>vipularsi</w>
+      <w>websafe</w>
     </words>
   </dictionary>
 </component>

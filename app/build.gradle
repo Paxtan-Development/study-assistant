@@ -80,4 +80,5 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.0.3'
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.jsoup:jsoup:1.12.1'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.62'
 }

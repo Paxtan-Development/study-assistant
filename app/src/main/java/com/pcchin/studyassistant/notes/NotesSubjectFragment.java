@@ -517,6 +517,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         // Check if the file can be created
                         String finalOutputFileName = outputFileName;
                         String finalResponseText = responseText;
+                        exportDialog.dismiss();
                         new Handler().post(() -> {
                             try {
                                 File outputFile = new File(finalOutputFileName);
@@ -535,7 +536,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     outputStream.write(ConverterFunctions
                                             .intToBytes(subjectDatabase.SubjectDao()
                                                     .search(notesSubject).sortOrder));
-                                    outputStream.write(SecurityFunctions.subjectEncrypt(
+                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
                                             finalResponseText, notesArray));
                                     outputStream.flush();
                                     outputStream.close();
@@ -548,7 +549,6 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     Toast.makeText(getContext(), R.string.n2_error_file_not_created,
                                             Toast.LENGTH_SHORT).show();
                                 }
-                                exportDialog.dismiss();
                             } catch (FileNotFoundException e) {
                                 Log.e("StudyAssistant", "File Error: File "
                                         + finalOutputFileName + " not found, stack trace is");

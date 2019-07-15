@@ -150,7 +150,4 @@
     <string name="p3_pass_old">Old password</string>
     <string name="p3_pass_new1">New password</string>
     <string name="p3_pass_new2">Re-enter password</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

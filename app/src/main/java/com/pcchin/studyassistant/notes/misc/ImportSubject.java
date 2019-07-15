@@ -324,7 +324,7 @@ public class ImportSubject {
                             password = inputLayout.getEditText().getText().toString();
                         }
                         ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
-                                .subjectDecrypt(password, content);
+                                .subjectDecrypt(title, password, content);
                         if (subjectContents == null) {
                             inputLayout.setErrorEnabled(true);
                             inputLayout.setError(activity.getString(R.string.error_password_incorrect));

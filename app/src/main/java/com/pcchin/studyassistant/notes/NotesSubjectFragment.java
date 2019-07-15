@@ -412,12 +412,11 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                     // Export all the note's data to a text .subj file
                     try {
-                        // FIXME: SUBJ FILE NOT EXPORTED
-                        String infoOutputPath = FileFunctions.generateValidFile(
+                        String infoTempOutputPath = FileFunctions.generateValidFile(
                                 tempExportFolder + notesSubject, ".subj");
-                        FileWriter infoOutput = new FileWriter(infoOutputPath);
+                        FileWriter infoTempOutput = new FileWriter(infoTempOutputPath);
                         NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
-                        infoOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
+                        infoTempOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
 
                         for (int i = 0; i < notesArray.size(); i++) {
                             // Export the note to the output folder
@@ -435,14 +434,16 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     notesArray.get(i).set(j, "NULL");
                                 }
                             }
-                            infoOutput.write(new File(currentPath).getName()
+                            infoTempOutput.write(new File(currentPath).getName()
                                     + "\n" + notesArray.get(i).get(0) + "\n"
                             + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
                             + notesArray.get(i).get(5) + "\n");
                         }
-                        infoOutput.flush();
-                        infoOutput.close();
-                        exportFilesList.add(new File(infoOutputPath));
+                        infoTempOutput.flush();
+                        infoTempOutput.close();
+
+                        // Rename temp info output path to .subj file
+                        exportFilesList.add(new File(infoTempOutputPath));
                     } catch (IOException e) {
                         Log.w("StudyAssistant", "File Error: Writing subject " + notesSubject
                             + " failed. Stack trace is");
@@ -491,6 +492,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 inputText.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
+            inputText.setEndIconActivated(true);
+            inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
                     .setView(inputText)
@@ -517,6 +520,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         // Check if the file can be created
                         String finalOutputFileName = outputFileName;
                         String finalResponseText = responseText;
+                        exportDialog.dismiss();
                         new Handler().post(() -> {
                             try {
                                 File outputFile = new File(finalOutputFileName);
@@ -535,7 +539,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     outputStream.write(ConverterFunctions
                                             .intToBytes(subjectDatabase.SubjectDao()
                                                     .search(notesSubject).sortOrder));
-                                    outputStream.write(SecurityFunctions.subjectEncrypt(
+                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
                                             finalResponseText, notesArray));
                                     outputStream.flush();
                                     outputStream.close();
@@ -548,7 +552,6 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     Toast.makeText(getContext(), R.string.n2_error_file_not_created,
                                             Toast.LENGTH_SHORT).show();
                                 }
-                                exportDialog.dismiss();
                             } catch (FileNotFoundException e) {
                                 Log.e("StudyAssistant", "File Error: File "
                                         + finalOutputFileName + " not found, stack trace is");

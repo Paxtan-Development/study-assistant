@@ -15,6 +15,7 @@ package com.pcchin.studyassistant.notes.misc;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Toast;
@@ -318,20 +319,22 @@ public class ImportSubject {
                 importDialog.setOnShowListener(dialogInterface -> {
                     importDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                         Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
-
-                        String password = "";
-                        if (inputLayout.getEditText() != null) {
-                            password = inputLayout.getEditText().getText().toString();
-                        }
-                        ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
-                                .subjectDecrypt(password, content);
-                        if (subjectContents == null) {
-                            inputLayout.setErrorEnabled(true);
-                            inputLayout.setError(activity.getString(R.string.error_password_incorrect));
-                        } else {
-                            importSubjectToDatabase(title, subjectContents, sortOrder);
-                            importDialog.dismiss();
-                        }
+                        new Handler().post(() -> {
+                            // Everything is done in Handler to prevent main thread from being overloaded
+                            String password = "";
+                            if (inputLayout.getEditText() != null) {
+                                password = inputLayout.getEditText().getText().toString();
+                            }
+                            ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
+                                    .subjectDecrypt(title, password, content);
+                            if (subjectContents == null) {
+                                inputLayout.setErrorEnabled(true);
+                                inputLayout.setError(activity.getString(R.string.error_password_incorrect));
+                            } else {
+                                importSubjectToDatabase(title, subjectContents, sortOrder);
+                                importDialog.dismiss();
+                            }
+                        });
                     });
                     importDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
                             importDialog.dismiss());
@@ -398,6 +401,8 @@ public class ImportSubject {
         if (inputLayout.getEditText() != null) {
             inputLayout.getEditText().setText(title);
         }
+        inputLayout.setEndIconActivated(true);
+        inputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
                 "notesSubject")
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -414,8 +419,9 @@ public class ImportSubject {
                 String inputText = "";
                 if (inputLayout.getEditText() != null) {
                     inputText = inputLayout.getEditText().getText().toString();
+                    Log.d("A", inputText);
                 }
-                if (inputText.length() == 0 && database.SubjectDao().search(inputText) == null) {
+                if (inputText.length() > 0 && database.SubjectDao().search(inputText) == null) {
                     // Import subject into database
                     database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
                     renameDialog.dismiss();

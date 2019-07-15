@@ -56,61 +56,65 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        displayFragment(new MainFragment());
 
-        // Delete any past export files
-        new Handler().post(() -> {
-            String outputFileName = getFilesDir().getAbsolutePath() + "/files";
-            File apkInstallDir = new File(outputFileName);
-            if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
-                // Deletes all children in the folder
-                File[] dirFiles = apkInstallDir.listFiles();
-                if (dirFiles != null) {
-                    for (File child : dirFiles) {
-                        FileFunctions.deleteDir(child);
+        // First time starting the app
+        if (savedInstanceState == null) {
+            displayFragment(new MainFragment());
+
+            // Delete any past export files
+            new Handler().post(() -> {
+                String outputFileName = getFilesDir().getAbsolutePath() + "/files";
+                File apkInstallDir = new File(outputFileName);
+                if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
+                    // Deletes all children in the folder
+                    File[] dirFiles = apkInstallDir.listFiles();
+                    if (dirFiles != null) {
+                        for (File child : dirFiles) {
+                            FileFunctions.deleteDir(child);
+                        }
                     }
+                } else if (!apkInstallDir.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    apkInstallDir.mkdir();
                 }
-            } else if (!apkInstallDir.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                apkInstallDir.mkdir();
-            }
 
-            SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-            String pastUpdateFilePath = sharedPref.getString("AppUpdatePath", "");
-            if (pastUpdateFilePath.length() != 0) {
-                File pastUpdateFile = new File(pastUpdateFilePath);
-                if (pastUpdateFile.exists()) {
-                    if (pastUpdateFile.delete()) {
+                SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+                String pastUpdateFilePath = sharedPref.getString("AppUpdatePath", "");
+                if (pastUpdateFilePath.length() != 0) {
+                    File pastUpdateFile = new File(pastUpdateFilePath);
+                    if (pastUpdateFile.exists()) {
+                        if (pastUpdateFile.delete()) {
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString("AppUpdatePath", "");
+                            editor.apply();
+                        } else {
+                            Log.w("StudyAssistant", "File Error: File "
+                                    + pastUpdateFilePath + " could not be deleted.");
+                        }
+                    } else {
+                        // File has already been removed
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("AppUpdatePath", "");
                         editor.apply();
-                    } else {
-                        Log.w("StudyAssistant", "File Error: File "
-                            + pastUpdateFilePath + " could not be deleted.");
                     }
-                } else {
-                    // File has already been removed
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString("AppUpdatePath", "");
-                    editor.apply();
                 }
-            }
-        });
+            });
 
-        // Only check for updates once a day
-        if (getIntent().getBooleanExtra("displayUpdate", false)) {
-            new Handler().post(() -> new AppUpdate(MainActivity.this, true));
-        } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                        .getString("lastUpdateCheck", ""),
-                GeneralFunctions.standardDateFormat.format(new Date()))) {
-            new Handler().post(() -> new AppUpdate(MainActivity.this, false));
+            // Only check for updates once a day
+            if (getIntent().getBooleanExtra("displayUpdate", false)) {
+                new Handler().post(() -> new AppUpdate(MainActivity.this, true));
+            } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+                            .getString("lastUpdateCheck", ""),
+                    GeneralFunctions.standardDateFormat.format(new Date()))) {
+                new Handler().post(() -> new AppUpdate(MainActivity.this, false));
+            }
         }
 
-        // Set toolbar
+        // Set toolbar, set again when rotated
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Set up drawer
+        // Set up drawer, set again when rotated
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

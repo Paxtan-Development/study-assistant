@@ -19,6 +19,13 @@
     <string name="license_cc_3_unported">Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</string>
     <string name="license_self_copyright">Copyright 2019 PC Chin. All rights reserved.</string>
 
+    <string-array name="bouncycastle_license">
+        <item>@string/license_mit</item>
+        <item>BouncyCastle</item>
+        <item>Copyright © 2000–2019 The Legion Of The Bouncy Castle (&lt;a href=&quot;http://www.
+            bouncycastle.org&quot;&gt;http://www.bouncycastle.org&lt;/a&gt;)</item>
+    </string-array>
+
     <string-array name="filechooser_license">
         <item>@string/license_apache_2</item>
         <item>Android FileChooser</item>
@@ -26,17 +33,17 @@
             - © 2015-2019 &lt;a href=&quot;https://github.com/hedzr&quot;&gt;Hedzr Yeh&lt;/a&gt;</item>
     </string-array>
 
-    <string-array name="zip4j_license">
-        <item>@string/license_apache_2</item>
-        <item>Zip4j</item>
-        <item>&lt;a href=&quot;https://github.com/srikanth-lingala/zip4j&gt;Zip4j&lt;/a&gt; library
-            - © 2008-2019 &lt;a href=&quot;http://www.lingala.net/&quot;&gt;Srikanth Reddy Lingala&lt;/a&gt;</item>
-    </string-array>
-
     <string-array name="jsoup_license">
         <item>@string/license_mit</item>
         <item>jsoup</item>
         <item><![CDATA[Copyright © 2009 – 2019 <a href="https://jhy.io">
             Jonathan Hedley</a> (<a href="mailto:jonathan@hedley.ney">jonathan@hedley.net</a>)]]></item>
+    </string-array>
+
+    <string-array name="zip4j_license">
+        <item>@string/license_apache_2</item>
+        <item>Zip4j</item>
+        <item>&lt;a href=&quot;https://github.com/srikanth-lingala/zip4j&gt;Zip4j&lt;/a&gt; library
+            - © 2008-2019 &lt;a href=&quot;http://www.lingala.net/&quot;&gt;Srikanth Reddy Lingala&lt;/a&gt;</item>
     </string-array>
 </resources>

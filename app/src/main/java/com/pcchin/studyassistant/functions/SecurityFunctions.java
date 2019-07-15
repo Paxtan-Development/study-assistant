@@ -16,20 +16,55 @@ package com.pcchin.studyassistant.functions;
 import android.util.Base64;
 import android.util.Log;
 
-import java.security.InvalidKeyException;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.BlowfishEngine;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-
-/** Functions used in hashing, encryption etc. **/
+/** Functions used in hashing, encryption, decryption etc. **/
 public class SecurityFunctions {
+    /** Process a cipher buffer based on a specific length and
+     * @return a specific output. **/
+    private static byte[] processCipherBuffer(PaddedBufferedBlockCipher cipher, byte[] original)
+            throws InvalidCipherTextException, DataLengthException {
+        byte[] output = new byte[cipher.getOutputSize(original.length)];
+        int length1 = cipher.processBytes(original,  0, original.length, output, 0);
+        int length2 = cipher.doFinal(output, length1);
+        byte[] result = new byte[length1+length2];
+        System.arraycopy(output, 0, result, 0, result.length);
+        return result;
+    }
+
+    /** Trims a byte array to a specific length, or adds to it if its not enough. **/
+    private static byte[] trimByte(byte[] original, int size) {
+        byte[] response = new byte[32];
+        if (original.length > size) {
+            // Trim the key to 32 bytes in length (256 bits)
+            System.arraycopy(original, 0, response, 0, response.length);
+        } else {
+            // Add the same characters (or 0) if it is not enough
+            for (int i = 0; i < 32; i++) {
+                if (original.length == 0) {
+                    response[i] = 0;
+                } else {
+                    response[i] = original[i % original.length];
+                }
+            }
+        }
+        return response;
+    }
+
     /** Hashing method used in the passwords that prevent notes from being edited.
      * No need to be too secure as they can be easily found when exported. **/
     public static String notesHash(String original) {
@@ -44,128 +79,75 @@ public class SecurityFunctions {
         }
 
         // 2) Blowfish
-        blowfish(originalByte, original.getBytes(), Cipher.ENCRYPT_MODE);
+        originalByte = blowfish(originalByte, original.getBytes(), true);
 
         return Base64.encodeToString(originalByte, Base64.DEFAULT);
     }
 
     /** Encryption method used to protect subject contents in .subject files **/
-    public static byte[] subjectEncrypt(String password,
+    public static byte[] subjectEncrypt(String title, String password,
                                         ArrayList<ArrayList<String>> content) {
-        // TODO: PBKDF2 (Encrypt & Decrypt)
         byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
-        byte[] passwordByte = password.getBytes();
-        aes(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
-        blowfish(responseByte, passwordByte, Cipher.ENCRYPT_MODE);
+        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
+        responseByte = aes(responseByte, passwordByte, title.getBytes(), true);
+        responseByte = blowfish(responseByte, passwordByte, true);
 
         return responseByte;
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<ArrayList<String>> subjectDecrypt(String password, byte[] content) {
-        byte[] passwordByte = password.getBytes();
-        aes(content, passwordByte, Cipher.DECRYPT_MODE);
-        blowfish(content, passwordByte, Cipher.DECRYPT_MODE);
+    public static ArrayList<ArrayList<String>> subjectDecrypt(String title, String password,
+                                                              byte[] content) {
+        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
+        content = blowfish(content, passwordByte, false);
+        content = aes(content, passwordByte, title.getBytes(), false);
         return ConverterFunctions.jsonToArray(new String(content));
     }
 
-    /** AES encryption/decryption via Cipher.getInstance().
-     * @param mode takes either Cipher.ENCRYPT_MODE or Cipher.DECRYPT_MODE
-     * There is no return statement as
-     * @param original has been modified in the statement. **/
-    public static void aes(byte[] original, byte[] key, int mode) {
-        byte[] modifiedKey;
-        if (key.length > 32) {
-            // Trim the key to 32 bytes in length
-            modifiedKey = new byte[32];
-        } else {
-            // Add the same characters (or 0) if it is not enough
-            modifiedKey = new byte[16];
-            for (int i = 0; i < 16; i++) {
-                if (key.length == 0) {
-                    modifiedKey[i] = 0;
-                } else {
-                    modifiedKey[i] = key[i % key.length];
-                }
-            }
-        }
+    /** AES encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.
+     * IV added as additional security measure. **/
+    public static byte[] aes(byte[] original, byte[] key, byte[] iv, boolean isEncrypt) {
+        key = trimByte(key, 32);
+        iv = trimByte(iv, 16);
+        PaddedBufferedBlockCipher aes = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()));
+        aes.init(isEncrypt, new ParametersWithIV(new KeyParameter(key), iv, 0, 16));
         try {
-            Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            aesCipher.init(mode, new SecretKeySpec
-                    (modifiedKey, 0, modifiedKey.length, "AES"));
-            aesCipher.doFinal(original);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("StudyAssistant", "Cryptography Error: Algorithm AES/CBC/PKCS5Padding "
-                    + "not found in Cipher.getInstance(). Stack trace is");
+            original = processCipherBuffer(aes, original);
+        } catch (InvalidCipherTextException e) {
+            Log.w("StudyAssistant", "Cipher text in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The padding in algorithm "
-                    + "AES/CBC/PKCS5Padding not found in Cipher.getInstance(). Stack trace is");
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The key provided in the algorithm"
-                    + " AES/CBC/PKCS5Padding of " + Arrays.toString(key) + " is not valid. Stack trace is");
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The padding provided in the "
-                    + "algorithm AES/CBC/PKCS5Padding is not valid.");
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The block size provided in the "
-                    + "algorithm AES/CBC/PKCS5Padding is not valid. The input provided is "
-                    + Arrays.toString(original) + " and the key is "+ Arrays.toString(key));
+        } catch (DataLengthException e) {
+            Log.w("StudyAssistant", "Data length in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
+        return original;
     }
 
-    /** Blowfish encryption/decryption via Cipher.getInstance().
-     * @param mode takes either Cipher.ENCRYPT_MODE or Cipher.DECRYPT_MODE
-     * There is no return statement as
-     * @param original has been modified in the statement. **/
-    public static void blowfish(byte[] original, byte[] key, int mode) {
-        byte[] modifiedKey;
-        if (key.length > 56) {
-            // Trim the array short if its too long
-            modifiedKey = new byte[56];
-            System.arraycopy(key, 0, modifiedKey, 0, 56);
-        } else if (key.length == 0) {
-            modifiedKey = new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
-        } else if (key.length < 8) {
-            // Repeat the values in the array if its too short
-            modifiedKey = new byte[8];
-            for (int i = 0; i < 8; i++) {
-                // Used remainder as it is possible to calculate multiple times
-                modifiedKey[i] = key[i % key.length];
-            }
-        } else {
-            modifiedKey = key;
-        }
+    /** Blowfish encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle. **/
+    public static byte[] blowfish(byte[] original, byte[] key, boolean isEncrypt) {
+        key = trimByte(key, 56);
+        PaddedBufferedBlockCipher blowfish = new PaddedBufferedBlockCipher(new CBCBlockCipher(
+                new BlowfishEngine()));
+        blowfish.init(isEncrypt, new ParametersWithRandom(new KeyParameter(key)));
         try {
-            Cipher blowfishCipher = Cipher.getInstance("BLOWFISH/CBC/PKCS5Padding");
-            blowfishCipher.init(mode, new SecretKeySpec(modifiedKey,
-                    0, modifiedKey.length, "BLOWFISH"));
-            blowfishCipher.doFinal(original);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("StudyAssistant", "Cryptography Error: Algorithm BLOWFISH/CBC/PKCS5Padding"
-                    + " not found in Cipher.getInstance().");
+            original = processCipherBuffer(blowfish, original);
+        } catch (InvalidCipherTextException e) {
+            Log.w("StudyAssistant", "Cipher text in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The padding PKCS5Padding does "
-                    + " not exist in algorithm BLOWFISH/CBC/PKCS5Padding in Cipher.getInstance().");
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The padding provided in the "
-                    + "algorithm BLOWFISH/CBC/PKCS5Padding is not valid.");
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The block size provided in the "
-                    + "algorithm BLOWFISH/CBC/PKCS5Padding is not valid. The input provided is "
-                    + Arrays.toString(original) + " and the key is "+ Arrays.toString(modifiedKey));
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            Log.e("StudyAssistant", "Cryptography Error: The key provided in the"
-                    + " algorithm BLOWFISH/CBC/PKCS5Padding of " + Arrays.toString(key) + " is not valid.");
+        } catch (DataLengthException e) {
+            Log.w("StudyAssistant", "Data length in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
+        return original;
+    }
+
+    /** PBKDF2 hashing method with SHA 256.
+     * @param iterations should be >=100000 to ensure that the hash is secure.
+     * @return A byte[] of the hashed String. If an cryptography error occurs during encryption,
+     * original.getBytes() would be returned. **/
+    public static byte[] pbkdf2(byte[] original, byte[] salt, int iterations) {
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA256Digest());
+        pbkdf2.init(original, salt, iterations);
+        return ((KeyParameter) pbkdf2.generateDerivedParameters(original.length)).getKey();
     }
 }

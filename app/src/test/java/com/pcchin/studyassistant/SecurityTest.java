@@ -20,23 +20,24 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import javax.crypto.Cipher;
-
 /** Test local hashing & encryption/decryption functions. **/
 public class SecurityTest {
-    // TODO: PBKDF2
     private static final int TEST_COUNT = 10000;
+
+    public SecurityTest() {
+    }
 
     /** Check if the encryption function for the .subject files work. **/
     @Test
     public void testSubjectEncrypt() {
         // Normal input
         byte[] responseArray = SecurityFunctions.subjectEncrypt(
-                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomArray(TEST_COUNT));
+                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomArray(TEST_COUNT));
         Assert.assertNotNull(responseArray);
 
         // Minimal input
-        responseArray = SecurityFunctions.subjectEncrypt(
+        responseArray = SecurityFunctions.subjectEncrypt(TestFunctions.randomString(2),
                 TestFunctions.randomString(2), null);
         Assert.assertNotNull(responseArray);
     }
@@ -45,13 +46,14 @@ public class SecurityTest {
     @Test
     public void testSubjectEncryptDecrypt() {
         // Normal input
+        String testTitle = TestFunctions.randomString(TEST_COUNT);
         String testPassword = TestFunctions.randomString(TEST_COUNT);
         ArrayList<ArrayList<String>> testContents = TestFunctions.randomArray(TEST_COUNT);
-        byte[] testOutput = SecurityFunctions.subjectEncrypt(testPassword, testContents);
+        byte[] testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
         Assert.assertNotNull(testOutput);
 
-        ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testPassword,
-                testOutput);
+        ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testTitle,
+                testPassword, testOutput);
         Assert.assertEquals(testContents, testResponse);
     }
 
@@ -73,30 +75,52 @@ public class SecurityTest {
     @Test
     public void testAES() {
         byte[] original = TestFunctions.randomString(TEST_COUNT).getBytes();
-        SecurityFunctions.aes(original, TestFunctions
-                .randomString(TEST_COUNT).getBytes(), Cipher.ENCRYPT_MODE);
+        byte[] key = TestFunctions.randomString(TEST_COUNT).getBytes();
+        byte[] iv = TestFunctions.randomString(TEST_COUNT).getBytes();
+        byte[] response = SecurityFunctions.aes(original, key, iv, true);
         Assert.assertNotNull(original);
+        Assert.assertNotNull(response);
+        Assert.assertArrayEquals(original, SecurityFunctions.aes(response, key, iv, false));
 
         // Minimal input
         original = TestFunctions.randomString(2).getBytes();
-        SecurityFunctions.aes(original, TestFunctions
-            .randomString(2).getBytes(), Cipher.ENCRYPT_MODE);
+        key = TestFunctions.randomString(2).getBytes();
+        iv = TestFunctions.randomString(2).getBytes();
+        response = SecurityFunctions.aes(original, key, iv, true);
         Assert.assertNotNull(original);
+        Assert.assertNotNull(response);
+        Assert.assertArrayEquals(original, SecurityFunctions.aes(response, key, iv, false));
     }
 
     /** Check if the blowfish algorithm is working. **/
     @Test
     public void testBlowfish() {
         byte[] original = TestFunctions.randomString(TEST_COUNT).getBytes();
-        SecurityFunctions.blowfish(original, TestFunctions
-                .randomString(TEST_COUNT).getBytes(), Cipher.ENCRYPT_MODE);
+        byte[] key = TestFunctions.randomString(TEST_COUNT).getBytes();
+        byte[] response = SecurityFunctions.blowfish(original, key, true);
         Assert.assertNotNull(original);
+        Assert.assertNotNull(response);
+        Assert.assertArrayEquals(original, SecurityFunctions.blowfish(response, key, false));
 
         // Minimal input
         original = TestFunctions.randomString(2).getBytes();
-        SecurityFunctions.blowfish(original, TestFunctions
-                .randomString(2).getBytes(), Cipher.ENCRYPT_MODE);
+        key = TestFunctions.randomString(2).getBytes();
+        response = SecurityFunctions.blowfish(original, key, true);
         Assert.assertNotNull(original);
+        Assert.assertNotNull(response);
+        Assert.assertArrayEquals(original, SecurityFunctions.blowfish(response, key, false));
+    }
+
+    /** Check if the PBKDF2 algorithm is working. **/
+    @Test
+    public void testPbkdf2() {
+        byte[] response = SecurityFunctions.pbkdf2(TestFunctions.randomString(TEST_COUNT).getBytes(),
+                TestFunctions.randomString(TEST_COUNT).getBytes(), TEST_COUNT * 10);
+        Assert.assertNotNull(response);
+
+        response = SecurityFunctions.pbkdf2(TestFunctions.randomString(2).getBytes(),
+                TestFunctions.randomString(2).getBytes(), TEST_COUNT);
+        Assert.assertNotNull(response);
     }
 }
 

@@ -13,13 +13,16 @@
 
 package com.pcchin.studyassistant.main;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
@@ -36,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
@@ -53,6 +57,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Fragment currentFragment;
+    public static int EXTERNAL_STORAGE_PERMISSION = 200;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -80,6 +85,15 @@ public class MainActivity extends AppCompatActivity
                     manager.createNotificationChannel(updateChannel);
                 }
             }
+
+            // Get permission to read and write files
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                    .checkSelfPermission(this, Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        EXTERNAL_STORAGE_PERMISSION);
+            }
+
 
             // Delete any past export files
             new Handler().post(() -> {
@@ -245,6 +259,17 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
         if (!(fragment instanceof FragmentOnBackPressed) || !((FragmentOnBackPressed) fragment).onBackPressed()) {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == EXTERNAL_STORAGE_PERMISSION) {
+            if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, R.string.error_write_permission_denied,
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

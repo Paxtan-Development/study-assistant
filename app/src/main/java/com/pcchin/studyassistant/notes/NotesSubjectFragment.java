@@ -13,7 +13,10 @@
 
 package com.pcchin.studyassistant.notes;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
 import android.app.AlarmManager;
@@ -21,6 +24,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -333,19 +338,26 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
         if (getContext() != null) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n2_export_format)
-                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
-                            new Handler().post(() -> {
-                                if (i == 0) {
-                                    askZipPassword();
-                                } else {
-                                    exportSubject();
-                                }
-                            }))
-                    .setNegativeButton(android.R.string.cancel,
-                            (dialogInterface, i) -> dialogInterface.dismiss())
-                    .create().show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                    .checkSelfPermission(getContext(), Manifest.permission
+                            .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), R.string
+                        .error_write_permission_denied, Toast.LENGTH_SHORT).show();
+            } else {
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.n2_export_format)
+                        .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
+                                new Handler().post(() -> {
+                                    if (i == 0) {
+                                        askZipPassword();
+                                    } else {
+                                        exportSubject();
+                                    }
+                                }))
+                        .setNegativeButton(android.R.string.cancel,
+                                (dialogInterface, i) -> dialogInterface.dismiss())
+                        .create().show();
+            }
         }
     }
 
@@ -438,8 +450,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             }
                             infoTempOutput.write(new File(currentPath).getName()
                                     + "\n" + notesArray.get(i).get(0) + "\n"
-                            + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
-                            + notesArray.get(i).get(5) + "\n");
+                                    + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
+                                    + notesArray.get(i).get(5) + "\n");
                         }
                         infoTempOutput.flush();
                         infoTempOutput.close();
@@ -448,7 +460,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         exportFilesList.add(new File(infoTempOutputPath));
                     } catch (IOException e) {
                         Log.w("StudyAssistant", "File Error: Writing subject " + notesSubject
-                            + " failed. Stack trace is");
+                                + " failed. Stack trace is");
                         e.printStackTrace();
                     }
 
@@ -525,6 +537,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         exportDialog.dismiss();
                         new Handler().post(() -> {
                             try {
+                                Log.d("Test", "F");
+                                // Get permission to read and write files
                                 File outputFile = new File(finalOutputFileName);
                                 if (outputFile.createNewFile()) {
                                     Toast.makeText(getContext(), R.string.n2_exporting_subject,

@@ -13,10 +13,17 @@
 
 package com.pcchin.studyassistant.functions;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+
+import com.pcchin.studyassistant.R;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,16 +40,17 @@ public class FileFunctions {
 
     /** Generates a .txt file based on a path and its contents. **/
     public static void exportTxt(String path, String contents) {
-        try {
-            FileWriter outputNote = new FileWriter(path);
-            outputNote.write(contents);
-            outputNote.flush();
-            outputNote.close();
-        } catch (IOException e) {
-            Log.d("StudyAssistant", "File Error: IO Exception occurred when exporting "
-                    + "note with path , stack trace is");
-            e.printStackTrace();
-        }
+        // Get permission to read and write files
+            try {
+                FileWriter outputNote = new FileWriter(path);
+                outputNote.write(contents);
+                outputNote.flush();
+                outputNote.close();
+            } catch (IOException e) {
+                Log.d("StudyAssistant", "File Error: IO Exception occurred when exporting "
+                        + "note with path , stack trace is");
+                e.printStackTrace();
+            }
     }
 
     /** Generates a valid file in the required directory.

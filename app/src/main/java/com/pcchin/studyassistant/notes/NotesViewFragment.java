@@ -13,8 +13,10 @@
 
 package com.pcchin.studyassistant.notes;
 
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
@@ -23,7 +25,9 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -191,19 +195,26 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     /** Exports the note to a txt file. **/
     public void onExportPressed() {
         if (getContext() != null) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.data_export)
-                    .setMessage(R.string.n3_confirm_export_note)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                        String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
-                                + notesInfo.get(0), ".txt");
-                        FileFunctions.exportTxt(outputText, notesInfo.get(2));
-                        Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
-                                Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                    .create().show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                    .checkSelfPermission(getContext(), Manifest.permission
+                            .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), R.string
+                        .error_write_permission_denied, Toast.LENGTH_SHORT).show();
+            } else {
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.data_export)
+                        .setMessage(R.string.n3_confirm_export_note)
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
+                                    + notesInfo.get(0), ".txt");
+                            FileFunctions.exportTxt(outputText, notesInfo.get(2));
+                            Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
+                                    Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                        .create().show();
+            }
         }
     }
 

@@ -56,6 +56,7 @@
     <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
     <string name="error_password_short">Password must be 8 characters or longer.</string>
     <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
+    <string name="error_write_permission_denied">Permission denied for writing files. Exporting files may not be possible.</string>
 
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>

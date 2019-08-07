@@ -42,7 +42,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="48sp" />
+            android:layout_height="60sp" />
 
     </LinearLayout>
 </ScrollView>

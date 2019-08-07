@@ -334,6 +334,57 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         }
     }
 
+    /** Renames the subject to another one. **/
+    public void onRenamePressed() {
+        if (getActivity() != null) {
+            @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
+                    getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            popupView.setEndIconActivated(true);
+            popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+            if (popupView.getEditText() != null) {
+                popupView.getEditText().setText(R.string.rename_subject);
+            }
+            AlertDialog renameDialog = new AlertDialog.Builder(getActivity())
+                    .setPositiveButton(R.string.rename, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+            renameDialog.setOnShowListener(dialogInterface -> {
+                renameDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                        .setOnClickListener(view -> {
+                            String popupInputText = popupView.getEditText().getText().toString();
+                            // Check if input is blank
+                            if (popupInputText.replaceAll("\\s+", "")
+                                    .length() == 0) {
+                                popupView.setErrorEnabled(true);
+                                popupView.setError(getString(R.string.n_error_subject_empty));
+                            } else if (subjectDatabase.SubjectDao().search(popupInputText) != null) {
+                                popupView.setErrorEnabled(true);
+                                popupView.setError(getString(R.string.error_subject_exists));
+                            } else {
+                                // Move subject
+                                dialogInterface.dismiss();
+                                NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
+                                NotesSubject newSubject = new NotesSubject(popupInputText,
+                                        subject.contents, subject.sortOrder);
+                                subjectDatabase.SubjectDao().insert(newSubject);
+                                subjectDatabase.SubjectDao().delete(subject);
+                                subjectDatabase.close();
+
+                                // Display new subject
+                                Toast.makeText(getActivity(), R.string.n2_subject_renamed,
+                                        Toast.LENGTH_SHORT).show();
+                                GeneralFunctions.updateNavView((MainActivity) getActivity());
+                                ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+                                        .newInstance(popupInputText));
+                            }
+                        });
+                renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                        .setOnClickListener(view -> dialogInterface.dismiss());
+            });
+            renameDialog.show();
+        }
+    }
+
     /** Export all the notes of the subject into a ZIP file,
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
@@ -508,6 +559,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             }
             inputText.setEndIconActivated(true);
             inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+            inputText.setHintEnabled(true);
+            inputText.setHint(getString(R.string.n_password_set));
             AlertDialog exportDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_password_export)
                     .setView(inputText)
@@ -521,7 +574,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     if (inputText.getEditText() != null) {
                         responseText = inputText.getEditText().getText().toString();
                     }
-                    if (responseText.length() >= 8) {
+                    if (responseText.length() == 0 || responseText.length() >= 8) {
                         // Set output file name
                         String outputFileName = "/storage/emulated/0/Download/" + notesSubject
                                 + ".subject";
@@ -535,9 +588,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         String finalOutputFileName = outputFileName;
                         String finalResponseText = responseText;
                         exportDialog.dismiss();
+                        String finalResponseText1 = responseText;
                         new Handler().post(() -> {
                             try {
-                                Log.d("Test", "F");
                                 // Get permission to read and write files
                                 File outputFile = new File(finalOutputFileName);
                                 if (outputFile.createNewFile()) {
@@ -555,8 +608,15 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     outputStream.write(ConverterFunctions
                                             .intToBytes(subjectDatabase.SubjectDao()
                                                     .search(notesSubject).sortOrder));
-                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
-                                            finalResponseText, notesArray));
+                                    if (finalResponseText1.length() >= 8) {
+                                        outputStream.write(1);
+                                        outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
+                                                finalResponseText, notesArray));
+                                    } else {
+                                        outputStream.write(0);
+                                        outputStream.write(ConverterFunctions
+                                                .arrayToJson(notesArray).getBytes());
+                                    }
                                     outputStream.flush();
                                     outputStream.close();
 

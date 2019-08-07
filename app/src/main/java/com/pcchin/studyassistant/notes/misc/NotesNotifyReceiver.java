@@ -13,7 +13,6 @@
 
 package com.pcchin.studyassistant.notes.misc;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;

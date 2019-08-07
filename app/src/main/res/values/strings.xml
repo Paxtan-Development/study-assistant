@@ -39,7 +39,6 @@
     <string name="rename">Rename</string>
     <string name="rename_subject">Rename Subject</string>
     <string name="subject_imported">Subject Imported</string>
-    <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
 
     <!-- String used in notifications -->
     <string name="notif_channel_notes_ID">notes</string>
@@ -53,10 +52,12 @@
     <string name="error_password_incorrect">The password that is entered is incorrect.</string>
     <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
     <string name="error_zip_corrupt">The ZIP file that is selected appears to be invalid.</string>
+    <string name="error_subject_import">The .subject file that is selected could not be imported.</string>
     <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
     <string name="error_password_short">Password must be 8 characters or longer.</string>
     <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
     <string name="error_write_permission_denied">Permission denied for writing files. Exporting files may not be possible.</string>
+    <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
 
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>
@@ -101,6 +102,7 @@
     <string name="n2_sort_alpha_des">Z-A</string>
     <string name="n2_sort_date_asc">Ascending Date</string>
     <string name="n2_sort_date_des">Descending Date</string>
+    <string name="n2_subject_renamed">Subject renamed</string>
 
     <!-- Error messages in Fragment n2 -->
     <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
@@ -142,7 +144,7 @@
     <!-- Array used in AlertDialogs when importing/exporting subjects -->
     <string-array name="n_import_subject_format">
         <item>ZIP File</item>
-        <item>Password protected subject (.subject) file</item>
+        <item>Custom subject (.subject) file</item>
     </string-array>
 
     <!-- Strings used in group P -->

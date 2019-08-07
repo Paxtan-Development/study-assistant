@@ -57,7 +57,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Fragment currentFragment;
-    public static int EXTERNAL_STORAGE_PERMISSION = 200;
+    private static final int EXTERNAL_STORAGE_PERMISSION = 200;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -179,6 +179,10 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.n2_sort:
                 ((NotesSubjectFragment) currentFragment).onSortPressed();
+                break;
+
+            case R.id.n2_rename:
+                ((NotesSubjectFragment) currentFragment).onRenamePressed();
                 break;
 
             case R.id.n2_export:

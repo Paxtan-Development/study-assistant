@@ -13,17 +13,10 @@
 
 package com.pcchin.studyassistant.functions;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-
-import com.pcchin.studyassistant.R;
 
 import java.io.BufferedReader;
 import java.io.File;

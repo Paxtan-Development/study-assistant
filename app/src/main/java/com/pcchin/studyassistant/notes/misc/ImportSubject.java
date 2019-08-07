@@ -297,53 +297,69 @@ public class ImportSubject {
                 String title = new String(FileFunctions.getBytesFromFile(titleLength, inputStream));
                 // Then the int containing the sort order is returned
                 int sortOrder = ConverterFunctions.bytesToInt(FileFunctions.getBytesFromFile(4, inputStream));
+                // Then whether the byte containing whether the subject is encrypted is returned
+                byte subjectEncrypted = FileFunctions.getBytesFromFile(1, inputStream)[0];
                 // Then the content of the subject is returned
-                byte[] content = FileFunctions.getBytesFromFile(fileSize - titleLength - 8, inputStream);
+                byte[] content = FileFunctions.getBytesFromFile(fileSize - titleLength - 8 - 1, inputStream);
                 inputStream.close();
 
-                @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout) activity
-                        .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-                if (inputLayout.getEditText() != null) {
-                    inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                            InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                }
-                inputLayout.setEndIconActivated(true);
-                inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+                if (subjectEncrypted == 1) {
+                    // Subject is encrypted
+                    @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout) activity
+                            .getLayoutInflater().inflate(R.layout.popup_edittext, null);
+                    if (inputLayout.getEditText() != null) {
+                        inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    }
+                    inputLayout.setEndIconActivated(true);
+                    inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
-                AlertDialog importDialog = new AlertDialog.Builder(activity)
-                        .setTitle(R.string.enter_password)
-                        .setView(inputLayout)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .create();
-                importDialog.setOnShowListener(dialogInterface -> {
-                    importDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                        Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
-                        new Handler().post(() -> {
-                            // Everything is done in Handler to prevent main thread from being overloaded
-                            String password = "";
-                            if (inputLayout.getEditText() != null) {
-                                password = inputLayout.getEditText().getText().toString();
-                            }
-                            ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
-                                    .subjectDecrypt(title, password, content);
-                            if (subjectContents == null) {
-                                inputLayout.setErrorEnabled(true);
-                                inputLayout.setError(activity.getString(R.string.error_password_incorrect));
-                            } else {
-                                importSubjectToDatabase(title, subjectContents, sortOrder);
-                                importDialog.dismiss();
-                            }
+                    AlertDialog importDialog = new AlertDialog.Builder(activity)
+                            .setTitle(R.string.enter_password)
+                            .setView(inputLayout)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .create();
+                    importDialog.setOnShowListener(dialogInterface -> {
+                        importDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                            Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
+                            new Handler().post(() -> {
+                                // Everything is done in Handler to prevent main thread from being overloaded
+                                String password = "";
+                                if (inputLayout.getEditText() != null) {
+                                    password = inputLayout.getEditText().getText().toString();
+                                }
+                                ArrayList<ArrayList<String>> subjectContents = SecurityFunctions
+                                        .subjectDecrypt(title, password, content);
+                                if (subjectContents == null) {
+                                    inputLayout.setErrorEnabled(true);
+                                    inputLayout.setError(activity.getString(R.string.error_password_incorrect));
+                                } else {
+                                    importSubjectToDatabase(title, subjectContents, sortOrder);
+                                    importDialog.dismiss();
+                                }
+                            });
                         });
+                        importDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
+                                importDialog.dismiss());
                     });
-                    importDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                            importDialog.dismiss());
-                });
-                importDialog.show();
+                    importDialog.show();
+                } else {
+                    // Subject is not encrypted
+                    String contentString = new String(content);
+                    if (ConverterFunctions.jsonToArray(contentString) == null) {
+                        Log.w("StudyAssistant", "File Error: The .subject file "
+                        + path + " could not be imported as its content is incorrect.");
+                        Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
+                    } else {
+                        importSubjectToDatabase(title, ConverterFunctions
+                                .jsonToArray(contentString), sortOrder);
+                    }
+                }
             } catch (IOException e) {
                 Log.e("StudyAssistant", "File Error: File " + path + " could not be read"
                         + " by FileInputStream. Stack trace is");
-                Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         } else {

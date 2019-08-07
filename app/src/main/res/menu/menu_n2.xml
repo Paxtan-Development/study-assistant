@@ -27,6 +27,11 @@
         android:title="@string/n2_sorting_method"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/n2_rename"
+        android:icon="@drawable/ic_menu_edit"
+        android:title="@string/rename_subject"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/n2_export"
         android:icon="@drawable/ic_menu_export"
         android:title="@string/data_export"

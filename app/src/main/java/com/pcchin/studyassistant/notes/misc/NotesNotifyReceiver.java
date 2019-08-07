@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.RingtoneManager;
+import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -34,6 +36,7 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
     /** Displays a notification with the message of the note as the title. **/
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("Test", "Alert notified");
         // Show notification
         String title = intent.getStringExtra("title");
         String message = intent.getStringExtra("message");
@@ -49,7 +52,7 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(context, 0, startIntent, 0);
-        Notification notif = new NotificationCompat.Builder(context, context.getPackageName())
+        NotificationCompat.Builder notif = new NotificationCompat.Builder(context, context.getPackageName())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(message)
@@ -58,8 +61,11 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setLights(Color.BLUE, 2000, 0)
                 .setVibrate(new long[]{0, 250, 250, 250, 250})
-                .setAutoCancel(true).build();
+                .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notif.setChannelId(context.getString(R.string.notif_channel_notes_ID));
+        }
         NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-        manager.notify(new Random().nextInt(100), notif);
+        manager.notify(new Random().nextInt(100), notif.build());
     }
 }

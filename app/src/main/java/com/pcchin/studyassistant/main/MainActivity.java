@@ -14,7 +14,10 @@
 package com.pcchin.studyassistant.main;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -60,6 +63,23 @@ public class MainActivity extends AppCompatActivity
         // First time starting the app
         if (savedInstanceState == null) {
             displayFragment(new MainFragment());
+
+            // Set up notification channels
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel mainChannel = new NotificationChannel(getString(
+                        R.string.notif_channel_notes_ID), getString(R.string.notif_channel_notes),
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                mainChannel.setDescription(getString(R.string.notif_channel_notes_desc));
+                NotificationChannel updateChannel = new NotificationChannel(getString(
+                        R.string.notif_channel_update_ID), getString(R.string.notif_channel_update),
+                        NotificationManager.IMPORTANCE_LOW);
+                updateChannel.setDescription(getString(R.string.notif_channel_update_desc));
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                if (manager != null) {
+                    manager.createNotificationChannel(mainChannel);
+                    manager.createNotificationChannel(updateChannel);
+                }
+            }
 
             // Delete any past export files
             new Handler().post(() -> {

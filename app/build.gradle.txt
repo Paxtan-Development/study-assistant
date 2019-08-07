@@ -33,19 +33,10 @@ android {
         }
     }
     buildTypes {
-        release {
+        debug {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            setSigningConfig getSigningConfig()
-        }
-        debug {
-            applicationIdSuffix ".debug"
-            debuggable true
-            versionNameSuffix = '-d'
-            sourceSets {
-                androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-            }
         }
     }
     compileOptions {

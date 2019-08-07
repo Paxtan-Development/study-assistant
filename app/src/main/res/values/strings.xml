@@ -41,6 +41,14 @@
     <string name="subject_imported">Subject Imported</string>
     <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
 
+    <!-- String used in notifications -->
+    <string name="notif_channel_notes_ID">notes</string>
+    <string name="notif_channel_notes">Notes</string>
+    <string name="notif_channel_notes_desc">Alert for individual notes</string>
+    <string name="notif_channel_update_ID">updater</string>
+    <string name="notif_channel_update">App Update</string>
+    <string name="notif_channel_update_desc">Notify users of a newer app version</string>
+
     <!-- String used in general errors -->
     <string name="error_password_incorrect">The password that is entered is incorrect.</string>
     <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
@@ -124,6 +132,7 @@
     <string name="n3_alert_set">Alert set</string>
     <string name="n3_alert_cancelled">Alert cancelled</string>
     <string name="n3_note_exported">Note exported to </string>
+    <string name="n3_confirm_export_note">Export note?</string>
 
     <string name="n4_return">Return</string>
     <string name="n4_save_note">Save note?</string>

@@ -190,11 +190,21 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
     /** Exports the note to a txt file. **/
     public void onExportPressed() {
-        String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
-            + notesInfo.get(0), ".txt");
-        FileFunctions.exportTxt(outputText, notesInfo.get(2));
-        Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
-                Toast.LENGTH_SHORT).show();
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.data_export)
+                    .setMessage(R.string.n3_confirm_export_note)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
+                                + notesInfo.get(0), ".txt");
+                        FileFunctions.exportTxt(outputText, notesInfo.get(2));
+                        Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
+                                Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                    .create().show();
+        }
     }
 
     /** Prevents the note from being able to be edited. **/
@@ -378,7 +388,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             // Delete listener
                             AlarmManager manager = (AlarmManager) getActivity()
                                     .getSystemService(Context.ALARM_SERVICE);
-                            if (manager != null && notesInfo.get(5) != null) {
+                            if (manager != null && notesInfo.size() > 5 && notesInfo.get(5) != null) {
                                 PendingIntent alertIntent = getNotifyReceiverIntent(
                                         Integer.valueOf(notesInfo.get(5)));
                                 manager.cancel(alertIntent);
@@ -461,6 +471,11 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 
                 // Save value to database
+                while (notesInfo.size() < 3) {
+                    notesInfo.add("");
+                } while (notesInfo.size() < 6) {
+                    notesInfo.add(null);
+                }
                 notesInfo.set(4, GeneralFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                 notesInfo.set(5, String.valueOf(requestCode));
                 SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
@@ -477,7 +492,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
                 // Insert alarm and reset menu
                 if (manager != null) {
-                    manager.setWindow(AlarmManager.RTC, targetDateTime.getTimeInMillis(), 10000, alarmIntent);
+                    manager.set(AlarmManager.RTC, targetDateTime.getTimeInMillis(), alarmIntent);
                     hasAlert = true;
                     Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
                 }
@@ -494,6 +509,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
         intent.putExtra("title", notesInfo.get(0));
         intent.putExtra("message", notesInfo.get(2));
+        intent.putExtra("subject", notesSubject);
         return PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
     }
 }

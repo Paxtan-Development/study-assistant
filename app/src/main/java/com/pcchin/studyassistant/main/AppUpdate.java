@@ -13,7 +13,6 @@
 
 package com.pcchin.studyassistant.main;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -188,7 +187,7 @@ class AppUpdate {
                     intent.putExtra("displayUpdate", true);
                     PendingIntent pendingIntent = PendingIntent
                             .getActivity(activity, 0, intent, 0);
-                    Notification notif = new NotificationCompat.Builder
+                    NotificationCompat.Builder notif = new NotificationCompat.Builder
                             (activity, activity.getPackageName())
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle(activity.getString(R.string.app_name))
@@ -198,9 +197,12 @@ class AppUpdate {
                             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                             .setLights(Color.BLUE, 2000, 0)
                             .setVibrate(new long[]{0, 250, 250, 250, 250})
-                            .setAutoCancel(true).build();
+                            .setAutoCancel(true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        notif.setChannelId(activity.getString(R.string.notif_channel_update_ID));
+                    }
                     NotificationManagerCompat manager = NotificationManagerCompat.from(activity);
-                    manager.notify(activity.getTaskId(), notif);
+                    manager.notify(activity.getTaskId(), notif.build());
                 }
 
                 // Set up dialog

@@ -17,7 +17,6 @@
     <string name="license_apache_2">Apache 2.0</string>
     <string name="license_mit">MIT</string>
     <string name="license_cc_3_unported">Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</string>
-    <string name="license_self_copyright">Copyright 2019 PC Chin. All rights reserved.</string>
 
     <string-array name="bouncycastle_license">
         <item>@string/license_mit</item>

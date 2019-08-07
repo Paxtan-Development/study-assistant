@@ -83,7 +83,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
                     ));
                 }
             });
-            ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, i);
+            ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, 2 + i);
         }
         return returnView;
     }

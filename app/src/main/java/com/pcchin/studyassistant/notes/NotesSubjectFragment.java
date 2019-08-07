@@ -255,6 +255,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         if (getContext() != null && getActivity() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            popupView.setEndIconActivated(true);
+            popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
             AlertDialog newNoteDialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.n2_new_note)
                     .setView(popupView)

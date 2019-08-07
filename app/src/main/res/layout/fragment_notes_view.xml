@@ -50,6 +50,7 @@
             android:background="@drawable/n_edittext_border"
             android:gravity="start|top"
             android:text="@string/blank"
+            android:textIsSelectable="true"
             android:textSize="18sp" />
     </LinearLayout>
 </ScrollView>

@@ -25,13 +25,6 @@
             bouncycastle.org&quot;&gt;http://www.bouncycastle.org&lt;/a&gt;)</item>
     </string-array>
 
-    <string-array name="filechooser_license">
-        <item>@string/license_apache_2</item>
-        <item>Android FileChooser</item>
-        <item>&lt;a href=&quot;https://github.com/hedzr/android-file-chooser&quot;&gt;android-file-chooser&lt;/a&gt; library
-            - © 2015-2019 &lt;a href=&quot;https://github.com/hedzr&quot;&gt;Hedzr Yeh&lt;/a&gt;</item>
-    </string-array>
-
     <string-array name="jsoup_license">
         <item>@string/license_mit</item>
         <item>jsoup</item>

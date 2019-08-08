@@ -13,18 +13,23 @@
 
 package com.pcchin.studyassistant.notes.misc;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.obsez.android.lib.filechooser.ChooserDialog;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
@@ -53,33 +58,59 @@ import java.util.Scanner;
 public class ImportSubject {
     private final MainActivity activity;
 
-    /** The function used to import subjects, either via a ZIP file or a .subject file.
-     * Also serves as the constructor for the class as activity needs to be passed on
-     * from function to function.
+    /** Displays the import dialog for whether to import from a ZIP or a .subject file.
+     * Separated from the constructor as this function will startActivityForResult
+     * before continuing on with the rest of the functions in the class. **/
+    public static void displayImportDialog(MainActivity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                .checkSelfPermission(activity, Manifest.permission
+                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MainActivity.EXTERNAL_STORAGE_READ_PERMISSION);
+        }
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.import_from)
+                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) -> {
+                        try {
+                            // Set up file chooser
+                            Intent fileSelectIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                            fileSelectIntent.setType("*/*");
+                            if (i == 0) {
+                                String[] mimeType = {"application/zip", "application/x-compressed",
+                                        "application/x-zip-compressed", "multipart/x-zip"};
+                                fileSelectIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeType);
+                                activity.startActivityForResult(Intent.createChooser(fileSelectIntent,
+                                        activity.getString(R.string.select_file)), MainActivity.SELECT_ZIP_FILE);
+                            } else {
+                                // TODO: Complete
+                                activity.startActivityForResult(fileSelectIntent, MainActivity.SELECT_SUBJECT_FILE);
+                            }
+                        } catch (ActivityNotFoundException e) {
+                            Toast.makeText(activity, R.string.error_file_manager_not_found, Toast.LENGTH_SHORT).show();
+                            Log.e("StudyAssistant", "File Error: This device appears to "
+                                    + "not have a file manager. Stack trace is");
+                            e.printStackTrace();
+                        }
+                    })
+                    .create().show();
+        } else {
+            Toast.makeText(activity, R.string.error_read_permission_denied, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** The constructor for the class as activity needs to be passed on.
+     * Originally contained displayImportDialog(MainActivity activity) but moved for better structuring of files.
      * importZipConfirm(String path) and importSubjectFile(String path) separated for clarity. **/
     public ImportSubject(MainActivity activity) {
         this.activity = activity;
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.import_from)
-                .setItems(R.array.n_import_subject_format, (dialogInterface, i) -> {
-                    // Set up file chooser
-                    ChooserDialog importFileDialog = new ChooserDialog(activity)
-                            .withStartFile("/storage/emulated/0");
-                    if (i == 0) {
-                        importFileDialog = importFileDialog.withFilter(true, "zip")
-                                .withChosenListener((s, file) -> importZipConfirm(s));
-                    } else {
-                        importFileDialog = importFileDialog.withFilter(true, "subject")
-                                .withChosenListener((s, file) -> importSubjectFile(s));
-                    }
-                    importFileDialog.build().show();
-                })
-                .create().show();
     }
 
     /** Function used to confirm whether the ZIP file is valid and the password is provided
      * before unzipping the ZIP file. Separated from constructor for clarity. **/
-    private void importZipConfirm(String path) {
+    public void importZipConfirm(String path) {
         try {
             if (new ZipFile(path).isValidZipFile()) {
                 if (new ZipFile(path).isEncrypted()) {
@@ -285,7 +316,7 @@ public class ImportSubject {
 
     /** Function used to import a subject using a .subject file.
      * Separated from constructor for clarity. **/
-    private void importSubjectFile(String path) {
+    public void importSubjectFile(String path) {
         // Check if file exists
         File targetFile = new File(path);
         if (targetFile.exists() && targetFile.isFile()) {

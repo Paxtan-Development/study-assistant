@@ -30,7 +30,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="import_from">Import from</string>
-    <string name="file_error">File Error</string>
     <string name="importing_subject">Importing Subject…</string>
     <string name="subject_exported">Subject exported to </string>
     <string name="enter_password">Enter Password</string>
@@ -39,6 +38,7 @@
     <string name="rename">Rename</string>
     <string name="rename_subject">Rename Subject</string>
     <string name="subject_imported">Subject Imported</string>
+    <string name="select_file">Select File</string>
 
     <!-- String used in notifications -->
     <string name="notif_channel_notes_ID">notes</string>
@@ -48,22 +48,10 @@
     <string name="notif_channel_update">App Update</string>
     <string name="notif_channel_update_desc">Notify users of a newer app version</string>
 
-    <!-- String used in general errors -->
-    <string name="error_password_incorrect">The password that is entered is incorrect.</string>
-    <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
-    <string name="error_zip_corrupt">The ZIP file that is selected appears to be invalid.</string>
-    <string name="error_subject_import">The .subject file that is selected could not be imported.</string>
-    <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
-    <string name="error_password_short">Password must be 8 characters or longer.</string>
-    <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
-    <string name="error_write_permission_denied">Permission denied for writing files. Exporting files may not be possible.</string>
-    <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
-
     <!-- Strings used in MainActivity -->
     <string name="a_update_app">Update App</string>
     <string name="a_new_version">A newer version of the app is available. Would you like to update to the latest version?</string>
     <string name="a_downloading">Downloading the latest version…</string>
-    <string name="a_network_error">Network Error</string>
     <string name="a_app_updating">Updating app…</string>
     <string name="a_learn_more">Learn More</string>
 
@@ -86,10 +74,8 @@
     <string name="m3_nav_close">Close navigation drawer</string>
 
     <!-- Strings used in group N -->
-    <string name="n_error_corrupt">The notes in this subject may be missing</string>
     <string name="n_change_subj">Change subject</string>
     <string name="n_last_edited">Last changed: </string>
-    <string name="n_error_subject_empty">Subject name cannot be empty</string>
     <string name="n_new_alert">New alert</string>
     <string name="n_password_set">Leave blank to not set a password.</string>
 
@@ -103,12 +89,6 @@
     <string name="n2_sort_date_asc">Ascending Date</string>
     <string name="n2_sort_date_des">Descending Date</string>
     <string name="n2_subject_renamed">Subject renamed</string>
-
-    <!-- Error messages in Fragment n2 -->
-    <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
-    <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
-    <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
-    <string name="n2_error_file_not_created">The file could not be created.</string>
 
     <!-- General notes used in Fragment n2 -->
     <string name="n2_new_note">New note</string>

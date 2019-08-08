@@ -17,6 +17,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -49,6 +50,7 @@ import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
+import com.pcchin.studyassistant.notes.misc.ImportSubject;
 
 import java.io.File;
 import java.util.Date;
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Fragment currentFragment;
     private static final int EXTERNAL_STORAGE_PERMISSION = 200;
+    public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
+    public static final int SELECT_ZIP_FILE = 300;
+    public static final int SELECT_SUBJECT_FILE = 301;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -90,7 +95,8 @@ public class MainActivity extends AppCompatActivity
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
                     .checkSelfPermission(this, Manifest.permission
                     .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         EXTERNAL_STORAGE_PERMISSION);
             }
 
@@ -158,6 +164,13 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         GeneralFunctions.updateNavView(this);
+    }
+
+    /** Ensures that all the user's data is safe before quitting the app. **/
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        safeOnBackPressed();
     }
 
     /** Delegates the items that are selected on the menu to the respective fragments. **/
@@ -266,6 +279,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /** Returns the check permission result for all runtime permissions needed. **/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -273,6 +287,26 @@ public class MainActivity extends AppCompatActivity
             if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, R.string.error_write_permission_denied,
                         Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /** External intent is returned here from picking a file from
+     * @see ImportSubject . The file would be sent back to a new ImportSubject to be imported. **/
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data.getData() != null && data.getData().getPath() != null) {
+            String targetFile = data.getData().getPath();
+            if (targetFile.split(":").length >= 2) {
+                targetFile = targetFile.split(":")[1];
+            }
+            if (requestCode == SELECT_ZIP_FILE) {
+                // Sample URI:
+                // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
+                new ImportSubject(this).importZipConfirm(targetFile);
+            } else if (requestCode == SELECT_SUBJECT_FILE) {
+                new ImportSubject(this).importSubjectFile(targetFile);
             }
         }
     }

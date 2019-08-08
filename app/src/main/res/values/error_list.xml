@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Resources used in error handling. Strings that belong here would be displayed to the user
+     when a Log.w() or a Log.e() is recorded. -->
+<resources>
+    <!-- Short error messages shown to the user. -->
+    <string name="file_error">File Error</string>
+    <string name="a_network_error">Network Error</string>
+
+    <!-- String used in general errors. -->
+    <string name="error_password_incorrect">The password that is entered is incorrect.</string>
+    <string name="error_zip_import">The ZIP file that is selected could not be imported.</string>
+    <string name="error_zip_corrupt">The ZIP file that is selected appears to be invalid.</string>
+    <string name="error_subject_import">The .subject file that is selected could not be imported.</string>
+    <string name="error_subject_title_invalid">The title of the subject imported is invalid.</string>
+    <string name="error_password_short">Password must be 8 characters or longer.</string>
+    <string name="error_subject_same_name">Another subject with the same name has been found. Should both subjects be merged or should the new subject be renamed?</string>
+    <string name="error_read_permission_denied">Permission denied for reading files. Importing files may not be possible.</string>
+    <string name="error_write_permission_denied">Permission denied for writing files. Exporting files may not be possible.</string>
+    <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
+    <string name="error_file_manager_not_found">A file manager could not be found on the device.</string>
+
+    <!-- Errors used in group N. -->
+    <string name="n_error_corrupt">The notes in this subject may be missing</string>
+    <string name="n_error_subject_empty">Subject name cannot be empty</string>
+
+    <!-- Error messages in Fragment n2 -->
+    <string name="n2_error_missing_subject">The subject requested appears to be missing</string>
+    <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
+    <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
+    <string name="n2_error_file_not_created">The file could not be created.</string>
+</resources>

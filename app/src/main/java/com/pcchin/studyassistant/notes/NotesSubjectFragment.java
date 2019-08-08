@@ -345,6 +345,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 popupView.getEditText().setText(R.string.rename_subject);
             }
             AlertDialog renameDialog = new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.rename_subject)
+                    .setView(popupView)
                     .setPositiveButton(R.string.rename, null)
                     .setNegativeButton(android.R.string.cancel, null)
                     .create();
@@ -619,7 +621,6 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     }
                                     outputStream.flush();
                                     outputStream.close();
-
                                     Toast.makeText(getContext(), getString(R.string.subject_exported)
                                             + outputFile, Toast.LENGTH_SHORT).show();
                                 } else {

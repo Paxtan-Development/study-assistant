@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TODO: Check if activity is called to open ZIP or .subject files
+
         // First time starting the app
         if (savedInstanceState == null) {
             displayFragment(new MainFragment());
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         EXTERNAL_STORAGE_PERMISSION);
             }
-
 
             // Delete any past export files
             new Handler().post(() -> {
@@ -296,17 +297,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data.getData() != null && data.getData().getPath() != null) {
-            String targetFile = data.getData().getPath();
-            if (targetFile.split(":").length >= 2) {
-                targetFile = targetFile.split(":")[1];
-            }
+        if (resultCode == RESULT_OK && data.getData() != null) {
+            String targetFile = FileFunctions.getRealPathFromUri(this, data.getData());
             if (requestCode == SELECT_ZIP_FILE) {
                 // Sample URI:
                 // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
                 new ImportSubject(this).importZipConfirm(targetFile);
             } else if (requestCode == SELECT_SUBJECT_FILE) {
-                new ImportSubject(this).importSubjectFile(targetFile);
+                if (targetFile.endsWith(".subject")) {
+                    new ImportSubject(this).importSubjectFile(targetFile);
+                } else {
+                    Toast.makeText(this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

@@ -14,6 +14,9 @@
 package com.pcchin.studyassistant.functions;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -126,4 +129,31 @@ public class FileFunctions {
             return new byte[0];
         }
     }
+
+    /** Returns the absolute path of a path from the given URI.
+     * If the Uri is invalid, an empty string would be returned. **/
+    public static String getRealPathFromUri(Context context, Uri uri){
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            if (cursor != null) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                return cursor.getString(column_index);
+            } else {
+                return "";
+            }
+        } catch (Exception e) {
+            Log.e("StudyAssistant", "File Error: Uri" + uri.toString() + "could not be "
+                + "parsed as a path. Stack trace is");
+            e.printStackTrace();
+            return "";
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 }

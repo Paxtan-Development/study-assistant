@@ -342,7 +342,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             popupView.setEndIconActivated(true);
             popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
             if (popupView.getEditText() != null) {
-                popupView.getEditText().setText(R.string.rename_subject);
+                popupView.getEditText().setText(notesSubject);
             }
             AlertDialog renameDialog = new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.rename_subject)

@@ -39,6 +39,8 @@
     <string name="rename_subject">Rename Subject</string>
     <string name="subject_imported">Subject Imported</string>
     <string name="select_file">Select File</string>
+    <string name="select_subject_file">Select a .subject file</string>
+    <string name="not_subject_file">The file that is selected is not a .subject file</string>
 
     <!-- String used in notifications -->
     <string name="notif_channel_notes_ID">notes</string>

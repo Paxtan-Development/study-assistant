@@ -85,7 +85,7 @@ public class ImportSubject {
                                 activity.startActivityForResult(Intent.createChooser(fileSelectIntent,
                                         activity.getString(R.string.select_file)), MainActivity.SELECT_ZIP_FILE);
                             } else {
-                                // TODO: Complete
+                                Toast.makeText(activity, R.string.select_subject_file, Toast.LENGTH_SHORT).show();
                                 activity.startActivityForResult(fileSelectIntent, MainActivity.SELECT_SUBJECT_FILE);
                             }
                         } catch (ActivityNotFoundException e) {

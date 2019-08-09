@@ -31,6 +31,7 @@
     <string name="error_write_permission_denied">Permission denied for writing files. Exporting files may not be possible.</string>
     <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
     <string name="error_file_manager_not_found">A file manager could not be found on the device.</string>
+    <string name="error_file_format_incorrect">The file selected could not be imported into the app.</string>
 
     <!-- Errors used in group N. -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>

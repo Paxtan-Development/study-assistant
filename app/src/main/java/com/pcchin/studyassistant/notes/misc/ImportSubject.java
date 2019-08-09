@@ -80,7 +80,7 @@ public class ImportSubject {
                             fileSelectIntent.setType("*/*");
                             if (i == 0) {
                                 String[] mimeType = {"application/zip", "application/x-compressed",
-                                        "application/x-zip-compressed", "multipart/x-zip"};
+                                        "application/x-zip-compressed"};
                                 fileSelectIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeType);
                                 activity.startActivityForResult(Intent.createChooser(fileSelectIntent,
                                         activity.getString(R.string.select_file)), MainActivity.SELECT_ZIP_FILE);

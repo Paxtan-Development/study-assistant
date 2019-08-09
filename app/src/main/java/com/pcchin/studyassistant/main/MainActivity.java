@@ -20,6 +20,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -70,7 +71,20 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: Check if activity is called to open ZIP or .subject files
+        // Check if app is opened to process files
+        Uri intentUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+        if (intentUri != null) {
+            String receiveFilePath = FileFunctions.getRealPathFromUri(this, intentUri);
+            // Check if file type matches the required file types
+            if (receiveFilePath.endsWith(".subject")) {
+                new ImportSubject(this).importSubjectFile(receiveFilePath);
+            } else if (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
+                || receiveFilePath.endsWith(".Zip")) {
+                new ImportSubject(this).importZipConfirm(receiveFilePath);
+            } else {
+                Toast.makeText(this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
+            }
+        }
 
         // First time starting the app
         if (savedInstanceState == null) {

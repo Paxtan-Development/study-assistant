@@ -13,7 +13,6 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.pcchin.studyassistant">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -39,30 +38,138 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- TODO: Check -->
-            <!-- Support for ZIP Files -->
-            <intent-filter android:icon="@mipmap/ic_launcher"
-                android:label="@string/app_name"
-                tools:ignore="AppLinkUrlError">
-                <action android:name="android.intent.action.VIEW"/>
-                <action android:name="android.intent.action.BROWSABLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="file"
-                    android:host="*"
-                    android:mimeType="application/zip"/>
-                <data android:scheme="http"
-                    android:host="*"
-                    android:mimeType="application/zip"/>
+
+            <!-- Send ZIP and .subject files through the 'Share' function.
+             Unfortunately, as .subject files have no MIME type,
+             they could not be shown in normal file explorers. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-zip-compressed" />
+                <data android:mimeType="application/x-compressed" />
             </intent-filter>
-            <!-- Support for .subject files -->
-            <intent-filter android:icon="@mipmap/ic_launcher"
-                android:label="@string/app_name">
+
+            <!-- In case the MIME type is incorrect -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="file"
-                    android:host="*"
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="*" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+
+            <!-- Support for ZIP Files, modified from ZArchiver's AndroidManifest.xml -->
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-zip-compressed" />
+                <data android:mimeType="application/x-compressed" />
+            </intent-filter>
+
+            <!-- Filter based purely on the ZIP file extension -->
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
                     android:mimeType="*/*"
-                    android:pathPattern=".*\\.subject" />
+                    android:host="*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:pathPattern=".*\.zip" />
+                <data android:pathPattern=".*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.zip" />
+                <data android:pathPattern=".*zip" />
+            </intent-filter>
+
+            <!-- Variations of the ZIP extension -->
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:mimeType="*/*"
+                    android:host="*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:pathPattern=".*\.ZIP" />
+                <data android:pathPattern=".*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.ZIP" />
+                <data android:pathPattern=".*\.Zip" />
+                <data android:pathPattern=".*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.Zip" />
+                <data android:pathPattern=".*ZIP" />
+                <data android:pathPattern=".*Zip" />
+            </intent-filter>
+
+            <!-- Support for .subject files -->
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:pathPattern=".*\.subject" />
+                <data android:pathPattern=".*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\..*\.subject" />
+                <data android:pathPattern=".*subject" />
             </intent-filter>
         </activity>
     </application>

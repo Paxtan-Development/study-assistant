@@ -22,9 +22,14 @@ import java.util.ArrayList;
 
 /** Test local hashing & encryption/decryption functions. **/
 public class SecurityTest {
-    private static final int TEST_COUNT = 10000;
+    private static int TEST_COUNT;
 
     public SecurityTest() {
+        if (BuildConfig.IS_LOCAL) {
+            TEST_COUNT = 10000;
+        } else {
+            TEST_COUNT = 1000;
+        }
     }
 
     /** Check if the encryption function for the .subject files work. **/

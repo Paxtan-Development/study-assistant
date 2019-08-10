@@ -13,6 +13,6 @@
 
 package com.pcchin.studyassistant;
 
-/** Tests to check whether the file  **/
+/** Tests to check whether the file-related functions are working. **/
 public class FileTest {
 }

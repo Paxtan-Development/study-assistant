@@ -16,12 +16,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-<<<<<<< HEAD
             storeFile file(Keystore_Dir)
             keyAlias = Keystore_Alias
             keyPassword Keystore_Pass
             storePassword Keystore_Pass
-=======
             // The hasProperty is for the pipeline on Gitlab
             if (hasProperty('Keystore_Dir')) storeFile = file(Keystore_Dir) else storeFile = file('file')
             if (hasProperty('Keystore_Alias')) keyAlias = Keystore_Alias else keyAlias = 'alias'
@@ -32,7 +30,6 @@ android {
                 keyAlias = 'password'
                 storePassword = 'password'
             }
->>>>>>> f8a4727... Completed pipeline
         }
     }
     compileSdkVersion 29

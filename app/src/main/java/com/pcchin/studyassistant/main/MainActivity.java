@@ -15,7 +15,6 @@ package com.pcchin.studyassistant.main;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -48,7 +47,6 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
@@ -165,6 +163,10 @@ public class MainActivity extends AppCompatActivity
                     GeneralFunctions.standardDateFormat.format(new Date()))) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
+        } else {
+            // Set currentFragment
+            currentFragment = getSupportFragmentManager().getFragments()
+                    .get(getSupportFragmentManager().getFragments().size() - 1);
         }
 
         // Set toolbar, set again when rotated

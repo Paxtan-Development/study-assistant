@@ -29,19 +29,14 @@ public class ConverterTest {
     @Test
     public void testJson() {
         Random rand = new Random();
-        ArrayList<ArrayList<String>> initialArray = new ArrayList<>();
         for (int i = 0; i < rand.nextInt(TEST_COUNT); i++) {
-            ArrayList<String> temp = new ArrayList<>();
-            for (int j = 0; j < rand.nextInt(TEST_COUNT); i++) {
-                temp.add(TestFunctions.randomString(TEST_COUNT));
-            }
-            initialArray.add(temp);
+            ArrayList<ArrayList<String>> initialArray = TestFunctions.randomArray(TEST_COUNT);
+            ArrayList<ArrayList<String>> compareArray = ConverterFunctions
+                    .jsonToArray(ConverterFunctions.arrayToJson(initialArray));
+            Assert.assertNotNull(compareArray);
+            Assert.assertEquals(initialArray.size(), compareArray.size());
+            Assert.assertEquals(initialArray, compareArray);
         }
-        ArrayList<ArrayList<String>> compareArray = ConverterFunctions
-                .jsonToArray(ConverterFunctions.arrayToJson(initialArray));
-        Assert.assertNotNull(compareArray);
-        Assert.assertEquals(initialArray.size(), compareArray.size());
-        Assert.assertEquals(initialArray, compareArray);
     }
 
     /** Test int to byte[] and vice versa. **/

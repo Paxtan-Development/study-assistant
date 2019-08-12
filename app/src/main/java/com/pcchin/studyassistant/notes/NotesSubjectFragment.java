@@ -49,6 +49,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -257,22 +258,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
     /** Creates a new note with a given title. **/
     public void onNewNotePressed() {
-        if (getContext() != null && getActivity() != null) {
+        if (getActivity() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
             popupView.setEndIconActivated(true);
             popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-            AlertDialog newNoteDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n2_new_note)
-                    .setView(popupView)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-            // OnClickListeners implemented separately to prevent
-            // dialog from being dismissed after button click
-            newNoteDialog.setOnShowListener(dialog -> {
+            DialogInterface.OnShowListener nListener = dialog -> {
                 popupView.setHint(getString(R.string.title));
-                newNoteDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
                         .setOnClickListener(v -> {
                             String popupInputText = "";
                             if (popupView.getEditText() != null) {
@@ -293,16 +286,19 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                                 notesSubject, popupInputText));
                             }
                         });
-                newNoteDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
                         .setOnClickListener(v -> dialog.dismiss());
-            });
-            newNoteDialog.show();
+            };
+            new AutoDismissDialog(getString(R.string.n2_new_note), popupView,
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""}, nListener)
+                    .show(getFragmentManager(), "NotesSubjectFragment.1");
         }
     }
 
     /** Change the method which the notes are sorted. **/
     public void onSortPressed() {
-        if (getContext() != null) {
+        if (getContext() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") final Spinner sortingSpinner = (Spinner) getLayoutInflater().inflate
                     (R.layout.n2_sorting_spinner, null);
 
@@ -316,11 +312,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     sortingSpinner.setSelection(i);
                 }
             }
-
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n2_sorting_method)
-                    .setView(sortingSpinner)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+            new AutoDismissDialog(getString(R.string.n2_sorting_method), sortingSpinner,
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
                         // Update value in database
                         NotesSubject subject1 = subjectDatabase.SubjectDao().search(notesSubject);
                         subject1.sortOrder = sortingList[sortingSpinner.getSelectedItemPosition()];
@@ -328,15 +323,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         dialogInterface.dismiss();
                         sortNotes(subject1);
                         GeneralFunctions.reloadFragment(this);
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                    .create().show();
+                    }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
+                    .show(getFragmentManager(), "NotesSubjectFragment.2");
         }
     }
 
     /** Renames the subject to another one. **/
     public void onRenamePressed() {
-        if (getActivity() != null) {
+        if (getActivity() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
             popupView.setEndIconActivated(true);
@@ -344,14 +338,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             if (popupView.getEditText() != null) {
                 popupView.getEditText().setText(notesSubject);
             }
-            AlertDialog renameDialog = new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.rename_subject)
-                    .setView(popupView)
-                    .setPositiveButton(R.string.rename, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-            renameDialog.setOnShowListener(dialogInterface -> {
-                renameDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            DialogInterface.OnShowListener nListener = dialogInterface -> {
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
                         .setOnClickListener(view -> {
                             String popupInputText = popupView.getEditText().getText().toString();
                             // Check if input is blank
@@ -380,37 +368,36 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                         .newInstance(popupInputText));
                             }
                         });
-                renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
                         .setOnClickListener(view -> dialogInterface.dismiss());
-            });
-            renameDialog.show();
+            };
+            new AutoDismissDialog(getString(R.string.rename_subject), popupView,
+                    new String[]{getString(R.string.rename),
+                            getString(android.R.string.cancel), ""}, nListener)
+                    .show(getFragmentManager(), "NotesSubjectFragment.3");
         }
     }
 
     /** Export all the notes of the subject into a ZIP file,
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
-        if (getContext() != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                    .checkSelfPermission(getContext(), Manifest.permission
-                            .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), R.string
-                        .error_write_permission_denied, Toast.LENGTH_SHORT).show();
-            } else {
-                new AlertDialog.Builder(getContext())
-                        .setTitle(R.string.n2_export_format)
-                        .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
-                                new Handler().post(() -> {
-                                    if (i == 0) {
-                                        askZipPassword();
-                                    } else {
-                                        exportSubject();
-                                    }
-                                }))
-                        .setNegativeButton(android.R.string.cancel,
-                                (dialogInterface, i) -> dialogInterface.dismiss())
-                        .create().show();
-            }
+        if (getContext() != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                .checkSelfPermission(getContext(), Manifest.permission
+                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getContext(), R.string
+                    .error_write_permission_denied, Toast.LENGTH_SHORT).show();
+        } else if (getFragmentManager() != null) {
+            new AutoDismissDialog(getString(R.string.n2_export_format),
+                    R.array.n_import_subject_format, (dialogInterface, i) ->
+                    new Handler().post(() -> {
+                        if (i == 0) {
+                            askZipPassword();
+                        } else {
+                            exportSubject();
+                        }
+                    }), new String[]{"", getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{null, null, null})
+                    .show(getFragmentManager(), "NotesSubjectFragment.4");
         }
     }
 
@@ -418,7 +405,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
      * Separated from onExportPressed() for clarity,
      * exportZip() separated for clarity. **/
     private void askZipPassword() {
-        if (getContext() != null) {
+        if (getFragmentManager() != null) {
             @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
             if (inputLayout.getEditText() != null) {
@@ -430,14 +417,9 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             inputLayout.setHintEnabled(true);
             inputLayout.setHint(getString(R.string.n_password_set));
 
-            AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.enter_password)
-                    .setView(inputLayout)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-            passwordDialog.setOnShowListener(dialogInterface -> {
-                passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+            DialogInterface.OnShowListener passwordListener = dialogInterface -> {
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
+                        .setOnClickListener(view -> {
                     String inputText = "";
                     if (inputLayout.getEditText() != null) {
                         inputText = inputLayout.getEditText().getText().toString();
@@ -448,11 +430,14 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         inputLayout.setErrorEnabled(true);
                         inputLayout.setError(getString(R.string.error_password_short));
                     }
-                    passwordDialog.dismiss();
+                    dialogInterface.dismiss();
                 });
-                passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view -> passwordDialog.dismiss());
-            });
-            passwordDialog.show();
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
+                        .setOnClickListener(view -> dialogInterface.dismiss());
+            };
+            new AutoDismissDialog(getString(R.string.enter_password), inputLayout, new String[]{
+                    getString(android.R.string.ok), getString(android.R.string.cancel), ""},
+                    passwordListener).show(getFragmentManager(), "NotesSubjectFragment.5");
         }
     }
 
@@ -552,7 +537,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     /** Export the subject as a password-protected byte[] as a .subject file,
      * separated from onExportSubject() for clarity. **/
     private void exportSubject() {
-        if (getContext() != null) {
+        if (getFragmentManager() != null) {
             @SuppressLint("InflateParams") TextInputLayout inputText = (TextInputLayout) getLayoutInflater()
                     .inflate(R.layout.popup_edittext, null);
             if (inputText.getEditText() != null) {
@@ -563,14 +548,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
             inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
             inputText.setHintEnabled(true);
             inputText.setHint(getString(R.string.n_password_set));
-            AlertDialog exportDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n2_password_export)
-                    .setView(inputText)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create();
-            exportDialog.setOnShowListener(dialogInterface -> {
-                exportDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+            DialogInterface.OnShowListener exportListener = dialogInterface -> {
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                     // Check if password is too short, must be 8 characters in length
                     String responseText = "";
                     if (inputText.getEditText() != null) {
@@ -589,7 +568,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         // Check if the file can be created
                         String finalOutputFileName = outputFileName;
                         String finalResponseText = responseText;
-                        exportDialog.dismiss();
+                        dialogInterface.dismiss();
                         String finalResponseText1 = responseText;
                         new Handler().post(() -> {
                             try {
@@ -633,12 +612,12 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                 Log.e("StudyAssistant", "File Error: File "
                                         + finalOutputFileName + " not found, stack trace is");
                                 e.printStackTrace();
-                                exportDialog.dismiss();
+                                dialogInterface.dismiss();
                             } catch (IOException e) {
                                 Log.e("StudyAssistant", "File Error: An IO Exception"
                                         + " occurred on file " + finalOutputFileName + ", stack trace is");
                                 e.printStackTrace();
-                                exportDialog.dismiss();
+                                dialogInterface.dismiss();
                             }
                         });
                     } else {
@@ -646,28 +625,31 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         inputText.setError(getString(R.string.error_password_short));
                     }
                 });
-                exportDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                        exportDialog.dismiss());
-            });
-            exportDialog.show();
+                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
+                        dialogInterface.dismiss());
+            };
+            new AutoDismissDialog(getString(R.string.n2_password_export), inputText,
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""}, exportListener)
+                    .show(getFragmentManager(), "NotesSubjectFragment.6");
         }
     }
 
     /** Deletes the current subject and returns to
      * @see NotesSelectFragment **/
     public void onDeletePressed() {
-        if (getContext() != null) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.del)
-                    .setMessage(R.string.n2_del_confirm)
-                    .setPositiveButton(R.string.del, (dialog, which) -> {
+        if (getFragmentManager() != null) {
+            new AutoDismissDialog(getString(R.string.del), getString(R.string.n2_del_confirm),
+                    new String[]{getString(R.string.del),
+                            getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{(dialog, which) -> {
                         if (getContext() != null && getActivity() != null) {
                             // Delete phantom alerts
                             for (ArrayList<String> note: notesArray) {
                                 AlarmManager manager = (AlarmManager) getContext()
                                         .getSystemService(Context.ALARM_SERVICE);
                                 if (manager != null && note.size() > 6 && note.get(5) != null
-                                    && note.get(0) != null && note.get(2) != null) {
+                                        && note.get(0) != null && note.get(2) != null) {
                                     // Get PendingIntent for note alert
                                     Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
                                     intent.putExtra("title", note.get(0));
@@ -695,9 +677,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             subjectDatabase.close();
                             ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                         }
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
-                    .create().show();
+                    }, (dialog, which) -> dialog.dismiss(), null})
+                    .show(getFragmentManager(), "NotesSubjectFragment.7");
         }
     }
 

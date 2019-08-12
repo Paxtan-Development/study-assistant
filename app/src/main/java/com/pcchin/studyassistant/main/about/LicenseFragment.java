@@ -14,10 +14,10 @@
 package com.pcchin.studyassistant.main.about;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -32,6 +32,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 
 import java.util.Arrays;
@@ -60,18 +61,18 @@ public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
         for (int licenseArray : licenseArrays) {
             // Updates license info & OnClickListeners
             String[] infoArray = getResources().getStringArray(licenseArray);
-            if (infoArray.length == 3) {
+            if (infoArray.length == 3 && getFragmentManager() != null) {
                 @SuppressLint("InflateParams") LinearLayout licenseDisplay = (LinearLayout) inflater
                         .inflate(R.layout.license_display, null);
                 // Common functions used by all licenses for neatness
                 ((TextView) licenseDisplay.findViewById(R.id.m4_lib)).setText(infoArray[1]);
-                AlertDialog.Builder licenseBuilder = new AlertDialog.Builder(inflater.getContext())
-                        .setNegativeButton(R.string.close, (dialogInterface, i1) ->
-                                dialogInterface.dismiss());
+                DialogInterface.OnClickListener[] yListeners = new DialogInterface
+                        .OnClickListener[]{null, (dialogInterface, i1) ->
+                        dialogInterface.dismiss(), null};
+                String[] buttonList = {"", getString(R.string.close), ""};
 
                 if (Objects.equals(infoArray[0], getString(R.string.license_apache_2))) {
                     // Apache 2.0 license
-                    licenseBuilder.setTitle(R.string.license_apache_2);
                     ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_apache_2);
                     licenseDisplay.setOnClickListener(view -> {
                         // TextView needs to be set for each instance to prevent error
@@ -81,11 +82,12 @@ public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
                         GeneralFunctions.setHtml(licenseView,
                                 infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
                                         "apache_2_license.txt"));
-                        licenseBuilder.setView(licenseView).create().show();
+                        new AutoDismissDialog(getString(R.string.license_apache_2), licenseView,
+                                buttonList, yListeners).show(getFragmentManager(),
+                                "LicenseFragment.Apache2");
                     });
                 } else if (Objects.equals(infoArray[0], getString(R.string.license_mit))) {
                     // MIT license
-                    licenseBuilder.setTitle(R.string.license_mit);
                     ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_mit);
                     licenseDisplay.setOnClickListener(view -> {
                         // TextView needs to be set for each instance to prevent error
@@ -95,11 +97,12 @@ public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
                         GeneralFunctions.setHtml(licenseView,
                                 infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
                                         "mit_license.txt"));
-                        licenseBuilder.setView(licenseView).create().show();
+                        new AutoDismissDialog(getString(R.string.license_mit), licenseView,
+                                buttonList, yListeners).show(getFragmentManager(),
+                                "LicenseFragment.Apache2");
                     });
                 } else if (Objects.equals(infoArray[0], getString(R.string.license_cc_3_unported))) {
                     // Creative Commons CC 3.0 Unported
-                    licenseBuilder.setTitle(R.string.license_cc_3_unported);
                     ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_cc_3_unported);
                     licenseDisplay.setOnClickListener(view -> {
                         // TextView needs to be set for each instance to prevent error
@@ -109,7 +112,9 @@ public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
                         GeneralFunctions.setHtml(licenseView,
                                 infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
                                         "cc_3_unported.txt"));
-                        licenseBuilder.setView(licenseView).create().show();
+                        new AutoDismissDialog(getString(R.string.license_cc_3_unported), licenseView,
+                                buttonList, yListeners).show(getFragmentManager(),
+                                "LicenseFragment.Apache2");
                     });
                 }
                 returnLayout.addView(licenseDisplay);

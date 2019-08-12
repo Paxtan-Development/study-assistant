@@ -127,17 +127,5 @@ public class SecurityTest {
                 TestFunctions.randomString(2).getBytes(), TEST_COUNT);
         Assert.assertNotNull(response);
     }
-
-    /** Check if the PBKDF2 algorithm is working. **/
-    @Test
-    public void testPbkdf2() {
-        byte[] response = SecurityFunctions.pbkdf2(TestFunctions.randomString(TEST_COUNT).getBytes(),
-                TestFunctions.randomString(TEST_COUNT).getBytes(), TEST_COUNT * 10);
-        Assert.assertNotNull(response);
-
-        response = SecurityFunctions.pbkdf2(TestFunctions.randomString(2).getBytes(),
-                TestFunctions.randomString(2).getBytes(), TEST_COUNT);
-        Assert.assertNotNull(response);
-    }
 }
 

@@ -15,11 +15,10 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
-import android.content.Context;
 import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 
@@ -39,6 +38,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
@@ -61,23 +61,16 @@ public class GeneralFunctions {
             new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
     /** Shows the dialog to add a new subject to the notes list **/
-    public static void showNewSubject(Context context, @NonNull final MainActivity activity,
+    public static void showNewSubject(@NonNull final MainActivity activity,
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
         popupView.setEndIconActivated(true);
         popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-        AlertDialog subjectDialog = new AlertDialog.Builder(context)
-                .setTitle(R.string.n1_new_subject)
-                .setView(popupView)
-                .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setCancelable(false)
-                .create();
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
-        subjectDialog.setOnShowListener(dialog -> {
+        DialogInterface.OnShowListener subjectListener = dialog -> {
             popupView.setHint(activity.getString(R.string.n1_subject_title));
-            subjectDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
                     .setOnClickListener(v -> {
                         String inputText = "";
                         if (popupView.getEditText() != null) {
@@ -104,10 +97,13 @@ public class GeneralFunctions {
                             GeneralFunctions.updateNavView(activity);
                         }
                     });
-            subjectDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
                     .setOnClickListener(v -> dialog.dismiss());
-        });
-        subjectDialog.show();
+        };
+        new AutoDismissDialog(activity.getString(R.string.n1_new_subject), popupView,
+                new String[]{activity.getString(android.R.string.ok),
+                        activity.getString(android.R.string.cancel), ""}, subjectListener)
+                        .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
     }
 
     /** Updates the NavigationView in MainActivity **/
@@ -140,7 +136,7 @@ public class GeneralFunctions {
         MenuItem newSubj = subjMenu.add(R.string.m3_new_subject);
         newSubj.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            showNewSubject(activity, activity, subjectDatabase);
+            showNewSubject(activity, subjectDatabase);
             return true;
         });
 

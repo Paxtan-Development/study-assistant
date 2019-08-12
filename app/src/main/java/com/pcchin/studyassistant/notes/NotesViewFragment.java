@@ -48,6 +48,7 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -194,33 +195,30 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
     /** Exports the note to a txt file. **/
     public void onExportPressed() {
-        if (getContext() != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                    .checkSelfPermission(getContext(), Manifest.permission
-                            .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), R.string
-                        .error_write_permission_denied, Toast.LENGTH_SHORT).show();
-            } else {
-                new AlertDialog.Builder(getContext())
-                        .setTitle(R.string.data_export)
-                        .setMessage(R.string.n3_confirm_export_note)
-                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
-                                    + notesInfo.get(0), ".txt");
-                            FileFunctions.exportTxt(outputText, notesInfo.get(2));
-                            Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
-                                    Toast.LENGTH_SHORT).show();
-                        })
-                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                        .create().show();
-            }
+        if (getContext() != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                .checkSelfPermission(getContext(), Manifest.permission
+                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getContext(), R.string
+                    .error_write_permission_denied, Toast.LENGTH_SHORT).show();
+        } else if (getFragmentManager() != null) {
+            new AutoDismissDialog(getString(R.string.data_export),
+                    getString(R.string.n3_confirm_export_note),
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""}, new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+                dialogInterface.dismiss();
+                String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
+                        + notesInfo.get(0), ".txt");
+                FileFunctions.exportTxt(outputText, notesInfo.get(2));
+                Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
+                        Toast.LENGTH_SHORT).show();
+                }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
+                    .show(getFragmentManager(), "NotesViewFragment.1");
         }
     }
 
     /** Prevents the note from being able to be edited. **/
     public void onLockPressed() {
-        if (getContext() != null) {
+        if (getContext() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") TextInputLayout inputLayout =
                     (TextInputLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
             if (inputLayout.getEditText() != null) {
@@ -231,50 +229,48 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
             inputLayout.setHintEnabled(true);
             inputLayout.setHint(getString(R.string.n_password_set));
-            new AlertDialog.Builder(getContext())
-                    .setTitle(getString(R.string.n3_lock_password))
-                    .setView(inputLayout)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                        // Get values from database
-                        String inputText = "";
-                        if (inputLayout.getEditText() != null) {
-                            inputText = inputLayout.getEditText().getText().toString();
-                        }
-                        SubjectDatabase database = Room.databaseBuilder(getContext(),
-                                SubjectDatabase.class, "notesSubject")
-                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                .allowMainThreadQueries().build();
-                        NotesSubject subject = database.SubjectDao().search(notesSubject);
-                        ArrayList<ArrayList<String>> contents = subject.contents;
+            new AutoDismissDialog(getString(R.string.n3_lock_password), inputLayout,
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+                // Get values from database
+                String inputText = "";
+                if (inputLayout.getEditText() != null) {
+                    inputText = inputLayout.getEditText().getText().toString();
+                }
+                SubjectDatabase database = Room.databaseBuilder(getContext(),
+                        SubjectDatabase.class, "notesSubject")
+                        .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                        .allowMainThreadQueries().build();
+                NotesSubject subject = database.SubjectDao().search(notesSubject);
+                ArrayList<ArrayList<String>> contents = subject.contents;
 
-                        // Update values to database
-                        if (contents != null && contents.size() > notesOrder) {
-                            FileFunctions.checkNoteIntegrity(contents.get(notesOrder));
-                            if (inputText.length() == 0) {
-                                contents.get(notesOrder).set(3, "");
-                            } else {
-                                contents.get(notesOrder).set(3, SecurityFunctions.notesHash(inputText));
-                            }
-                            subject.contents = contents;
-                            database.SubjectDao().update(subject);
-                            Toast.makeText(getContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
-                        }
-                        database.close();
-                        isLocked = true;
-                        if (getActivity() != null) {
-                            getActivity().invalidateOptionsMenu();
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) ->
-                            dialogInterface.dismiss())
-                    .create().show();
+                // Update values to database
+                if (contents != null && contents.size() > notesOrder) {
+                    FileFunctions.checkNoteIntegrity(contents.get(notesOrder));
+                    if (inputText.length() == 0) {
+                        contents.get(notesOrder).set(3, "");
+                    } else {
+                        contents.get(notesOrder).set(3, SecurityFunctions.notesHash(inputText));
+                    }
+                    subject.contents = contents;
+                    database.SubjectDao().update(subject);
+                    Toast.makeText(getContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
+                }
+                database.close();
+                isLocked = true;
+                if (getActivity() != null) {
+                    getActivity().invalidateOptionsMenu();
+                }
+            }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
+                    .show(getFragmentManager(), "NotesViewFragment.2");
         }
     }
 
     /** Unlocks the note. If there is no password, the note will be unlocked immediately.
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
-        if (getContext() != null) {
+        if (getContext() != null && getFragmentManager() != null) {
             SubjectDatabase database = Room.databaseBuilder(getContext(),
                     SubjectDatabase.class, "notesSubject")
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -296,37 +292,32 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     }
                     inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-                    // Asks user for password
-                    AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
-                            .setTitle(R.string.n3_unlock_password)
-                            .setView(inputLayout)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create();
-                    // OnClickListeners implemented separately to prevent dialog from
-                    // being dismissed after pressed
-                    passwordDialog.setOnShowListener(dialogInterface -> {
+                    DialogInterface.OnShowListener passwordListenere = dialogInterface -> {
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
-                            String inputText = "";
-                            if (inputLayout.getEditText() != null) {
-                                inputText = inputLayout.getEditText().getText().toString();
-                            }
-                            if (Objects.equals(SecurityFunctions.notesHash(inputText),
-                                    contents.get(notesOrder).get(3))) {
-                                // Removes password
-                                dialogInterface.dismiss();
-                                removeLock(contents, database, subject);
-                            } else {
-                                // Show error dialog
-                                inputLayout.setErrorEnabled(true);
-                                inputLayout.setError(getString(R.string.error_password_incorrect));
-                            }
-                        });
+                                    String inputText = "";
+                                    if (inputLayout.getEditText() != null) {
+                                        inputText = inputLayout.getEditText().getText().toString();
+                                    }
+                                    if (Objects.equals(SecurityFunctions.notesHash(inputText),
+                                            contents.get(notesOrder).get(3))) {
+                                        // Removes password
+                                        dialogInterface.dismiss();
+                                        removeLock(contents, database, subject);
+                                    } else {
+                                        // Show error dialog
+                                        inputLayout.setErrorEnabled(true);
+                                        inputLayout.setError(getString(R.string.error_password_incorrect));
+                                    }
+                                });
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
                                 view -> dialogInterface.dismiss());
-                    });
-                    passwordDialog.show();
+                    };
+                    // Asks user for password
+                    new AutoDismissDialog(getString(R.string.n3_unlock_password), inputLayout,
+                            new String[]{getString(android.R.string.ok),
+                                    getString(android.R.string.cancel), ""},
+                            passwordListenere).show(getFragmentManager(), "NotesViewFragment.3");
                 } else {
                     // Unlocks immediately
                     removeLock(contents, database, subject);
@@ -390,11 +381,10 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
     /** Deletes the note from the subject. **/
     public void onDeletePressed() {
-        if (getContext() != null) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.del)
-                    .setMessage(R.string.n3_del_confirm)
-                    .setPositiveButton(R.string.del, (dialog, which) -> {
+        if (getFragmentManager() != null) {
+            new AutoDismissDialog(getString(R.string.del), getString(R.string.n3_del_confirm),
+                    new String[]{getString(R.string.del), getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{(dialog, which) -> {
                         if (getActivity() != null) {
                             // Delete listener
                             AlarmManager manager = (AlarmManager) getActivity()
@@ -405,10 +395,10 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                 manager.cancel(alertIntent);
                             }
 
-                            SubjectDatabase database = Room.databaseBuilder(getContext(),
-                                SubjectDatabase.class, "notesSubject")
-                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                .allowMainThreadQueries().build();
+                            SubjectDatabase database = Room.databaseBuilder(getActivity(),
+                                    SubjectDatabase.class, "notesSubject")
+                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                                    .allowMainThreadQueries().build();
                             NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
                             if (notesSubject != null) {
                                 // Check if contents is valid
@@ -432,9 +422,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             }
                             Toast.makeText(getContext(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
                         }
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
-                    .create().show();
+                    }, (dialog, which) -> dialog.dismiss(), null})
+                    .show(getFragmentManager(), "NotesViewFragment.4");
         }
     }
 

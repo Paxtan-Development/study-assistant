@@ -13,8 +13,9 @@
 
 package com.pcchin.studyassistant.notes;
 
-import android.app.AlertDialog;
 import androidx.room.Room;
+
+import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -30,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
@@ -166,7 +168,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
 
     /** Changes the subject that the note will be saved to. **/
     public void onSubjPressed() {
-        if (getContext() != null) {
+        if (getContext() != null && getFragmentManager() != null) {
             final Spinner subjListSpinner = new Spinner(getContext());
             // Get all subject titles
             List<String> subjTitleList = new ArrayList<>();
@@ -190,10 +192,10 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             subjListSpinner.setAdapter(subjAdaptor);
 
             // Show dialog
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.n_change_subj)
-                    .setView(subjListSpinner)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            new AutoDismissDialog(getString(R.string.n_change_subj), subjListSpinner,
+                    new String[]{getString(android.R.string.ok),
+                            getString(android.R.string.cancel), ""},
+                    new DialogInterface.OnClickListener[]{(dialog, which) -> {
                         subjModified = true;
                         targetNotesSubject = subjListSpinner.getSelectedItem().toString();
                         if (getActivity() != null) {
@@ -201,9 +203,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                         }
                         targetSubjContents = database.SubjectDao()
                                 .search(targetNotesSubject).contents;
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
-                    .create().show();
+                    }, (dialog, which) -> dialog.dismiss(), null})
+                    .show(getFragmentManager(), "NotesEditFragment.1");
         }
     }
 
@@ -280,16 +281,19 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     }
 
     /** Forwards to onSavePressed() to ensure consistency when dealing with AlertDialogs.
-     * @see MainActivity showGitlabUpdateNotif(JSONArray response) **/
+     * @see MainActivity safeOnBackPressed() **/
     @Override
     public boolean onBackPressed() {
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.n4_return)
-                .setMessage(R.string.n4_save_note)
-                .setPositiveButton(R.string.yes, (dialogInterface, i) -> onSavePressed())
-                .setNegativeButton(R.string.no, (dialogInterface, i) -> onCancelPressed())
-                .setNeutralButton(android.R.string.cancel, ((dialogInterface, i) -> dialogInterface.dismiss()))
-                .create().show();
+        if (getFragmentManager() != null) {
+            new AutoDismissDialog(getString(R.string.n4_return), getString(R.string.n4_save_note),
+                    new String[]{getString(R.string.yes), getString(R.string.no),
+                            getString(android.R.string.cancel)},
+                    new DialogInterface.OnClickListener[]{
+                            (dialogInterface, i) -> onSavePressed(),
+                            (dialogInterface, i) -> onCancelPressed(),
+                            (dialogInterface, i) -> dialogInterface.dismiss()})
+                    .show(getFragmentManager(), "NotesEditFragment.2");
+        }
         return true;
     }
 }

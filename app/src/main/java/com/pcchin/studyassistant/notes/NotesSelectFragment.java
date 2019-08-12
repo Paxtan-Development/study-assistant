@@ -102,7 +102,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
                                     SubjectDatabase.class, "notesSubject")
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
-            GeneralFunctions.showNewSubject(getContext(), ((MainActivity) getActivity()), subjectDatabase);
+            GeneralFunctions.showNewSubject(((MainActivity) getActivity()), subjectDatabase);
         }
     }
 

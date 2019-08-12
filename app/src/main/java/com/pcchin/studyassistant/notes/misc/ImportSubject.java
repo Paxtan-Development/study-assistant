@@ -36,6 +36,7 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
@@ -71,9 +72,8 @@ public class ImportSubject {
         }
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-            new AlertDialog.Builder(activity)
-                    .setTitle(R.string.import_from)
-                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) -> {
+            new AutoDismissDialog(activity.getString(R.string.import_from), R.array.n_import_subject_format,
+                    (dialogInterface, i) -> {
                         try {
                             // Set up file chooser
                             Intent fileSelectIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -94,8 +94,8 @@ public class ImportSubject {
                                     + "not have a file manager. Stack trace is");
                             e.printStackTrace();
                         }
-                    })
-                    .create().show();
+            }, new String[]{"", "", ""}, new DialogInterface.OnClickListener[]{null, null, null})
+                    .show(activity.getSupportFragmentManager(), "ImportSubject.1");
         } else {
             Toast.makeText(activity, R.string.error_read_permission_denied, Toast.LENGTH_SHORT).show();
         }
@@ -124,14 +124,8 @@ public class ImportSubject {
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
                     // Asks for password
-                    AlertDialog passwordDialog = new AlertDialog.Builder(activity)
-                            .setTitle(R.string.enter_password)
-                            .setView(inputLayout)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create();
-                    passwordDialog.setOnShowListener(dialogInterface -> {
-                        passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    DialogInterface.OnShowListener passwordListener = dialogInterface -> {
+                        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
                                     String password = "";
                                     if (inputLayout.getEditText() != null) {
@@ -141,7 +135,7 @@ public class ImportSubject {
                                         try {
                                             ZipFile inputFile = new ZipFile(path, password.toCharArray());
                                             importZipFile(inputFile);
-                                            passwordDialog.dismiss();
+                                            dialogInterface.dismiss();
                                         } catch (ZipException e) {
                                             inputLayout.setErrorEnabled(true);
                                             inputLayout.setError(activity.getString(R.string
@@ -153,10 +147,14 @@ public class ImportSubject {
                                                 .error_password_short));
                                     }
                                 });
-                        passwordDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-                                .setOnClickListener(view -> passwordDialog.dismiss());
-                    });
-                    passwordDialog.show();
+                        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
+                                .setOnClickListener(view -> dialogInterface.dismiss());
+                    };
+                    new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout,
+                            new String[]{activity.getString(android.R.string.ok),
+                                    activity.getString(android.R.string.cancel), null},
+                            passwordListener).show(activity.getSupportFragmentManager(),
+                            "ImportSubject.2");
                 } else {
                     // Error thrown in importZipFile will be handled by the external error handler
                     ZipFile inputFile = new ZipFile(path);
@@ -345,14 +343,8 @@ public class ImportSubject {
                     inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
-                    AlertDialog importDialog = new AlertDialog.Builder(activity)
-                            .setTitle(R.string.enter_password)
-                            .setView(inputLayout)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create();
-                    importDialog.setOnShowListener(dialogInterface -> {
-                        importDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                    DialogInterface.OnShowListener importListener = dialogInterface -> {
+                        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                             Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
                             new Handler().post(() -> {
                                 // Everything is done in Handler to prevent main thread from being overloaded
@@ -367,14 +359,17 @@ public class ImportSubject {
                                     inputLayout.setError(activity.getString(R.string.error_password_incorrect));
                                 } else {
                                     importSubjectToDatabase(title, subjectContents, sortOrder);
-                                    importDialog.dismiss();
+                                    dialogInterface.dismiss();
                                 }
                             });
                         });
-                        importDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                                importDialog.dismiss());
-                    });
-                    importDialog.show();
+                        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
+                                dialogInterface.dismiss());
+                    };
+                    new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout,
+                            new String[]{activity.getString(android.R.string.ok),
+                                    activity.getString(android.R.string.cancel), ""}, importListener)
+                            .show(activity.getSupportFragmentManager(), "ImportSubject.3");
                 } else {
                     // Subject is not encrypted
                     String contentString = new String(content);
@@ -412,20 +407,19 @@ public class ImportSubject {
             // Import to database
             if (database.SubjectDao().search(title) != null) {
                 // Subject conflict
-                new AlertDialog.Builder(activity)
-                        .setTitle(R.string.subject_conflict)
-                        .setMessage(R.string.error_subject_same_name)
-                        .setPositiveButton(R.string.merge, (dialogInterface, i) -> {
+                new AutoDismissDialog(activity.getString(R.string.subject_conflict),
+                        activity.getString(R.string.error_subject_same_name),
+                        new String[]{activity.getString(R.string.merge),
+                                activity.getString(R.string.rename),
+                                activity.getString(android.R.string.cancel)},
+                        new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
                             dialogInterface.dismiss();
                             mergeSubjects(title, contents);
-                        })
-                        .setNegativeButton(R.string.rename, (dialogInterface, i) -> {
+                        }, (dialogInterface, i) -> {
                             dialogInterface.dismiss();
                             showRenameDialog(title, contents, sortOrder);
-                        })
-                        .setNeutralButton(android.R.string.cancel,
-                                (dialogInterface, i) -> dialogInterface.dismiss())
-                        .create().show();
+                        }, (dialogInterface, i) -> dialogInterface.dismiss()})
+                        .show(activity.getSupportFragmentManager(), "ImportSubject.4");
             } else {
                 database.SubjectDao().insert(new NotesSubject(title, contents, sortOrder));
                 Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
@@ -455,14 +449,8 @@ public class ImportSubject {
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                 .allowMainThreadQueries().build();
 
-        AlertDialog renameDialog = new AlertDialog.Builder(activity)
-                .setTitle(R.string.rename_subject)
-                .setView(inputLayout)
-                .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-        renameDialog.setOnShowListener(dialogInterface -> {
-            renameDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+        DialogInterface.OnShowListener renameListener = dialogInterface -> {
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                 String inputText = "";
                 if (inputLayout.getEditText() != null) {
                     inputText = inputLayout.getEditText().getText().toString();
@@ -471,7 +459,7 @@ public class ImportSubject {
                 if (inputText.length() > 0 && database.SubjectDao().search(inputText) == null) {
                     // Import subject into database
                     database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
-                    renameDialog.dismiss();
+                    dialogInterface.dismiss();
                     Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
                     activity.safeOnBackPressed();
                     activity.displayFragment(NotesSubjectFragment.newInstance(inputText));
@@ -483,11 +471,15 @@ public class ImportSubject {
                             "AlertDialog in ImportSubject.showRenameDialog not found.");
                 }
             });
-            renameDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-                    .setOnClickListener(view -> renameDialog.dismiss());
-        });
-        renameDialog.setOnDismissListener(dialogInterface -> database.close());
-        renameDialog.show();
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
+                    .setOnClickListener(view -> dialogInterface.dismiss());
+        };
+        AutoDismissDialog renameDialog = new AutoDismissDialog(
+                activity.getString(R.string.rename_subject), inputLayout,
+                new String[]{activity.getString(android.R.string.ok),
+                        activity.getString(android.R.string.cancel), ""}, renameListener);
+        renameDialog.setDismissListener(dialogInterface -> database.close());
+        renameDialog.show(activity.getSupportFragmentManager(), "ImportSubject.5");
     }
 
     /** Merge two conflicted subjects with the same name.

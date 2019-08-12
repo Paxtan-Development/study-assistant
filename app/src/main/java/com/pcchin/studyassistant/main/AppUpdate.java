@@ -42,6 +42,7 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 
 import org.json.JSONArray;
@@ -206,29 +207,27 @@ class AppUpdate {
                 }
 
                 // Set up dialog
-                AlertDialog updateDialog = new AlertDialog.Builder(activity)
-                        .setTitle(R.string.a_update_app)
-                        .setMessage(R.string.a_new_version)
-                        .setPositiveButton(android.R.string.yes, null)
-                        .setNeutralButton(R.string.a_learn_more, null)
-                        .setNegativeButton(android.R.string.no, null)
-                        .create();
-                updateDialog.setOnShowListener(dialogInterface -> {
-                    updateDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                        updateDialog.dismiss();
+                DialogInterface.OnShowListener updateListener = dialogInterface -> {
+                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                        dialogInterface.dismiss();
                         updateViaGitlab(downloadLink);
                     });
-                    updateDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
+                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
                         // The user should be able to update after coming back from the website
                         activity.safeOnBackPressed();
                         Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(GITLAB_RELEASES));
                         activity.startActivity(gitlabReleaseSite);
                     });
-                    updateDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
-                            view -> updateDialog.dismiss());
-                });
-                updateDialog.show();
+                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
+                            view -> dialogInterface.dismiss());
+                };
+                new AutoDismissDialog(activity.getString(R.string.a_update_app),
+                        activity.getString(R.string.a_new_version), new String[]{
+                                activity.getString(android.R.string.yes),
+                                activity.getString(R.string.a_learn_more),
+                                activity.getString(android.R.string.no)}, updateListener)
+                                .show(activity.getSupportFragmentManager(), "AppUpdate.1");
             }
         } catch (JSONException e) {
             Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_API_RELEASES
@@ -251,17 +250,17 @@ class AppUpdate {
         AtomicBoolean continueDownload = new AtomicBoolean(true);
         ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setIndeterminate(true);
-        AlertDialog downloadDialog = new AlertDialog.Builder(activity)
-                .setTitle(R.string.a_downloading)
-                .setView(progressBar)
-                .setPositiveButton(android.R.string.cancel, null)
-                .setOnDismissListener(dialogInterface -> {
-                    Log.d("StudyAssistant", "Notification: Download of latest APK cancelled");
-                    queue.stop();
-                    continueDownload.set(false);
-                })
-                .create();
-        downloadDialog.show();
+        DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
+            Log.d("StudyAssistant", "Notification: Download of latest APK cancelled");
+            queue.stop();
+            continueDownload.set(false);
+        };
+        AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
+                .getString(R.string.a_downloading), progressBar,
+                new String[]{activity.getString(android.R.string.cancel), "", ""});
+        downloadDialog.setCancellable(false);
+        downloadDialog.setDismissListener(dismissListener);
+        downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
 
         String finalOutputFileName = outputFileName;
         VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,

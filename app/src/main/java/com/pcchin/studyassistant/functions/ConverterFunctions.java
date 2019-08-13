@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 /** Functions specifically used to convert from one type of variable to another. **/
 public class ConverterFunctions {
@@ -42,13 +43,21 @@ public class ConverterFunctions {
     public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
-    /** Converts a date to a ISO-8601 compliant string. **/
+    /** Converts a date to a ISO-8601 compliant string. If the date is null, "null" is returned. **/
+    @TypeConverter
     public static String dateToString(Date original) {
-        return isoDateTimeFormat.format(original);
+        if (original == null) {
+            return "null";
+        } else {
+            return isoDateTimeFormat.format(original);
+        }
     }
 
-    /** Converts a ISO-8601 compliant string to a date, returns null if fails. **/
+    /** Converts a ISO-8601 compliant string to a date,
+     * returns null if fails or if string is "null". **/
+    @TypeConverter
     public static Date stringToDate(String original) {
+        if (Objects.equals(original, "null")) return null;
         try {
             return isoDateTimeFormat.parse(original);
         } catch (ParseException e) {

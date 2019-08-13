@@ -70,4 +70,9 @@ public class TaskData {
 
     /** Special notes about the task. **/
     public String taskComments;
+
+    /** Default constructor. **/
+    TaskData() {
+
+    }
 }

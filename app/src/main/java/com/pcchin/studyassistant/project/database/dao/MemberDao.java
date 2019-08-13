@@ -14,7 +14,46 @@
 package com.pcchin.studyassistant.project.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Update;
+
+import com.pcchin.studyassistant.project.database.data.MemberData;
+
+import java.util.List;
 
 @Dao
 public interface MemberDao {
+    /** Search for a member based on his ID. **/
+    @Query("SELECT * FROM memberData WHERE _memberID = :ID")
+    MemberData searchByID(String ID);
+
+    /** Search for members in a project. **/
+    @Query("SELECT * FROM memberData WHERE parentProject = :projectID")
+    List<MemberData> searchByProject(String projectID);
+
+    /** Search for members in a project based on their roles. **/
+    @Query("SELECT * FROM memberData WHERE parentProject = :projectID AND role = :roleID")
+    List<MemberData> searchRoleInProject(String projectID, String roleID);
+
+    /** Search for members in all project based on their roles. **/
+    @Query("SELECT * FROM memberData WHERE role = :roleID")
+    List<MemberData> searchByRole(String roleID);
+
+    /** Search for a member in all projects based on his username. **/
+    @Query("SELECT * FROM memberData WHERE username = :username")
+    List<MemberData> searchByUsername(String username);
+
+    /** Adds a new role into the database. **/
+    @Insert
+    void insert(MemberData member);
+
+    /** Updates an existing role. **/
+    @Update
+    void update(MemberData member);
+
+    /** Deletes an existing role. **/
+    @Delete
+    void delete(MemberData member);
 }

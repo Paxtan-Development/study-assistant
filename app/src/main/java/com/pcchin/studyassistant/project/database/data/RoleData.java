@@ -55,4 +55,9 @@ public class RoleData {
     public boolean canSetPassword;
     public boolean canModifyInfo;
     public boolean canDeleteProject;
+
+    /** Default constructor. **/
+    RoleData() {
+
+    }
 }

@@ -21,18 +21,22 @@ import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.project.database.dao.MemberDao;
 import com.pcchin.studyassistant.project.database.dao.ProjectDao;
 import com.pcchin.studyassistant.project.database.dao.RoleDao;
+import com.pcchin.studyassistant.project.database.dao.StatusDao;
 import com.pcchin.studyassistant.project.database.dao.TaskDao;
 import com.pcchin.studyassistant.project.database.data.MemberData;
 import com.pcchin.studyassistant.project.database.data.ProjectData;
 import com.pcchin.studyassistant.project.database.data.RoleData;
+import com.pcchin.studyassistant.project.database.data.StatusData;
 import com.pcchin.studyassistant.project.database.data.TaskData;
 
 /** The database layer for the projects. **/
-@Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class}, version=1)
+@Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class,
+        StatusData.class}, version=1)
 @TypeConverters(ConverterFunctions.class)
 public abstract class ProjectDatabase extends RoomDatabase {
     public abstract ProjectDao ProjectDao();
     public abstract MemberDao MemberDao();
     public abstract TaskDao TaskDao();
     public abstract RoleDao RoleDao();
+    public abstract StatusDao StatusDao();
 }

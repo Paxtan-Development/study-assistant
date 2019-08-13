@@ -33,17 +33,32 @@ public class ProjectData {
     /** The salt for each project used specifically to protect the password. **/
     public String salt;
 
+    /** The title of the project. **/
+    public String projectTitle;
+
     /** A hashed password, if needed, to access the project. **/
     public String projectPass;
 
     /** The description of the project. **/
     public String description;
 
-    /** The date that the project was started. **/
-    public Date startDate;
+    /** The path stored in the local storage that points to the icon for the project. **/
+    public String projectIcon;
 
-    /** The due date of the project. **/
-    public Date dueDate;
+    /** The resource file pointing to the icon for the project status. **/
+    public int projectStatusIcon;
+
+    /** The date that the project is expected to start. **/
+    public Date expectedStartDate;
+
+    /** The date that the task is expected to end. **/
+    public Date expectedEndDate;
+
+    /** The date that the task actually started. **/
+    public Date actualStartDate;
+
+    /** The date that the task actually ended. **/
+    public Date actualEndDate;
 
     /** Whether members are enabled in the project. **/
     public boolean membersEnabled;
@@ -73,6 +88,11 @@ public class ProjectData {
      * @see androidx.room.ForeignKey cannot be used in this case as
      * there are multiple roles per entity. **/
     public ArrayList<String> roleList;
+
+    /** A list of all the status updates in the project.
+     * @see androidx.room.ForeignKey cannot be used in this case as
+     * there are multiple roles per entity. **/
+    public ArrayList<String> statusList;
 
     /** Default constructor. **/
     ProjectData() {

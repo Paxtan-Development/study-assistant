@@ -18,35 +18,39 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-/** The entity for each member. **/
+import java.util.Date;
+
+/** The entity for each status. **/
 @Entity
-public class MemberData {
-    /** The ID for each user, serves as a unique key and is randomly generated **/
+public class StatusData {
+    /** The ID for each status, serves as a unique key and is randomly generated. **/
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name="_memberID")
-    public String memberID = "";
+    @ColumnInfo(name="_statusID")
+    public String statusID = "";
 
-    /** The project ID which contains the user. **/
+    /** The date in which the status is published. **/
+    public Date publishedDate;
+
+    /** The title of the status. **/
+    public String statusTitle;
+
+    /** The type of the status. **/
+    public String statusType;
+
+    /** The content of the status. **/
+    public String statusContent;
+
+    /** The project that the status was published under. **/
     public String parentProject;
 
-    /** The username of the member, if needed. **/
-    public String username;
+    /** The member that published the status. **/
+    public String memberID;
 
-    /** The full name of the member. **/
-    public String fullName;
+    /** The colour used in the side icon of the status. **/
+    public int statusColor;
 
-    /** The salt for the member used specifically to protect the password. **/
-    public String salt;
-
-    /** A hashed password, if needed, used by members to access the project. **/
-    public String memberPass;
-
-    /** The role for each user in the project. **/
-    public String role;
-
-    /** Default constructor. **/
-    MemberData() {
+    StatusData() {
 
     }
 }

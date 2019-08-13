@@ -14,7 +14,38 @@
 package com.pcchin.studyassistant.project.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Update;
+
+import com.pcchin.studyassistant.project.database.data.ProjectData;
+
+import java.util.List;
 
 @Dao
 public interface ProjectDao {
+    /** Search for a project based on its ID. **/
+    @Query("SELECT * FROM projectData WHERE _projectID = :id")
+    ProjectData searchByID(String id);
+
+    /** Search for projects based on its title. Multiple projects can have the same title. **/
+    @Query("SELECT * FROM projectData WHERE projectTitle = :title")
+    List<ProjectData> searchByTitle(String title);
+
+    /** Returns all the existing projects in the database. **/
+    @Query("SELECT * FROM projectData")
+    List<ProjectData> getAllProjects();
+
+    /** Adds a new project into the database. **/
+    @Insert
+    void add(ProjectData project);
+
+    /** Updates an existing project. **/
+    @Update
+    void update(ProjectData project);
+
+    /** Deletes an existing project. **/
+    @Delete
+    void delete(ProjectData project);
 }

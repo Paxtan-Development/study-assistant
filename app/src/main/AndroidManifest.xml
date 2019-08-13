@@ -41,11 +41,13 @@
 
             <!-- Send ZIP and .subject files through the 'Share' function.
              Unfortunately, as .subject files have no MIME type,
-             they could not be shown in normal file explorers. -->
+             they have to be filtered manually. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="*/*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
             </intent-filter>
 
             <!-- In case the MIME type is incorrect -->

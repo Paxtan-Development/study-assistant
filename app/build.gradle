@@ -57,7 +57,7 @@ android {
         debug {
             applicationIdSuffix ".debug"
             debuggable true
-            versionNameSuffix = '-d'
+            // versionNameSuffix = '-d'
             sourceSets {
                 androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
             }

@@ -45,11 +45,9 @@ public class NotesSubject {
     public String title;
 
     /** The contents of the subject. Contains the values of the notes. **/
-    @ColumnInfo(name = "contents")
     public ArrayList<ArrayList<String>> contents;
 
     /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
-    @ColumnInfo(name = "sortOrder")
     public int sortOrder;
 
     /** Default constructor. **/

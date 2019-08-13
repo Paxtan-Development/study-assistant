@@ -24,25 +24,73 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /** Functions specifically used to convert from one type of variable to another. **/
 public class ConverterFunctions {
+    /** The ISO-8601 compliant date and time format.  **/
+    private static final SimpleDateFormat isoDateTimeFormat =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
+    /** The standard date and time display format. **/
+    public static final SimpleDateFormat standardDateTimeFormat =
+            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    /** The standard date storage format. **/
+    public static final SimpleDateFormat standardDateFormat =
+            new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
-    /** Converts an ArrayList to a string JSON array.
+    /** Converts a date to a ISO-8601 compliant string. **/
+    public static String dateToString(Date original) {
+        return isoDateTimeFormat.format(original);
+    }
+
+    /** Converts a ISO-8601 compliant string to a date, returns null if fails. **/
+    public static Date stringToDate(String original) {
+        try {
+            return isoDateTimeFormat.parse(original);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    /** Converts a single layer ArrayList to a string JSON array.
      * GSON was used for backwards compatibility and is more secure. **/
     @TypeConverter
-    public static String arrayToJson(ArrayList<ArrayList<String>> original) {
+    public static String singleArrayToJson(ArrayList<String> original) {
         return new Gson().toJson(original);
     }
 
-    /** Converts a string JSON array into an ArrayList.
+    /** Converts a string JSON array into a single layer ArrayList.
      * Returns null if the original array is invalid.
      * Returns an empty ArrayList if the original array is empty.
      * GSON was used for backwards compatibility and is more secure.**/
     @TypeConverter
     @Nullable
-    public static ArrayList<ArrayList<String>> jsonToArray(String original) {
+    public static ArrayList<String> singleJsonToArray(String original) {
+        if (isJson(original)) {
+            Type listType = new TypeToken<ArrayList<String>>() {}.getType();
+            return new Gson().fromJson(original, listType);
+        }
+        return null;
+    }
+
+    /** Converts a double layer ArrayList to a string JSON array.
+     * GSON was used for backwards compatibility and is more secure. **/
+    @TypeConverter
+    public static String doubleArrayToJson(ArrayList<ArrayList<String>> original) {
+        return new Gson().toJson(original);
+    }
+
+    /** Converts a string JSON array into a double layer ArrayList.
+     * Returns null if the original array is invalid.
+     * Returns an empty ArrayList if the original array is empty.
+     * GSON was used for backwards compatibility and is more secure.**/
+    @TypeConverter
+    @Nullable
+    public static ArrayList<ArrayList<String>> doubleJsonToArray(String original) {
         if (isJson(original)) {
             Type listType = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
             return new Gson().fromJson(original, listType);

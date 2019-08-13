@@ -47,10 +47,10 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
@@ -79,7 +79,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     /** Used when viewing a note.
      * @param subject is the title of the subject.
      * @param order is the order of the note in the notes list of the subject. **/
-    public static NotesViewFragment newInstance(String subject, int order) {
+    static NotesViewFragment newInstance(String subject, int order) {
         NotesViewFragment fragment = new NotesViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SUBJECT, subject);
@@ -476,7 +476,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 } while (notesInfo.size() < 6) {
                     notesInfo.add(null);
                 }
-                notesInfo.set(4, GeneralFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+                notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                 notesInfo.set(5, String.valueOf(requestCode));
                 SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                         "notesSubject")

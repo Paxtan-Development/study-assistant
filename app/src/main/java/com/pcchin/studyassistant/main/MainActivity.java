@@ -44,6 +44,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> new AppUpdate(MainActivity.this, true));
             } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
                             .getString("lastUpdateCheck", ""),
-                    GeneralFunctions.standardDateFormat.format(new Date()))) {
+                    ConverterFunctions.standardDateFormat.format(new Date()))) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
         } else {

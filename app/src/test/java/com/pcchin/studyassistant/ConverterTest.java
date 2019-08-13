@@ -25,14 +25,28 @@ import java.util.Random;
 public class ConverterTest {
     private static final int TEST_COUNT = 5000;
 
-    /** Test JSON to ArrayList and vice versa. **/
+    /** Test JSON to a single layer ArrayList and vice versa. **/
     @Test
-    public void testJson() {
+    public void testSingleJson() {
+        ArrayList<String> compareArray;
+        ArrayList<ArrayList<String>> initialArray = TestFunctions.randomArray(TEST_COUNT);
+        for (ArrayList<String> currentArray: initialArray) {
+            compareArray = ConverterFunctions.singleJsonToArray(ConverterFunctions
+                    .singleArrayToJson(currentArray));
+            Assert.assertNotNull(compareArray);
+            Assert.assertEquals(currentArray.size(), compareArray.size());
+            Assert.assertEquals(currentArray, compareArray);
+        }
+    }
+
+    /** Test JSON to a double layer ArrayList and vice versa. **/
+    @Test
+    public void testDoubleJson() {
         Random rand = new Random();
         for (int i = 0; i < rand.nextInt(TEST_COUNT); i++) {
             ArrayList<ArrayList<String>> initialArray = TestFunctions.randomArray(TEST_COUNT);
             ArrayList<ArrayList<String>> compareArray = ConverterFunctions
-                    .jsonToArray(ConverterFunctions.arrayToJson(initialArray));
+                    .doubleJsonToArray(ConverterFunctions.doubleArrayToJson(initialArray));
             Assert.assertNotNull(compareArray);
             Assert.assertEquals(initialArray.size(), compareArray.size());
             Assert.assertEquals(initialArray, compareArray);

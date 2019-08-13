@@ -40,8 +40,8 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 
@@ -166,7 +166,7 @@ class AppUpdate {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
                     activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
-            editor.putString("lastUpdateCheck", GeneralFunctions
+            editor.putString("lastUpdateCheck", ConverterFunctions
                     .standardDateFormat.format(new Date()));
             editor.apply();
 

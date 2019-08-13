@@ -31,9 +31,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.notes.database.NotesSubject;
 import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
@@ -71,7 +71,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     /** Used when creating a new note.
      * @param title is the title of the new note, without subject.
      * @param subject is the current subject that the note will save to. **/
-    public static NotesEditFragment newInstance(String subject, String title) {
+    static NotesEditFragment newInstance(String subject, String title) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, subject);
@@ -84,7 +84,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     /** Used when modifying an existing note.
      * @param subject is the title of the selected subject.
      * @param order is the order of the note in the subject. **/
-    public static NotesEditFragment newInstance(String subject, int order) {
+    static NotesEditFragment newInstance(String subject, int order) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, subject);
@@ -217,7 +217,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             // Save original as ArrayList
             ArrayList<String> updatedNote = new ArrayList<>();
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
-            updatedNote.add(GeneralFunctions.standardDateTimeFormat.format(new Date()));
+            updatedNote.add(ConverterFunctions.standardDateTimeFormat.format(new Date()));
             updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
             updatedNote.add(null);
 

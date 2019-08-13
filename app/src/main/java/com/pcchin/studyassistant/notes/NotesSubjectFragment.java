@@ -596,7 +596,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     } else {
                                         outputStream.write(0);
                                         outputStream.write(ConverterFunctions
-                                                .arrayToJson(notesArray).getBytes());
+                                                .doubleArrayToJson(notesArray).getBytes());
                                     }
                                     outputStream.flush();
                                     outputStream.close();

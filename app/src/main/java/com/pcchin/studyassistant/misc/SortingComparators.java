@@ -13,7 +13,7 @@
 
 package com.pcchin.studyassistant.misc;
 
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -51,11 +51,11 @@ public class SortingComparators {
                     Date date_a, date_b;
                     // Check if date a is null
                     try {
-                        date_a = GeneralFunctions.standardDateTimeFormat.parse(a.get(1));
+                        date_a = ConverterFunctions.standardDateTimeFormat.parse(a.get(1));
                     } catch (ParseException e) {
                         try {
                             // Date a is null while date b is not
-                            GeneralFunctions.standardDateTimeFormat.parse(b.get(1));
+                            ConverterFunctions.standardDateTimeFormat.parse(b.get(1));
                             return -1;
                         } catch (ParseException e1) {
                             // Date a and date b are both null
@@ -65,7 +65,7 @@ public class SortingComparators {
 
                     // Check if date b is null
                     try {
-                        date_b = GeneralFunctions.standardDateTimeFormat.parse(b.get(1));
+                        date_b = ConverterFunctions.standardDateTimeFormat.parse(b.get(1));
                     } catch (ParseException e) {
                         // Date b is null while date a is not
                         return 1;

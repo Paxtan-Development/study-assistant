@@ -52,13 +52,6 @@ import java.util.Locale;
 
 /** General functions used throughout the app **/
 public class GeneralFunctions {
-    /** The standard date and time storage format used in the app. **/
-    public static final SimpleDateFormat standardDateTimeFormat =
-            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.ENGLISH);
-
-    /** The standard date storage format used in the app. **/
-    public static final SimpleDateFormat standardDateFormat =
-            new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(@NonNull final MainActivity activity,

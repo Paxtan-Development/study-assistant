@@ -87,7 +87,7 @@ public class SecurityFunctions {
     /** Encryption method used to protect subject contents in .subject files **/
     public static byte[] subjectEncrypt(String title, String password,
                                         ArrayList<ArrayList<String>> content) {
-        byte[] responseByte = ConverterFunctions.arrayToJson(content).getBytes();
+        byte[] responseByte = ConverterFunctions.doubleArrayToJson(content).getBytes();
         byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
         responseByte = aes(responseByte, passwordByte, title.getBytes(), true);
         responseByte = blowfish(responseByte, passwordByte, true);
@@ -101,7 +101,7 @@ public class SecurityFunctions {
         byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
         content = blowfish(content, passwordByte, false);
         content = aes(content, passwordByte, title.getBytes(), false);
-        return ConverterFunctions.jsonToArray(new String(content));
+        return ConverterFunctions.doubleJsonToArray(new String(content));
     }
 
     /** AES encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.

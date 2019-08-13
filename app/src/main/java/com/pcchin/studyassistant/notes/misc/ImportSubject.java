@@ -33,7 +33,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
@@ -255,7 +254,7 @@ public class ImportSubject {
                                     // Add note info to ArrayList
                                     ArrayList<String> currentNote = new ArrayList<>();
                                     currentNote.add(notesInfo.get(i).get(1));
-                                    currentNote.add(GeneralFunctions.standardDateTimeFormat
+                                    currentNote.add(ConverterFunctions.standardDateTimeFormat
                                             .format(new Date()));
                                     currentNote.add(fileContents.toString());
 
@@ -275,7 +274,7 @@ public class ImportSubject {
                                 // Removes the .txt extension
                                 tempArray.add(fileName.replace(fileName.substring(fileName.length() - 4),
                                         ""));
-                                tempArray.add(GeneralFunctions.standardDateTimeFormat.format(new Date()));
+                                tempArray.add(ConverterFunctions.standardDateTimeFormat.format(new Date()));
                                 tempArray.add(fileContents.toString());
 
                                 // For lock, alert time & request code respectively
@@ -373,13 +372,13 @@ public class ImportSubject {
                 } else {
                     // Subject is not encrypted
                     String contentString = new String(content);
-                    if (ConverterFunctions.jsonToArray(contentString) == null) {
+                    if (ConverterFunctions.doubleJsonToArray(contentString) == null) {
                         Log.w("StudyAssistant", "File Error: The .subject file "
                         + path + " could not be imported as its content is incorrect.");
                         Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                     } else {
                         importSubjectToDatabase(title, ConverterFunctions
-                                .jsonToArray(contentString), sortOrder);
+                                .doubleJsonToArray(contentString), sortOrder);
                     }
                 }
             } catch (IOException e) {

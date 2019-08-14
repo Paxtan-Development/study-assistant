@@ -16,14 +16,28 @@ package com.pcchin.studyassistant.project.database.data;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-/** The entity for each project. **/
+/** The entity for each project. Each project should also have its own folder named after its ID
+ * to store images related to it. **/
 @Entity
 public class ProjectData {
+    // The types of content that is displayed at the bottom of the project info page.
+    @Ignore
+    public static final int DISPLAYED_NONE = 0;
+    @Ignore
+    public static final int DISPLAYED_MEDIA = 1;
+    @Ignore
+    public static final int DISPLAYED_MEMBERS = 2;
+    @Ignore
+    public static final int DISPLAYED_ROLES = 3;
+    @Ignore
+    public static final int DISPLAYED_TASKS = 4;
+
     /** The ID for each project, serves as a unique key and is randomly generated. **/
     @PrimaryKey
     @NonNull
@@ -60,6 +74,12 @@ public class ProjectData {
     /** The date that the task actually ended. **/
     public Date actualEndDate;
 
+    /** Whether members can sign up via the login screen. **/
+    public boolean memberSignupEnabled;
+
+    /** The default role of members in the project. **/
+    public String memberDefaultRole;
+
     /** Whether members are enabled in the project. **/
     public boolean membersEnabled;
 
@@ -73,6 +93,13 @@ public class ProjectData {
     /** If this is true, tasks and status share the same database (from Tasks),
      * while if this is false, tasks and status have separate databases. **/
     public boolean mergeTaskStatus;
+
+    /** Whether tasks are enabled in the project. **/
+    public boolean taskEnabled;
+
+    /** Whether status updates specifically are enabled in the project.
+     * Both taskEnabled and statusEnabled must be true for mergeTaskStatus to be used. **/
+    public boolean statusEnabled;
 
     /** A list of all member IDs in the project.
      * @see androidx.room.ForeignKey cannot be used in this case as
@@ -94,8 +121,14 @@ public class ProjectData {
      * there are multiple roles per entity. **/
     public ArrayList<String> statusList;
 
+    /** The info that is displayed at the bottom of the project info page. **/
+    public int displayedInfo;
+
+    /** The title of the note subject that is associated to the project. **/
+    public String associatedSubject;
+
     /** Default constructor. **/
-    ProjectData() {
+    public ProjectData() {
 
     }
 }

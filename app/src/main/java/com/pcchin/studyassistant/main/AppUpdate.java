@@ -223,11 +223,11 @@ class AppUpdate {
                             view -> dialogInterface.dismiss());
                 };
                 new AutoDismissDialog(activity.getString(R.string.a_update_app),
-                        activity.getString(R.string.a_new_version), new String[]{
-                                activity.getString(android.R.string.yes),
-                                activity.getString(R.string.a_learn_more),
-                                activity.getString(android.R.string.no)}, updateListener)
-                                .show(activity.getSupportFragmentManager(), "AppUpdate.1");
+                        activity.getString(R.string.a_new_version), new String[]
+                        {activity.getString(android.R.string.yes),
+                        activity.getString(android.R.string.no),
+                        activity.getString(R.string.a_learn_more)}, updateListener)
+                        .show(activity.getSupportFragmentManager(), "AppUpdate.1");
             }
         } catch (JSONException e) {
             Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_API_RELEASES

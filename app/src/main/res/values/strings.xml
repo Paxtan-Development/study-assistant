@@ -136,12 +136,4 @@
     <string name="p_member">Members</string>
     <string name="p_description">Description</string>
     <string name="p_progress">Progress</string>
-
-    <string name="p2_task_list">Task List</string>
-
-    <string name="p3_id">Project ID</string>
-    <string name="p3_member_input">Use a semicolon (;) to separate members.</string>
-    <string name="p3_pass_old">Old password</string>
-    <string name="p3_pass_new1">New password</string>
-    <string name="p3_pass_new2">Re-enter password</string>
 </resources>

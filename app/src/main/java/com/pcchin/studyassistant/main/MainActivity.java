@@ -14,6 +14,7 @@
 package com.pcchin.studyassistant.main;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -39,6 +40,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.room.Room;
+
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -53,6 +56,12 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
+import com.pcchin.studyassistant.project.database.ProjectDatabase;
+import com.pcchin.studyassistant.project.database.data.MemberData;
+import com.pcchin.studyassistant.project.database.data.ProjectData;
+import com.pcchin.studyassistant.project.database.data.RoleData;
+import com.pcchin.studyassistant.project.database.data.StatusData;
+import com.pcchin.studyassistant.project.database.data.TaskData;
 
 import java.io.File;
 import java.util.Date;

@@ -50,7 +50,7 @@ public class StatusData {
     /** The colour used in the side icon of the status. **/
     public int statusColor;
 
-    StatusData() {
+    public StatusData() {
 
     }
 }

@@ -57,7 +57,7 @@ public class RoleData {
     public boolean canDeleteProject;
 
     /** Default constructor. **/
-    RoleData() {
+    public RoleData() {
 
     }
 }

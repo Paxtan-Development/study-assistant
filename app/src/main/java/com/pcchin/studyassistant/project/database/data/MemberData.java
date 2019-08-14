@@ -46,7 +46,7 @@ public class MemberData {
     public String role;
 
     /** Default constructor. **/
-    MemberData() {
+    public MemberData() {
 
     }
 }

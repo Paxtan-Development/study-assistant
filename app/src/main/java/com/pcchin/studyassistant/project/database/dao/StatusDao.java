@@ -59,7 +59,7 @@ public interface StatusDao {
 
     /** Adds a new role into the database. **/
     @Insert
-    void add(StatusData status);
+    void insert(StatusData status);
 
     /** Updates an existing role. **/
     @Update

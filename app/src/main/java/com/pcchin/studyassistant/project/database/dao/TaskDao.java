@@ -14,7 +14,25 @@
 package com.pcchin.studyassistant.project.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Update;
+
+import com.pcchin.studyassistant.project.database.data.TaskData;
 
 @Dao
 public interface TaskDao {
+    // TODO: Complete
+
+    /** Adds a new task into the database. **/
+    @Insert
+    void insert(TaskData status);
+
+    /** Updates an existing task. **/
+    @Update
+    void update(TaskData status);
+
+    /** Deletes an existing task. **/
+    @Delete
+    void delete(TaskData status);
 }

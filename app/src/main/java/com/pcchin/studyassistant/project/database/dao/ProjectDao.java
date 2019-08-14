@@ -33,13 +33,18 @@ public interface ProjectDao {
     @Query("SELECT * FROM projectData WHERE projectTitle = :title")
     List<ProjectData> searchByTitle(String title);
 
+    /** Search for projects based on its related subject.
+     * Multiple projects can have ths same subject. **/
+    @Query("SELECT * FROM projectData WHERE associatedSubject = :subject")
+    List<ProjectData> searchBySubject(String subject);
+
     /** Returns all the existing projects in the database. **/
     @Query("SELECT * FROM projectData")
     List<ProjectData> getAllProjects();
 
     /** Adds a new project into the database. **/
     @Insert
-    void add(ProjectData project);
+    void insert(ProjectData project);
 
     /** Updates an existing project. **/
     @Update

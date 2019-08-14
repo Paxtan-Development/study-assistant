@@ -43,7 +43,7 @@ public interface RoleDao {
 
     /** Adds a new role into the database. **/
     @Insert
-    void add(RoleData role);
+    void insert(RoleData role);
 
     /** Updates an existing role. **/
     @Update

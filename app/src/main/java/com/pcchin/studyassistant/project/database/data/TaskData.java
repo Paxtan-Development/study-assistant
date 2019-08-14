@@ -72,7 +72,7 @@ public class TaskData {
     public String taskComments;
 
     /** Default constructor. **/
-    TaskData() {
+    public TaskData() {
 
     }
 }

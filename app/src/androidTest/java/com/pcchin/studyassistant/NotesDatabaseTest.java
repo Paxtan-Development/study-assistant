@@ -23,15 +23,15 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
-/** Check whether all functions used in the NotesSubject database is correct. **/
+/** Check whether all functions used in the NotesSubject notes is correct. **/
 public class NotesDatabaseTest {
     private static final int TEST_COUNT = 1000;
     private static final String TEST_DB_NAME = AndroidTestFunctions.randomString(TEST_COUNT);
@@ -83,7 +83,7 @@ public class NotesDatabaseTest {
             Assert.assertEquals(subject.contents, ConverterFunctions.doubleJsonToArray(testContents));
             Assert.assertEquals(subject.sortOrder, TEST_COUNT);
         } else {
-            throw new NoSuchFieldException("User not found in database.");
+            throw new NoSuchFieldException("User not found in notes.");
         }
     }
 }

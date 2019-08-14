@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.dao;
+package com.pcchin.studyassistant.database.project.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -19,7 +19,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.pcchin.studyassistant.project.database.data.StatusData;
+import com.pcchin.studyassistant.database.project.data.StatusData;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public interface StatusDao {
     @Query("SELECT * FROM statusData WHERE parentProject = :projectID AND memberID = :memberID")
     List<StatusData> searchInProjectByMember(String projectID, String memberID);
 
-    /** Adds a new role into the database. **/
+    /** Adds a new role into the notes. **/
     @Insert
     void insert(StatusData status);
 

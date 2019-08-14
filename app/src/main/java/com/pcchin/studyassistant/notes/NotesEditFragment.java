@@ -35,9 +35,9 @@ import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,7 +94,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         return fragment;
     }
 
-    /** Initializes the fragment. Gets the data of the notes from the database. **/
+    /** Initializes the fragment. Gets the data of the notes from the notes. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +124,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         setHasOptionsMenu(true);
     }
 
-    /** Closes the database before the fragment exits. **/
+    /** Closes the notes before the fragment exits. **/
     @Override
     public void onDestroy() {
         super.onDestroy();

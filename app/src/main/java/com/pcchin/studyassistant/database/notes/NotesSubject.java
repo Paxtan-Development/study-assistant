@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.notes.database;
+package com.pcchin.studyassistant.database.notes;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

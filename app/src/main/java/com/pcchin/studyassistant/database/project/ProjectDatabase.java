@@ -11,25 +11,25 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database;
+package com.pcchin.studyassistant.database.project;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.project.database.dao.MemberDao;
-import com.pcchin.studyassistant.project.database.dao.ProjectDao;
-import com.pcchin.studyassistant.project.database.dao.RoleDao;
-import com.pcchin.studyassistant.project.database.dao.StatusDao;
-import com.pcchin.studyassistant.project.database.dao.TaskDao;
-import com.pcchin.studyassistant.project.database.data.MemberData;
-import com.pcchin.studyassistant.project.database.data.ProjectData;
-import com.pcchin.studyassistant.project.database.data.RoleData;
-import com.pcchin.studyassistant.project.database.data.StatusData;
-import com.pcchin.studyassistant.project.database.data.TaskData;
+import com.pcchin.studyassistant.database.project.dao.MemberDao;
+import com.pcchin.studyassistant.database.project.dao.ProjectDao;
+import com.pcchin.studyassistant.database.project.dao.RoleDao;
+import com.pcchin.studyassistant.database.project.dao.StatusDao;
+import com.pcchin.studyassistant.database.project.dao.TaskDao;
+import com.pcchin.studyassistant.database.project.data.MemberData;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
+import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.database.project.data.StatusData;
+import com.pcchin.studyassistant.database.project.data.TaskData;
 
-/** The database layer for the projects. **/
+/** The notes layer for the projects. **/
 @Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class,
         StatusData.class}, version=1)
 @TypeConverters(ConverterFunctions.class)

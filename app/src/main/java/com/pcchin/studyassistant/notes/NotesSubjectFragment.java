@@ -55,9 +55,9 @@ import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.SortingComparators;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.NotesNotifyReceiver;
 import com.pcchin.studyassistant.notes.misc.NotesSortAdaptor;
 
@@ -116,7 +116,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         return fragment;
     }
 
-    /** Initializes the fragment. Retrieves all of the notes of the subject from the database. **/
+    /** Initializes the fragment. Retrieves all of the notes of the subject from the notes. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +132,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 previousOrder = getArguments().getInt(ARG_PREV);
             }
 
-            // Check if subject exists in database
+            // Check if subject exists in notes
             NotesSubject currentSubject = subjectDatabase.SubjectDao().search(notesSubject);
             if (currentSubject == null) {
                 Toast.makeText(getContext(), R.string.n2_error_missing_subject,
@@ -142,7 +142,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
 
             } else {
-                // Get notes from database
+                // Get notes from notes
                 getActivity().setTitle(notesSubject);
                 NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
                 notesArray = subject.contents;
@@ -316,7 +316,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     new String[]{getString(android.R.string.ok),
                             getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
-                        // Update value in database
+                        // Update value in notes
                         NotesSubject subject1 = subjectDatabase.SubjectDao().search(notesSubject);
                         subject1.sortOrder = sortingList[sortingSpinner.getSelectedItemPosition()];
                         subjectDatabase.SubjectDao().update(subject1);

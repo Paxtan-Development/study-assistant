@@ -33,9 +33,9 @@ import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     /** Default constructor. **/
     public NotesSelectFragment() {}
 
-    /** Initializes the fragment and the database. **/
+    /** Initializes the fragment and the notes. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

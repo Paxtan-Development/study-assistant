@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.dao;
+package com.pcchin.studyassistant.database.project.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -19,7 +19,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.pcchin.studyassistant.project.database.data.ProjectData;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
 
 import java.util.List;
 
@@ -38,11 +38,11 @@ public interface ProjectDao {
     @Query("SELECT * FROM projectData WHERE associatedSubject = :subject")
     List<ProjectData> searchBySubject(String subject);
 
-    /** Returns all the existing projects in the database. **/
+    /** Returns all the existing projects in the notes. **/
     @Query("SELECT * FROM projectData")
     List<ProjectData> getAllProjects();
 
-    /** Adds a new project into the database. **/
+    /** Adds a new project into the notes. **/
     @Insert
     void insert(ProjectData project);
 

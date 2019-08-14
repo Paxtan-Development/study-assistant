@@ -11,28 +11,35 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.dao;
+package com.pcchin.studyassistant.database.notes;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.Query;
 import androidx.room.Update;
 
-import com.pcchin.studyassistant.project.database.data.TaskData;
+import java.util.List;
 
 @Dao
-public interface TaskDao {
-    // TODO: Complete
+public interface SubjectDao {
+    /** Search for a subject based on its title. **/
+    @Query("SELECT * FROM notesSubject WHERE _title = :title")
+    NotesSubject search(String title);
 
-    /** Adds a new task into the database. **/
+    /** Get all of the notes. **/
+    @Query("SELECT * FROM notesSubject ORDER BY _title ASC")
+    List<NotesSubject> getAll();
+
+    /** Adds a new subject into the notes. **/
     @Insert
-    void insert(TaskData status);
+    void insert(NotesSubject subject);
 
-    /** Updates an existing task. **/
+    /** Updates an existing subject. **/
     @Update
-    void update(TaskData status);
+    void update(NotesSubject subject);
 
-    /** Deletes an existing task. **/
+    /** Deletes an existing subject. **/
     @Delete
-    void delete(TaskData status);
+    void delete(NotesSubject subject);
 }

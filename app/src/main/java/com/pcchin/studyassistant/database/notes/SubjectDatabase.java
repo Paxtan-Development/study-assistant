@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.notes.database;
+package com.pcchin.studyassistant.database.notes;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
@@ -19,7 +19,7 @@ import androidx.room.TypeConverters;
 
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 
-/** The database layer for the subjects. **/
+/** The notes layer for the subjects. **/
 @Database(entities = {NotesSubject.class}, version = 2)
 @TypeConverters({ConverterFunctions.class})
 public abstract class SubjectDatabase extends RoomDatabase {

@@ -53,9 +53,9 @@ import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         return fragment;
     }
 
-    /** Initializes the fragment. Gets the contents of the notes from the database. **/
+    /** Initializes the fragment. Gets the contents of the notes from the notes. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +98,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         }
 
         if (getContext() != null) {
-            // Get notes required from database
+            // Get notes required from notes
             SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class,
                     "notesSubject")
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -233,7 +233,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     new String[]{getString(android.R.string.ok),
                             getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
-                // Get values from database
+                // Get values from notes
                 String inputText = "";
                 if (inputLayout.getEditText() != null) {
                     inputText = inputLayout.getEditText().getText().toString();
@@ -245,7 +245,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 NotesSubject subject = database.SubjectDao().search(notesSubject);
                 ArrayList<ArrayList<String>> contents = subject.contents;
 
-                // Update values to database
+                // Update values to notes
                 if (contents != null && contents.size() > notesOrder) {
                     FileFunctions.checkNoteIntegrity(contents.get(notesOrder));
                     if (inputText.length() == 0) {
@@ -356,7 +356,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
             if (manager != null) {
                 manager.cancel(cancelIntent);
-                // Update values in database
+                // Update values in notes
                 if (getActivity() != null) {
                     notesInfo.set(4, null);
                     notesInfo.set(5, null);
@@ -410,7 +410,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                                 } else {
                                     contents = new ArrayList<>();
                                 }
-                                // Update value in database
+                                // Update value in notes
                                 currentSubject.contents = contents;
                                 database.SubjectDao().update(currentSubject);
                                 database.close();
@@ -470,7 +470,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
                 PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 
-                // Save value to database
+                // Save value to notes
                 while (notesInfo.size() < 3) {
                     notesInfo.add("");
                 } while (notesInfo.size() < 6) {

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.data;
+package com.pcchin.studyassistant.database.project.data;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -90,7 +90,7 @@ public class ProjectData {
      * If both membersEnabled and this are false, all users would have admin privileges. **/
     public boolean rolesEnabled;
 
-    /** If this is true, tasks and status share the same database (from Tasks),
+    /** If this is true, tasks and status share the same notes (from Tasks),
      * while if this is false, tasks and status have separate databases. **/
     public boolean mergeTaskStatus;
 

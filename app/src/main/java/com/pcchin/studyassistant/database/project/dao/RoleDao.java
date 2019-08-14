@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.dao;
+package com.pcchin.studyassistant.database.project.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -19,7 +19,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.pcchin.studyassistant.project.database.data.RoleData;
+import com.pcchin.studyassistant.database.project.data.RoleData;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface RoleDao {
     @Query("SELECT * FROM roleData WHERE parentPRoject = :projectID AND roleName = :name")
     List<RoleData> searchInProjectByName(String projectID, String name);
 
-    /** Adds a new role into the database. **/
+    /** Adds a new role into the notes. **/
     @Insert
     void insert(RoleData role);
 

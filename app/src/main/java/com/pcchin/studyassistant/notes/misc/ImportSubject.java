@@ -37,9 +37,9 @@ import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -394,7 +394,7 @@ public class ImportSubject {
         }
     }
 
-    /** Import a NotesSubject into the database.
+    /** Import a NotesSubject into the notes.
      * Duplicating titles for subject are checked within the function. **/
     private void importSubjectToDatabase(String title, ArrayList<ArrayList<String>> contents,
                                          int sortOrder) {
@@ -403,7 +403,7 @@ public class ImportSubject {
                     "notesSubject")
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
-            // Import to database
+            // Import to notes
             if (database.SubjectDao().search(title) != null) {
                 // Subject conflict
                 new AutoDismissDialog(activity.getString(R.string.subject_conflict),
@@ -456,7 +456,7 @@ public class ImportSubject {
                     Log.d("A", inputText);
                 }
                 if (inputText.length() > 0 && database.SubjectDao().search(inputText) == null) {
-                    // Import subject into database
+                    // Import subject into notes
                     database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
                     dialogInterface.dismiss();
                     Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
@@ -483,7 +483,7 @@ public class ImportSubject {
 
     /** Merge two conflicted subjects with the same name.
      * Notes that are exactly the same will not be re-imported,
-     * sort order will inherit the original subject stored on the database. **/
+     * sort order will inherit the original subject stored on the notes. **/
     private void mergeSubjects(String title, ArrayList<ArrayList<String>> newContent) {
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
                 "notesSubject")

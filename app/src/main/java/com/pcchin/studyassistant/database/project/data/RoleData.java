@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project.database.data;
+package com.pcchin.studyassistant.database.project.data;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

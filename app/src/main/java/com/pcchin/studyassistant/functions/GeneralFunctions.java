@@ -40,15 +40,13 @@ import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.notes.database.NotesSubject;
-import com.pcchin.studyassistant.notes.database.NotesSubjectMigration;
-import com.pcchin.studyassistant.notes.database.SubjectDatabase;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /** General functions used throughout the app **/
 public class GeneralFunctions {

@@ -66,8 +66,8 @@ import java.util.Objects;
 import java.util.Random;
 
 public class NotesViewFragment extends Fragment implements FragmentOnBackPressed {
-    private static final String ARG_SUBJECT = "notesSubject";
-    private static final String ARG_ORDER = "notesOrder";
+    private static final String ARG_SUBJECT = "noteSubject";
+    private static final String ARG_ORDER = "noteOrder";
 
     private ArrayList<String> notesInfo;
     private String notesSubject;
@@ -102,7 +102,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         if (getContext() != null) {
             // Get notes required from notes
             SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class,
-                    "notesSubject")
+                    MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             ArrayList<ArrayList<String>> allNotes = database
@@ -143,7 +143,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
                 getString(R.string.n_last_edited), notesInfo.get(1)));
-        if (notesInfo.size() > 5 && notesInfo.get(4) != null && notesInfo.get(4).length() > 0) {
+        if (notesInfo.size() >= 5 && notesInfo.get(4) != null && notesInfo.get(4).length() > 0) {
             ((TextView) returnView.findViewById(R.id.n3_notif_time)).setText(String.format("%s%s",
                     getString(R.string.n3_notif_time), notesInfo.get(4)));
         } else {
@@ -254,7 +254,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     inputText = inputLayout.getEditText().getText().toString();
                 }
                 SubjectDatabase database = Room.databaseBuilder(getContext(),
-                        SubjectDatabase.class, "notesSubject")
+                        SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                         .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                         .allowMainThreadQueries().build();
                 NotesSubject subject = database.SubjectDao().search(notesSubject);
@@ -287,7 +287,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
     public void onUnlockPressed() {
         if (getContext() != null && getFragmentManager() != null) {
             SubjectDatabase database = Room.databaseBuilder(getContext(),
-                    SubjectDatabase.class, "notesSubject")
+                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             NotesSubject subject = database.SubjectDao().search(notesSubject);
@@ -376,7 +376,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     notesInfo.set(4, null);
                     notesInfo.set(5, null);
                     SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                            "notesSubject").allowMainThreadQueries()
+                            MainActivity.DATABASE_NOTES).allowMainThreadQueries()
                             .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
                     NotesSubject subject = database.SubjectDao().search(notesSubject);
                     if (subject != null) {
@@ -404,14 +404,14 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                             // Delete listener
                             AlarmManager manager = (AlarmManager) getActivity()
                                     .getSystemService(Context.ALARM_SERVICE);
-                            if (manager != null && notesInfo.size() > 5 && notesInfo.get(5) != null) {
+                            if (manager != null && notesInfo.size() >= 5 && notesInfo.get(5) != null) {
                                 PendingIntent alertIntent = getNotifyReceiverIntent(
                                         Integer.valueOf(notesInfo.get(5)));
                                 manager.cancel(alertIntent);
                             }
 
                             SubjectDatabase database = Room.databaseBuilder(getActivity(),
-                                    SubjectDatabase.class, "notesSubject")
+                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
                             NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
@@ -485,17 +485,11 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
                     PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 
-                    // Save value to notes
-                    while (notesInfo.size() < 3) {
-                        notesInfo.add("");
-                    }
-                    while (notesInfo.size() < 6) {
-                        notesInfo.add(null);
-                    }
+                    FileFunctions.checkNoteIntegrity(notesInfo);
                     notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                     notesInfo.set(5, String.valueOf(requestCode));
                     SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                            "notesSubject")
+                            MainActivity.DATABASE_NOTES)
                             .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                             .allowMainThreadQueries().build();
                     NotesSubject subject = database.SubjectDao().search(notesSubject);
@@ -508,7 +502,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
 
                     // Insert alarm and reset menu
                     if (manager != null) {
-                        Log.w("StudyAssistant", ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+                        Log.w(MainActivity.LOG_APP_NAME, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             // User may use note alert to do important things, so
                             // they would need to be called when when idle
@@ -536,9 +530,10 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
      * @see NotesNotifyReceiver **/
     private PendingIntent getNotifyReceiverIntent(int requestCode) {
         Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
-        intent.putExtra("title", notesInfo.get(0));
-        intent.putExtra("message", notesInfo.get(2));
-        intent.putExtra("subject", notesSubject);
+        intent.putExtra(MainActivity.INTENT_VALUE_TITLE, notesInfo.get(0));
+        intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, notesInfo.get(2));
+        intent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, notesSubject);
+        intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, notesInfo.get(5));
         return PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
     }
 }

@@ -107,7 +107,7 @@ public class GeneralFunctions {
 
         // Add subjects
         final SubjectDatabase subjectDatabase = Room.databaseBuilder(activity, SubjectDatabase.class,
-                "notesSubject")
+                MainActivity.DATABASE_NOTES)
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                 .allowMainThreadQueries().build();
         SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);

@@ -89,7 +89,7 @@ public class ImportSubject {
                             }
                         } catch (ActivityNotFoundException e) {
                             Toast.makeText(activity, R.string.error_file_manager_not_found, Toast.LENGTH_SHORT).show();
-                            Log.e("StudyAssistant", "File Error: This device appears to "
+                            Log.e(MainActivity.LOG_APP_NAME, "File Error: This device appears to "
                                     + "not have a file manager. Stack trace is");
                             e.printStackTrace();
                         }
@@ -160,11 +160,11 @@ public class ImportSubject {
                     importZipFile(inputFile);
                 }
             } else {
-                Log.e("StudyAssistant", "File Error: ZIP file " + path + " is invalid.");
+                Log.e(MainActivity.LOG_APP_NAME, "File Error: ZIP file " + path + " is invalid.");
                 Toast.makeText(activity, R.string.error_zip_corrupt, Toast.LENGTH_SHORT).show();
             }
         } catch (ZipException e) {
-            Log.e("StudyAssistant", "File Error: ZIP processing error occurred while "
+            Log.e(MainActivity.LOG_APP_NAME, "File Error: ZIP processing error occurred while "
                     + " importing a subject, stack trace is");
             Toast.makeText(activity, R.string.error_zip_import, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -210,7 +210,7 @@ public class ImportSubject {
                             }
                             scanner.close();
                         } catch (FileNotFoundException e) {
-                            Log.e("StudyAssistant", "File Error: " + file.getAbsolutePath()
+                            Log.e(MainActivity.LOG_APP_NAME, "File Error: " + file.getAbsolutePath()
                                 + " not found despite contained in file list of parent folder. " +
                                     "Stack trace is");
                             e.printStackTrace();
@@ -286,7 +286,7 @@ public class ImportSubject {
                             }
                         }
                     } catch (FileNotFoundException e) {
-                        Log.e("StudyAssistant", "File Error: ");
+                        Log.e(MainActivity.LOG_APP_NAME, "File Error: ");
                         e.printStackTrace();
                     }
                 }
@@ -300,12 +300,12 @@ public class ImportSubject {
             if (title.length() > 0) {
                 importSubjectToDatabase(title, content, listOrder);
             } else {
-                Log.w("StudyAssistant", "File Error: Title of subject in ZIP file "
+                Log.w(MainActivity.LOG_APP_NAME, "File Error: Title of subject in ZIP file "
                         + inputFile.getFile().getAbsolutePath() + " invalid.");
                 Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
             }
         } else {
-            Log.w("StudyAssistant", "File Error: Folder "+ tempInputDirPath
+            Log.w(MainActivity.LOG_APP_NAME, "File Error: Folder "+ tempInputDirPath
                     + " is not found");
             Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
         }
@@ -373,7 +373,7 @@ public class ImportSubject {
                     // Subject is not encrypted
                     String contentString = new String(content);
                     if (ConverterFunctions.doubleJsonToArray(contentString) == null) {
-                        Log.w("StudyAssistant", "File Error: The .subject file "
+                        Log.w(MainActivity.LOG_APP_NAME, "File Error: The .subject file "
                         + path + " could not be imported as its content is incorrect.");
                         Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                     } else {
@@ -382,13 +382,13 @@ public class ImportSubject {
                     }
                 }
             } catch (IOException e) {
-                Log.e("StudyAssistant", "File Error: File " + path + " could not be read"
+                Log.e(MainActivity.LOG_APP_NAME, "File Error: File " + path + " could not be read"
                         + " by FileInputStream. Stack trace is");
                 Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         } else {
-            Log.e("StudyAssistant", "File Error: File " + path + " is not found.");
+            Log.e(MainActivity.LOG_APP_NAME, "File Error: File " + path + " is not found.");
             Toast.makeText(activity, "The file " + path + " appears to be missing.",
                     Toast.LENGTH_SHORT).show();
         }
@@ -400,7 +400,7 @@ public class ImportSubject {
                                          int sortOrder) {
         if (title.length() > 0) {
             SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                    "notesSubject")
+                    MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             // Import to notes
@@ -427,7 +427,7 @@ public class ImportSubject {
             }
             database.close();
         } else {
-            Log.w("StudyAssistant", "File Error: Title of subject in ZIP file  invalid.");
+            Log.w(MainActivity.LOG_APP_NAME, "File Error: Title of subject in ZIP file  invalid.");
             Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
         }
     }
@@ -444,7 +444,7 @@ public class ImportSubject {
         inputLayout.setEndIconActivated(true);
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                "notesSubject")
+                MainActivity.DATABASE_NOTES)
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                 .allowMainThreadQueries().build();
 
@@ -453,7 +453,6 @@ public class ImportSubject {
                 String inputText = "";
                 if (inputLayout.getEditText() != null) {
                     inputText = inputLayout.getEditText().getText().toString();
-                    Log.d("A", inputText);
                 }
                 if (inputText.length() > 0 && database.SubjectDao().search(inputText) == null) {
                     // Import subject into notes
@@ -466,7 +465,7 @@ public class ImportSubject {
                     inputLayout.setErrorEnabled(true);
                     inputLayout.setError(activity.getString(R.string.error_subject_exists));
                 } else {
-                    Log.w("StudyAssistant", "TextInputLayout Error: getEditText() for " +
+                    Log.w(MainActivity.LOG_APP_NAME, "TextInputLayout Error: getEditText() for " +
                             "AlertDialog in ImportSubject.showRenameDialog not found.");
                 }
             });
@@ -486,7 +485,7 @@ public class ImportSubject {
      * sort order will inherit the original subject stored on the notes. **/
     private void mergeSubjects(String title, ArrayList<ArrayList<String>> newContent) {
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                "notesSubject")
+                MainActivity.DATABASE_NOTES)
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                 .allowMainThreadQueries().build();
         NotesSubject editSubject = database.SubjectDao().search(title);

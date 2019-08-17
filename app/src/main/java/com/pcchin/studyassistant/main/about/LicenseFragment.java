@@ -119,7 +119,7 @@ public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
                 }
                 returnLayout.addView(licenseDisplay);
             } else {
-                Log.w("StudyAssistant", "XML Error: Incorrect CharSequence[] in " +
+                Log.w(MainActivity.LOG_APP_NAME, "XML Error: Incorrect CharSequence[] in " +
                         "license_display read, value is " + Arrays.toString(infoArray));
             }
         }

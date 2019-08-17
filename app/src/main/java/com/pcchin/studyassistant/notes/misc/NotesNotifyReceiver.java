@@ -23,10 +23,16 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.room.Room;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.main.MainActivity;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 /** Notification receiver when the alert of a note is triggered. **/
@@ -35,8 +41,10 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Show notification
-        String title = intent.getStringExtra("title");
-        String message = intent.getStringExtra("message");
+        String title = intent.getStringExtra(MainActivity.INTENT_VALUE_TITLE);
+        String message = intent.getStringExtra(MainActivity.INTENT_VALUE_MESSAGE);
+        String subjectTitle = intent.getStringExtra(MainActivity.INTENT_VALUE_SUBJECT);
+        String requestCode = intent.getStringExtra(MainActivity.INTENT_VALUE_REQUEST_CODE);
         if (title == null || title.length() == 0) {
             title = context.getPackageName();
         }
@@ -44,9 +52,30 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
             message = context.getString(R.string.n_new_alert);
         }
 
+        // Clear data from database
+        SubjectDatabase database = Room.databaseBuilder(context, SubjectDatabase.class,
+                MainActivity.DATABASE_NOTES)
+                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                .allowMainThreadQueries().build();
+        NotesSubject subject = database.SubjectDao().search(subjectTitle);
+        if (subject != null) {
+            ArrayList<ArrayList<String>> notesList = subject.contents;
+            for (ArrayList<String> note: notesList) {
+                if (note != null && note.size() >= 6 && Objects.equals(note.get(0), title) &&
+                        Objects.equals(note.get(5), requestCode)) {
+                    note.set(4, null);
+                    note.set(5, null);
+                }
+            }
+            database.SubjectDao().update(subject);
+        }
+        database.close();
+
         // Display a notification
         Intent startIntent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(MainActivity.INTENT_VALUE_START_FRAGMENT, true);
+        intent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, subjectTitle);
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(context, 0, startIntent, 0);
         NotificationCompat.Builder notif = new NotificationCompat.Builder(context, context.getPackageName())

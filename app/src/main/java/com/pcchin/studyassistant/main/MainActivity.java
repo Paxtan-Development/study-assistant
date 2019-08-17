@@ -62,6 +62,20 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Fragment currentFragment;
+    // Constants used across fragments
+    public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
+    public static final String SHAREDPREF_GITLAB_RELEASE_JSON = "gitlabReleasesJson";
+    public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
+    public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
+    public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";
+    public static final String INTENT_VALUE_REQUEST_CODE = "requestCode";
+    public static final String INTENT_VALUE_SUBJECT = "subject";
+    public static final String INTENT_VALUE_MESSAGE = "message";
+    public static final String INTENT_VALUE_TITLE = "title";
+    public static final String DATABASE_NOTES = "notesSubject";
+    public static final String DATABASE_PROJECT = "projectDatabase";
+    public static final String LOG_APP_NAME = "StudyAssistant";
+
     private static final int EXTERNAL_STORAGE_PERMISSION = 200;
     public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
     public static final int SELECT_ZIP_FILE = 300;
@@ -135,32 +149,32 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-                String pastUpdateFilePath = sharedPref.getString("AppUpdatePath", "");
+                String pastUpdateFilePath = sharedPref.getString(SHAREDPREF_APP_UPDATE_PATH, "");
                 if (pastUpdateFilePath.length() != 0) {
                     File pastUpdateFile = new File(pastUpdateFilePath);
                     if (pastUpdateFile.exists()) {
                         if (pastUpdateFile.delete()) {
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString("AppUpdatePath", "");
+                            editor.putString(SHAREDPREF_APP_UPDATE_PATH,"");
                             editor.apply();
                         } else {
-                            Log.w("StudyAssistant", "File Error: File "
+                            Log.w(LOG_APP_NAME, "File Error: File "
                                     + pastUpdateFilePath + " could not be deleted.");
                         }
                     } else {
                         // File has already been removed
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("AppUpdatePath", "");
+                        editor.putString(SHAREDPREF_APP_UPDATE_PATH, "");
                         editor.apply();
                     }
                 }
             });
 
             // Only check for updates once a day
-            if (getIntent().getBooleanExtra("displayUpdate", false)) {
+            if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, true));
             } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                            .getString("lastUpdateCheck", ""),
+                            .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
                     ConverterFunctions.standardDateFormat.format(new Date()))) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
@@ -168,6 +182,12 @@ public class MainActivity extends AppCompatActivity
             // Set currentFragment
             currentFragment = getSupportFragmentManager().getFragments()
                     .get(getSupportFragmentManager().getFragments().size() - 1);
+        }
+
+        // Get subject, if needed from Intent
+        if (getIntent().getBooleanExtra(INTENT_VALUE_START_FRAGMENT, false)) {
+            String targetSubject = getIntent().getStringExtra(INTENT_VALUE_SUBJECT);
+            displayFragment(NotesSubjectFragment.newInstance(targetSubject));
         }
 
         // Set toolbar, set again when rotated

@@ -53,7 +53,8 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getContext() != null && getActivity() != null) {
-            subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class, "notesSubject")
+            subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class,
+                    MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             getActivity().setTitle(R.string.app_name);
@@ -101,7 +102,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public void onNewSubjectPressed() {
         if (getContext() != null && getActivity() != null) {
             SubjectDatabase subjectDatabase = Room.databaseBuilder(getContext(),
-                                    SubjectDatabase.class, "notesSubject")
+                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
             GeneralFunctions.showNewSubject(((MainActivity) getActivity()), subjectDatabase);

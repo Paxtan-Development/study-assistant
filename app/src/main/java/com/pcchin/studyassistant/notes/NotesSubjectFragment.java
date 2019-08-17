@@ -71,11 +71,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
 public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
-    private static final String ARG_SUBJECT = "notesSubject";
+    private static final String ARG_SUBJECT = "noteSubject";
     private static final String ARG_PREV = "previousOrder";
     private static final int MAXLINES = 4;
 
@@ -122,7 +125,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         super.onCreate(savedInstanceState);
         if (getContext() != null && getActivity() != null) {
             subjectDatabase = Room.databaseBuilder(getContext(),
-                                    SubjectDatabase.class, "notesSubject")
+                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
 
@@ -146,10 +149,33 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 getActivity().setTitle(notesSubject);
                 NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
                 notesArray = subject.contents;
-
                 if (notesArray != null) {
                     // Sort notes just in case
                     sortNotes(subject);
+
+                    // Check for any note that is expired
+                    Calendar storedDate;
+                    Date tempDate;
+                    for (ArrayList<String> note: notesArray) {
+                        FileFunctions.checkNoteIntegrity(note);
+                        storedDate = Calendar.getInstance();
+                        if (note.get(4) != null) {
+                            try {
+                                tempDate = ConverterFunctions.standardDateTimeFormat.parse(note.get(4));
+                                if (tempDate != null) {
+                                    storedDate.setTime(tempDate);
+                                    // Delete alert if time passed
+                                    if (storedDate.before(Calendar.getInstance())) {
+                                        note.set(4, null);
+                                        note.set(5, null);
+                                    }
+                                }
+                            } catch (ParseException e) {
+                                Log.w(MainActivity.LOG_APP_NAME, "Parse Error: Failed to parse date "
+                                        + note.get(4) + " as standard date time.");
+                            }
+                        }
+                    }
                 }
                 subjectDatabase.SubjectDao().update(subject);
             }
@@ -497,7 +523,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                         // Rename temp info output path to .subj file
                         exportFilesList.add(new File(infoTempOutputPath));
                     } catch (IOException e) {
-                        Log.w("StudyAssistant", "File Error: Writing subject " + notesSubject
+                        Log.w(MainActivity.LOG_APP_NAME, "File Error: Writing subject " + notesSubject
                                 + " failed. Stack trace is");
                         e.printStackTrace();
                     }
@@ -515,18 +541,18 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                     // Delete temp folder
                     if (!FileFunctions.deleteDir(new File(tempExportFolder))) {
-                        Log.w("StudyAssistant", "File Error: Temporary folder "
+                        Log.w(MainActivity.LOG_APP_NAME, "File Error: Temporary folder "
                                 + tempExportFolder + " could not be deleted.");
                     }
                     Toast.makeText(getContext(), getString(R.string.subject_exported)
                             + exportFilePath, Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.e("StudyAssistant", "File Error: Folder " + tempExportFolder
+                    Log.e(MainActivity.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
                             + " cannot be created.");
                     Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
                 }
             } catch (ZipException e) {
-                Log.e("StudyAssistant", "File error: ZIP processing error occurred while " +
+                Log.e(MainActivity.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
                         "exporting a subject. Stack trace is ");
                 e.printStackTrace();
                 Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
@@ -603,18 +629,18 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                                     Toast.makeText(getContext(), getString(R.string.subject_exported)
                                             + outputFile, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.e("StudyAssistant", "File Error: File "
+                                    Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
                                             + finalOutputFileName + " cannot be created.");
                                     Toast.makeText(getContext(), R.string.n2_error_file_not_created,
                                             Toast.LENGTH_SHORT).show();
                                 }
                             } catch (FileNotFoundException e) {
-                                Log.e("StudyAssistant", "File Error: File "
+                                Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
                                         + finalOutputFileName + " not found, stack trace is");
                                 e.printStackTrace();
                                 dialogInterface.dismiss();
                             } catch (IOException e) {
-                                Log.e("StudyAssistant", "File Error: An IO Exception"
+                                Log.e(MainActivity.LOG_APP_NAME, "File Error: An IO Exception"
                                         + " occurred on file " + finalOutputFileName + ", stack trace is");
                                 e.printStackTrace();
                                 dialogInterface.dismiss();
@@ -648,12 +674,13 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             for (ArrayList<String> note: notesArray) {
                                 AlarmManager manager = (AlarmManager) getContext()
                                         .getSystemService(Context.ALARM_SERVICE);
-                                if (manager != null && note.size() > 6 && note.get(5) != null
+                                if (manager != null && note.size() >= 6 && note.get(5) != null
                                         && note.get(0) != null && note.get(2) != null) {
                                     // Get PendingIntent for note alert
                                     Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
-                                    intent.putExtra("title", note.get(0));
-                                    intent.putExtra("message", note.get(2));
+                                    intent.putExtra(MainActivity.INTENT_VALUE_TITLE, note.get(0));
+                                    intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, note.get(2));
+                                    intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, note.get(5));
                                     PendingIntent alertIntent = PendingIntent.getBroadcast(
                                             getActivity(), Integer.valueOf(note.get(5)), intent, 0);
 
@@ -663,7 +690,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
 
                             // Delete subject
                             SubjectDatabase database = Room.databaseBuilder(getContext(),
-                                    SubjectDatabase.class, "notesSubject")
+                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
                             NotesSubject delTarget = database.SubjectDao().search(notesSubject);

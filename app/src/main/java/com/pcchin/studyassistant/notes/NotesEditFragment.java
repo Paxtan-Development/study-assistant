@@ -101,7 +101,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
 
         if (getArguments() != null && getActivity() != null) {
             database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                    "notesSubject")
+                    MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
             // Get values from newInstance

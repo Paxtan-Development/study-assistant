@@ -123,7 +123,7 @@ class AppUpdate {
         JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_API_RELEASES, response -> {
             SharedPreferences.Editor editor = activity.getSharedPreferences(
                     activity.getPackageName(), Context.MODE_PRIVATE).edit();
-            editor.putString("gitlabReleasesJson", response.toString());
+            editor.putString(MainActivity.SHAREDPREF_GITLAB_RELEASE_JSON, response.toString());
             editor.apply();
             showGitlabUpdateNotif(response);
         }, error -> {
@@ -131,17 +131,17 @@ class AppUpdate {
                 // Error 304 means that the page remains the same, pulls page from old site
                 SharedPreferences sharedPref = activity.getSharedPreferences(
                         activity.getPackageName(), Context.MODE_PRIVATE);
-                String oldResponse = sharedPref.getString("gitlabReleasesJson", "");
+                String oldResponse = sharedPref.getString(MainActivity.SHAREDPREF_GITLAB_RELEASE_JSON, "");
                 try {
                     JSONArray oldArray = new JSONArray(oldResponse);
                     showGitlabUpdateNotif(oldArray);
                 } catch (JSONException e) {
-                    Log.d("StudyAssistant", "Data Error: former response " + oldResponse
+                    Log.d(MainActivity.LOG_APP_NAME, "Data Error: former response " + oldResponse
                             + " is not a JSON array.");
                     queue.stop();
                 }
             } else {
-                Log.d("StudyAssistant", "Network Error: Volley returned error " +
+                Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
                         error.getMessage() + ":" + error.toString() + " from " + GITLAB_API_RELEASES
                         + ", stack trace is");
                 error.printStackTrace();
@@ -166,7 +166,7 @@ class AppUpdate {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
                     activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
-            editor.putString("lastUpdateCheck", ConverterFunctions
+            editor.putString(MainActivity.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
                     .standardDateFormat.format(new Date()));
             editor.apply();
 
@@ -185,7 +185,7 @@ class AppUpdate {
                     // Set up notification
                     Intent intent = new Intent(activity, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("displayUpdate", true);
+                    intent.putExtra(MainActivity.INTENT_VALUE_DISPLAY_UPDATE, true);
                     PendingIntent pendingIntent = PendingIntent
                             .getActivity(activity, 0, intent, 0);
                     NotificationCompat.Builder notif = new NotificationCompat.Builder
@@ -230,7 +230,7 @@ class AppUpdate {
                         .show(activity.getSupportFragmentManager(), "AppUpdate.1");
             }
         } catch (JSONException e) {
-            Log.d("StudyAssistant", "Network Error: Response returned by " + GITLAB_API_RELEASES
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Response returned by " + GITLAB_API_RELEASES
                     + " invalid, response given is " + response + ", error given is "
                     + e.getMessage());
         }
@@ -251,7 +251,7 @@ class AppUpdate {
         ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setIndeterminate(true);
         DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
-            Log.d("StudyAssistant", "Notification: Download of latest APK cancelled");
+            Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
             queue.stop();
             continueDownload.set(false);
         };
@@ -273,7 +273,7 @@ class AppUpdate {
                     if (outputFile.createNewFile()) {
                         SharedPreferences.Editor editor = activity.getSharedPreferences(
                                 activity.getPackageName(), Context.MODE_PRIVATE).edit();
-                        editor.putString("AppUpdatePath", finalOutputFileName);
+                        editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, finalOutputFileName);
                         editor.apply();
 
                         // Write output file with buffer
@@ -297,29 +297,29 @@ class AppUpdate {
                         installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         activity.startActivity(installIntent);
                     } else {
-                        Log.d("StudyAssistant", "File Error: File " + finalOutputFileName
+                        Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + finalOutputFileName
                                 + " could not be created.");
                         Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (FileNotFoundException e) {
-                Log.d("StudyAssistant", "File Error: File" + finalOutputFileName + " not found, stack trace is ");
+                Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + finalOutputFileName + " not found, stack trace is ");
                 e.printStackTrace();
                 Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
             } catch (IOException e2) {
-                Log.d("StudyAssistant", "File Error: An IOException occurred at " + finalOutputFileName
+                Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + finalOutputFileName
                         + ", stack trace is");
                 e2.printStackTrace();
                 Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Log.d("Study Assistant", "Error: Volley download request failed " +
+                Log.d(MainActivity.LOG_APP_NAME, "Error: Volley download request failed " +
                         "in middle of operation with error");
                 e.printStackTrace();
                 Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
             }
         }, error -> {
             downloadDialog.dismiss();
-            Log.d("StudyAssistant", "Network Error: Volley file download request failed"
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
                     + ", response given is " + error.getMessage() + ", stack trace is");
             error.printStackTrace();
             Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();

@@ -16,6 +16,8 @@ package com.pcchin.studyassistant.functions;
 import android.util.Base64;
 import android.util.Log;
 
+import com.pcchin.studyassistant.main.MainActivity;
+
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -74,7 +76,7 @@ public class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
             originalByte = shaDigest.digest(original.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e("StudyAssistant", "Cryptography Error: Algorithm SHA-512 not found in" +
+            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
                     " MessageDigest.");
         }
 
@@ -114,10 +116,10 @@ public class SecurityFunctions {
         try {
             original = processCipherBuffer(aes, original);
         } catch (InvalidCipherTextException e) {
-            Log.w("StudyAssistant", "Cipher text in AES encryption invalid. Stack trace is ");
+            Log.w(MainActivity.LOG_APP_NAME, "Cipher text in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
         } catch (DataLengthException e) {
-            Log.w("StudyAssistant", "Data length in AES encryption invalid. Stack trace is ");
+            Log.w(MainActivity.LOG_APP_NAME, "Data length in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
         return original;
@@ -132,10 +134,10 @@ public class SecurityFunctions {
         try {
             original = processCipherBuffer(blowfish, original);
         } catch (InvalidCipherTextException e) {
-            Log.w("StudyAssistant", "Cipher text in Blowfish encryption invalid. Stack trace is ");
+            Log.w(MainActivity.LOG_APP_NAME, "Cipher text in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
         } catch (DataLengthException e) {
-            Log.w("StudyAssistant", "Data length in Blowfish encryption invalid. Stack trace is ");
+            Log.w(MainActivity.LOG_APP_NAME, "Data length in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
         return original;

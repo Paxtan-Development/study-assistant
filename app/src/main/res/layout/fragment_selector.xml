@@ -14,14 +14,14 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/n1"
+    android:id="@+id/fs"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".notes.NotesSelectFragment">
 
     <LinearLayout
-        android:id="@+id/n1_notes_list"
+        android:id="@+id/fs_notes_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -31,13 +31,13 @@
             android:layout_height="48sp" />
 
         <TextView
-            android:id="@+id/n1_title"
+            android:id="@+id/fs_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingStart="20sp"
             android:paddingEnd="20sp"
-            android:text="@string/notes"
+            android:text="@string/blank"
             android:textSize="36sp" />
 
         <Space

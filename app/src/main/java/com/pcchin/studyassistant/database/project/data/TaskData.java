@@ -47,6 +47,9 @@ public class TaskData {
     /** The description for the task. **/
     public String taskDesc;
 
+    /** The project that the task was published under. **/
+    public String parentProject;
+
     /** The date that the task is expected to start. **/
     public Date expectedStartDate;
 
@@ -67,9 +70,6 @@ public class TaskData {
 
     /** Custom status for each task, if needed. **/
     public String taskStatusCustom;
-
-    /** Special notes about the task. **/
-    public String taskComments;
 
     /** Default constructor. **/
     public TaskData() {

@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -65,7 +66,8 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View returnView = inflater.inflate(R.layout.fragment_notes_select, container, false);
+        View returnView = inflater.inflate(R.layout.fragment_selector, container, false);
+        ((TextView) returnView.findViewById(R.id.fs_title)).setText(R.string.notes);
 
         // Add existing subjects
         final List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
@@ -83,7 +85,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
                     ));
                 }
             });
-            ((LinearLayout) returnView.findViewById(R.id.n1_notes_list)).addView(subjectBtn, 2 + i);
+            ((LinearLayout) returnView.findViewById(R.id.fs_notes_list)).addView(subjectBtn, 2 + i);
         }
         return returnView;
     }

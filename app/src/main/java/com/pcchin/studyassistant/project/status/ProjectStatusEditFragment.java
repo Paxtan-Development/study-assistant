@@ -11,51 +11,37 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.project;
+package com.pcchin.studyassistant.project.status;
+
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
-import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.main.MainFragment;
 
-public class ProjectSelectFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectStatusEditFragment extends Fragment {
     /** Default constructor. **/
-    public ProjectSelectFragment() {
+    public ProjectStatusEditFragment() {
     }
 
-    /** Initializes the fragments and the projects. **/
+    /** Initializes the fragment and the status' info. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
-    /** Sets up the layout and add projects to it. **/
+    /** Sets up the layout for editing the status. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View returnView = inflater.inflate(R.layout.fragment_selector, container, false);
-        ((TextView) returnView.findViewById(R.id.fs_title)).setText(R.string.projects);
-
-        // TODO: Add projects
-        return returnView;
+        return inflater.inflate(R.layout.fragment_project_status_edit, container, false);
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new MainFragment());
-            return true;
-        }
-        return false;
-    }
 }

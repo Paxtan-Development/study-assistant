@@ -481,7 +481,15 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             if (targetDateTime.after(Calendar.getInstance())) {
                 if (getActivity() != null) {
                     // Set alert
-                    int requestCode = new Random().nextInt();
+                    Random rand = new Random();
+                    int requestCode = rand.nextInt();
+                    while (requestCode == 0) {
+                        // Unlikely, but it could happen
+                        requestCode = rand.nextInt();
+                    }
+                    if (requestCode < 0) {
+                        requestCode = -requestCode;
+                    }
                     AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
                     PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 

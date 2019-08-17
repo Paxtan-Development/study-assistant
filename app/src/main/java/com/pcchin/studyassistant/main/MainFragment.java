@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -59,7 +60,8 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
         });
 
         returnView.findViewById(R.id.m1_projects).setOnClickListener(v -> {
-            if (getActivity() != null) {
+            // TODO: Remove statement once completed
+            if (getActivity() != null && BuildConfig.DEBUG) {
                 ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
             }
         });

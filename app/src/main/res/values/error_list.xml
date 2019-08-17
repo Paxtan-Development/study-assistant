@@ -42,4 +42,5 @@
     <string name="n2_error_some_corrupt">Some notes in this subject may be corrupt</string>
     <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
     <string name="n2_error_file_not_created">The file could not be created.</string>
+    <string name="n2_error_time_passed">The time selected had passed.</string>
 </resources>

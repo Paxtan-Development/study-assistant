@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity
         // First time starting the app
         if (savedInstanceState == null) {
             displayFragment(new MainFragment());
-
             // Set up notification channels
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel mainChannel = new NotificationChannel(getString(

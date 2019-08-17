@@ -35,7 +35,7 @@ import java.util.Objects;
 public class ConverterFunctions {
     /** The ISO-8601 compliant date and time format.  **/
     private static final SimpleDateFormat isoDateTimeFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.ENGLISH);
     /** The standard date and time display format. **/
     public static final SimpleDateFormat standardDateTimeFormat =
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);

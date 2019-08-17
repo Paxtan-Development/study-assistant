@@ -35,6 +35,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.text.InputType;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,6 +50,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -140,7 +142,14 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
         }
         ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
-                                                                          getString(R.string.n_last_edited), notesInfo.get(1)));
+                getString(R.string.n_last_edited), notesInfo.get(1)));
+        if (notesInfo.size() > 5 && notesInfo.get(4) != null && notesInfo.get(4).length() > 0) {
+            ((TextView) returnView.findViewById(R.id.n3_notif_time)).setText(String.format("%s%s",
+                    getString(R.string.n3_notif_time), notesInfo.get(4)));
+        } else {
+            returnView.findViewById(R.id.n3_notif_time).setVisibility(View.GONE);
+        }
+
         // Set title
         if (getActivity() != null) {
             getActivity().setTitle(notesSubject);
@@ -155,10 +164,16 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
+                    int navBarId = getResources().getIdentifier("navigation_bar_height",
+                            "dimen", "android");
                     returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     ((TextView) returnView.findViewById(R.id.n3_text)).setMinHeight(endPt.y
-                            - returnView.findViewById(R.id.n3_last_edited).getBottom()
+                            - returnView.findViewById(R.id.n3_notif_time).getBottom()
                             - (int) getResources().getDimension(R.dimen.nav_header_height));
+                    if (navBarId > 0) {
+                        ((TextView) returnView.findViewById(R.id.n3_text)).setMaxHeight(endPt.y -
+                                getResources().getDimensionPixelSize(navBarId));
+                    }
                 }
             });
         }
@@ -292,7 +307,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     }
                     inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-                    DialogInterface.OnShowListener passwordListenere = dialogInterface -> {
+                    DialogInterface.OnShowListener passwordListener = dialogInterface -> {
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
                                 .setOnClickListener(view -> {
                                     String inputText = "";
@@ -317,7 +332,7 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                     new AutoDismissDialog(getString(R.string.n3_unlock_password), inputLayout,
                             new String[]{getString(android.R.string.ok),
                                     getString(android.R.string.cancel), ""},
-                            passwordListenere).show(getFragmentManager(), "NotesViewFragment.3");
+                            passwordListener).show(getFragmentManager(), "NotesViewFragment.3");
                 } else {
                     // Unlocks immediately
                     removeLock(contents, database, subject);
@@ -463,40 +478,54 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
             targetDateTime.set(Calendar.HOUR_OF_DAY, i);
             targetDateTime.set(Calendar.MINUTE, i1);
             targetDateTime.set(Calendar.SECOND, 0);
+            if (targetDateTime.after(Calendar.getInstance())) {
+                if (getActivity() != null) {
+                    // Set alert
+                    int requestCode = new Random().nextInt();
+                    AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                    PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
 
-            if (getActivity() != null) {
-                // Set alert
-                int requestCode = new Random().nextInt();
-                AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-                PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
+                    // Save value to notes
+                    while (notesInfo.size() < 3) {
+                        notesInfo.add("");
+                    }
+                    while (notesInfo.size() < 6) {
+                        notesInfo.add(null);
+                    }
+                    notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+                    notesInfo.set(5, String.valueOf(requestCode));
+                    SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
+                            "notesSubject")
+                            .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                            .allowMainThreadQueries().build();
+                    NotesSubject subject = database.SubjectDao().search(notesSubject);
+                    if (subject != null) {
+                        ArrayList<ArrayList<String>> updateArray = subject.contents;
+                        updateArray.set(notesOrder, notesInfo);
+                        database.SubjectDao().update(subject);
+                    }
+                    database.close();
 
-                // Save value to notes
-                while (notesInfo.size() < 3) {
-                    notesInfo.add("");
-                } while (notesInfo.size() < 6) {
-                    notesInfo.add(null);
+                    // Insert alarm and reset menu
+                    if (manager != null) {
+                        Log.w("StudyAssistant", ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            // User may use note alert to do important things, so
+                            // they would need to be called when when idle
+                            manager.setExactAndAllowWhileIdle(AlarmManager.RTC,
+                                    targetDateTime.getTimeInMillis(), alarmIntent);
+                        } else {
+                            manager.setExact(AlarmManager.RTC,
+                                    targetDateTime.getTimeInMillis(), alarmIntent);
+                        }
+                        hasAlert = true;
+                        Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
+                    }
+                    GeneralFunctions.reloadFragment(this);
                 }
-                notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
-                notesInfo.set(5, String.valueOf(requestCode));
-                SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                        "notesSubject")
-                        .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                        .allowMainThreadQueries().build();
-                NotesSubject subject = database.SubjectDao().search(notesSubject);
-                if (subject != null) {
-                    ArrayList<ArrayList<String>> updateArray = subject.contents;
-                    updateArray.set(notesOrder, notesInfo);
-                    database.SubjectDao().update(subject);
-                }
-                database.close();
-
-                // Insert alarm and reset menu
-                if (manager != null) {
-                    manager.set(AlarmManager.RTC, targetDateTime.getTimeInMillis(), alarmIntent);
-                    hasAlert = true;
-                    Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
-                }
-                getActivity().invalidateOptionsMenu();
+            } else {
+                // The time selected is in the past
+                Toast.makeText(getContext(), R.string.n2_error_time_passed, Toast.LENGTH_SHORT).show();
             }
         }, Calendar.getInstance().get(Calendar.HOUR), Calendar.getInstance().get(Calendar.MINUTE),
                 DateFormat.is24HourFormat(getContext()));

@@ -42,7 +42,6 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // TODO: Set up Settings
         return inflater.inflate(R.layout.fragment_project_settings, container, false);
     }
 

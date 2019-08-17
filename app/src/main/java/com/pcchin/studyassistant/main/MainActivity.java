@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity
             currentFragment = getSupportFragmentManager().getFragments()
                     .get(getSupportFragmentManager().getFragments().size() - 1);
         }
+        new AppUpdate(this, true);
 
         // Get subject, if needed from Intent
         if (getIntent().getBooleanExtra(INTENT_VALUE_START_FRAGMENT, false)) {

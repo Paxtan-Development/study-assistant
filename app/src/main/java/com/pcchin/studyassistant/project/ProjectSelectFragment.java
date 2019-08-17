@@ -45,8 +45,6 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
         // Inflate the layout for this fragment
         View returnView = inflater.inflate(R.layout.fragment_selector, container, false);
         ((TextView) returnView.findViewById(R.id.fs_title)).setText(R.string.projects);
-
-        // TODO: Add projects
         return returnView;
     }
 

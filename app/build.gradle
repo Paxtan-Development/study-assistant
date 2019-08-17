@@ -33,8 +33,8 @@ android {
         applicationId "com.pcchin.studyassistant"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 9
-        versionName "1.42"
+        versionCode 10
+        versionName "1.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Variable used in SecurityTest as CI server does not have enough memory to test as much as local machines
         buildConfigField "boolean", "IS_LOCAL", "${(boolean) hasProperty('Keystore_Dir')}"

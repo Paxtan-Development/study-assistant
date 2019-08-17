@@ -31,6 +31,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.FileProvider;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -240,93 +241,96 @@ class AppUpdate {
      * separated from showGitlabUpdateNotif(JSONArray response) for clarity. **/
     private void updateViaGitlab(String downloadLink) {
         // Generate output file name
-        // Ask other APK files is deleted on startup, leftover files would not be checked here
-        String outputFileName = "/storage/emulated/0/Download";
-        outputFileName = FileFunctions.generateValidFile(outputFileName +
-                "/.studyassistant-update", ".apk");
-
-        RequestQueue queue = Volley.newRequestQueue(activity);
-        // Boolean used as it is possible for user to cancel the dialog before the download starts
-        AtomicBoolean continueDownload = new AtomicBoolean(true);
-        ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
-        progressBar.setIndeterminate(true);
-        DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
-            queue.stop();
-            continueDownload.set(false);
-        };
-        AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
-                .getString(R.string.a_downloading), progressBar,
-                new String[]{activity.getString(android.R.string.cancel), "", ""});
-        downloadDialog.setCancellable(false);
-        downloadDialog.setDismissListener(dismissListener);
-        downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
-
-        String finalOutputFileName = outputFileName;
-        VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,
-                downloadLink, response -> {
-            try {
-                downloadDialog.dismiss();
+        // Checks if the /files directory exists, if not it is created
+        File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/files");
+        if (filesDir.exists() || filesDir.mkdir()) {
+            // Ask other APK files is deleted on startup, leftover files would not be checked here
+            String outputFileName = FileFunctions.generateValidFile(activity
+                    .getFilesDir().getAbsolutePath() + "/.studyassistant-update", ".apk");
+            RequestQueue queue = Volley.newRequestQueue(activity);
+            // Boolean used as it is possible for user to cancel the dialog before the download starts
+            AtomicBoolean continueDownload = new AtomicBoolean(true);
+            ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
+            progressBar.setIndeterminate(true);
+            DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
+                Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
                 queue.stop();
-                if (response != null) {
-                    File outputFile = new File(finalOutputFileName);
-                    if (outputFile.createNewFile()) {
-                        SharedPreferences.Editor editor = activity.getSharedPreferences(
-                                activity.getPackageName(), Context.MODE_PRIVATE).edit();
-                        editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, finalOutputFileName);
-                        editor.apply();
+                continueDownload.set(false);
+            };
+            AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
+                    .getString(R.string.a_downloading), progressBar,
+                    new String[]{activity.getString(android.R.string.cancel), "", ""});
+            downloadDialog.setCancellable(false);
+            downloadDialog.setDismissListener(dismissListener);
+            downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
 
-                        // Write output file with buffer
-                        InputStream input = new ByteArrayInputStream(response);
-                        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
-                        byte[] data = new byte[1024];
-                        int count;
-                        while ((count = input.read(data)) != -1) {
-                            output.write(data, 0, count);
+            VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,
+                    downloadLink, response -> {
+                try {
+                    downloadDialog.dismiss();
+                    queue.stop();
+                    if (response != null) {
+                        File outputFile = new File(outputFileName);
+                        if (outputFile.createNewFile()) {
+                            SharedPreferences.Editor editor = activity.getSharedPreferences(
+                                    activity.getPackageName(), Context.MODE_PRIVATE).edit();
+                            editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
+                            editor.apply();
+
+                            // Write output file with buffer
+                            InputStream input = new ByteArrayInputStream(response);
+                            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
+                            byte[] data = new byte[1024];
+                            int count;
+                            while ((count = input.read(data)) != -1) {
+                                output.write(data, 0, count);
+                            }
+                            output.flush();
+                            output.close();
+                            input.close();
+
+                            // Install app
+                            activity.safeOnBackPressed();
+                            Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
+                            Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                            installIntent.setDataAndType(FileProvider.getUriForFile(activity,
+                                    "com.pcchin.studyassistant.provider",
+                                    new File(outputFileName)),
+                                    "application/vnd.android.package-archive");
+                            installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            activity.startActivity(installIntent);
+                        } else {
+                            Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + outputFileName
+                                    + " could not be created.");
+                            Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
                         }
-                        output.flush();
-                        output.close();
-                        input.close();
-
-                        // Install app
-                        activity.safeOnBackPressed();
-                        Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
-                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                        installIntent.setDataAndType(Uri.fromFile(new File(finalOutputFileName)),
-                                "application/vnd.android.package-archive");
-                        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        activity.startActivity(installIntent);
-                    } else {
-                        Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + finalOutputFileName
-                                + " could not be created.");
-                        Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
                     }
-                }
-            } catch (FileNotFoundException e) {
-                Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + finalOutputFileName + " not found, stack trace is ");
-                e.printStackTrace();
-                Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
-            } catch (IOException e2) {
-                Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + finalOutputFileName
-                        + ", stack trace is");
-                e2.printStackTrace();
-                Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
+                } catch (FileNotFoundException e) {
+                    Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName + " not found, stack trace is ");
+                    e.printStackTrace();
+                    Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
+                } catch (IOException e2) {
+                    Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
+                            + ", stack trace is");
+                    e2.printStackTrace();
+                    Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
                 Log.d(MainActivity.LOG_APP_NAME, "Error: Volley download request failed " +
                         "in middle of operation with error");
                 e.printStackTrace();
                 Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
-            }
-        }, error -> {
-            downloadDialog.dismiss();
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
-                    + ", response given is " + error.getMessage() + ", stack trace is");
-            error.printStackTrace();
-            Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
-        }, null);
+                }
+            }, error -> {
+                downloadDialog.dismiss();
+                Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
+                        + ", response given is " + error.getMessage() + ", stack trace is");
+                error.printStackTrace();
+                Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
+            }, null);
 
-        if (continueDownload.get()) {
-            queue.add(request);
+            if (continueDownload.get()) {
+                queue.add(request);
+            }
         }
     }
 }

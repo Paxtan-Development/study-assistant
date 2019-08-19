@@ -43,4 +43,12 @@
     <string name="n2_error_note_title_empty">Note title cannot be empty.</string>
     <string name="n2_error_file_not_created">The file could not be created.</string>
     <string name="n2_error_time_passed">The time selected had passed.</string>
+
+    <!-- Errors used in group P. -->
+    <string name="p_error_project_not_found">The project selected is not found.</string>
+
+    <!-- Errors used in group V. -->
+    <string name="v_error_username_blank">Username cannot be blank.</string>
+
+    <string name="v2_error_username_missing">The username entered could not be found.</string>
 </resources>

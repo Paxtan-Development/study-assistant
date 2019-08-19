@@ -68,7 +68,7 @@ public class SecurityFunctions {
     }
 
     /** Hashing method used in the passwords that prevent notes from being edited.
-     * No need to be too secure as they can be easily found when exported. **/
+     * No need to be too secure as the contents of the notes can be easily found when exported. **/
     public static String notesHash(String original) {
         byte[] originalByte = null;
         // 1) SHA
@@ -82,6 +82,49 @@ public class SecurityFunctions {
 
         // 2) Blowfish
         originalByte = blowfish(originalByte, original.getBytes(), true);
+
+        return Base64.encodeToString(originalByte, Base64.DEFAULT);
+    }
+
+    /** Hashing method used in the passwords of roles when logging in. **/
+    public static String roleHash(String original, String salt){
+        byte[] originalByte = null, hashedPassword = null;
+        // 1) SHA
+        try {
+            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            originalByte = shaDigest.digest(original.getBytes());
+            hashedPassword = shaDigest.digest(salt.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
+                    " MessageDigest.");
+        }
+
+        // 2) PBKDF
+        originalByte = pbkdf2(originalByte, salt.getBytes(), 10000);
+
+        // 3) Blowfish
+        originalByte = blowfish(originalByte, hashedPassword, true);
+
+        return Base64.encodeToString(originalByte, Base64.DEFAULT);
+    }
+
+    /** Hashing method used in the passwords of members when logging in. **/
+    public static String memberHash(String original, String salt, String iv) {
+        byte[] originalByte, ivBytes = null;
+        // 1) PBKDF
+        originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10000);
+
+        // 2) SHA
+        try {
+            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            ivBytes = shaDigest.digest(iv.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
+                    " MessageDigest.");
+        }
+
+        // 3) AES
+        originalByte = aes(originalByte, salt.getBytes(), ivBytes, true);
 
         return Base64.encodeToString(originalByte, Base64.DEFAULT);
     }

@@ -76,6 +76,36 @@ public class SecurityTest {
         Assert.assertNotNull(responseString);
     }
 
+    /** Check if the hashing function for project roles works. **/
+    @Test
+    public void testRoleHash() {
+        // Normal input
+        String responseString;
+        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT));
+        Assert.assertNotNull(responseString);
+
+        // Minimal input
+        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT));
+        Assert.assertNotNull(responseString);
+    }
+
+    /** Check if the hashing function for project members works. **/
+    @Test
+    public void testMemberHash() {
+        // Normal input
+        String responseString;
+        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT));
+        Assert.assertNotNull(responseString);
+
+        // Minimal input
+        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT));
+        Assert.assertNotNull(responseString);
+    }
+
     /** Check if the AES algorithm is working. **/
     @Test
     public void testAES() {

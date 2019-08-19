@@ -123,8 +123,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getContext() != null && getActivity() != null) {
-            subjectDatabase = Room.databaseBuilder(getContext(),
+        if (getActivity() != null) {
+            subjectDatabase = Room.databaseBuilder(getActivity(),
                                     SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();
@@ -669,10 +669,10 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                     new String[]{getString(R.string.del),
                             getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{(dialog, which) -> {
-                        if (getContext() != null && getActivity() != null) {
+                        if (getActivity() != null) {
                             // Delete phantom alerts
                             for (ArrayList<String> note: notesArray) {
-                                AlarmManager manager = (AlarmManager) getContext()
+                                AlarmManager manager = (AlarmManager) getActivity()
                                         .getSystemService(Context.ALARM_SERVICE);
                                 if (manager != null && note.size() >= 6 && note.get(5) != null
                                         && note.get(0) != null && note.get(2) != null) {
@@ -689,7 +689,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             }
 
                             // Delete subject
-                            SubjectDatabase database = Room.databaseBuilder(getContext(),
+                            SubjectDatabase database = Room.databaseBuilder(getActivity(),
                                     SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                                     .allowMainThreadQueries().build();

@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -52,12 +51,12 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getContext() != null && getActivity() != null) {
-            subjectDatabase = Room.databaseBuilder(getContext(), SubjectDatabase.class,
+        if (getActivity() != null) {
+            subjectDatabase = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                     MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
                     .allowMainThreadQueries().build();
-            getActivity().setTitle(R.string.app_name);
+            getActivity().setTitle(R.string.notes);
         }
         setHasOptionsMenu(true);
     }
@@ -67,8 +66,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View returnView = inflater.inflate(R.layout.fragment_selector, container, false);
-        ((TextView) returnView.findViewById(R.id.fs_title)).setText(R.string.notes);
+        View returnView = inflater.inflate(R.layout.blank_list, container, false);
 
         // Add existing subjects
         final List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
@@ -86,7 +84,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
                     ));
                 }
             });
-            ((LinearLayout) returnView.findViewById(R.id.fs_notes_list)).addView(subjectBtn, 2 + i);
+            ((LinearLayout) returnView.findViewById(R.id.blank_linear)).addView(subjectBtn, i);
         }
         return returnView;
     }
@@ -94,17 +92,13 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
     /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_n1, menu);
+        inflater.inflate(R.menu.menu_selector, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     /** Creates a new subject. **/
     public void onNewSubjectPressed() {
-        if (getContext() != null && getActivity() != null) {
-            SubjectDatabase subjectDatabase = Room.databaseBuilder(getContext(),
-                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                    .allowMainThreadQueries().build();
+        if (getActivity() != null) {
             GeneralFunctions.showNewSubject(((MainActivity) getActivity()), subjectDatabase);
         }
     }
@@ -118,6 +112,7 @@ public class NotesSelectFragment extends Fragment implements FragmentOnBackPress
      * @see MainFragment **/
     @Override
     public boolean onBackPressed() {
+        subjectDatabase.close();
         if (getActivity() != null) {
             ((MainActivity) getActivity()).displayFragment(new MainFragment());
             return true;

@@ -36,6 +36,8 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
@@ -44,13 +46,13 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
+import com.pcchin.studyassistant.project.verify.ProjectLoginFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** General functions used throughout the app **/
 public class GeneralFunctions {
-
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(@NonNull final MainActivity activity,
                                final SubjectDatabase database) {
@@ -97,6 +99,11 @@ public class GeneralFunctions {
                         .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
     }
 
+    /** Shows the dialog to add a new project to the projects list **/
+    public static void showNewProject(@NonNull MainActivity activity, ProjectDatabase database) {
+        // TODO: Add new project
+    }
+
     /** Updates the NavigationView in MainActivity **/
     public static void updateNavView(@NonNull final MainActivity activity) {
         NavigationView navView = activity.findViewById(R.id.nav_view);
@@ -136,19 +143,29 @@ public class GeneralFunctions {
         subjImport.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
             new Handler().post(() -> ImportSubject.displayImportDialog(activity));
-            return false;
+            return true;
         });
 
         // Add projects
         SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
-        // TODO: Add projects
+        ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
+                MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+        List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
+        for (ProjectData project: projectList) {
+            MenuItem projItem = projMenu.add(project.projectTitle);
+            projItem.setOnMenuItemClickListener(menuItem -> {
+                activity.closeDrawer();
+                activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+                return false;
+            });
+        }
 
         // Add New Project Button
         MenuItem newProj = projMenu.add(R.string.m3_new_project);
         newProj.setOnMenuItemClickListener(item -> {
-            // TODO: New Project
             activity.closeDrawer();
-            return false;
+            showNewProject(activity, projectDatabase);
+            return true;
         });
 
         // Add Import Project button
@@ -156,7 +173,7 @@ public class GeneralFunctions {
         projImport.setOnMenuItemClickListener(item -> {
             // TODO: Import projects
             activity.closeDrawer();
-            return false;
+            return true;
         });
 
         // Add subMenu for other buttons

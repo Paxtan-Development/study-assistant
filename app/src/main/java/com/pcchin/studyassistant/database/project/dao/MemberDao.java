@@ -29,14 +29,6 @@ public interface MemberDao {
     @Query("SELECT * FROM memberData WHERE _memberID = :ID")
     MemberData searchByID(String ID);
 
-    /** Search for members in a project. **/
-    @Query("SELECT * FROM memberData WHERE parentProject = :projectID")
-    List<MemberData> searchByProject(String projectID);
-
-    /** Search for members in a project based on their roles. **/
-    @Query("SELECT * FROM memberData WHERE parentProject = :projectID AND role = :roleID")
-    List<MemberData> searchRoleInProject(String projectID, String roleID);
-
     /** Search for members in all project based on their roles. **/
     @Query("SELECT * FROM memberData WHERE role = :roleID")
     List<MemberData> searchByRole(String roleID);
@@ -44,6 +36,18 @@ public interface MemberDao {
     /** Search for a member in all projects based on his username. **/
     @Query("SELECT * FROM memberData WHERE username = :username")
     List<MemberData> searchByUsername(String username);
+
+    /** Search for members in a project. **/
+    @Query("SELECT * FROM memberData WHERE parentProject = :projectID")
+    List<MemberData> searchByProject(String projectID);
+
+    /** Search for members in a project based on their roles. **/
+    @Query("SELECT * FROM memberData WHERE parentProject = :projectID AND role = :roleID")
+    List<MemberData> searchInProjectByRole(String projectID, String roleID);
+
+    /** Search for a member in a project based on his username. **/
+    @Query("SELECT * FROM memberData WHERE parentProject = :projectID AND username = :username")
+    MemberData searchInProjectByUsername(String projectID, String username);
 
     /** Adds a new role into the notes. **/
     @Insert

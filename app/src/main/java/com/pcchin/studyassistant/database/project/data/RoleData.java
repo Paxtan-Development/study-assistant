@@ -22,11 +22,10 @@ import androidx.room.PrimaryKey;
 /** The entity for each role of users in a project. **/
 @Entity
 public class RoleData {
-    /** Reserved roles for each project. Admin is all-powerful while
-     * the user can only access his/her info. None is reserved as
+    /** Reserved roles for each project. None is reserved as
      * it is possible for a task to be assigned to no one. **/
     @Ignore
-    public static final String[] reservedRoles = {"Admin", "User", "None"};
+    public static final String[] reservedRoles = {"none"};
 
     /** The ID for each role, serves as a unique key and is randomly generated. **/
     @PrimaryKey
@@ -40,24 +39,50 @@ public class RoleData {
     /** The name for each role. Cannot overlap with existing roles. **/
     public String roleName;
 
+    /** The salt for the role used specifically to protect the password. **/
+    public String salt;
+
+    /** A hashed password, if needed, used by specific roles to access the project. **/
+    public String rolePass;
+
     // A list of boolean values determining the privileges of the role
     /* A user by default (all false) is able to:
     1) View & modify his or her own user info
     2) View his or her own tasks
     3) View the general info for the project */
-    public boolean canModifyOtherUser;
-    public boolean canViewOtherUser;
-    public boolean canModifyRole;
-    public boolean canViewRole;
-    public boolean canModifyOtherTask;
-    public boolean canModifyOwnTask;
-    public boolean canViewTask;
-    public boolean canSetPassword;
-    public boolean canModifyInfo;
     public boolean canDeleteProject;
+    public boolean canModifyInfo;
+    public boolean canModifyOtherTask;
+    public boolean canModifyOtherUser;
+    public boolean canModifyOwnTask;
+    public boolean canModifyRole;
+    public boolean canSetPassword;
+    public boolean canViewOtherUser;
+    public boolean canViewRole;
+    public boolean canViewTask;
 
     /** Default constructor. **/
+    @Ignore
     public RoleData() {
 
+    }
+
+    /** Constructor used when creating a new role. Due to the number of boolean variables used,
+     * they would be configured individually for each usage.
+     * All the boolean values were set to false by default. **/
+    public RoleData(@NonNull String roleID, String parentProject, String roleName) {
+        this.roleID = roleID;
+        this.parentProject = parentProject;
+        this.roleName = roleName;
+        this.canDeleteProject = false;
+        this.canModifyInfo = false;
+        this.canModifyOtherTask = false;
+        this.canModifyOtherUser = false;
+        this.canModifyOwnTask = false;
+        this.canModifyRole = false;
+        this.canSetPassword = false;
+        this.canViewOtherUser = false;
+        this.canViewRole = false;
+        this.canViewTask = false;
     }
 }

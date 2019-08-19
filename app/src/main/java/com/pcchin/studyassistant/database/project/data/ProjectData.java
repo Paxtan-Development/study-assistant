@@ -128,7 +128,24 @@ public class ProjectData {
     public String associatedSubject;
 
     /** Default constructor. **/
+    @Ignore
     public ProjectData() {
 
+    }
+
+    /** Constructor used when creating a new project.
+     * By default, tasks would be displayed on the description,
+     * the actual start date would be the date that the project was created,
+     * and the default role of new members would be "member". **/
+    public ProjectData(@NonNull String projectID, String projectTitle) {
+        this.projectID = projectID;
+        this.projectTitle = projectTitle;
+        this.memberList = new ArrayList<>();
+        this.taskList = new ArrayList<>();
+        this.roleList = new ArrayList<>();
+        this.statusList = new ArrayList<>();
+        this.memberDefaultRole = "member";
+        this.actualStartDate = new Date();
+        this.displayedInfo = DISPLAYED_TASKS;
     }
 }

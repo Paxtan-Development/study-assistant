@@ -18,22 +18,49 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 
-public class ProjectInfoFragment extends Fragment {
+public class ProjectInfoFragment extends Fragment implements FragmentOnBackPressed {
+    private static final String ARG_ID = "projectID";
+    private static final String ARG_ID2 = "ID2";
+    private static final String ARG_IS_MEMBER = "isMember";
+    private ProjectDatabase projectDatabase;
+
     /** Default constructor. **/
     public ProjectInfoFragment() {
+    }
+
+    /** Used in all instances when creating new project.
+     * @param ID2 can be either the role ID or member ID depending on the project.
+     * @param isMember determines whether ID2 is a member ID or a role ID. If ID2 is none and **/
+    public static ProjectInfoFragment newInstance(String projectID, String ID2, boolean isMember) {
+        ProjectInfoFragment fragment = new ProjectInfoFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        args.putString(ARG_ID2, ID2);
+        args.putBoolean(ARG_IS_MEMBER, isMember);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Initializes the fragment and the project info. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
+                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+        }
+        // TODO: Set up navigation menu
         setHasOptionsMenu(true);
     }
 
@@ -45,4 +72,13 @@ public class ProjectInfoFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_project_info, container, false);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        projectDatabase.close();
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+            return true;
+        }
+        return false;
+    }
 }

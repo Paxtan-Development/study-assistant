@@ -17,7 +17,7 @@
     android:id="@+id/n4"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
+    android:layout_margin="20sp"
     android:baselineAligned="false"
     android:orientation="vertical"
     tools:context=".notes.NotesEditFragment">
@@ -37,7 +37,7 @@
         android:id="@+id/n4_title_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="20sp"
         android:text="@string/blank"
         android:textColor="@android:color/holo_red_dark" />
 

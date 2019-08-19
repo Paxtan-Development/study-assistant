@@ -12,11 +12,17 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/m3_home"
-        android:title="@string/home" />
+        android:id="@+id/menu_new_subj"
+        android:icon="@drawable/ic_menu_add"
+        android:title="@string/n1_new_subject"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_import"
+        android:icon="@drawable/ic_menu_import"
+        android:title="@string/data_import"
+        app:showAsAction="ifRoom" />
 </menu>

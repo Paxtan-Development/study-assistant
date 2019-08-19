@@ -76,8 +76,7 @@ public class AboutFragment extends Fragment implements FragmentOnBackPressed {
 
         // Set license text
         GeneralFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(
-                inflater.getContext(), "studyassistant_about.txt") +
-                FileFunctions.getTxt(inflater.getContext(), "apache_2_license.txt"));
+                inflater.getContext(), "studyassistant_about.txt"));
 
         return returnView;
     }

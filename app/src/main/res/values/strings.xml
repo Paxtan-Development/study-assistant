@@ -29,6 +29,7 @@
     <string name="title">Title</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="home">Home</string>
     <string name="import_from">Import from</string>
     <string name="importing_subject">Importing Subject…</string>
     <string name="subject_exported">Subject exported to </string>
@@ -67,7 +68,6 @@
     <string name="m2_libraries_used">Libraries Used</string>
     <string name="m2_rss_used">Resources Used</string>
 
-    <string name="m3_home">Home</string>
     <string name="m3_others">Others</string>
     <string name="m3_new_subject">New Subject…</string>
     <string name="m3_new_project">New Project…</string>
@@ -137,4 +137,19 @@
     <string name="p_member">Members</string>
     <string name="p_description">Description</string>
     <string name="p_progress">Progress</string>
+    <string name="p_roles">Roles</string>
+    <string name="p_role">Role</string>
+    <string name="p_media">Media</string>
+    <string name="p_settings">Settings</string>
+    <string name="p_user">User</string>
+    <string name="p_username">Username</string>
+    <string name="p_password">Password</string>
+
+    <string name="p2_linked_subject">Linked Subject</string>
+
+    <!-- Strings used in group V -->
+    <string name="v2_project_login">Project Login</string>
+    <string name="v2_login">Log In</string>
+    <string name="v2_signup">New member? Sign up here</string>
+    <string name="v2_logging_in">Logging in…</string>
 </resources>

@@ -26,6 +26,8 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectSignupFragment extends Fragment {
+    private static final String ARG_ID = "projectID";
+
     /** Default constructor. **/
     public ProjectSignupFragment() {
     }
@@ -34,7 +36,15 @@ public class ProjectSignupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+    }
+
+    /** Constructor used when signing up for a new profile. **/
+    public static ProjectSignupFragment newInstance(String projectID) {
+        ProjectSignupFragment fragment = new ProjectSignupFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Sets up the layout for the sign up info. **/

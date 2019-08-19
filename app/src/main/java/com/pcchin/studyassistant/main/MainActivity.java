@@ -34,17 +34,21 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.room.Room;
 
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -54,6 +58,7 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
+import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
 import java.io.File;
 import java.util.Date;
@@ -61,6 +66,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public BottomNavigationView bottomNavView;
     private Fragment currentFragment;
     // Constants used across fragments
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
@@ -101,10 +107,14 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
             }
         }
+        bottomNavView = findViewById(R.id.bottom_nav);
 
         // First time starting the app
         if (savedInstanceState == null) {
             displayFragment(new MainFragment());
+
+            // Hide bottom navigation view
+            bottomNavView.setVisibility(View.GONE);
             // Set up notification channels
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel mainChannel = new NotificationChannel(getString(
@@ -130,6 +140,29 @@ public class MainActivity extends AppCompatActivity
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         EXTERNAL_STORAGE_PERMISSION);
             }
+
+            // Set up Admin & Member roles in database for projects
+            new Handler().post(() -> {
+                ProjectDatabase projectDatabase = Room.databaseBuilder(this,
+                        ProjectDatabase.class, DATABASE_PROJECT)
+                        .allowMainThreadQueries().build();
+                RoleData admin = projectDatabase.RoleDao().searchByID("admin");
+                if (admin == null) {
+                    admin = new RoleData("admin", "", "Admin");
+                    admin.canDeleteProject = true;
+                    admin.canModifyInfo = true;
+                    admin.canModifyOtherTask = true;
+                    admin.canModifyOtherUser = true;
+                    admin.canModifyOwnTask = true;
+                    admin.canModifyRole = true;
+                    admin.canSetPassword = true;
+                    admin.canViewOtherUser = true;
+                    admin.canViewRole = true;
+                    admin.canViewTask = true;
+                    projectDatabase.RoleDao().insert(admin);
+                }
+                projectDatabase.close();
+            });
 
             // Delete any past export files
             new Handler().post(() -> {
@@ -211,12 +244,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
-            // When NotesSelectFragment is activated
-            case R.id.n1_new_subj:
-                ((NotesSelectFragment) currentFragment).onNewSubjectPressed();
+            // When NotesSelectFragment or ProjectSelectFragment is activated
+            case R.id.menu_new_subj:
+                if (currentFragment instanceof NotesSelectFragment) {
+                    ((NotesSelectFragment) currentFragment).onNewSubjectPressed();
+                } else {
+                    ((ProjectSelectFragment) currentFragment).onNewProjectPressed();
+                }
                 break;
-            case R.id.n1_import:
-                ((NotesSelectFragment) currentFragment).onImportPressed();
+            case R.id.menu_import:
+                if (currentFragment instanceof  NotesSelectFragment) {
+                    ((NotesSelectFragment) currentFragment).onImportPressed();
+                } else {
+                    ((ProjectSelectFragment) currentFragment).onImportPressed();
+                }
                 break;
 
             // When NotesSubjectFragment is activated
@@ -354,6 +395,7 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
         currentFragment = fragment;
+        bottomNavView.setVisibility(View.GONE);
         hideKeyboard();
     }
 

@@ -13,6 +13,7 @@
 
 package com.pcchin.studyassistant.project.verify;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +42,7 @@ import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -97,11 +100,15 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View returnScroll = inflater.inflate(R.layout.fragment_project_login, container, false);
-        View returnView = returnScroll.findViewById(R.id.v2);
-        ((TextView) returnView.findViewById(R.id.v2_title)).setText(project.projectTitle);
+        ((TextView) returnScroll.findViewById(R.id.v2_title)).setText(project.projectTitle);
+        // Set up icon (only for portrait)
+        ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
+        if (projectIcon != null && project.projectIcon.length() > 0) {
+            projectIcon.setImageURI(Uri.fromFile(new File(project.projectIcon)));
+        }
 
         // Set up TextInputLayouts
-        TextInputLayout passwordInputLayout = returnView.findViewById(R.id.v2_password_input);
+        TextInputLayout passwordInputLayout = returnScroll.findViewById(R.id.v2_password_input);
         if (passwordInputLayout.getEditText() != null) {
             passwordInputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                     InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -111,14 +118,14 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
 
         // Set up whether to display members or roles
         if (project.membersEnabled) {
-            TextInputLayout userInputLayout = returnView.findViewById(R.id.v2_username_input);
+            TextInputLayout userInputLayout = returnScroll.findViewById(R.id.v2_username_input);
             userInputLayout.setEndIconActivated(true);
             userInputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
 
-            returnView.findViewById(R.id.v2_role).setVisibility(View.GONE);
-            returnView.findViewById(R.id.v2_role_input).setVisibility(View.GONE);
+            returnScroll.findViewById(R.id.v2_role).setVisibility(View.GONE);
+            returnScroll.findViewById(R.id.v2_role_input).setVisibility(View.GONE);
 
-            returnView.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
+            returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
                 // Display signup page
                 if (getActivity() != null) {
                     ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
@@ -126,7 +133,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                 }
             });
             // Login through username
-            returnView.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
+            returnScroll.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
                 Toast.makeText(getActivity(), R.string.v2_logging_in, Toast.LENGTH_SHORT).show();
                 userInputLayout.setErrorEnabled(false);
                 passwordInputLayout.setErrorEnabled(false);
@@ -162,13 +169,13 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                 }
             });
         } else {
-            returnView.findViewById(R.id.v2_username).setVisibility(View.GONE);
-            returnView.findViewById(R.id.v2_username_input).setVisibility(View.GONE);
-            returnView.findViewById(R.id.v2_button_signup).setVisibility(View.GONE);
+            returnScroll.findViewById(R.id.v2_username).setVisibility(View.GONE);
+            returnScroll.findViewById(R.id.v2_username_input).setVisibility(View.GONE);
+            returnScroll.findViewById(R.id.v2_button_signup).setVisibility(View.GONE);
 
             if (getActivity() != null) {
                 // Populate spinner
-                Spinner roleSpinner = returnView.findViewById(R.id.v2_role_input);
+                Spinner roleSpinner = returnScroll.findViewById(R.id.v2_role_input);
                 List<RoleData> roleDataList = projectDatabase.RoleDao().searchByProject(project.projectID);
                 ArrayList<String> roleList = new ArrayList<>();
                 for (RoleData role: roleDataList) {
@@ -179,7 +186,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                 roleSpinner.setAdapter(roleAdapter);
 
                 // Login through role
-                returnView.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
+                returnScroll.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
                     Toast.makeText(getActivity(), R.string.v2_logging_in, Toast.LENGTH_SHORT).show();
                     passwordInputLayout.setErrorEnabled(false);
                     if (passwordInputLayout.getEditText() != null) {

@@ -12,8 +12,128 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/v1_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".project.verify.ProjectSignupFragment"/>
+    android:orientation="vertical"
+    tools:context=".project.verify.ProjectSignupFragment" >
+
+    <LinearLayout
+        android:id="@+id/v1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24sp">
+
+        <TextView
+            android:id="@+id/v1_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/blank"
+            android:textSize="36sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="36sp" />
+
+        <TextView
+            android:id="@+id/v1_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p_username"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/v1_usernrame_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/v1_password1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p_password"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/v1_password1_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/v1_password2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/v1_reenter_password"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/v1_password2_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="36sp" />
+
+        <LinearLayout
+            style="@style/Widget.AppCompat.ButtonBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/v1_return"
+                style="@style/AppTheme.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5sp"
+                android:layout_marginEnd="5sp"
+                android:layout_weight="1"
+                android:paddingTop="15sp"
+                android:paddingBottom="15sp"
+                android:text="@string/return_val"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/v1_signup"
+                style="@style/AppTheme.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5sp"
+                android:layout_marginEnd="5sp"
+                android:layout_weight="1"
+                android:paddingTop="15sp"
+                android:paddingBottom="15sp"
+                android:text="@string/v1_signup"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

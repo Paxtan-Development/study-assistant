@@ -225,15 +225,20 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                 .findViewById(R.id.n4_title)).getText().toString()
                 .replaceAll("\\s+", "").length() > 0) {
             // Save original as ArrayList
-            ArrayList<String> previousNote = subjContents.get(notesOrder);
+            ArrayList<String> previousNote;
+            if (hasParent) {
+                previousNote = subjContents.get(notesOrder);
+            } else {
+                previousNote = new ArrayList<>();
+            }
             ArrayList<String> updatedNote = new ArrayList<>();
             FileFunctions.checkNoteIntegrity(updatedNote);
-            updatedNote.add(((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
-            updatedNote.add(ConverterFunctions.standardDateTimeFormat.format(new Date()));
-            updatedNote.add(((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
-            updatedNote.add(""); // Note should be unlocked if it can be edited
-            updatedNote.add(null);
-            updatedNote.add(null);
+            updatedNote.set(0, ((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
+            updatedNote.set(1, ConverterFunctions.standardDateTimeFormat.format(new Date()));
+            updatedNote.set(2, ((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
+            updatedNote.set(3, ""); // Note should be unlocked if it can be edited
+            updatedNote.set(4, null);
+            updatedNote.set(5, null);
 
             AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
             if (manager != null && previousNote.size() >= 6 && previousNote.get(5) != null) {
@@ -338,7 +343,7 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
     @Override
     public boolean onBackPressed() {
         if (getFragmentManager() != null) {
-            new AutoDismissDialog(getString(R.string.n4_return), getString(R.string.n4_save_note),
+            new AutoDismissDialog(getString(R.string.return_val), getString(R.string.n4_save_note),
                     new String[]{getString(R.string.yes), getString(R.string.no),
                             getString(android.R.string.cancel)},
                     new DialogInterface.OnClickListener[]{

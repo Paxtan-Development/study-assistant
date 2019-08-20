@@ -35,7 +35,11 @@ public class ProjectSignupFragment extends Fragment {
     /** Initializes the fragment and the project info. **/
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // TODO: Current fragment
         super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.v1_signup);
+        }
     }
 
     /** Constructor used when signing up for a new profile. **/

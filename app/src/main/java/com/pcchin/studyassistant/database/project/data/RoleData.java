@@ -70,10 +70,13 @@ public class RoleData {
     /** Constructor used when creating a new role. Due to the number of boolean variables used,
      * they would be configured individually for each usage.
      * All the boolean values were set to false by default. **/
-    public RoleData(@NonNull String roleID, String parentProject, String roleName) {
+    public RoleData(@NonNull String roleID, String parentProject, String roleName,
+                    String salt, String rolePass) {
         this.roleID = roleID;
         this.parentProject = parentProject;
         this.roleName = roleName;
+        this.salt = salt;
+        this.rolePass = rolePass;
         this.canDeleteProject = false;
         this.canModifyInfo = false;
         this.canModifyOtherTask = false;

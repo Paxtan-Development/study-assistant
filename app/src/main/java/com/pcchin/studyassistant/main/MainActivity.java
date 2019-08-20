@@ -40,15 +40,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.room.Room;
 
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.database.project.ProjectDatabase;
-import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -142,13 +139,15 @@ public class MainActivity extends AppCompatActivity
             }
 
             // Set up Admin & Member roles in database for projects
+            // TODO: Restore statement once completed
+            /*
             new Handler().post(() -> {
                 ProjectDatabase projectDatabase = Room.databaseBuilder(this,
                         ProjectDatabase.class, DATABASE_PROJECT)
                         .allowMainThreadQueries().build();
                 RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                 if (admin == null) {
-                    admin = new RoleData("admin", "", "Admin");
+                    admin = new RoleData("admin", "", "Admin", "", "");
                     admin.canDeleteProject = true;
                     admin.canModifyInfo = true;
                     admin.canModifyOtherTask = true;
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity
                     projectDatabase.RoleDao().insert(admin);
                 }
                 projectDatabase.close();
-            });
+            }); */
 
             // Delete any past export files
             new Handler().post(() -> {
@@ -216,7 +215,6 @@ public class MainActivity extends AppCompatActivity
             currentFragment = getSupportFragmentManager().getFragments()
                     .get(getSupportFragmentManager().getFragments().size() - 1);
         }
-        new AppUpdate(this, true);
 
         // Get subject, if needed from Intent
         if (getIntent().getBooleanExtra(INTENT_VALUE_START_FRAGMENT, false)) {
@@ -395,7 +393,6 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
         currentFragment = fragment;
-        bottomNavView.setVisibility(View.GONE);
         hideKeyboard();
     }
 

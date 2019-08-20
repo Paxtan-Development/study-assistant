@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e047f589b9aecc8ce4bbc0b57d92c8f1",
+    "identityHash": "cf888d31f24b700c4e2455ae5646cc70",
     "entities": [
       {
         "tableName": "ProjectData",
@@ -294,7 +294,7 @@
       },
       {
         "tableName": "RoleData",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_roleID` TEXT NOT NULL, `parentProject` TEXT, `roleName` TEXT, `canModifyOtherUser` INTEGER NOT NULL, `canViewOtherUser` INTEGER NOT NULL, `canModifyRole` INTEGER NOT NULL, `canViewRole` INTEGER NOT NULL, `canModifyOtherTask` INTEGER NOT NULL, `canModifyOwnTask` INTEGER NOT NULL, `canViewTask` INTEGER NOT NULL, `canSetPassword` INTEGER NOT NULL, `canModifyInfo` INTEGER NOT NULL, `canDeleteProject` INTEGER NOT NULL, PRIMARY KEY(`_roleID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_roleID` TEXT NOT NULL, `parentProject` TEXT, `roleName` TEXT, `salt` TEXT, `rolePass` TEXT, `canDeleteProject` INTEGER NOT NULL, `canModifyInfo` INTEGER NOT NULL, `canModifyOtherTask` INTEGER NOT NULL, `canModifyOtherUser` INTEGER NOT NULL, `canModifyOwnTask` INTEGER NOT NULL, `canModifyRole` INTEGER NOT NULL, `canSetPassword` INTEGER NOT NULL, `canViewOtherUser` INTEGER NOT NULL, `canViewRole` INTEGER NOT NULL, `canViewTask` INTEGER NOT NULL, PRIMARY KEY(`_roleID`))",
         "fields": [
           {
             "fieldPath": "roleID",
@@ -315,50 +315,20 @@
             "notNull": false
           },
           {
-            "fieldPath": "canModifyOtherUser",
-            "columnName": "canModifyOtherUser",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
-            "fieldPath": "canViewOtherUser",
-            "columnName": "canViewOtherUser",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "rolePass",
+            "columnName": "rolePass",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
-            "fieldPath": "canModifyRole",
-            "columnName": "canModifyRole",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canViewRole",
-            "columnName": "canViewRole",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canModifyOtherTask",
-            "columnName": "canModifyOtherTask",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canModifyOwnTask",
-            "columnName": "canModifyOwnTask",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canViewTask",
-            "columnName": "canViewTask",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canSetPassword",
-            "columnName": "canSetPassword",
+            "fieldPath": "canDeleteProject",
+            "columnName": "canDeleteProject",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -369,8 +339,50 @@
             "notNull": true
           },
           {
-            "fieldPath": "canDeleteProject",
-            "columnName": "canDeleteProject",
+            "fieldPath": "canModifyOtherTask",
+            "columnName": "canModifyOtherTask",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyOtherUser",
+            "columnName": "canModifyOtherUser",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyOwnTask",
+            "columnName": "canModifyOwnTask",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyRole",
+            "columnName": "canModifyRole",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canSetPassword",
+            "columnName": "canSetPassword",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewOtherUser",
+            "columnName": "canViewOtherUser",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewRole",
+            "columnName": "canViewRole",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewTask",
+            "columnName": "canViewTask",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -450,7 +462,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e047f589b9aecc8ce4bbc0b57d92c8f1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf888d31f24b700c4e2455ae5646cc70')"
     ]
   }
 }

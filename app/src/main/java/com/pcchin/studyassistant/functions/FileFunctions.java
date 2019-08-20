@@ -110,7 +110,7 @@ public class FileFunctions {
         while (original.size() < 3) {
             original.add("");
         }
-        if (original.size() < 6) {
+        while (original.size() < 6) {
             original.add(null);
         }
     }

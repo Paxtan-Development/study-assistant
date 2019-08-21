@@ -21,7 +21,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -83,18 +85,23 @@ class AppUpdate {
         this.activity = activity;
         this.calledFromNotif = calledFromNotif;
 
-        // Check if network is connected
+        // Check if network is connected (Updated code as old code is deprecated)
         boolean isConnected = false;
-        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager)activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                NetworkCapabilities activeNetwork = cm.getNetworkCapabilities(cm.getActiveNetwork());
-                if (activeNetwork != null && activeNetwork
-                        .hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    isConnected = true;
+            if (Build.VERSION.SDK_INT < 23) {
+                final NetworkInfo ni = cm.getActiveNetworkInfo();
+                if (ni != null) {
+                    isConnected = ni.isConnected();
                 }
-            } else if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()) {
-                isConnected = true;
+            } else {
+                final Network n = cm.getActiveNetwork();
+                if (n != null) {
+                    final NetworkCapabilities nc = cm.getNetworkCapabilities(n);
+                    if (nc != null) {
+                        isConnected = nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+                    }
+                }
             }
         }
 

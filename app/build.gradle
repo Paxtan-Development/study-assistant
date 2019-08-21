@@ -102,3 +102,9 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.12.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.62'
 }
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+}

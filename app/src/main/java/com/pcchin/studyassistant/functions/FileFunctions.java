@@ -137,6 +137,7 @@ public class FileFunctions {
     public static String getRealPathFromUri(Context context, Uri uri){
         Cursor cursor = null;
         try {
+            // MediaStore.Images.Media.DATA is deprecated but no viable alternatives are found yet
             String[] proj = {MediaStore.Images.Media.DATA};
             cursor = context.getContentResolver().query(uri, proj, null, null, null);
             if (cursor != null) {

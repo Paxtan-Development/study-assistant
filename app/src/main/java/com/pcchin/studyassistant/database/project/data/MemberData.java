@@ -16,6 +16,7 @@ package com.pcchin.studyassistant.database.project.data;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /** The entity for each member. **/
@@ -46,6 +47,7 @@ public class MemberData {
     public String role;
 
     /** Default constructor. **/
+    @Ignore
     public MemberData() {
 
     }

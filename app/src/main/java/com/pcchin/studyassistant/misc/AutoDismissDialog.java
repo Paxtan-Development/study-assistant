@@ -204,7 +204,8 @@ public class AutoDismissDialog extends DialogFragment {
             } else if (contentType == DIALOG_CONTENT_LIST) {
                 builder.setItems(arrayRes, arrayListener);
             }
-            if (autoDismiss && buttonList != null && yListeners != null) {
+            if (autoDismiss && buttonList != null && yListeners != null
+                    && contentType != DIALOG_CONTENT_LIST) {
                 builder.setPositiveButton(buttonList[0], yListeners[0]);
                 builder.setNegativeButton(buttonList[1], yListeners[1]);
                 builder.setNeutralButton(buttonList[2], yListeners[2]);

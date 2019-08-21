@@ -40,12 +40,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.room.Room;
 
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
@@ -139,29 +143,30 @@ public class MainActivity extends AppCompatActivity
             }
 
             // Set up Admin & Member roles in database for projects
-            // TODO: Restore statement once completed
-            /*
-            new Handler().post(() -> {
-                ProjectDatabase projectDatabase = Room.databaseBuilder(this,
-                        ProjectDatabase.class, DATABASE_PROJECT)
-                        .allowMainThreadQueries().build();
-                RoleData admin = projectDatabase.RoleDao().searchByID("admin");
-                if (admin == null) {
-                    admin = new RoleData("admin", "", "Admin", "", "");
-                    admin.canDeleteProject = true;
-                    admin.canModifyInfo = true;
-                    admin.canModifyOtherTask = true;
-                    admin.canModifyOtherUser = true;
-                    admin.canModifyOwnTask = true;
-                    admin.canModifyRole = true;
-                    admin.canSetPassword = true;
-                    admin.canViewOtherUser = true;
-                    admin.canViewRole = true;
-                    admin.canViewTask = true;
-                    projectDatabase.RoleDao().insert(admin);
-                }
-                projectDatabase.close();
-            }); */
+            // TODO: Remove statement once completed
+            if (BuildConfig.DEBUG) {
+                new Handler().post(() -> {
+                    ProjectDatabase projectDatabase = Room.databaseBuilder(this,
+                            ProjectDatabase.class, DATABASE_PROJECT)
+                            .allowMainThreadQueries().build();
+                    RoleData admin = projectDatabase.RoleDao().searchByID("admin");
+                    if (admin == null) {
+                        admin = new RoleData("admin", "", "Admin", "", "");
+                        admin.canDeleteProject = true;
+                        admin.canModifyInfo = true;
+                        admin.canModifyOtherTask = true;
+                        admin.canModifyOtherUser = true;
+                        admin.canModifyOwnTask = true;
+                        admin.canModifyRole = true;
+                        admin.canSetPassword = true;
+                        admin.canViewOtherUser = true;
+                        admin.canViewRole = true;
+                        admin.canViewTask = true;
+                        projectDatabase.RoleDao().insert(admin);
+                    }
+                    projectDatabase.close();
+                });
+            }
 
             // Delete any past export files
             new Handler().post(() -> {

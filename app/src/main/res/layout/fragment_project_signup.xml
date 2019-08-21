@@ -48,7 +48,28 @@
             android:textSize="24sp" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/v1_usernrame_input"
+            android:id="@+id/v1_username_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/v1_fullname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p_full_name"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/v1_fullname_input"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

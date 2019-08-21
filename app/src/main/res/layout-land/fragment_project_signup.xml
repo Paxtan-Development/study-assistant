@@ -62,7 +62,24 @@
                     android:textSize="24sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/v1_usernrame_input"
+                    android:id="@+id/v1_username_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/v1_fullname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/p_full_name"
+                    android:textSize="24sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/v1_fullname_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -96,6 +113,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/v1_password2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/v1_reenter_password"
+                    android:textSize="24sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_password2_input"

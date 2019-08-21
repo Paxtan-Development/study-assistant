@@ -49,4 +49,16 @@ public class MemberData {
     public MemberData() {
 
     }
+
+    /** Constructor used when creating a new account. **/
+    public MemberData(@NonNull String memberID, String parentProject, String username, String fullName,
+                      String salt, String memberPass, String role) {
+        this.memberID = memberID;
+        this.parentProject = parentProject;
+        this.username = username;
+        this.fullName = fullName;
+        this.salt = salt;
+        this.memberPass = memberPass;
+        this.role = role;
+    }
 }

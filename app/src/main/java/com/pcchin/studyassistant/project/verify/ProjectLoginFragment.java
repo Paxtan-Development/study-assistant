@@ -116,21 +116,19 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
         passwordInputLayout.setEndIconActivated(true);
         passwordInputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
-        // Set up whether to display members or roles
-        if (project.membersEnabled) {
-            TextInputLayout userInputLayout = returnScroll.findViewById(R.id.v2_username_input);
-            userInputLayout.setEndIconActivated(true);
-            userInputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+        TextInputLayout userInputLayout = returnScroll.findViewById(R.id.v2_username_input);
+        userInputLayout.setEndIconActivated(true);
+        userInputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
 
+        // Set up whether to display members or roles
+        if (getActivity() != null && project.membersEnabled) {
             returnScroll.findViewById(R.id.v2_role).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.v2_role_input).setVisibility(View.GONE);
 
             returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
                 // Display signup page
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
-                            .newInstance(project.projectID));
-                }
+                ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
+                        .newInstance(project.projectID));
             });
             // Login through username
             returnScroll.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
@@ -149,8 +147,8 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                                         userInputLayout.getEditText().getText().toString());
                         if (targetMember == null) {
                             userInputLayout.setErrorEnabled(true);
-                            userInputLayout.setError(getString(R.string.v2_error_username_missing));
-                        } else if (getActivity() != null) {
+                            userInputLayout.setError(getString(R.string.v_error_username_missing));
+                        } else {
                             // Check if password entered is correct
                             String hashedPassword = SecurityFunctions.memberHash(
                                     userInputLayout.getEditText().getText().toString(),
@@ -168,7 +166,15 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                     }
                 }
             });
-        } else {
+            // Sign up if conditions met
+            if (project.membersEnabled && project.memberSignupEnabled) {
+                returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
+                    projectDatabase.close();
+                    ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
+                            .newInstance(project.projectID));
+                });
+            }
+        } else if (getActivity() != null) {
             returnScroll.findViewById(R.id.v2_username).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.v2_username_input).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.v2_button_signup).setVisibility(View.GONE);
@@ -211,11 +217,19 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                             }
                         } else {
                             passwordInputLayout.setErrorEnabled(true);
-                            passwordInputLayout.setError(getString(R.string.error_password_incorrect));
+                            passwordInputLayout.setError(getString(R.string.error_password_short));
                         }
                     }
 
                 });
+                // Sign up if conditions met
+                if (project.membersEnabled && project.memberSignupEnabled) {
+                    returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
+                        projectDatabase.close();
+                        ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
+                                .newInstance(project.projectID));
+                    });
+                }
             }
         }
         return returnScroll;

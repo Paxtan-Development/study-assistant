@@ -49,6 +49,9 @@
 
     <!-- Errors used in group V. -->
     <string name="v_error_username_blank">Username cannot be blank.</string>
-
-    <string name="v2_error_username_missing">The username entered could not be found.</string>
+    <string name="v_error_username_taken">The username entered has been taken. Please try another username.</string>
+    <string name="v_error_username_whitespace">Username cannot contain whitespace characters such as spaces or tabs.</string>
+    <string name="v_error_username_missing">The username entered could not be found.</string>
+    <string name="v_error_password_blank">Password cannot be blank.</string>
+    <string name="v_error_password_unequal">Both passwords are not the same.</string>
 </resources>

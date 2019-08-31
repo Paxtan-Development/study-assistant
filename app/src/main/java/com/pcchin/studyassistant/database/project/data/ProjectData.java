@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /** The entity for each project. Each project should also have its own folder named after its ID
- * to store images related to it. **/
+ * to store images related to it. Could be updated to some sort of secure key in the future but **/
 @Entity
 public class ProjectData {
     // The types of content that is displayed at the bottom of the project info page.
@@ -56,8 +56,9 @@ public class ProjectData {
     /** The description of the project. **/
     public String description;
 
-    /** The path stored in the local storage that points to the icon for the project. **/
-    public String projectIcon;
+    /** Whether the project has an icon. The default icon path is at
+     * getFilesDir() + /icons/project/ + projectID.jpg **/
+    public boolean hasIcon;
 
     /** The resource file pointing to the icon for the project status. **/
     public int projectStatusIcon;
@@ -73,6 +74,9 @@ public class ProjectData {
 
     /** The date that the task actually ended. **/
     public Date actualEndDate;
+
+    /** Whether the the project is protected and requires a password to enter. **/
+    public boolean projectProtected;
 
     /** Whether members can sign up via the login screen. **/
     public boolean memberSignupEnabled;
@@ -145,7 +149,8 @@ public class ProjectData {
         this.roleList = new ArrayList<>();
         this.statusList = new ArrayList<>();
         this.memberDefaultRole = memberDefaultRole;
-        this.projectIcon = "";
+        this.projectProtected = false;
+        this.hasIcon = false;
         this.actualStartDate = new Date();
         this.displayedInfo = DISPLAYED_TASKS;
     }

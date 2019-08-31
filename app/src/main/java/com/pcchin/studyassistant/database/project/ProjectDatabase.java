@@ -29,7 +29,17 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.database.project.data.StatusData;
 import com.pcchin.studyassistant.database.project.data.TaskData;
 
-/** The notes layer for the projects. **/
+/** The notes layer for the projects.
+ * Both databases could be upgraded to some sort of encrypted SQLite database
+ * eg. https://github.com/commonsguy/cwac-saferoom
+ * Potential issues would be
+ * 1) No suitable passphrase
+ * 2) Backwards compatibility could be affected
+ *
+ * Minimum requirements for every database:
+ * 1) If only roles are enabled, at least 1 role must be able to edit role data
+ * 2) If only members are enabled, there should be at least 1 member in the project
+ * 3) If roles and members are enabled, at least 1 member must have a role that can edit role data **/
 @Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class,
         StatusData.class}, version=1)
 @TypeConverters(ConverterFunctions.class)

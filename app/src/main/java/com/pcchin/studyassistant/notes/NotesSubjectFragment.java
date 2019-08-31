@@ -473,7 +473,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         if (getContext() != null) {
             // Generate valid paths for temp storage folder
             String tempExportFolder = FileFunctions.generateValidFile(getContext()
-                    .getFilesDir().getAbsolutePath() + "/.tempZip", "");
+                    .getFilesDir().getAbsolutePath() + "/tempZip", "");
             try {
                 // Creates ZIP file
                 String exportFilePath = FileFunctions.generateValidFile(

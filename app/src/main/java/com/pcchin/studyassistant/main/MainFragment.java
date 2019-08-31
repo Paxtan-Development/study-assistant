@@ -80,7 +80,7 @@ public class MainFragment extends Fragment implements FragmentOnBackPressed {
         if (getActivity() != null) {
             // Press back to exit
             if (doubleBackToExitPressedOnce) {
-                GeneralFunctions.displayExit(getActivity());
+                GeneralFunctions.exitApp(getActivity());
             } else {
                 this.doubleBackToExitPressedOnce = true;
                 Toast.makeText(getContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();

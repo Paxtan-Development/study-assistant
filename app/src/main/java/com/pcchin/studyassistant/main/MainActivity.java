@@ -59,7 +59,12 @@ import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.notes.NotesViewFragment;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
+import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
+import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
+import com.pcchin.studyassistant.project.role.ProjectRoleFragment;
+import com.pcchin.studyassistant.project.status.ProjectStatusFragment;
+import com.pcchin.studyassistant.project.task.ProjectTaskFragment;
 
 import java.io.File;
 import java.util.Date;
@@ -170,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
             // Delete any past export files
             new Handler().post(() -> {
-                String outputFileName = getFilesDir().getAbsolutePath() + "/files";
+                String outputFileName = getFilesDir().getAbsolutePath() + "/temp";
                 File apkInstallDir = new File(outputFileName);
                 if (apkInstallDir.exists() && apkInstallDir.isDirectory()) {
                     // Deletes all children in the folder
@@ -393,6 +398,16 @@ public class MainActivity extends AppCompatActivity
     /** Displays the fragment that is needed to be displayed.
      * Keyboard will be hidden between fragments **/
     public void displayFragment(Fragment fragment) {
+        // Hides bottomNavView if the project comes from a project fragment
+        // and to a non-project fragment
+        if (! (fragment instanceof ProjectInfoFragment || fragment instanceof ProjectMemberFragment
+                || fragment instanceof ProjectTaskFragment
+                || fragment instanceof ProjectRoleFragment
+                || fragment instanceof ProjectStatusFragment)) {
+            bottomNavView.setVisibility(View.GONE);
+        }
+
+        // Display the fragment
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.base, fragment);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);

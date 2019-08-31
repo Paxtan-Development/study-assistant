@@ -73,7 +73,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class AppUpdate {
     private static final String GITLAB = "https://gitlab.com";
     private static final String GITLAB_API_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
-    private static final String GITLAB_RELEASES = "https://gitlab.com/pc.chin/study-assistant/releases";
+    private static final String GITLAB_RELEASES = "https://gitlab.com/paxtandev/study-assistant/releases";
 
     private int gitlabReleasesStatusCode;
     private final boolean calledFromNotif;
@@ -249,11 +249,11 @@ class AppUpdate {
     private void updateViaGitlab(String downloadLink) {
         // Generate output file name
         // Checks if the /files directory exists, if not it is created
-        File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/files");
+        File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/temp");
         if (filesDir.exists() || filesDir.mkdir()) {
             // Ask other APK files is deleted on startup, leftover files would not be checked here
             String outputFileName = FileFunctions.generateValidFile(activity
-                    .getFilesDir().getAbsolutePath() + "/.studyassistant-update", ".apk");
+                    .getFilesDir().getAbsolutePath() + "/temp/studyassistant-update", ".apk");
             RequestQueue queue = Volley.newRequestQueue(activity);
             // Boolean used as it is possible for user to cancel the dialog before the download starts
             AtomicBoolean continueDownload = new AtomicBoolean(true);

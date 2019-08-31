@@ -25,7 +25,7 @@ public class RoleData {
     /** Reserved roles for each project. None is reserved as
      * it is possible for a task to be assigned to no one. **/
     @Ignore
-    public static final String[] reservedRoles = {"none"};
+    public static final String[] reservedRoles = {"admin", "none"};
 
     /** The ID for each role, serves as a unique key and is randomly generated. **/
     @PrimaryKey

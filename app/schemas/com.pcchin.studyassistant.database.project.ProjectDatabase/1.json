@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cf888d31f24b700c4e2455ae5646cc70",
+    "identityHash": "e18f9f8e761f420e08fd97fa0e5d904a",
     "entities": [
       {
         "tableName": "ProjectData",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_projectID` TEXT NOT NULL, `salt` TEXT, `projectTitle` TEXT, `projectPass` TEXT, `description` TEXT, `projectIcon` TEXT, `projectStatusIcon` INTEGER NOT NULL, `expectedStartDate` TEXT, `expectedEndDate` TEXT, `actualStartDate` TEXT, `actualEndDate` TEXT, `memberSignupEnabled` INTEGER NOT NULL, `memberDefaultRole` TEXT, `membersEnabled` INTEGER NOT NULL, `rolesEnabled` INTEGER NOT NULL, `mergeTaskStatus` INTEGER NOT NULL, `taskEnabled` INTEGER NOT NULL, `statusEnabled` INTEGER NOT NULL, `memberList` TEXT, `taskList` TEXT, `roleList` TEXT, `statusList` TEXT, `displayedInfo` INTEGER NOT NULL, `associatedSubject` TEXT, PRIMARY KEY(`_projectID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_projectID` TEXT NOT NULL, `salt` TEXT, `projectTitle` TEXT, `projectPass` TEXT, `description` TEXT, `hasIcon` INTEGER NOT NULL, `projectStatusIcon` INTEGER NOT NULL, `expectedStartDate` TEXT, `expectedEndDate` TEXT, `actualStartDate` TEXT, `actualEndDate` TEXT, `projectProtected` INTEGER NOT NULL, `memberSignupEnabled` INTEGER NOT NULL, `memberDefaultRole` TEXT, `membersEnabled` INTEGER NOT NULL, `rolesEnabled` INTEGER NOT NULL, `mergeTaskStatus` INTEGER NOT NULL, `taskEnabled` INTEGER NOT NULL, `statusEnabled` INTEGER NOT NULL, `memberList` TEXT, `taskList` TEXT, `roleList` TEXT, `statusList` TEXT, `displayedInfo` INTEGER NOT NULL, `associatedSubject` TEXT, PRIMARY KEY(`_projectID`))",
         "fields": [
           {
             "fieldPath": "projectID",
@@ -39,10 +39,10 @@
             "notNull": false
           },
           {
-            "fieldPath": "projectIcon",
-            "columnName": "projectIcon",
-            "affinity": "TEXT",
-            "notNull": false
+            "fieldPath": "hasIcon",
+            "columnName": "hasIcon",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "projectStatusIcon",
@@ -73,6 +73,12 @@
             "columnName": "actualEndDate",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "projectProtected",
+            "columnName": "projectProtected",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "memberSignupEnabled",
@@ -462,7 +468,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf888d31f24b700c4e2455ae5646cc70')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e18f9f8e761f420e08fd97fa0e5d904a')"
     ]
   }
 }

@@ -37,7 +37,9 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
+import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
@@ -104,7 +106,8 @@ public class GeneralFunctions {
         // TODO: Add new project
     }
 
-    /** Updates the NavigationView in MainActivity **/
+    /** Updates the NavigationView in
+     * @see MainActivity **/
     public static void updateNavView(@NonNull final MainActivity activity) {
         NavigationView navView = activity.findViewById(R.id.nav_view);
         // Nuke menu
@@ -191,13 +194,35 @@ public class GeneralFunctions {
         MenuItem exitItem = otherMenu.add(R.string.exit);
         exitItem.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            displayExit(activity);
+            exitApp(activity);
             return true;
         });
     }
 
+    /** Updates the bottom NavigationView to either the project's menu or the media selection's menu. **/
+    public static void updateBottomNavView(MainActivity activity, int res, ProjectData project,
+                                           MemberData member, RoleData role) {
+        // Only member or role are allowed to be null, not both at once
+        if (member == null && role == null) {
+            throw new IllegalArgumentException("MemberData member and RoleData role cannot be " +
+                    "null in the same arguments");
+        } else {
+            // Reset menu
+            activity.bottomNavView.getMenu().clear();
+            activity.bottomNavView.inflateMenu(res);
+            Menu navViewMenu = activity.bottomNavView.getMenu();
+
+            // TODO: Update bottom nav view
+            if (res == R.menu.menu_p_bottom) {
+
+            } else {
+
+            }
+        }
+    }
+
     /** Exits the app.**/
-    public static void displayExit(Activity activity) {
+    public static void exitApp(Activity activity) {
         activity.moveTaskToBack(true);
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(0);

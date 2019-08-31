@@ -173,7 +173,7 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
                         projectDatabase.close();
                         Toast.makeText(getActivity(), R.string.v1_member_created, Toast.LENGTH_SHORT).show();
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                .newInstance(project.projectID, memberID, true));
+                                .newInstance(project.projectID, memberID, true, true));
                     }
                 }
             });

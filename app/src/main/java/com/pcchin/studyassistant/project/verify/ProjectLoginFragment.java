@@ -87,7 +87,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                     // All users will be logged in as admin if roles & members are not enabled
                     projectDatabase.close();
                     ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, "admin", false));
+                            .newInstance(project.projectID, "admin", false, true));
                 } else {
                     getActivity().setTitle(R.string.v2_project_login);
                 }
@@ -102,9 +102,13 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
         View returnScroll = inflater.inflate(R.layout.fragment_project_login, container, false);
         ((TextView) returnScroll.findViewById(R.id.v2_title)).setText(project.projectTitle);
         // Set up icon (only for portrait)
-        ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
-        if (projectIcon != null && project.projectIcon.length() > 0) {
-            projectIcon.setImageURI(Uri.fromFile(new File(project.projectIcon)));
+        if (getActivity() != null) {
+            String iconPath = getActivity().getFilesDir().getAbsolutePath() + "/icons/project/"
+                    + project.projectID + ".jpg";
+            ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
+            if (project.hasIcon && new File(iconPath).exists()) {
+                projectIcon.setImageURI(Uri.fromFile(new File(iconPath)));
+            }
         }
 
         // Set up TextInputLayouts
@@ -157,7 +161,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                                 projectDatabase.close();
                                 ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                         .newInstance(project.projectID,
-                                                targetMember.memberID, true));
+                                                targetMember.memberID, true, true));
                             } else {
                                 passwordInputLayout.setErrorEnabled(true);
                                 passwordInputLayout.setError(getString(R.string.error_password_incorrect));
@@ -202,7 +206,8 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                             // Role doesn't have a password
                             projectDatabase.close();
                             ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                    .newInstance(project.projectID, roleSelected.roleID, false));
+                                    .newInstance(project.projectID, roleSelected.roleID,
+                                            false, true));
                         } else if (inputPassword.length() >= 8){
                             // Check whether the password for the role is correct.
                             String hashedPassword = SecurityFunctions.roleHash(
@@ -210,7 +215,8 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                             if (Objects.equals(hashedPassword, roleSelected.rolePass)) {
                                 projectDatabase.close();
                                 ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                        .newInstance(project.projectID, roleSelected.roleID, false));
+                                        .newInstance(project.projectID, roleSelected.roleID,
+                                                false, true));
                             } else {
                                 passwordInputLayout.setErrorEnabled(true);
                                 passwordInputLayout.setError(getString(R.string.error_password_incorrect));

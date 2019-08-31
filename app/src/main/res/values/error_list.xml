@@ -45,7 +45,9 @@
     <string name="n2_error_time_passed">The time selected had passed.</string>
 
     <!-- Errors used in group P. -->
-    <string name="p_error_project_not_found">The project selected is not found.</string>
+    <string name="p_error_project_not_found">The project selected is not found</string>
+    <string name="p_error_member_not_found">The member selected is not found</string>
+    <string name="p_error_role_not_found">The role selected is not found</string>
 
     <!-- Errors used in group V. -->
     <string name="v_error_username_blank">Username cannot be blank.</string>

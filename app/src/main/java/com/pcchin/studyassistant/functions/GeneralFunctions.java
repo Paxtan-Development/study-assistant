@@ -35,6 +35,7 @@ import android.view.SubMenu;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
@@ -151,33 +152,36 @@ public class GeneralFunctions {
 
         // Add projects
         SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
-        ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
-                MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
-        List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
-        for (ProjectData project: projectList) {
-            MenuItem projItem = projMenu.add(project.projectTitle);
-            projItem.setOnMenuItemClickListener(menuItem -> {
+        // TODO: Remove statement once completed
+        if (BuildConfig.DEBUG) {
+            ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
+                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+            List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
+            for (ProjectData project : projectList) {
+                MenuItem projItem = projMenu.add(project.projectTitle);
+                projItem.setOnMenuItemClickListener(menuItem -> {
+                    activity.closeDrawer();
+                    activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+                    return false;
+                });
+            }
+
+            // Add New Project Button
+            MenuItem newProj = projMenu.add(R.string.m3_new_project);
+            newProj.setOnMenuItemClickListener(item -> {
                 activity.closeDrawer();
-                activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-                return false;
+                showNewProject(activity, projectDatabase);
+                return true;
+            });
+
+            // Add Import Project button
+            MenuItem projImport = projMenu.add(R.string.m3_data_import);
+            projImport.setOnMenuItemClickListener(item -> {
+                // TODO: Import projects
+                activity.closeDrawer();
+                return true;
             });
         }
-
-        // Add New Project Button
-        MenuItem newProj = projMenu.add(R.string.m3_new_project);
-        newProj.setOnMenuItemClickListener(item -> {
-            activity.closeDrawer();
-            showNewProject(activity, projectDatabase);
-            return true;
-        });
-
-        // Add Import Project button
-        MenuItem projImport = projMenu.add(R.string.m3_data_import);
-        projImport.setOnMenuItemClickListener(item -> {
-            // TODO: Import projects
-            activity.closeDrawer();
-            return true;
-        });
 
         // Add subMenu for other buttons
         SubMenu otherMenu = currentMenu.addSubMenu(R.string.m3_others);

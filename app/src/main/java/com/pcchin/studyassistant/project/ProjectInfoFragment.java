@@ -42,7 +42,7 @@ public class ProjectInfoFragment extends Fragment implements FragmentOnBackPress
     private ProjectDatabase projectDatabase;
     private ProjectData project;
 
-    // Mutually exclusive
+    // Mutually exclusive unless the project has both of those enabled
     private MemberData member;
     private RoleData role;
 
@@ -122,6 +122,9 @@ public class ProjectInfoFragment extends Fragment implements FragmentOnBackPress
                             R.menu.menu_p_bottom, project, null, role);
                 }
             }
+        } else {
+            // getActivity() is somehow null, returns to previous fragment.
+            onBackPressed();
         }
         setHasOptionsMenu(true);
     }

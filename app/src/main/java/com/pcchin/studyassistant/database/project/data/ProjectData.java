@@ -138,17 +138,22 @@ public class ProjectData {
     }
 
     /** Constructor used when creating a new project.
+     * Inserts a admin member and two default roles, admin and member.
      * By default, tasks would be displayed on the description,
      * the actual start date would be the date that the project was created,
      * and the default role of new members would be "member". **/
-    public ProjectData(@NonNull String projectID, String projectTitle, String memberDefaultRole) {
+    public ProjectData(@NonNull String projectID, String projectTitle, RoleData memberDefaultRole,
+                        MemberData defaultAdmin, RoleData adminRole) {
         this.projectID = projectID;
         this.projectTitle = projectTitle;
         this.memberList = new ArrayList<>();
+        this.memberList.add(defaultAdmin.memberID);
         this.taskList = new ArrayList<>();
         this.roleList = new ArrayList<>();
+        this.roleList.add(memberDefaultRole.roleID);
+        this.roleList.add(adminRole.roleID);
         this.statusList = new ArrayList<>();
-        this.memberDefaultRole = memberDefaultRole;
+        this.memberDefaultRole = memberDefaultRole.roleID;
         this.projectProtected = false;
         this.hasIcon = false;
         this.actualStartDate = new Date();

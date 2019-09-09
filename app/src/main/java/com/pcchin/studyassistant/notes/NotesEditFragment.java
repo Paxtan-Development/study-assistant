@@ -236,9 +236,6 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
             updatedNote.set(0, ((EditText) getView().findViewById(R.id.n4_title)).getText().toString());
             updatedNote.set(1, ConverterFunctions.standardDateTimeFormat.format(new Date()));
             updatedNote.set(2, ((EditText) getView().findViewById(R.id.n4_edit)).getText().toString());
-            updatedNote.set(3, ""); // Note should be unlocked if it can be edited
-            updatedNote.set(4, null);
-            updatedNote.set(5, null);
 
             AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
             if (manager != null && previousNote.size() >= 6 && previousNote.get(5) != null) {

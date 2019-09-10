@@ -13,6 +13,7 @@
   -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/v1_scroll"
     android:layout_width="match_parent"
@@ -64,7 +65,8 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_username_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:endIconMode="clear_text">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -81,7 +83,8 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_fullname_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:endIconMode="clear_text">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -107,28 +110,32 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_password1_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="text|textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/v1_password2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/v1_reenter_password"
+                    android:text="@string/reenter_password"
                     android:textSize="24sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_password2_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="text|textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

@@ -12,7 +12,9 @@
   ~ limitations under the License.
   -->
 
+<!-- The LinearLayouts are used here for neatness -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/p6_scroll"
     android:layout_width="match_parent"
@@ -24,212 +26,340 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20sp">
+        android:padding="24sp">
 
         <TextView
             android:id="@+id/p6_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="@string/p6_project_name"
+            android:textSize="24sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/p6_name_input"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
+                android:hint="@string/blank" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
 
         <Switch
             android:id="@+id/p6_enable_members"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switch" />
+            android:checked="true"
+            android:text="@string/p6_enable_members"
+            android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/p6_first_member_name"
+        <LinearLayout
+            android:id="@+id/p6_first_member"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_first_member_name_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24sp" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <TextView
+                android:id="@+id/p6_first_member_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/p6_initial_member_name"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/p6_first_member_password1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_first_member_password1_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/p6_first_member_name_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                app:endIconMode="clear_text">
 
-        <TextView
-            android:id="@+id/p6_first_member_password2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/blank" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_first_member_password2_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24sp" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <TextView
+                android:id="@+id/p6_first_member_password1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/p6_initial_member_password"
+                android:textSize="18sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/p6_first_member_password1_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/blank"
+                    android:inputType="text|textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24sp" />
+
+            <TextView
+                android:id="@+id/p6_first_member_password2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reenter_password"
+                android:textSize="18sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/p6_first_member_password2_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/blank"
+                    android:inputType="text|textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
 
         <Switch
             android:id="@+id/p6_enable_roles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switch" />
+            android:checked="true"
+            android:text="@string/p6_enable_roles"
+            android:textSize="24sp" />
 
-        <CheckBox
-            android:id="@+id/p6_custom_admin"
+        <LinearLayout
+            android:id="@+id/p6_custom_roles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switch" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/p6_admin_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24sp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_admin_name_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
+            <CheckBox
+                android:id="@+id/p6_custom_admin_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/p6_custom_admin"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/p6_admin_password1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_admin_password1_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
+            <LinearLayout
+                android:id="@+id/p6_custom_admin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/p6_admin_password2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_admin_password2_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/p6_admin_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/p6_admin_name"
+                    android:textSize="18sp" />
 
-            <com.google.android.material.textfield.TextInputEditText
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_admin_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="clear_text">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
+
+                <TextView
+                    android:id="@+id/p6_admin_password1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/p6_admin_password"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_admin_password1_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank"
+                        android:inputType="text|textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
+
+                <TextView
+                    android:id="@+id/p6_admin_password2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reenter_password"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_admin_password2_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank"
+                        android:inputType="text|textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/p6_custom_member_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/p6_custom_member"
+                android:textSize="18sp" />
 
-        <CheckBox
-            android:id="@+id/p6_custom_member"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Switch" />
-
-        <TextView
-            android:id="@+id/p6_member_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_member_name_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
+            <LinearLayout
+                android:id="@+id/p6_custom_member"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/p6_member_password1"
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
+
+                <TextView
+                    android:id="@+id/p6_member_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/p6_member_name"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_member_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="clear_text">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
+
+                <TextView
+                    android:id="@+id/p6_member_password1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/p6_member_password"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_member_password1_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank"
+                        android:inputType="text|textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24sp" />
+
+                <TextView
+                    android:id="@+id/p6_member_password2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reenter_password"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/p6_member_password2_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/blank"
+                        android:inputType="text|textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/p6_default_role_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_member_password1_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24sp" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <TextView
+                android:id="@+id/p6_default_role"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/p6_default_role"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/p6_member_password2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/p6_member_password2_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
+            <Spinner
+                android:id="@+id/p6_default_role_input"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="hint" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/p6_default_role"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+        </LinearLayout>
 
-        <Spinner
-            android:id="@+id/p6_default_role_input"
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="36sp" />
 
         <LinearLayout
             style="@style/Widget.AppCompat.ButtonBar"
@@ -240,18 +370,28 @@
             <Button
                 android:id="@+id/p6_return"
                 style="@style/AppTheme.Button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5sp"
+                android:layout_marginEnd="5sp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:paddingTop="15sp"
+                android:paddingBottom="15sp"
+                android:text="@string/return_val"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/p6_create"
                 style="@style/AppTheme.Button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5sp"
+                android:layout_marginEnd="5sp"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:paddingTop="15sp"
+                android:paddingBottom="15sp"
+                android:text="@string/p6_create_project"
+                android:textSize="18sp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

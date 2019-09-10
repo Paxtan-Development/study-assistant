@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,24 +92,6 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
                 passwordInput1 = returnView.findViewById(R.id.v1_password1_input),
                 passwordInput2 = returnView.findViewById(R.id.v1_password2_input),
                 fullnameInput = returnView.findViewById(R.id.v1_fullname_input);
-
-        // Sets up end icons
-        usernameInput.setEndIconActivated(true);
-        usernameInput.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-        fullnameInput.setEndIconActivated(true);
-        fullnameInput.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-        if (passwordInput1.getEditText() != null) {
-            passwordInput1.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
-        if (passwordInput2.getEditText() != null) {
-            passwordInput2.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
-        passwordInput1.setEndIconActivated(true);
-        passwordInput1.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-        passwordInput2.setEndIconActivated(true);
-        passwordInput2.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
         // Set up listeners
         if (getActivity() != null) {

@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,16 +112,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
 
         // Set up TextInputLayouts
         TextInputLayout passwordInputLayout = returnScroll.findViewById(R.id.v2_password_input);
-        if (passwordInputLayout.getEditText() != null) {
-            passwordInputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
-        passwordInputLayout.setEndIconActivated(true);
-        passwordInputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-
         TextInputLayout userInputLayout = returnScroll.findViewById(R.id.v2_username_input);
-        userInputLayout.setEndIconActivated(true);
-        userInputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
 
         // Set up whether to display members or roles
         if (getActivity() != null && project.membersEnabled) {

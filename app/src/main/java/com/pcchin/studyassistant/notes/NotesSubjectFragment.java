@@ -287,8 +287,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         if (getActivity() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            popupView.setEndIconActivated(true);
-            popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+            // End icon has been set in XML file
             DialogInterface.OnShowListener nListener = dialog -> {
                 popupView.setHint(getString(R.string.title));
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
@@ -359,8 +358,7 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
         if (getActivity() != null && getFragmentManager() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            popupView.setEndIconActivated(true);
-            popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+            // End icon has been set in XML file
             if (popupView.getEditText() != null) {
                 popupView.getEditText().setText(notesSubject);
             }

@@ -29,7 +29,6 @@ import android.widget.Button;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
@@ -88,7 +87,8 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
     /** Creates a new project. **/
     public void onNewProjectPressed() {
         if (getActivity() != null) {
-            GeneralFunctions.showNewProject((MainActivity) getActivity(), projectDatabase);
+            projectDatabase.close();
+            ((MainActivity) getActivity()).displayFragment(new ProjectCreateFragment());
         }
     }
 

@@ -12,7 +12,6 @@
   -->
 
 <resources>
-
     <style name="DefaultTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

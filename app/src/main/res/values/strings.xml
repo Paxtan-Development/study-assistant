@@ -42,6 +42,7 @@
     <string name="select_file">Select File</string>
     <string name="select_subject_file">Select a .subject file</string>
     <string name="not_subject_file">The file that is selected is not a .subject file</string>
+    <string name="reenter_password">Re-enter Password</string>
     <string name="return_val">Return</string>
 
     <!-- String used in notifications -->
@@ -143,10 +144,22 @@
     <string name="p_full_name">Full Name</string>
     <string name="p2_linked_subject">Linked Subject</string>
 
-    <string name="v1_signup">Sign Up</string>
+    <string name="p6_project_name">Project Name</string>
+    <string name="p6_enable_members">Enable Members</string>
+    <string name="p6_enable_roles">Enable Roles</string>
+    <string name="p6_initial_member_name">Initial Member Name</string>
+    <string name="p6_initial_member_password">Initial Member Password</string>
+    <string name="p6_custom_admin">Custom admin role</string>
+    <string name="p6_custom_member">Custom member role</string>
+    <string name="p6_admin_name">Admin Name</string>
+    <string name="p6_admin_password">Admin Password</string>
+    <string name="p6_member_name">Member Name</string>
+    <string name="p6_member_password">Member Password</string>
+    <string name="p6_create_project">Create Project</string>
+    <string name="p6_default_role">Default Role</string>
 
     <!-- Strings used in group V -->
-    <string name="v1_reenter_password">Re-enter Password</string>
+    <string name="v1_signup">Sign Up</string>
     <string name="v1_member_created">Member created.</string>
     <string name="v2_project_login">Project Login</string>
 

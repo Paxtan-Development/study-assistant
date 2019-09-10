@@ -49,6 +49,7 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
+import com.pcchin.studyassistant.project.ProjectCreateFragment;
 import com.pcchin.studyassistant.project.verify.ProjectLoginFragment;
 
 import java.util.ArrayList;
@@ -61,8 +62,7 @@ public class GeneralFunctions {
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-        popupView.setEndIconActivated(true);
-        popupView.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+        // End icon has been set by default in XML file
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
         DialogInterface.OnShowListener subjectListener = dialog -> {
             popupView.setHint(activity.getString(R.string.n1_subject_title));
@@ -87,6 +87,7 @@ public class GeneralFunctions {
                                                     new ArrayList<>(),
                                                     NotesSubject.SORT_ALPHABETICAL_ASC));
                             database.close();
+                            activity.safeOnBackPressed();
                             activity.displayFragment(
                                     NotesSubjectFragment.newInstance(inputText));
                             dialog.dismiss();
@@ -100,11 +101,6 @@ public class GeneralFunctions {
                 new String[]{activity.getString(android.R.string.ok),
                         activity.getString(android.R.string.cancel), ""}, subjectListener)
                         .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
-    }
-
-    /** Shows the dialog to add a new project to the projects list **/
-    public static void showNewProject(@NonNull MainActivity activity, ProjectDatabase database) {
-        // TODO: Add new project
     }
 
     /** Updates the NavigationView in
@@ -129,6 +125,7 @@ public class GeneralFunctions {
             subjItem.setOnMenuItemClickListener(item -> {
                 // Opens subject when clicked
                 activity.closeDrawer();
+                activity.safeOnBackPressed();
                 activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
                 return true;
             });
@@ -161,6 +158,7 @@ public class GeneralFunctions {
                 MenuItem projItem = projMenu.add(project.projectTitle);
                 projItem.setOnMenuItemClickListener(menuItem -> {
                     activity.closeDrawer();
+                    activity.safeOnBackPressed();
                     activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
                     return false;
                 });
@@ -170,7 +168,8 @@ public class GeneralFunctions {
             MenuItem newProj = projMenu.add(R.string.m3_new_project);
             newProj.setOnMenuItemClickListener(item -> {
                 activity.closeDrawer();
-                showNewProject(activity, projectDatabase);
+                activity.safeOnBackPressed();
+                activity.displayFragment(new ProjectCreateFragment());
                 return true;
             });
 
@@ -190,6 +189,7 @@ public class GeneralFunctions {
         MenuItem aboutItem = otherMenu.add(R.string.m_about);
         aboutItem.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
+            activity.safeOnBackPressed();
             activity.displayFragment(new AboutFragment());
             return true;
         });
@@ -198,6 +198,7 @@ public class GeneralFunctions {
         MenuItem exitItem = otherMenu.add(R.string.exit);
         exitItem.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
+            activity.safeOnBackPressed();
             exitApp(activity);
             return true;
         });

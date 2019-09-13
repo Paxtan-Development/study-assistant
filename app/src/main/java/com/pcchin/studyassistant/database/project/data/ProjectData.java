@@ -19,6 +19,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.pcchin.studyassistant.R;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -87,6 +89,11 @@ public class ProjectData {
     /** Whether members are enabled in the project. **/
     public boolean membersEnabled;
 
+    /** A list of all member IDs in the project.
+     * @see androidx.room.ForeignKey cannot be used in this case as
+     * there are multiple members per entity.**/
+    public ArrayList<String> memberList;
+
     /** Whether roles are enabled in the project.
      * If membersEnabled is false but this is true, users would need to sign in with their roles.
      * If membersEnabled is true but this is false, all members would have admin privileges.
@@ -94,36 +101,31 @@ public class ProjectData {
      * If both membersEnabled and this are false, all users would have admin privileges. **/
     public boolean rolesEnabled;
 
-    /** If this is true, tasks and status share the same notes (from Tasks),
-     * while if this is false, tasks and status have separate databases. **/
-    public boolean mergeTaskStatus;
+    /** A list of all the roles in the project.
+     * @see androidx.room.ForeignKey cannot be used in this case as
+     * there are multiple roles per entity. **/
+    public ArrayList<String> roleList;
 
     /** Whether tasks are enabled in the project. **/
     public boolean taskEnabled;
-
-    /** Whether status updates specifically are enabled in the project.
-     * Both taskEnabled and statusEnabled must be true for mergeTaskStatus to be used. **/
-    public boolean statusEnabled;
-
-    /** A list of all member IDs in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple members per entity.**/
-    public ArrayList<String> memberList;
 
     /** A list of all the tasks IDs in the project.
      * @see androidx.room.ForeignKey cannot be used in this case as
      * there are multiple tasks per entity. **/
     public ArrayList<String> taskList;
 
-    /** A list of all the roles in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple roles per entity. **/
-    public ArrayList<String> roleList;
+    /** Whether status updates specifically are enabled in the project.
+     * Both taskEnabled and statusEnabled must be true for mergeTaskStatus to be used. **/
+    public boolean statusEnabled;
 
     /** A list of all the status updates in the project.
      * @see androidx.room.ForeignKey cannot be used in this case as
      * there are multiple roles per entity. **/
     public ArrayList<String> statusList;
+
+    /** If this is true, tasks and status share the same notes (from Tasks),
+     * while if this is false, tasks and status have separate databases. **/
+    public boolean mergeTaskStatus;
 
     /** The info that is displayed at the bottom of the project info page. **/
     public int displayedInfo;
@@ -131,32 +133,84 @@ public class ProjectData {
     /** The title of the note subject that is associated to the project. **/
     public String associatedSubject;
 
-    /** Default constructor. **/
-    @Ignore
+    /** Default constructor.
+     * This constructor should not be used in code but is unable to be
+     * marked as @Deprecated or @Ignore as it is the default constructor. **/
     public ProjectData() {
 
     }
 
-    /** Constructor used when creating a new project.
+    /** Constructor used when creating a new project with members.
+     * This constructor is still used and not deprecated despite marked as @Ignore.
      * Inserts a admin member and two default roles, admin and member.
+     * Even when roles are disabled, a default role would always be set up so that every
+     * user will be assigned to it.
      * By default, tasks would be displayed on the description,
      * the actual start date would be the date that the project was created,
      * and the default role of new members would be "member". **/
-    public ProjectData(@NonNull String projectID, String projectTitle, RoleData memberDefaultRole,
-                        MemberData defaultAdmin, RoleData adminRole) {
+    @Ignore
+    public ProjectData(@NonNull String projectID, String projectTitle, String salt,
+                       String projectPass, RoleData memberRole, RoleData adminRole,
+                       MemberData defaultAdmin, RoleData memberDefaultRole) {
         this.projectID = projectID;
+        this.salt = salt;
         this.projectTitle = projectTitle;
+        this.projectPass = projectPass;
+        this.description = "";
+        this.hasIcon = false;
+        this.projectStatusIcon = R.drawable.status_ic_circle;
+        this.actualStartDate = new Date();
+        this.projectProtected = projectPass.length() != 0;
+        this.memberSignupEnabled = true;
+        this.memberDefaultRole = memberDefaultRole.roleID;
+        this.membersEnabled = true;
         this.memberList = new ArrayList<>();
         this.memberList.add(defaultAdmin.memberID);
-        this.taskList = new ArrayList<>();
+        this.rolesEnabled = true;
         this.roleList = new ArrayList<>();
-        this.roleList.add(memberDefaultRole.roleID);
+        this.roleList.add(memberRole.roleID);
         this.roleList.add(adminRole.roleID);
+        this.taskEnabled = true;
+        this.taskList = new ArrayList<>();
+        this.statusEnabled = true;
         this.statusList = new ArrayList<>();
-        this.memberDefaultRole = memberDefaultRole.roleID;
-        this.projectProtected = false;
+        this.mergeTaskStatus = false;
+        this.displayedInfo = DISPLAYED_TASKS;
+    }
+
+    /** Constructor used when creating a new project without members.
+     * This constructor is still used and not deprecated despite marked as @Ignore.
+     * Inserts a admin and member role.
+     * Even when roles are disabled, a default role would always be set up when it is required
+     * By default, tasks would be displayed on the description,
+     * the actual start date would be the date that the project was created,
+     * and the default role of new members would be "member". **/
+    @Ignore
+    public ProjectData(@NonNull String projectID, String projectTitle, String salt,
+                       String projectPass, boolean rolesEnabled,
+                       RoleData adminRole, RoleData memberRole) {
+        this.projectID = projectID;
+        this.salt = salt;
+        this.projectTitle = projectTitle;
+        this.projectPass = projectPass;
+        this.description = "";
         this.hasIcon = false;
+        this.projectStatusIcon = R.drawable.status_ic_circle;
         this.actualStartDate = new Date();
+        this.projectProtected = projectPass.length() != 0;
+        this.memberSignupEnabled = true;
+        this.memberDefaultRole = memberRole.roleID;
+        this.membersEnabled = false;
+        this.memberList = new ArrayList<>();
+        this.rolesEnabled = rolesEnabled;
+        this.roleList = new ArrayList<>();
+        this.roleList.add(adminRole.roleID);
+        this.roleList.add(memberRole.roleID);
+        this.taskEnabled = true;
+        this.taskList = new ArrayList<>();
+        this.statusEnabled = true;
+        this.statusList = new ArrayList<>();
+        this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
     }
 }

@@ -32,6 +32,7 @@
     <string name="error_subject_exists">Another subject already has this name. Try using another one.</string>
     <string name="error_file_manager_not_found">A file manager could not be found on the device.</string>
     <string name="error_file_format_incorrect">The file selected could not be imported into the app.</string>
+    <string name="error_password_unequal">Both passwords are not the same.</string>
 
     <!-- Errors used in group N. -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>
@@ -49,11 +50,15 @@
     <string name="p_error_member_not_found">The member selected is not found</string>
     <string name="p_error_role_not_found">The role selected is not found</string>
 
+    <!-- Error messages in Fragment P6. -->
+    <string name="p6_error_project_name_empty">Project name cannot be empty.</string>
+    <string name="p6_error_member_name_empty">Member name cannot be empty.</string>
+    <string name="p6_error_project_exists">Another project with the same name already exists.</string>
+
     <!-- Errors used in group V. -->
     <string name="v_error_username_blank">Username cannot be blank.</string>
     <string name="v_error_username_taken">The username entered has been taken. Please try another username.</string>
     <string name="v_error_username_whitespace">Username cannot contain whitespace characters such as spaces or tabs.</string>
-    <string name="v_error_username_missing">The username entered could not be found.</string>
     <string name="v_error_password_blank">Password cannot be blank.</string>
-    <string name="v_error_password_unequal">Both passwords are not the same.</string>
+    <string name="v_error_username_password_incorrect">The username or password entered is incorrect.</string>
 </resources>

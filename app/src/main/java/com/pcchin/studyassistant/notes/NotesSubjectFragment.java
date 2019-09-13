@@ -436,10 +436,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
-            inputLayout.setEndIconActivated(true);
             inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-            inputLayout.setHintEnabled(true);
-            inputLayout.setHint(getString(R.string.n_password_set));
+            inputLayout.setHint(getString(R.string.set_blank_password));
 
             DialogInterface.OnShowListener passwordListener = dialogInterface -> {
                 ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
@@ -568,10 +566,8 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                 inputText.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
-            inputText.setEndIconActivated(true);
             inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-            inputText.setHintEnabled(true);
-            inputText.setHint(getString(R.string.n_password_set));
+            inputText.setHint(getString(R.string.set_blank_password));
             DialogInterface.OnShowListener exportListener = dialogInterface -> {
                 ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                     // Check if password is too short, must be 8 characters in length

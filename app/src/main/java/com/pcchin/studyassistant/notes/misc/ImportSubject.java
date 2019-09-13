@@ -119,7 +119,6 @@ public class ImportSubject {
                         inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                                 InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     }
-                    inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
                     // Asks for password
@@ -339,7 +338,6 @@ public class ImportSubject {
                         inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                                 InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     }
-                    inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
                     DialogInterface.OnShowListener importListener = dialogInterface -> {
@@ -441,7 +439,6 @@ public class ImportSubject {
         if (inputLayout.getEditText() != null) {
             inputLayout.getEditText().setText(title);
         }
-        inputLayout.setEndIconActivated(true);
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
         SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
                 MainActivity.DATABASE_NOTES)

@@ -152,7 +152,9 @@ public class GeneralFunctions {
         // TODO: Remove statement once completed
         if (BuildConfig.DEBUG) {
             ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+                    MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1)
+                    .allowMainThreadQueries().build();
             List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
             for (ProjectData project : projectList) {
                 MenuItem projItem = projMenu.add(project.projectTitle);

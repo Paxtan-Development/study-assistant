@@ -1,0 +1,474 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "e18f9f8e761f420e08fd97fa0e5d904a",
+    "entities": [
+      {
+        "tableName": "ProjectData",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_projectID` TEXT NOT NULL, `salt` TEXT, `projectTitle` TEXT, `projectPass` TEXT, `description` TEXT, `hasIcon` INTEGER NOT NULL, `projectStatusIcon` INTEGER NOT NULL, `expectedStartDate` TEXT, `expectedEndDate` TEXT, `actualStartDate` TEXT, `actualEndDate` TEXT, `projectProtected` INTEGER NOT NULL, `memberSignupEnabled` INTEGER NOT NULL, `memberDefaultRole` TEXT, `membersEnabled` INTEGER NOT NULL, `rolesEnabled` INTEGER NOT NULL, `mergeTaskStatus` INTEGER NOT NULL, `taskEnabled` INTEGER NOT NULL, `statusEnabled` INTEGER NOT NULL, `memberList` TEXT, `taskList` TEXT, `roleList` TEXT, `statusList` TEXT, `displayedInfo` INTEGER NOT NULL, `associatedSubject` TEXT, PRIMARY KEY(`_projectID`))",
+        "fields": [
+          {
+            "fieldPath": "projectID",
+            "columnName": "_projectID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "projectTitle",
+            "columnName": "projectTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "projectPass",
+            "columnName": "projectPass",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hasIcon",
+            "columnName": "hasIcon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectStatusIcon",
+            "columnName": "projectStatusIcon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expectedStartDate",
+            "columnName": "expectedStartDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "expectedEndDate",
+            "columnName": "expectedEndDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "actualStartDate",
+            "columnName": "actualStartDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "actualEndDate",
+            "columnName": "actualEndDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "projectProtected",
+            "columnName": "projectProtected",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberSignupEnabled",
+            "columnName": "memberSignupEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberDefaultRole",
+            "columnName": "memberDefaultRole",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "membersEnabled",
+            "columnName": "membersEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rolesEnabled",
+            "columnName": "rolesEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mergeTaskStatus",
+            "columnName": "mergeTaskStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskEnabled",
+            "columnName": "taskEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusEnabled",
+            "columnName": "statusEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberList",
+            "columnName": "memberList",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "taskList",
+            "columnName": "taskList",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "roleList",
+            "columnName": "roleList",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusList",
+            "columnName": "statusList",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "displayedInfo",
+            "columnName": "displayedInfo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "associatedSubject",
+            "columnName": "associatedSubject",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_projectID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "MemberData",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_memberID` TEXT NOT NULL, `parentProject` TEXT, `username` TEXT, `fullName` TEXT, `salt` TEXT, `memberPass` TEXT, `role` TEXT, PRIMARY KEY(`_memberID`))",
+        "fields": [
+          {
+            "fieldPath": "memberID",
+            "columnName": "_memberID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentProject",
+            "columnName": "parentProject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fullName",
+            "columnName": "fullName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "memberPass",
+            "columnName": "memberPass",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_memberID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "TaskData",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_taskID` TEXT NOT NULL, `taskDesc` TEXT, `parentProject` TEXT, `expectedStartDate` TEXT, `expectedEndDate` TEXT, `actualStartDate` TEXT, `actualEndDate` TEXT, `assignedMember` TEXT, `taskStatus` INTEGER NOT NULL, `taskStatusCustom` TEXT, PRIMARY KEY(`_taskID`))",
+        "fields": [
+          {
+            "fieldPath": "taskID",
+            "columnName": "_taskID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskDesc",
+            "columnName": "taskDesc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "parentProject",
+            "columnName": "parentProject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "expectedStartDate",
+            "columnName": "expectedStartDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "expectedEndDate",
+            "columnName": "expectedEndDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "actualStartDate",
+            "columnName": "actualStartDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "actualEndDate",
+            "columnName": "actualEndDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "assignedMember",
+            "columnName": "assignedMember",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "taskStatus",
+            "columnName": "taskStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskStatusCustom",
+            "columnName": "taskStatusCustom",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_taskID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "RoleData",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_roleID` TEXT NOT NULL, `parentProject` TEXT, `roleName` TEXT, `salt` TEXT, `rolePass` TEXT, `canDeleteProject` INTEGER NOT NULL, `canModifyInfo` INTEGER NOT NULL, `canModifyOtherTask` INTEGER NOT NULL, `canModifyOtherUser` INTEGER NOT NULL, `canModifyOwnTask` INTEGER NOT NULL, `canModifyRole` INTEGER NOT NULL, `canSetPassword` INTEGER NOT NULL, `canViewOtherUser` INTEGER NOT NULL, `canViewRole` INTEGER NOT NULL, `canViewTask` INTEGER NOT NULL, PRIMARY KEY(`_roleID`))",
+        "fields": [
+          {
+            "fieldPath": "roleID",
+            "columnName": "_roleID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentProject",
+            "columnName": "parentProject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "roleName",
+            "columnName": "roleName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rolePass",
+            "columnName": "rolePass",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "canDeleteProject",
+            "columnName": "canDeleteProject",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyInfo",
+            "columnName": "canModifyInfo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyOtherTask",
+            "columnName": "canModifyOtherTask",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyOtherUser",
+            "columnName": "canModifyOtherUser",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyOwnTask",
+            "columnName": "canModifyOwnTask",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canModifyRole",
+            "columnName": "canModifyRole",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canSetPassword",
+            "columnName": "canSetPassword",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewOtherUser",
+            "columnName": "canViewOtherUser",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewRole",
+            "columnName": "canViewRole",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canViewTask",
+            "columnName": "canViewTask",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_roleID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "StatusData",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_statusID` TEXT NOT NULL, `publishedDate` TEXT, `statusTitle` TEXT, `statusType` TEXT, `statusContent` TEXT, `parentProject` TEXT, `memberID` TEXT, `statusColor` INTEGER NOT NULL, PRIMARY KEY(`_statusID`))",
+        "fields": [
+          {
+            "fieldPath": "statusID",
+            "columnName": "_statusID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publishedDate",
+            "columnName": "publishedDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusTitle",
+            "columnName": "statusTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusType",
+            "columnName": "statusType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusContent",
+            "columnName": "statusContent",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "parentProject",
+            "columnName": "parentProject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "memberID",
+            "columnName": "memberID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusColor",
+            "columnName": "statusColor",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_statusID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e18f9f8e761f420e08fd97fa0e5d904a')"
+    ]
+  }
+}

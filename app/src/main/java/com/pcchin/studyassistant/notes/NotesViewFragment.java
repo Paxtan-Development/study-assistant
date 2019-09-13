@@ -240,10 +240,8 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                 inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
-            inputLayout.setEndIconActivated(true);
             inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-            inputLayout.setHintEnabled(true);
-            inputLayout.setHint(getString(R.string.n_password_set));
+            inputLayout.setHint(getString(R.string.set_blank_password));
             new AutoDismissDialog(getString(R.string.n3_lock_password), inputLayout,
                     new String[]{getString(android.R.string.ok),
                             getString(android.R.string.cancel), ""},
@@ -305,7 +303,6 @@ public class NotesViewFragment extends Fragment implements FragmentOnBackPressed
                         inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                                 InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     }
-                    inputLayout.setEndIconActivated(true);
                     inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
                     DialogInterface.OnShowListener passwordListener = dialogInterface -> {
                         ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)

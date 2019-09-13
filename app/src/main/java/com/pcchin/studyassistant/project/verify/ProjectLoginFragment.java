@@ -13,6 +13,9 @@
 
 package com.pcchin.studyassistant.project.verify;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -20,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +41,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
@@ -68,9 +73,10 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
+        if (getActivity() != null && getFragmentManager() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1)
                     .allowMainThreadQueries().build();
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
@@ -80,15 +86,83 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                 Toast.makeText(getActivity(), R.string.p_error_project_not_found,
                         Toast.LENGTH_SHORT).show();
                 projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+                if (getActivity() != null) {
+                    // If statement added to prevent NullPointerException
+                    ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+                }
             } else {
-                if (!project.membersEnabled && !project.rolesEnabled) {
-                    // All users will be logged in as admin if roles & members are not enabled
-                    projectDatabase.close();
-                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, "admin", false, true));
-                } else {
+                if (project.projectProtected || project.membersEnabled || project.rolesEnabled) {
                     getActivity().setTitle(R.string.v2_project_login);
+                    if (project.projectProtected) {
+                        // Set up password input layout
+                        @SuppressLint("InflateParams") TextInputLayout passwordLayout =
+                                (TextInputLayout) getLayoutInflater()
+                                .inflate(R.layout.popup_edittext, null);
+                        if (passwordLayout.getEditText() != null) {
+                            passwordLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        }
+                        passwordLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+                        passwordLayout.setHint(getString(R.string.v1_project_protected_password));
+
+                        // Set up OnShowListener
+                        DialogInterface.OnShowListener passwordDialogListener = dialogInterface -> {
+                            ((AlertDialog) dialogInterface).getButton(
+                                    DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                                        // Check if password is correct
+                                        if (passwordLayout.getEditText().getText()
+                                                .toString().length() >= 8) {
+                                            if (Objects.equals(SecurityFunctions.projectHash(
+                                                    passwordLayout.getEditText().getText()
+                                                            .toString(), project.salt),
+                                                    project.projectPass)) {
+                                                // Password is correct
+                                                dialogInterface.dismiss();
+                                                if (!project.membersEnabled && !project.rolesEnabled) {
+                                                    // No secondary check
+                                                    projectDatabase.close();
+                                                    ((MainActivity) getActivity()).displayFragment
+                                                            (ProjectInfoFragment.newInstance(
+                                                                    project.projectID, "admin",
+                                                                    false, true));
+                                                }
+                                            } else {
+                                                passwordLayout.setError(getString(
+                                                        R.string.error_password_incorrect));
+                                            }
+                                        } else {
+                                            // Display error message
+                                            passwordLayout.setError(getString(
+                                                    R.string.error_password_short));
+                                        }
+                            });
+                            ((AlertDialog) dialogInterface).getButton(
+                                    DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view -> {
+                                        // Returns to ProjectSelectFragment
+                                        dialogInterface.dismiss();
+                                        projectDatabase.close();
+                                        ((MainActivity) getActivity())
+                                                .displayFragment(new ProjectSelectFragment());
+                                    });
+                        };
+
+                        AutoDismissDialog passwordDialog = new AutoDismissDialog(
+                                getString(R.string.v1_project_protected), passwordLayout,
+                                new String[]{getString(android.R.string.ok),
+                                        getString(android.R.string.cancel), ""},
+                                passwordDialogListener);
+                        passwordDialog.setCancellable(false);
+                        passwordDialog.show(getFragmentManager(), "ProjectLoginFragment.1");
+                    }
+                } else {
+                    // All users will be logged in as admin if roles & members are not enabled
+                    // and the project is not password-protected
+                    projectDatabase.close();
+                    if (getActivity() != null) {
+                        // If statement added to prevent NullPointerException
+                        ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                                .newInstance(project.projectID, "admin", false, true));
+                    }
                 }
             }
         }
@@ -115,70 +189,70 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
         TextInputLayout userInputLayout = returnScroll.findViewById(R.id.v2_username_input);
 
         // Set up whether to display members or roles
-        if (getActivity() != null && project.membersEnabled) {
-            returnScroll.findViewById(R.id.v2_role).setVisibility(View.GONE);
-            returnScroll.findViewById(R.id.v2_role_input).setVisibility(View.GONE);
-
-            returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
-                // Display signup page
-                ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
-                        .newInstance(project.projectID));
-            });
-            // Login through username
-            returnScroll.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
-                Toast.makeText(getActivity(), R.string.v2_logging_in, Toast.LENGTH_SHORT).show();
-                userInputLayout.setErrorEnabled(false);
-                passwordInputLayout.setErrorEnabled(false);
-
-                // Check if username exists
-                if (userInputLayout.getEditText() != null && passwordInputLayout.getEditText() != null) {
-                    if (userInputLayout.getEditText().length() == 0) {
-                        userInputLayout.setErrorEnabled(true);
-                        userInputLayout.setError(getString(R.string.v_error_username_blank));
-                    } else {
-                        MemberData targetMember = projectDatabase.MemberDao()
-                                .searchInProjectByUsername(project.projectID,
-                                        userInputLayout.getEditText().getText().toString());
-                        if (targetMember == null) {
-                            userInputLayout.setErrorEnabled(true);
-                            userInputLayout.setError(getString(R.string.v_error_username_missing));
-                        } else {
-                            // Check if password entered is correct
-                            String hashedPassword = SecurityFunctions.memberHash(
-                                    userInputLayout.getEditText().getText().toString(),
-                                    targetMember.salt, project.salt);
-                            if (Objects.equals(hashedPassword, targetMember.memberPass)) {
-                                projectDatabase.close();
-                                ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                        .newInstance(project.projectID,
-                                                targetMember.memberID, true, true));
-                            } else {
-                                passwordInputLayout.setErrorEnabled(true);
-                                passwordInputLayout.setError(getString(R.string.error_password_incorrect));
-                            }
-                        }
-                    }
-                }
-            });
-            // Sign up if conditions met
-            if (project.membersEnabled && project.memberSignupEnabled) {
+        if (getActivity() != null) {
+            if (project.membersEnabled) {
+                returnScroll.findViewById(R.id.v2_role).setVisibility(View.GONE);
+                returnScroll.findViewById(R.id.v2_role_input).setVisibility(View.GONE);
                 returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
-                    projectDatabase.close();
+                    // Display signup page
                     ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
                             .newInstance(project.projectID));
                 });
-            }
-        } else if (getActivity() != null) {
-            returnScroll.findViewById(R.id.v2_username).setVisibility(View.GONE);
-            returnScroll.findViewById(R.id.v2_username_input).setVisibility(View.GONE);
-            returnScroll.findViewById(R.id.v2_button_signup).setVisibility(View.GONE);
+                // Login through username
+                returnScroll.findViewById(R.id.v2_button_login).setOnClickListener(view -> {
+                    Toast.makeText(getActivity(), R.string.v2_logging_in, Toast.LENGTH_SHORT).show();
+                    userInputLayout.setErrorEnabled(false);
+                    passwordInputLayout.setErrorEnabled(false);
 
-            if (getActivity() != null) {
+                    // Check if username exists
+                    if (userInputLayout.getEditText() != null && passwordInputLayout.getEditText() != null) {
+                        if (userInputLayout.getEditText().getText().length() == 0) {
+                            userInputLayout.setErrorEnabled(true);
+                            userInputLayout.setError(getString(R.string.v_error_username_blank));
+                        } else {
+                            MemberData targetMember = projectDatabase.MemberDao()
+                                    .searchInProjectByUsername(project.projectID,
+                                            userInputLayout.getEditText().getText().toString());
+                            if (targetMember == null) {
+                                userInputLayout.setErrorEnabled(true);
+                                userInputLayout.setError(getString(R.string.v_error_username_password_incorrect));
+                            } else {
+                                // Check if password entered is correct
+                                String hashedPassword = SecurityFunctions.memberHash(
+                                        userInputLayout.getEditText().getText().toString(),
+                                        targetMember.salt, project.salt);
+                                if (Objects.equals(hashedPassword, targetMember.memberPass)) {
+                                    projectDatabase.close();
+                                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                                            .newInstance(project.projectID,
+                                                    targetMember.memberID, true, true));
+                                } else {
+                                    passwordInputLayout.setErrorEnabled(true);
+                                    passwordInputLayout.setError(
+                                            getString(R.string.v_error_username_password_incorrect));
+                                }
+                            }
+                        }
+                    }
+                });
+                // Sign up if conditions met
+                if (project.membersEnabled && project.memberSignupEnabled) {
+                    returnScroll.findViewById(R.id.v2_button_signup).setOnClickListener(view -> {
+                        projectDatabase.close();
+                        ((MainActivity) getActivity()).displayFragment(ProjectSignupFragment
+                                .newInstance(project.projectID));
+                    });
+                }
+            } else if (project.rolesEnabled) {
+                returnScroll.findViewById(R.id.v2_username).setVisibility(View.GONE);
+                returnScroll.findViewById(R.id.v2_username_input).setVisibility(View.GONE);
+                returnScroll.findViewById(R.id.v2_button_signup).setVisibility(View.GONE);
+
                 // Populate spinner
                 Spinner roleSpinner = returnScroll.findViewById(R.id.v2_role_input);
                 List<RoleData> roleDataList = projectDatabase.RoleDao().searchByProject(project.projectID);
                 ArrayList<String> roleList = new ArrayList<>();
-                for (RoleData role: roleDataList) {
+                for (RoleData role : roleDataList) {
                     roleList.add(role.roleName);
                 }
                 ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(getActivity(),
@@ -198,7 +272,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                             ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                     .newInstance(project.projectID, roleSelected.roleID,
                                             false, true));
-                        } else if (inputPassword.length() >= 8){
+                        } else if (inputPassword.length() >= 8) {
                             // Check whether the password for the role is correct.
                             String hashedPassword = SecurityFunctions.roleHash(
                                     inputPassword, roleSelected.salt);
@@ -216,7 +290,6 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
                             passwordInputLayout.setError(getString(R.string.error_password_short));
                         }
                     }
-
                 });
                 // Sign up if conditions met
                 if (project.membersEnabled && project.memberSignupEnabled) {

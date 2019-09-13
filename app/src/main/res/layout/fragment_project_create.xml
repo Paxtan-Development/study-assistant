@@ -51,6 +51,54 @@
             android:layout_width="match_parent"
             android:layout_height="24sp" />
 
+        <TextView
+            android:id="@+id/p6_project_password1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p6_project_password"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/p6_project_password1_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/set_blank_password"
+                android:inputType="text|textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
+        <TextView
+            android:id="@+id/p6_project_password2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reenter_password"
+            android:textSize="24sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/p6_project_password2_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/blank"
+                android:inputType="text|textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24sp" />
+
         <Switch
             android:id="@+id/p6_enable_members"
             android:layout_width="match_parent"
@@ -103,6 +151,7 @@
                 android:id="@+id/p6_first_member_password1_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/set_blank_password"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -164,6 +213,7 @@
                 android:id="@+id/p6_custom_admin_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checked="false"
                 android:text="@string/p6_custom_admin"
                 android:textSize="18sp" />
 
@@ -171,7 +221,8 @@
                 android:id="@+id/p6_custom_admin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <Space
                     android:layout_width="match_parent"
@@ -211,6 +262,7 @@
                     android:id="@+id/p6_admin_password1_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/set_blank_password"
                     app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -250,6 +302,7 @@
                 android:id="@+id/p6_custom_member_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checked="false"
                 android:text="@string/p6_custom_member"
                 android:textSize="18sp" />
 
@@ -257,7 +310,8 @@
                 android:id="@+id/p6_custom_member"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <Space
                     android:layout_width="match_parent"
@@ -297,6 +351,7 @@
                     android:id="@+id/p6_member_password1_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/set_blank_password"
                     app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -353,7 +408,8 @@
             <Spinner
                 android:id="@+id/p6_default_role_input"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:entries="@array/p_default_role" />
 
         </LinearLayout>
 

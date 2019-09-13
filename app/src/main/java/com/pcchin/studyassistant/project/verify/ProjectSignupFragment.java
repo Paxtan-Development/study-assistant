@@ -65,6 +65,7 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1)
                     .allowMainThreadQueries().build();
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
@@ -137,7 +138,7 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
                     } else if (!Objects.equals(passwordText1, passwordText2)) {
                         // Checks if both passwords are the same
                         passwordInput2.setErrorEnabled(true);
-                        passwordInput2.setError(getString(R.string.v_error_password_unequal));
+                        passwordInput2.setError(getString(R.string.error_password_unequal));
                     } else {
                         // Generate member ID
                         RandomString randomID = new RandomString(48);

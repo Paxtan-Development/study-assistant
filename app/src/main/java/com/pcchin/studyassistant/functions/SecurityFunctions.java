@@ -86,6 +86,12 @@ public class SecurityFunctions {
         return Base64.encodeToString(originalByte, Base64.DEFAULT);
     }
 
+    /** Hashing method used in the passwords of projects when logging in. **/
+    public static String projectHash(String original, String salt) {
+        // TODO: Complete
+        return original;
+    }
+
     /** Hashing method used in the passwords of roles when logging in. **/
     public static String roleHash(String original, String salt){
         byte[] originalByte = null, hashedPassword = null;

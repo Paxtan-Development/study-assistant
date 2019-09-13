@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +78,9 @@ public class ProjectInfoFragment extends Fragment implements FragmentOnBackPress
             boolean hasError = false;
 
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+                    MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1)
+                    .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
             if (project == null) {
                 // Project is somehow missing

@@ -36,7 +36,7 @@ class AndroidTestFunctions {
                 .databaseBuilder(InstrumentationRegistry.getInstrumentation().getContext(),
                         SubjectDatabase.class, databaseName)
                 .addMigrations(migrations)
-                .build();
+                .allowMainThreadQueries().build();
         migrationTestHelper.closeWhenFinished(roomDatabase);
         return roomDatabase;
 

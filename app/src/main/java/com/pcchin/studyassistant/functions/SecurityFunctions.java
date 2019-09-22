@@ -33,6 +33,7 @@ import org.bouncycastle.crypto.params.ParametersWithRandom;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public class SecurityFunctions {
@@ -50,19 +51,17 @@ public class SecurityFunctions {
 
     /** Trims a byte array to a specific length, or adds to it if its not enough. **/
     private static byte[] trimByte(byte[] original, int size) {
-        byte[] response = new byte[32];
+        byte[] response = new byte[size];
         if (original.length > size) {
             // Trim the key to 32 bytes in length (256 bits)
             System.arraycopy(original, 0, response, 0, response.length);
-        } else {
-            // Add the same characters (or 0) if it is not enough
-            for (int i = 0; i < 32; i++) {
-                if (original.length == 0) {
-                    response[i] = 0;
-                } else {
-                    response[i] = original[i % original.length];
-                }
+        } else if (original.length > 0){
+            // Add the same characters if it is not enough
+            for (int i = 0; i < size; i++) {
+                response[i] = original[i % original.length];
             }
+        } else {
+            Arrays.fill(response, (byte) 0);
         }
         return response;
     }
@@ -88,8 +87,22 @@ public class SecurityFunctions {
 
     /** Hashing method used in the passwords of projects when logging in. **/
     public static String projectHash(String original, String salt) {
-        // TODO: Complete
-        return original;
+        // 1) PBKDF2
+        byte[] originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10800);
+
+        // 2) SHA
+        try {
+            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            originalByte = shaDigest.digest(originalByte);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
+                    " MessageDigest.");
+        }
+
+        // 3) Blowfish
+        originalByte = blowfish(originalByte, original.getBytes(), true);
+
+        return new String(originalByte);
     }
 
     /** Hashing method used in the passwords of roles when logging in. **/

@@ -51,13 +51,24 @@ public class SecurityTest {
     @Test
     public void testSubjectEncryptDecrypt() {
         // Normal input
-        String testTitle = TestFunctions.randomString(TEST_COUNT);
-        String testPassword = TestFunctions.randomString(TEST_COUNT);
+        String testTitle = TestFunctions.randomString(TEST_COUNT),
+                testPassword = TestFunctions.randomString(TEST_COUNT);
         ArrayList<ArrayList<String>> testContents = TestFunctions.randomArray(TEST_COUNT);
         byte[] testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
         Assert.assertNotNull(testOutput);
 
         ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testTitle,
+                testPassword, testOutput);
+        Assert.assertEquals(testContents, testResponse);
+
+        // Normal input
+        testTitle = TestFunctions.randomString(2);
+        testPassword = TestFunctions.randomString(2);
+        testContents = TestFunctions.randomArray(2);
+        testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
+        Assert.assertNotNull(testOutput);
+
+        testResponse = SecurityFunctions.subjectDecrypt(testTitle,
                 testPassword, testOutput);
         Assert.assertEquals(testContents, testResponse);
     }
@@ -73,6 +84,21 @@ public class SecurityTest {
         // Minimal input
         responseString = TestFunctions.randomString(2);
         responseString = SecurityFunctions.notesHash(responseString);
+        Assert.assertNotNull(responseString);
+    }
+
+    /** Check if the hashing function for protecting projects works. **/
+    @Test
+    public void testProjectHash() {
+        // Normal input
+        String responseString;
+        responseString = SecurityFunctions.projectHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT));
+        Assert.assertNotNull(responseString);
+
+        // Minimal input
+        responseString = SecurityFunctions.projectHash(TestFunctions.randomString(TEST_COUNT),
+                TestFunctions.randomString(TEST_COUNT));
         Assert.assertNotNull(responseString);
     }
 

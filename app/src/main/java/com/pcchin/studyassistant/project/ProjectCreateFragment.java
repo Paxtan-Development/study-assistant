@@ -63,7 +63,7 @@ public class ProjectCreateFragment extends Fragment implements FragmentOnBackPre
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(1, 2)
                     .allowMainThreadQueries().build();
         } else {
             onBackPressed();
@@ -200,7 +200,7 @@ public class ProjectCreateFragment extends Fragment implements FragmentOnBackPre
                     projectName.setError(getString(R.string.p6_error_project_name_empty));
                     allInputCorrect = false;
                 } else if (projectDatabase.ProjectDao().searchByTitle(projectName
-                        .getEditText().getText().toString()) != null) {
+                        .getEditText().getText().toString()).size() > 0) {
                     // Project name is taken
                     projectName.setErrorEnabled(true);
                     projectName.setError(getString(R.string.p6_error_project_exists));
@@ -235,6 +235,12 @@ public class ProjectCreateFragment extends Fragment implements FragmentOnBackPre
                         memberName.setErrorEnabled(true);
                         memberName.setError(getString(R.string.p6_error_member_name_empty));
                         allInputCorrect = false;
+                    } else if (memberName.getEditText().getText().toString()
+                            .replaceAll("\\s+", "").length()
+                            != memberName.getEditText().getText().toString().length()) {
+                        // Username contains whitespace
+                        memberName.setErrorEnabled(true);
+                        memberName.setError(getString(R.string.v_error_username_whitespace));
                     }
 
                     if (!Objects.equals(memberPass1.getEditText().getText().toString(),
@@ -362,6 +368,7 @@ public class ProjectCreateFragment extends Fragment implements FragmentOnBackPre
                 adminRole.canViewOtherUser = true;
                 adminRole.canViewRole = true;
                 adminRole.canViewTask = true;
+                adminRole.canViewMedia = true;
                 projectDatabase.RoleDao().insert(adminRole);
 
                 // Creates member role
@@ -385,7 +392,6 @@ public class ProjectCreateFragment extends Fragment implements FragmentOnBackPre
                 projectDatabase.RoleDao().insert(memberRole);
 
                 // Create the project
-                // TODO: Project hash
                 String projectSalt = generateValidString(idRand, TYPE_PROJECT), projectPass;
                 if (projectPass1.getEditText().getText().length() == 0) {
                     projectPass = "";

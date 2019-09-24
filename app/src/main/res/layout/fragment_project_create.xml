@@ -26,14 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24sp">
+        android:padding="18sp">
 
         <TextView
             android:id="@+id/p6_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/p6_project_name"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/p6_name_input"
@@ -49,14 +49,14 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24sp" />
+            android:layout_height="18sp" />
 
         <TextView
             android:id="@+id/p6_project_password1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/p6_project_password"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/p6_project_password1_input"
@@ -73,14 +73,14 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24sp" />
+            android:layout_height="18sp" />
 
         <TextView
             android:id="@+id/p6_project_password2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/reenter_password"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/p6_project_password2_input"
@@ -97,7 +97,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24sp" />
+            android:layout_height="18sp" />
 
         <Switch
             android:id="@+id/p6_enable_members"
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="@string/p6_enable_members"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/p6_first_member"
@@ -115,7 +115,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24sp" />
+                android:layout_height="18sp" />
 
             <TextView
                 android:id="@+id/p6_first_member_name"
@@ -138,7 +138,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24sp" />
+                android:layout_height="18sp" />
 
             <TextView
                 android:id="@+id/p6_first_member_password1"
@@ -163,7 +163,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24sp" />
+                android:layout_height="18sp" />
 
             <TextView
                 android:id="@+id/p6_first_member_password2"
@@ -189,7 +189,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24sp" />
+            android:layout_height="18sp" />
 
         <Switch
             android:id="@+id/p6_enable_roles"
@@ -197,7 +197,7 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="@string/p6_enable_roles"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/p6_custom_roles"
@@ -207,7 +207,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24sp" />
+                android:layout_height="18sp" />
 
             <CheckBox
                 android:id="@+id/p6_custom_admin_switch"
@@ -226,7 +226,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_admin_name"
@@ -249,7 +249,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_admin_password1"
@@ -274,7 +274,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_admin_password2"
@@ -315,7 +315,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_member_name"
@@ -338,7 +338,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_member_password1"
@@ -363,7 +363,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="24sp" />
+                    android:layout_height="18sp" />
 
                 <TextView
                     android:id="@+id/p6_member_password2"
@@ -396,7 +396,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24sp" />
+                android:layout_height="18sp" />
 
             <TextView
                 android:id="@+id/p6_default_role"

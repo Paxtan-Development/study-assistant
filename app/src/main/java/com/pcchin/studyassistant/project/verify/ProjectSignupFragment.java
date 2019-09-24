@@ -65,7 +65,7 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(1, 2)
                     .allowMainThreadQueries().build();
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
@@ -87,7 +87,7 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View returnView = inflater.inflate(R.layout.fragment_project_signup, container, false);
-        ((TextView) returnView.findViewById(R.id.v1_title)).setText(project.projectID);
+        ((TextView) returnView.findViewById(R.id.v1_title)).setText(project.projectTitle);
 
         TextInputLayout usernameInput = returnView.findViewById(R.id.v1_username_input),
                 passwordInput1 = returnView.findViewById(R.id.v1_password1_input),
@@ -123,22 +123,18 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
                         usernameInput.setErrorEnabled(true);
                         usernameInput.setError(getString(R.string.v_error_username_whitespace));
                     } else if (projectDatabase.MemberDao().searchInProjectByUsername
-                            (project.projectID, usernameText) == null) {
+                            (project.projectID, usernameText) != null) {
                         // Username has been taken
                         usernameInput.setErrorEnabled(true);
                         usernameInput.setError(getString(R.string.v_error_username_taken));
-                    } else if (passwordText1.length() == 0) {
-                        // Password is blank
-                        passwordInput1.setErrorEnabled(true);
-                        passwordInput1.setError(getString(R.string.v_error_password_blank));
-                    } else if (passwordText1.length() < 8) {
-                        // Password is too short
-                        passwordInput1.setErrorEnabled(true);
-                        passwordInput1.setError(getString(R.string.error_password_short));
                     } else if (!Objects.equals(passwordText1, passwordText2)) {
                         // Checks if both passwords are the same
                         passwordInput2.setErrorEnabled(true);
                         passwordInput2.setError(getString(R.string.error_password_unequal));
+                    } else if (passwordText1.length() > 0 && passwordText1.length() < 8) {
+                        // Password is too short
+                        passwordInput1.setErrorEnabled(true);
+                        passwordInput1.setError(getString(R.string.error_password_short));
                     } else {
                         // Generate member ID
                         RandomString randomID = new RandomString(48);
@@ -147,11 +143,18 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
                             memberID = randomID.nextString();
                         }
                         // Generate salt
-                        String salt = new RandomString(40).nextString(),
-                            hashedPass = SecurityFunctions.memberHash(passwordText1, salt, project.salt);
-                        projectDatabase.MemberDao().insert(new MemberData(memberID,
-                                project.projectID, usernameText, fullName, salt,
-                                hashedPass, project.memberDefaultRole));
+                        String salt = new RandomString(40).nextString();
+                        if (passwordText1.length() == 0) {
+                            projectDatabase.MemberDao().insert(new MemberData(memberID,
+                                    project.projectID, usernameText, fullName, salt,
+                                    "", project.memberDefaultRole));
+                        } else {
+                            String hashedPass = SecurityFunctions
+                                    .memberHash(passwordText1, salt, project.salt);
+                            projectDatabase.MemberDao().insert(new MemberData(memberID,
+                                    project.projectID, usernameText, fullName, salt,
+                                    hashedPass, project.memberDefaultRole));
+                        }
                         projectDatabase.close();
                         Toast.makeText(getActivity(), R.string.v1_member_created, Toast.LENGTH_SHORT).show();
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
@@ -164,12 +167,12 @@ public class ProjectSignupFragment extends Fragment implements FragmentOnBackPre
     }
 
     /** Return to
-     * @see ProjectSelectFragment **/
+     * @see ProjectLoginFragment **/
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
         if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+            ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
             return true;
         }
         return false;

@@ -76,7 +76,7 @@ public class ProjectLoginFragment extends Fragment implements FragmentOnBackPres
         if (getActivity() != null && getFragmentManager() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(1, 2)
                     .allowMainThreadQueries().build();
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));

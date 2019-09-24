@@ -60,6 +60,7 @@ public class RoleData {
     public boolean canViewOtherUser;
     public boolean canViewRole;
     public boolean canViewTask;
+    public boolean canViewMedia;
 
     /** Default constructor. **/
     @Ignore
@@ -87,5 +88,6 @@ public class RoleData {
         this.canViewOtherUser = false;
         this.canViewRole = false;
         this.canViewTask = false;
+        this.canViewMedia = false;
     }
 }

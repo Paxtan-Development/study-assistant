@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> {
                     ProjectDatabase projectDatabase = Room.databaseBuilder(this,
                             ProjectDatabase.class, DATABASE_PROJECT)
-                            .fallbackToDestructiveMigrationFrom(1)
+                            .fallbackToDestructiveMigrationFrom(1, 2)
                             .allowMainThreadQueries().build();
                     RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                     if (admin == null) {
@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity
                         admin.canViewOtherUser = true;
                         admin.canViewRole = true;
                         admin.canViewTask = true;
+                        admin.canViewMedia = true;
                         projectDatabase.RoleDao().insert(admin);
                     }
                     projectDatabase.close();
@@ -331,6 +332,27 @@ public class MainActivity extends AppCompatActivity
             case R.id.n4_cancel:
                 ((NotesEditFragment) currentFragment).onCancelPressed();
                 break;
+
+            // When ProjectInfoFragment is selected
+            case R.id.p2_menu_user:
+                ((ProjectInfoFragment) currentFragment).onUserPressed();
+                break;
+
+            case R.id.p2_menu_notes:
+                ((ProjectInfoFragment) currentFragment).onNotesPressed();
+                break;
+
+            case R.id.p2_menu_settings:
+                ((ProjectInfoFragment) currentFragment).onSettingsPressed();
+                break;
+
+            case R.id.p2_menu_media:
+                ((ProjectInfoFragment) currentFragment).onMediaPressed();
+                break;
+
+            case R.id.p2_menu_export:
+                ((ProjectInfoFragment) currentFragment).onExportPressed();
+                break;
         }
         return true;
     }
@@ -348,7 +370,6 @@ public class MainActivity extends AppCompatActivity
         if (item.getItemId() == R.id.m3_home) {
             displayFragment(new MainFragment());
         }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

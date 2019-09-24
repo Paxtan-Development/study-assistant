@@ -27,8 +27,25 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectSettingsFragment extends PreferenceFragmentCompat {
+    private static final String ARG_ID = "projectID";
+    private static final String ARG_ID2 = "ID2";
+    private static final String ARG_IS_MEMBER = "isMember";
+
     /** Default constructor. **/
     public ProjectSettingsFragment() {
+    }
+
+    /** Used in all instances when creating new project.
+     * @param ID2 can be either the role ID or member ID depending on the project.
+     * @param isMember determines whether ID2 is a member ID or a role ID. **/
+    public static ProjectSettingsFragment newInstance(String projectID, String ID2, boolean isMember) {
+        ProjectSettingsFragment fragment = new ProjectSettingsFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        args.putString(ARG_ID2, ID2);
+        args.putBoolean(ARG_IS_MEMBER, isMember);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Retrieve the settings for the project. **/

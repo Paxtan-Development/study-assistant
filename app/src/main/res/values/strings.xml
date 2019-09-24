@@ -142,7 +142,10 @@
     <string name="p_username">Username</string>
     <string name="p_password">Password</string>
     <string name="p_full_name">Full Name</string>
+
     <string name="p2_linked_subject">Linked Subject</string>
+    <string name="p2_subject_missing">Subject Missing</string>
+    <string name="p2_subject_missing_desc">The subject required is missing. Would you like to delete the linked subject from the project?</string>
 
     <string name="p6_project_name">Project Name</string>
     <string name="p6_enable_members">Enable Members</string>

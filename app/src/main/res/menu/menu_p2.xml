@@ -16,22 +16,29 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/p2_user"
+        android:id="@+id/p2_menu_user"
         android:icon="@drawable/ic_menu_user"
         android:title="@string/p_user"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/p2_notes"
+        android:id="@+id/p2_menu_notes"
         android:icon="@drawable/ic_menu_notes"
         android:title="@string/p2_linked_subject"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/p2_settings"
+        android:id="@+id/p2_menu_settings"
         android:icon="@drawable/ic_menu_settings"
         android:title="@string/p_settings"
         app:showAsAction="ifRoom" />
+
     <item
-        android:id="@+id/p2_export"
+        android:id="@+id/p2_menu_media"
+        android:icon="@drawable/ic_menu_media"
+        android:title="@string/p_media"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/p2_menu_export"
         android:icon="@drawable/ic_menu_export"
         android:title="@string/data_export"
         app:showAsAction="ifRoom" />

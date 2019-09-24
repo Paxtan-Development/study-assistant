@@ -35,11 +35,7 @@
         android:icon="@drawable/ic_menu_roles"
         android:title="@string/p_roles"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/p_bottom_media"
-        android:icon="@drawable/ic_menu_media"
-        android:title="@string/p_media"
-        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/p_bottom_status"
         android:icon="@drawable/ic_project_status"

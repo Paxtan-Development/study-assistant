@@ -26,8 +26,25 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectMediaFragment extends Fragment {
+    private static final String ARG_ID = "projectID";
+    private static final String ARG_ID2 = "ID2";
+    private static final String ARG_IS_MEMBER = "isMember";
+
     /** Default constructor. **/
     public ProjectMediaFragment() {
+    }
+
+    /** Used in all instances when creating new project.
+     * @param ID2 can be either the role ID or member ID depending on the project.
+     * @param isMember determines whether ID2 is a member ID or a role ID. **/
+    public static ProjectMediaFragment newInstance(String projectID, String ID2, boolean isMember) {
+        ProjectMediaFragment fragment = new ProjectMediaFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        args.putString(ARG_ID2, ID2);
+        args.putBoolean(ARG_IS_MEMBER, isMember);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Initializes the fragment and the project media. **/

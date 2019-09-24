@@ -32,6 +32,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -153,7 +154,7 @@ public class GeneralFunctions {
         if (BuildConfig.DEBUG) {
             ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(1, 2)
                     .allowMainThreadQueries().build();
             List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
             for (ProjectData project : projectList) {
@@ -219,12 +220,13 @@ public class GeneralFunctions {
             activity.bottomNavView.inflateMenu(res);
             Menu navViewMenu = activity.bottomNavView.getMenu();
 
-            // TODO: Update bottom nav view
+            // Bottom nav view
             if (res == R.menu.menu_p_bottom) {
-
+                // TODO: Update bottom nav view
             } else {
-
+                // TODO: File Manager menu
             }
+            activity.bottomNavView.setVisibility(View.VISIBLE);
         }
     }
 

@@ -14,26 +14,34 @@
 package com.pcchin.studyassistant.project;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
-import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.notes.NotesSubjectFragment;
+import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
 
 public class ProjectInfoFragment extends Fragment implements FragmentOnBackPressed {
     private static final String ARG_ID = "projectID";
@@ -79,36 +87,40 @@ public class ProjectInfoFragment extends Fragment implements FragmentOnBackPress
 
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(1, 2)
                     .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
+            // Set title
             if (project == null) {
                 // Project is somehow missing
                 Toast.makeText(getActivity(), R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
                 hasError = true;
-            } else if (isMember) {
-                member = projectDatabase.MemberDao().searchByID(id2);
-                if (member == null) {
-                    // Member is somehow missing
-                    Toast.makeText(getActivity(), R.string.p_error_member_not_found, Toast.LENGTH_SHORT).show();
-                    hasError = true;
-                } else if (project.rolesEnabled) {
+            } else {
+                getActivity().setTitle(project.projectTitle);
+                if (isMember) {
+                    member = projectDatabase.MemberDao().searchByID(id2);
+                    if (member == null) {
+                        // Member is somehow missing
+                        Toast.makeText(getActivity(), R.string.p_error_member_not_found, Toast.LENGTH_SHORT).show();
+                        hasError = true;
+                    } else if (project.rolesEnabled) {
+                        // Get the associated role if needed
+                        role = projectDatabase.RoleDao().searchByID(member.role);
+                        if (role == null) {
+                            // Role is somehow missing
+                            Toast.makeText(getActivity(), R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
+                            hasError = true;
+                        }
+                    }
+                } else {
+                    // We can safely assume that members are disabled
                     // Get the associated role if needed
-                    role = projectDatabase.RoleDao().searchByID(member.role);
+                    role = projectDatabase.RoleDao().searchByID(id2);
                     if (role == null) {
                         // Role is somehow missing
                         Toast.makeText(getActivity(), R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
                         hasError = true;
                     }
-                }
-            } else {
-                // We can safely assume that members are disabled
-                // Get the associated role if needed
-                role = projectDatabase.RoleDao().searchByID(id2);
-                if (role == null) {
-                    // Role is somehow missing
-                    Toast.makeText(getActivity(), R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
-                    hasError = true;
                 }
             }
 
@@ -144,6 +156,113 @@ public class ProjectInfoFragment extends Fragment implements FragmentOnBackPress
         }
         // TODO: Set up layout
         return returnView;
+    }
+
+    /** Sets up the menu for the fragment. **/
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_p2, menu);
+        // Disable user if project does not have user
+        if (!project.membersEnabled) {
+            menu.findItem(R.id.p2_menu_user).setVisible(false);
+        }
+        // Disable associated subject if the project does not have one
+        if (project.associatedSubject == null) {
+            menu.findItem(R.id.p2_menu_notes).setVisible(false);
+        }
+        if (project.rolesEnabled && role != null) {
+            // Disable settings and export if user/role cannot edit subject
+            if (!role.canModifyInfo) {
+                menu.findItem(R.id.p2_menu_settings).setVisible(false);
+                menu.findItem(R.id.p2_menu_export).setVisible(false);
+            }
+            // Disable media if user/role cannot edit it
+            if (!role.canViewMedia) {
+                menu.findItem(R.id.p2_menu_media).setVisible(false);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /** Goes to
+     * @see com.pcchin.studyassistant.project.member.ProjectMemberFragment for the member.**/
+    public void onUserPressed() {
+        if (getActivity() != null && member != null) {
+            projectDatabase.close();
+            ((MainActivity) getActivity()).displayFragment(ProjectMemberFragment
+                    .newInstance(project.projectID, member.memberID, member.memberID, false));
+        }
+    }
+
+    /** Goes to
+     * @see com.pcchin.studyassistant.notes.NotesSubjectFragment for the related subject.
+     * If the subject is not found, an alert will display asking if the user would
+     * like to delete the related subject from the project. **/
+    public void onNotesPressed() {
+        if (project.associatedSubject != null && getActivity() != null && getFragmentManager() != null) {
+            // Opens subject database
+            SubjectDatabase subjDatabase = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
+                    MainActivity.DATABASE_NOTES)
+                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                    .allowMainThreadQueries().build();
+            NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
+            if (targetSubject == null) {
+                // Ask the user whether to remove the associated subject
+                AutoDismissDialog subjDialog = new AutoDismissDialog(getString(R.string.p2_subject_missing),
+                        getString(R.string.p2_subject_missing_desc),
+                        new String[]{getString(android.R.string.yes),
+                        getString(android.R.string.no), ""},
+                        new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+                            project.associatedSubject = null;
+                            projectDatabase.ProjectDao().update(project);
+                            getActivity().invalidateOptionsMenu();
+                        }, null, null});
+                subjDialog.setDismissListener(dialogInterface -> subjDatabase.close());
+                subjDialog.show(getFragmentManager(), "ProjectInfoFragment.1");
+            } else {
+                subjDatabase.close();
+                projectDatabase.close();
+                if (getActivity() != null) {
+                    ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+                            .newInstance(project.associatedSubject));
+                }
+            }
+        }
+    }
+
+    /** Goes to
+     * @see ProjectSettingsFragment for the project. **/
+    public void onSettingsPressed() {
+        if (getActivity() != null) {
+            projectDatabase.close();
+            if (member != null) {
+                ((MainActivity) getActivity()).displayFragment(ProjectSettingsFragment
+                        .newInstance(project.projectID, member.memberID, true));
+            } else {
+                ((MainActivity) getActivity()).displayFragment(ProjectSettingsFragment
+                        .newInstance(project.projectID, role.roleID, false));
+            }
+        }
+    }
+
+    /** Access the media for the note at
+     * @see ProjectMediaFragment . **/
+    public void onMediaPressed() {
+        if (getActivity() != null) {
+            projectDatabase.close();
+            if (member != null) {
+                ((MainActivity) getActivity()).displayFragment(ProjectMediaFragment
+                        .newInstance(project.projectID, member.memberID, true));
+            } else {
+                ((MainActivity) getActivity()).displayFragment(ProjectMediaFragment
+                        .newInstance(project.projectID, role.roleID, false));
+            }
+        }
+    }
+
+    /** Exports the subject to either a .project file or a ZIP file. **/
+    public void onExportPressed() {
+        // TODO: Export subject
     }
 
     /** Returns to

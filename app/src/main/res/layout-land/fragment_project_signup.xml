@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="24sp">
+        android:padding="18sp">
 
         <TextView
             android:id="@+id/v1_title"
@@ -35,11 +35,11 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/blank"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="36sp" />
+            android:layout_height="24sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,7 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/p_username"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_username_input"
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/p_full_name"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_fullname_input"
@@ -105,7 +105,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/p_password"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_password1_input"
@@ -124,7 +124,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/reenter_password"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/v1_password2_input"
@@ -143,7 +143,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="36sp" />
+            android:layout_height="24sp" />
 
         <LinearLayout
             style="@style/Widget.AppCompat.ButtonBar"
@@ -159,9 +159,9 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="5sp"
                 android:layout_marginEnd="5sp"
-                android:paddingStart="36sp"
+                android:paddingStart="24sp"
                 android:paddingTop="15sp"
-                android:paddingEnd="36sp"
+                android:paddingEnd="24sp"
                 android:paddingBottom="15sp"
                 android:text="@string/return_val"
                 android:textSize="18sp" />
@@ -173,9 +173,9 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="5sp"
                 android:layout_marginEnd="5sp"
-                android:paddingStart="36sp"
+                android:paddingStart="24sp"
                 android:paddingTop="15sp"
-                android:paddingEnd="36sp"
+                android:paddingEnd="24sp"
                 android:paddingBottom="15sp"
                 android:text="@string/v1_signup"
                 android:textSize="18sp" />

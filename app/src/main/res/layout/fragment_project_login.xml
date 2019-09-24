@@ -28,9 +28,9 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingStart="18sp"
-        android:paddingTop="24sp"
+        android:paddingTop="18sp"
         android:paddingEnd="18sp"
-        android:paddingBottom="24sp">
+        android:paddingBottom="18sp">
 
         <TextView
             android:id="@+id/v2_title"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/blank"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
         <ImageView
             android:id="@+id/v2_icon"
@@ -49,14 +49,14 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="36sp" />
+            android:layout_height="24sp" />
 
         <TextView
             android:id="@+id/v2_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/p_username"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/v2_username_input"
@@ -67,8 +67,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/blank"
-                android:inputType="text|textPassword" />
+                android:hint="@string/blank" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -76,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/p_role"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <Spinner
             android:id="@+id/v2_role_input"
@@ -85,14 +84,14 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24sp" />
+            android:layout_height="18sp" />
 
         <TextView
             android:id="@+id/v2_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/p_password"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/v2_password_input"
@@ -108,7 +107,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="36sp" />
+            android:layout_height="24sp" />
 
         <Button
             android:id="@+id/v2_button_login"
@@ -119,7 +118,7 @@
             android:paddingTop="10sp"
             android:paddingBottom="10sp"
             android:text="@string/v2_login"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/v2_button_signup"

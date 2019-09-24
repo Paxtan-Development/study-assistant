@@ -33,7 +33,7 @@
         <!-- Provided used to prevent FileUriExposedException -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.pcchin.studyassistant.provider"
+            android:authorities="${applicationId}.ContentProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

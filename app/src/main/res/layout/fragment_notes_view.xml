@@ -20,10 +20,12 @@
     tools:context=".notes.NotesViewFragment">
 
     <LinearLayout
+        android:id="@+id/n3_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="24sp">
 
         <TextView
             android:id="@+id/n3_title"

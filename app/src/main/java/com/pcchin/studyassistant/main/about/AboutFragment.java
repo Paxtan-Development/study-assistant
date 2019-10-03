@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -28,12 +29,12 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AboutFragment extends Fragment implements FragmentOnBackPressed {
+public class AboutFragment extends Fragment implements ExtendedFragment {
 
     /** Default Constructor. **/
     public AboutFragment() {}

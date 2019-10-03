@@ -50,7 +50,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
@@ -77,7 +77,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-public class NotesSubjectFragment extends Fragment implements FragmentOnBackPressed {
+public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_SUBJECT = "noteSubject";
     private static final String ARG_PREV = "previousOrder";
     private static final int MAXLINES = 4;
@@ -250,12 +250,12 @@ public class NotesSubjectFragment extends Fragment implements FragmentOnBackPres
                             (int) ((MAXLINES - 1)* 18 * ((TextView) miniNote.findViewById(R.id.n2_mini_content))
                                     .getLineSpacingMultiplier()));
             // Set on click listener
-            final int finalI = i;
+            int finalI = i;
             View.OnClickListener displayNoteListener = v -> {
                 if (getActivity() != null) {
                     subjectDatabase.close();
-                    ((MainActivity) getActivity()).displayFragment(NotesViewFragment
-                            .newInstance(notesSubject, finalI));
+                    ((MainActivity) getActivity()).displayNotes(notesSubject, notesArray.size());
+                    ((MainActivity) getActivity()).pager.setCurrentItem(finalI, false);
                 }
             };
 

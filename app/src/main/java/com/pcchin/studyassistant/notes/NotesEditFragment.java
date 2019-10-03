@@ -41,7 +41,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
@@ -54,7 +54,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class NotesEditFragment extends Fragment implements FragmentOnBackPressed {
+public class NotesEditFragment extends Fragment implements ExtendedFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -294,8 +294,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                 database.SubjectDao().update(targetSubject);
 
                 // Go to NotesViewFragment
-                ((MainActivity) getActivity()).displayFragment(NotesViewFragment
-                        .newInstance(targetNotesSubject, targetSubjContents.size() - 1));
+                ((MainActivity) getActivity()).displayNotes(targetNotesSubject, targetSubjContents.size());
+                ((MainActivity) getActivity()).pager.setCurrentItem(targetSubjContents.size() - 1);
 
             } else {
                 if (hasParent) {
@@ -303,15 +303,15 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
                     subjContents.set(notesOrder, updatedNote);
                     subject.contents = subjContents;
                     database.SubjectDao().update(subject);
-                    ((MainActivity) getActivity()).displayFragment(NotesViewFragment
-                        .newInstance(notesSubject, notesOrder));
+                    ((MainActivity) getActivity()).displayNotes(notesSubject, subjContents.size());
+                    ((MainActivity) getActivity()).pager.setCurrentItem(notesOrder);
                 } else {
                     // Add new note
                     subjContents.add(updatedNote);
                     subject.contents = subjContents;
                     database.SubjectDao().update(subject);
-                    ((MainActivity) getActivity()).displayFragment(NotesViewFragment
-                        .newInstance(notesSubject, subjContents.size() - 1));
+                    ((MainActivity) getActivity()).displayNotes(notesSubject, subjContents.size());
+                    ((MainActivity) getActivity()).pager.setCurrentItem(subjContents.size() - 1);
                 }
             }
             database.close();
@@ -326,8 +326,8 @@ public class NotesEditFragment extends Fragment implements FragmentOnBackPressed
         // Go back to NotesViewFragment of subject
         if (getActivity() != null) {
             if (hasParent) {
-                ((MainActivity) getActivity()).displayFragment(NotesViewFragment
-                        .newInstance(notesSubject, notesOrder));
+                ((MainActivity) getActivity()).displayNotes(notesSubject, subjContents.size());
+                ((MainActivity) getActivity()).pager.setCurrentItem(notesOrder, false);
             } else {
                 ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
                         .newInstance(notesSubject));

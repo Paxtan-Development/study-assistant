@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -33,12 +34,12 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-public class LicenseFragment extends Fragment implements FragmentOnBackPressed {
+public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,
             R.array.jsoup_license, R.array.zip4j_license};
 

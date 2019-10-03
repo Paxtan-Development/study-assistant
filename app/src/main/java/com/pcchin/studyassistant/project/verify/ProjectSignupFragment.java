@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -33,14 +34,14 @@ import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.misc.RandomString;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
 import java.util.Objects;
 
-public class ProjectSignupFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectSignupFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
     private ProjectDatabase projectDatabase;
     private ProjectData project;

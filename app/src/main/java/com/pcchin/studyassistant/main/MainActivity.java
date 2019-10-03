@@ -23,37 +23,36 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.view.GravityCompat;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.room.Room;
-
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.room.Room;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
@@ -73,6 +72,9 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
+
+    public ViewPager pager;
+
     private Fragment currentFragment;
     // Constants used across fragments
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
             }
         }
+        pager = findViewById(R.id.base_pager);
         bottomNavView = findViewById(R.id.bottom_nav);
 
         // First time starting the app
@@ -379,7 +382,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
-        if (!(fragment instanceof FragmentOnBackPressed) || !((FragmentOnBackPressed) fragment).onBackPressed()) {
+        if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
             super.onBackPressed();
         }
     }
@@ -430,6 +433,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Display the fragment
+        if (pager.getAdapter() != null) {
+            pager.setAdapter(null);
+        }
+        pager.setVisibility(View.GONE);
+        findViewById(R.id.base).setVisibility(View.VISIBLE);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.base, fragment);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -437,6 +445,30 @@ public class MainActivity extends AppCompatActivity
         currentFragment = fragment;
         hideKeyboard();
     }
+
+    /** Displays the notes for the subject through a custom PageAdaptor.
+     * Keyboard will be hidden between the transition. **/
+    public void displayNotes(String subject, int size) {
+        findViewById(R.id.base).setVisibility(View.GONE);
+        FragmentStatePagerAdapter baseAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager(),
+                FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            @NonNull
+            @Override
+            public Fragment getItem(int position) {
+                currentFragment = NotesViewFragment.newInstance(subject, position);
+                return currentFragment;
+            }
+
+            @Override
+            public int getCount() {
+                return size;
+            }
+        };
+        pager.setAdapter(baseAdapter);
+        pager.setVisibility(View.VISIBLE);
+        hideKeyboard();
+    }
+
 
     /** Closes the navigation drawer. **/
     public void closeDrawer() {
@@ -465,7 +497,7 @@ public class MainActivity extends AppCompatActivity
      * when a function redirects to an external app/fragment. **/
     public void safeOnBackPressed() {
         if (currentFragment instanceof NotesEditFragment) {
-            ((NotesEditFragment) currentFragment).onBackPressed();
+            ((NotesEditFragment) currentFragment).onSavePressed();
         }
     }
 }

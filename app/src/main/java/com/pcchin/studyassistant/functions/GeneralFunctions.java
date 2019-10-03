@@ -222,7 +222,7 @@ public class GeneralFunctions {
 
             // Bottom nav view
             if (res == R.menu.menu_p_bottom) {
-                // TODO: Update bottom nav view
+                // TODO: Bottom nav menu
             } else {
                 // TODO: File Manager menu
             }

@@ -25,6 +25,7 @@ import androidx.room.Room;
 
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -42,7 +43,7 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
@@ -51,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ProjectLoginFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
     private ProjectDatabase projectDatabase;
     private ProjectData project;

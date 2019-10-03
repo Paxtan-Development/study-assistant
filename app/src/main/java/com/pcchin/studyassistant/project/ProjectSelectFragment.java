@@ -22,21 +22,23 @@ import androidx.room.Room;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;
 import com.pcchin.studyassistant.project.verify.ProjectLoginFragment;
 
 import java.util.List;
 
-public class ProjectSelectFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectSelectFragment extends Fragment implements ExtendedFragment {
     private ProjectDatabase projectDatabase;
 
     /** Default constructor. **/
@@ -61,6 +63,7 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View returnView = inflater.inflate(R.layout.blank_list, container, false);
+        LinearLayout linearView = returnView.findViewById(R.id.blank_linear);
         List<ProjectData> displayList = projectDatabase.ProjectDao().getAllProjects();
         for (int i = 0; i < displayList.size(); i++) {
             @SuppressLint("InflateParams") Button subjectBtn = (Button) getLayoutInflater()
@@ -73,6 +76,7 @@ public class ProjectSelectFragment extends Fragment implements FragmentOnBackPre
                             .newInstance(displayList.get(finalI).projectID));
                 }
             });
+            linearView.addView(subjectBtn);
         }
         return returnView;
     }

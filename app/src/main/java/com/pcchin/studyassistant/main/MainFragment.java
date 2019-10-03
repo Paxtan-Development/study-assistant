@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -26,12 +27,12 @@ import android.widget.Toast;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.main.about.AboutFragment;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
 
-public class MainFragment extends Fragment implements FragmentOnBackPressed {
+public class MainFragment extends Fragment implements ExtendedFragment {
     private boolean doubleBackToExitPressedOnce;
 
     /** Default constructor. **/

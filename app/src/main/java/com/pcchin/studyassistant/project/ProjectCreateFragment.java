@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -36,12 +37,12 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.misc.RandomString;
 
 import java.util.Objects;
 
-public class ProjectCreateFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectCreateFragment extends Fragment implements ExtendedFragment {
     // Variables used in generateValidString
     private static final int TYPE_PROJECT = 0;
     private static final int TYPE_ROLE = 1;

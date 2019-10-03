@@ -24,6 +24,7 @@ import androidx.room.Room;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -39,11 +40,11 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.FragmentOnBackPressed;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
 
-public class ProjectInfoFragment extends Fragment implements FragmentOnBackPressed {
+public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
     private static final String ARG_ID2 = "ID2";
     private static final String ARG_IS_MEMBER = "isMember";

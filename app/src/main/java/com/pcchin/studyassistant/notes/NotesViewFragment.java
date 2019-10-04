@@ -13,9 +13,6 @@
 
 package com.pcchin.studyassistant.notes;
 
-import androidx.core.content.ContextCompat;
-import androidx.room.Room;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -29,17 +26,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-
 import android.text.InputType;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -48,18 +40,24 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
-import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.SecurityFunctions;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.misc.AutoDismissDialog;
+import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.misc.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -74,11 +72,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     private ArrayList<String> notesInfo;
     private String notesSubject;
     private int notesOrder;
-    private int notesSize;
     private boolean isLocked;
     private boolean hasAlert;
-
-    private float swipeDownX;
 
     /** Default constructor. **/
     public NotesViewFragment() {}
@@ -112,7 +107,6 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     .allowMainThreadQueries().build();
             ArrayList<ArrayList<String>> allNotes = database
                     .SubjectDao().search(notesSubject).contents;
-            notesSize = allNotes.size();
 
             // Check if notesOrder exists
             if (notesOrder < allNotes.size()) {
@@ -142,8 +136,6 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
         // Inflate the layout for this fragment
         ScrollView returnView = (ScrollView) inflater.inflate(
                 R.layout.fragment_notes_view, container, false);
-        // Set motion event listeners
-        returnView.setOnTouchListener((view, motionEvent) -> onTouchEvent(motionEvent));
 
         // Display data for Fragment
         ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
@@ -462,43 +454,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     .newInstance(notesSubject, notesOrder));
             return true;
         }
+        Log.d("Temp", "Returned false");
         return false;
-    }
-
-    /** Detects left swipes and right swipes to go to previous or next fragments. **/
-    private boolean onTouchEvent(MotionEvent event) {
-        int SWIPE_THRESHOLD = 150;
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP:
-                float swipeUpX = event.getX(), diff = swipeUpX - swipeDownX;
-                if (getActivity() != null && Math.abs(diff) > SWIPE_THRESHOLD) {
-                    if (swipeUpX > swipeDownX) {
-                        // Swipe left
-                        if (notesOrder > 0) {
-                            ((MainActivity) getActivity()).pager.setCurrentItem(notesOrder - 1);
-                            return true;
-                        } else {
-                            // Fall back to default
-                            return false;
-                        }
-                    } else if (notesOrder < notesSize - 1) {
-                        // Swipe right
-                        ((MainActivity) getActivity()).pager.setCurrentItem(notesOrder + 1);
-                        return true;
-                    } else {
-                        // Fall back to default
-                        return false;
-                    }
-                } else {
-                    // Fall back to default
-                    return false;
-                }
-            case MotionEvent.ACTION_DOWN:
-                swipeDownX = event.getX();
-                return true;
-            default:
-                return false;
-        }
     }
 
     /** Removes the lock for the note and refreshes the menu.  **/

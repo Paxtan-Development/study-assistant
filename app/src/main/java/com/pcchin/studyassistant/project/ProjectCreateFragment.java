@@ -15,12 +15,7 @@ package com.pcchin.studyassistant.project;
 
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.room.Room;
-
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -29,12 +24,16 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.ExtendedFragment;
@@ -436,9 +435,11 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                                 initialMember, adminRole));
                     }
                     projectDatabase.close();
+
                     // Go to project info
                     Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
+                        GeneralFunctions.updateNavView((MainActivity) getActivity());
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                 .newInstance(projectID, initialMember.memberID,
                                         true, true));
@@ -460,6 +461,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     // Go to project info
                     Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
+                        GeneralFunctions.updateNavView((MainActivity) getActivity());
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                 .newInstance(projectID, adminRole.roleID,
                                         false, true));

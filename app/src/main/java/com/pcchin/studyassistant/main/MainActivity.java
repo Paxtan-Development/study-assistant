@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -72,9 +73,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
-
     public ViewPager pager;
-
     private Fragment currentFragment;
     // Constants used across fragments
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
@@ -381,9 +380,15 @@ public class MainActivity extends AppCompatActivity
     /** Delegates each onBackPressed to each Fragment **/
     @Override
     public void onBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
-        if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
-            super.onBackPressed();
+        if (currentFragment instanceof NotesViewFragment) {
+            // As NotesViewFragment is inside a PagerAdapter, it does not intercept
+            // the onBackPressed, hence its a special case
+            ((NotesViewFragment) currentFragment).onBackPressed();
+        } else {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
+            if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -433,15 +438,16 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Display the fragment
+        // The lines need to be executed in this order to allow a smooth transition
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.base, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
         if (pager.getAdapter() != null) {
             pager.setAdapter(null);
         }
+        pager.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
         pager.setVisibility(View.GONE);
         findViewById(R.id.base).setVisibility(View.VISIBLE);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.base, fragment);
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        fragmentTransaction.commit();
         currentFragment = fragment;
         hideKeyboard();
     }
@@ -449,7 +455,12 @@ public class MainActivity extends AppCompatActivity
     /** Displays the notes for the subject through a custom PageAdaptor.
      * Keyboard will be hidden between the transition. **/
     public void displayNotes(String subject, int size) {
-        findViewById(R.id.base).setVisibility(View.GONE);
+        if (currentFragment != null && !(currentFragment instanceof NotesViewFragment)) {
+            // Removes last fragment from the normal container if its not NotesViewFragment
+            // as NotesViewFragment is not displayed using the normal container
+            // This is to remove the menu from the bottom container and prevent double onBackPressed
+            getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+        }
         FragmentStatePagerAdapter baseAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager(),
                 FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @NonNull
@@ -465,6 +476,9 @@ public class MainActivity extends AppCompatActivity
             }
         };
         pager.setAdapter(baseAdapter);
+        // Fade out animation included to increase smoothness
+        findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
+        findViewById(R.id.base).setVisibility(View.GONE);
         pager.setVisibility(View.VISIBLE);
         hideKeyboard();
     }

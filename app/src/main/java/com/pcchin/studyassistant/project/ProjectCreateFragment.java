@@ -15,6 +15,7 @@ package com.pcchin.studyassistant.project;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
 
     private ProjectDatabase projectDatabase;
     private boolean enableMembers = true, enableRoles = true,
-            customAdmin = true, customMember = true;
+            customAdmin = false, customMember = false;
 
     /** Default constructor. **/
     public ProjectCreateFragment() {
@@ -105,6 +106,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         ((Switch) returnView.findViewById(R.id.p6_enable_roles))
                 .setOnCheckedChangeListener((compoundButton, b) -> {
                     enableRoles = b;
+                    Log.d("StudyAssistant - Temp", String.valueOf(enableRoles));
                     if (b) {
                         // Roles are enabled
                         returnView.findViewById(R.id.p6_custom_roles).setVisibility(View.VISIBLE);
@@ -427,11 +429,13 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                         }
 
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectPass, projectSalt, projectPass, memberRole, adminRole,
+                                projectName.getEditText().getText().toString(),
+                                projectSalt, projectPass, memberRole, adminRole,
                                 initialMember, defaultRole));
                     } else {
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectPass, projectSalt, projectPass, memberRole, adminRole,
+                                projectName.getEditText().getText().toString(),
+                                projectSalt, projectPass, memberRole, adminRole,
                                 initialMember, adminRole));
                     }
                     projectDatabase.close();

@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -143,6 +142,9 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                         while (projectDatabase.MemberDao().searchByID(memberID) != null) {
                             memberID = randomID.nextString();
                         }
+                        // Add member id to database
+                        project.memberList.add(memberID);
+                        projectDatabase.ProjectDao().update(project);
                         // Generate salt
                         String salt = new RandomString(40).nextString();
                         if (passwordText1.length() == 0) {

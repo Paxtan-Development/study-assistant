@@ -214,7 +214,7 @@ public class AutoDismissDialog extends DialogFragment {
                         .setNegativeButton(buttonList[1], null)
                         .setNeutralButton(buttonList[2], null);
             }
-            builder.setCancelable(cancellable);
+            setCancelable(cancellable);
 
             // Sets the dialog listeners if autoDismiss is false
             AlertDialog dialog = builder.create();

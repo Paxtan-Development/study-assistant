@@ -14,7 +14,7 @@
 package com.pcchin.studyassistant.project.verify;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +25,6 @@ import androidx.room.Room;
 
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -220,7 +219,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
                             } else {
                                 // Check if password entered is correct
                                 String hashedPassword = SecurityFunctions.memberHash(
-                                        userInputLayout.getEditText().getText().toString(),
+                                        passwordInputLayout.getEditText().getText().toString(),
                                         targetMember.salt, project.salt);
                                 if (Objects.equals(hashedPassword, targetMember.memberPass)) {
                                     projectDatabase.close();

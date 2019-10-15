@@ -112,8 +112,8 @@ public class SecurityTest {
         Assert.assertNotNull(responseString);
 
         // Minimal input
-        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT));
+        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(2),
+                TestFunctions.randomString(2));
         Assert.assertNotNull(responseString);
     }
 
@@ -127,8 +127,8 @@ public class SecurityTest {
         Assert.assertNotNull(responseString);
 
         // Minimal input
-        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT));
+        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(2),
+                TestFunctions.randomString(2), TestFunctions.randomString(2));
         Assert.assertNotNull(responseString);
     }
 

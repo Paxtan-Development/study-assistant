@@ -51,6 +51,11 @@ import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
 import com.pcchin.studyassistant.project.ProjectCreateFragment;
+import com.pcchin.studyassistant.project.ProjectInfoFragment;
+import com.pcchin.studyassistant.project.member.ProjectMemberListFragment;
+import com.pcchin.studyassistant.project.role.ProjectRoleFragment;
+import com.pcchin.studyassistant.project.status.ProjectStatusFragment;
+import com.pcchin.studyassistant.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.project.verify.ProjectLoginFragment;
 
 import java.util.ArrayList;
@@ -154,7 +159,7 @@ public class GeneralFunctions {
         if (BuildConfig.DEBUG) {
             ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
                     .allowMainThreadQueries().build();
             List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
             for (ProjectData project : projectList) {
@@ -220,12 +225,127 @@ public class GeneralFunctions {
             activity.bottomNavView.inflateMenu(res);
             Menu navViewMenu = activity.bottomNavView.getMenu();
 
+            // Set up database
+            ProjectDatabase database = Room.databaseBuilder(activity, ProjectDatabase.class,
+                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+
             // Bottom nav view
             if (res == R.menu.menu_p_bottom) {
                 // TODO: Bottom nav menu
+                // Home button
+                navViewMenu.findItem(R.id.p_bottom_home).setOnMenuItemClickListener(item -> {
+                    if (!(activity.currentFragment instanceof ProjectInfoFragment)) {
+                        if (member == null) {
+                            // Default to role
+                            activity.displayFragment(ProjectInfoFragment
+                                    .newInstance(project.projectID, role.roleID, false, false));
+                        } else {
+                            activity.displayFragment(ProjectInfoFragment
+                                    .newInstance(project.projectID, member.memberID, true, false));
+                        }
+                    }
+                    return true;
+                });
+
+                // Members button
+                if (project.membersEnabled && member != null && database.RoleDao().searchByID(member.role) != null
+                    && (database.RoleDao().searchByID(member.role).canViewOtherUser ||
+                        database.RoleDao().searchByID(member.role).canModifyOtherUser)) {
+                    navViewMenu.findItem(R.id.p_bottom_members).setOnMenuItemClickListener(item -> {
+                        if (!(activity.currentFragment instanceof ProjectMemberListFragment)) {
+                            activity.displayFragment(ProjectMemberListFragment
+                                    .newInstance(project.projectID, member.memberID, false));
+                        }
+                        return true;
+                    });
+                } else {
+                    navViewMenu.findItem(R.id.p_bottom_members).setVisible(false);
+                }
+
+                // Tasks button
+                if (project.taskEnabled && (
+                        // Member has privileges
+                        (member != null && database.RoleDao().searchByID(member.role) != null
+                        && (database.RoleDao().searchByID(member.role).canViewOtherTask ||
+                        database.RoleDao().searchByID(member.role).canModifyOtherTask ||
+                        database.RoleDao().searchByID(member.role).canViewTask ||
+                        database.RoleDao().searchByID(member.role).canModifyOwnTask)) ||
+
+                        // Role has privileges
+                        (role != null && (role.canViewOtherTask || role.canModifyOtherTask
+                            || role.canViewTask || role.canModifyOwnTask)))) {
+                    navViewMenu.findItem(R.id.p_bottom_task).setOnMenuItemClickListener(item -> {
+                        if (!(activity.currentFragment instanceof ProjectTaskFragment)) {
+                            if (member != null) {
+                                activity.displayFragment(ProjectTaskFragment
+                                        .newInstance(project.projectID, member.memberID, true, false));
+                            } else {
+                                activity.displayFragment(ProjectTaskFragment
+                                        .newInstance(project.projectID, role.roleID, false, false));
+                            }
+                        }
+                        return true;
+                    });
+                } else {
+                    navViewMenu.findItem(R.id.p_bottom_task).setVisible(false);
+                }
+
+                // Roles button
+                if (project.rolesEnabled && (
+                        // Member has privileges
+                        (member != null && database.RoleDao().searchByID(member.role) != null
+                        && (database.RoleDao().searchByID(member.role).canViewRole ||
+                        database.RoleDao().searchByID(member.role).canModifyRole)) ||
+
+                        // Role has privileges
+                        (role != null && (role.canViewRole || role.canModifyRole)))) {
+                    navViewMenu.findItem(R.id.p_bottom_role).setOnMenuItemClickListener(item -> {
+                        if (!(activity.currentFragment instanceof ProjectRoleFragment)) {
+                            if (member != null) {
+                                activity.displayFragment(ProjectRoleFragment
+                                        .newInstance(project.projectID, member.memberID, true, false));
+                            } else {
+                                activity.displayFragment(ProjectRoleFragment
+                                        .newInstance(project.projectID, role.roleID, false, false));
+                            }
+                        }
+                        return true;
+                    });
+                } else {
+                    navViewMenu.findItem(R.id.p_bottom_role).setVisible(false);
+                }
+
+                // Status button
+                if (project.statusEnabled && (
+                        // Member has privileges
+                        (member != null && database.RoleDao().searchByID(member.role) != null
+                                && (database.RoleDao().searchByID(member.role).canModifyOtherStatus ||
+                                database.RoleDao().searchByID(member.role).canPostStatus ||
+                                database.RoleDao().searchByID(member.role).canViewStatus)) ||
+
+                                // Role has privileges
+                                (role != null && (role.canModifyOtherStatus || role.canPostStatus
+                                        || role.canViewStatus)))) {
+                    navViewMenu.findItem(R.id.p_bottom_status).setOnMenuItemClickListener(item -> {
+                        if (!(activity.currentFragment instanceof ProjectStatusFragment)) {
+                            if (member != null) {
+                                activity.displayFragment(ProjectStatusFragment
+                                        .newInstance(project.projectID, member.memberID, true, false));
+                            } else {
+                                activity.displayFragment(ProjectStatusFragment
+                                        .newInstance(project.projectID, role.roleID, false, false));
+                            }
+                        }
+                        return true;
+                    });
+                } else {
+                    navViewMenu.findItem(R.id.p_bottom_status).setVisible(false);
+                }
             } else {
                 // TODO: File Manager menu
             }
+
+            database.close();
             activity.bottomNavView.setVisibility(View.VISIBLE);
         }
     }

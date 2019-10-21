@@ -26,8 +26,29 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectStatusFragment extends Fragment {
+    private static final String ARG_ID = "projectID";
+    private static final String ARG_ID2 = "ID2";
+    private static final String ARG_IS_MEMBER = "isMember";
+    private static final String ARG_UPDATE_NAV_VIEW = "updateNavView";
+
     /** Default constructor. **/
     public ProjectStatusFragment() {
+    }
+
+    /** Used in all instances when creating new project.
+     * @param ID2 can be either the role ID or member ID depending on the project.
+     * @param isMember determines whether ID2 is a member ID or a role ID. If ID2 is none.
+     * @param updateNavView determines whether the navigation view will be updated. **/
+    public static ProjectStatusFragment newInstance(String projectID, String ID2, boolean isMember,
+                                                  boolean updateNavView) {
+        ProjectStatusFragment fragment = new ProjectStatusFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        args.putString(ARG_ID2, ID2);
+        args.putBoolean(ARG_IS_MEMBER, isMember);
+        args.putBoolean(ARG_UPDATE_NAV_VIEW, updateNavView);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Initializes the fragment and the status' info. **/

@@ -38,7 +38,7 @@ public class ProjectMemberFragment extends Fragment {
     /** Used in all instances when accessing a user's profile.
      * @param memberID the member ID of the project.
      * @param targetMemberID the member ID that is being accessed by the member.
-     * @param updateNavView determines whether the navigation view will be displayed. **/
+     * @param updateNavView determines whether the navigation view will be updated. **/
     public static ProjectMemberFragment newInstance(String projectID, String memberID,
                                                     String targetMemberID, boolean updateNavView) {
         ProjectMemberFragment fragment = new ProjectMemberFragment();

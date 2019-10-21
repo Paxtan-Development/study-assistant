@@ -24,7 +24,6 @@ import androidx.room.Room;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -63,7 +62,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     /** Used in all instances when creating new project.
      * @param ID2 can be either the role ID or member ID depending on the project.
      * @param isMember determines whether ID2 is a member ID or a role ID. If ID2 is none.
-     * @param updateNavView determines whether the navigation view will be displayed. **/
+     * @param updateNavView determines whether the navigation view will be updated. **/
     public static ProjectInfoFragment newInstance(String projectID, String ID2, boolean isMember,
                                                   boolean updateNavView) {
         ProjectInfoFragment fragment = new ProjectInfoFragment();
@@ -88,7 +87,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
 
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
                     .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
             // Set title
@@ -154,6 +153,8 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             returnView = inflater.inflate(R.layout.fragment_project_info_notable, container, false);
         } else {
             returnView = inflater.inflate(R.layout.fragment_project_info, container, false);
+
+            // TODO: set up table
         }
         // TODO: Set up layout
         return returnView;
@@ -263,7 +264,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
 
     /** Exports the subject to either a .project file or a ZIP file. **/
     public void onExportPressed() {
-        // TODO: Export subject
+        // TODO: Export project
     }
 
     /** Returns to

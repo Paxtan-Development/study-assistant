@@ -56,10 +56,19 @@ public class RoleData {
     public boolean canModifyOtherUser;
     public boolean canModifyOwnTask;
     public boolean canModifyRole;
+    public boolean canModifyOtherStatus;
+    public boolean canPostStatus;
     public boolean canSetPassword;
+    // Implicitly granted with canModifyOtherTask
+    public boolean canViewOtherTask;
+    // Implicitly granted with canModifyOtherUser
     public boolean canViewOtherUser;
+    // Implicitly granted with canModifyRole
     public boolean canViewRole;
+    // Implicitly granted with canModifyOwnTask
     public boolean canViewTask;
+    // Implicitly granted with canModifyOtherStatus and canPostStatus
+    public boolean canViewStatus;
     public boolean canViewMedia;
 
     /** Default constructor. **/
@@ -84,10 +93,14 @@ public class RoleData {
         this.canModifyOtherUser = false;
         this.canModifyOwnTask = false;
         this.canModifyRole = false;
+        this.canModifyOtherStatus = true;
+        this.canPostStatus = true;
         this.canSetPassword = false;
+        this.canViewOtherTask = false;
         this.canViewOtherUser = false;
         this.canViewRole = false;
         this.canViewTask = false;
+        this.canViewStatus = false;
         this.canViewMedia = false;
     }
 }

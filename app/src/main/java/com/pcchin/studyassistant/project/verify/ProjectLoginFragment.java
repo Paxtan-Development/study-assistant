@@ -76,7 +76,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         if (getActivity() != null && getFragmentManager() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
                     .allowMainThreadQueries().build();
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));

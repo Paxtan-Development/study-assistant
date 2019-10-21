@@ -38,7 +38,7 @@ public class ProjectRoleFragment extends Fragment {
     /** Used in all instances when creating new project.
      * @param ID2 can be either the role ID or member ID depending on the project.
      * @param isMember determines whether ID2 is a member ID or a role ID. If ID2 is none.
-     * @param updateNavView determines whether the navigation view will be displayed. **/
+     * @param updateNavView determines whether the navigation view will be updated. **/
     public static ProjectRoleFragment newInstance(String projectID, String ID2, boolean isMember,
                                                   boolean updateNavView) {
         ProjectRoleFragment fragment = new ProjectRoleFragment();

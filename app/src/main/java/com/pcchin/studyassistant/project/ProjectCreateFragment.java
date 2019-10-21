@@ -64,7 +64,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
                     .allowMainThreadQueries().build();
         } else {
             onBackPressed();
@@ -366,10 +366,14 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 adminRole.canModifyOtherUser = true;
                 adminRole.canModifyOwnTask = true;
                 adminRole.canModifyRole = true;
+                adminRole.canModifyOtherStatus = true;
+                adminRole.canPostStatus = true;
                 adminRole.canSetPassword = true;
+                adminRole.canViewOtherTask = true;
                 adminRole.canViewOtherUser = true;
                 adminRole.canViewRole = true;
                 adminRole.canViewTask = true;
+                adminRole.canViewStatus = true;
                 adminRole.canViewMedia = true;
                 projectDatabase.RoleDao().insert(adminRole);
 
@@ -408,7 +412,9 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     if (memberPass1.getEditText().getText().length() > 0) {
                         initialMember = new MemberData(generateValidString(idRand, TYPE_MEMBER),
                                 projectID, memberName.getEditText().getText().toString(), "",
-                                memberSalt, memberPass1.getEditText().getText().toString(),
+                                memberSalt,
+                                SecurityFunctions.memberHash(memberPass1.getEditText()
+                                        .getText().toString(), memberSalt, projectSalt),
                                 adminRole.roleID);
                     } else {
                         initialMember = new MemberData(generateValidString(idRand, TYPE_MEMBER),

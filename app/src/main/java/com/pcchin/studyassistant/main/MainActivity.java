@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
     public ViewPager pager;
-    private Fragment currentFragment;
+    public Fragment currentFragment;
     // Constants used across fragments
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_GITLAB_RELEASE_JSON = "gitlabReleasesJson";
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> {
                     ProjectDatabase projectDatabase = Room.databaseBuilder(this,
                             ProjectDatabase.class, DATABASE_PROJECT)
-                            .fallbackToDestructiveMigrationFrom(1, 2)
+                            .fallbackToDestructiveMigrationFrom(1, 2, 3)
                             .allowMainThreadQueries().build();
                     RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                     if (admin == null) {
@@ -166,10 +166,14 @@ public class MainActivity extends AppCompatActivity
                         admin.canModifyOtherUser = true;
                         admin.canModifyOwnTask = true;
                         admin.canModifyRole = true;
+                        admin.canModifyOtherStatus = true;
+                        admin.canPostStatus = true;
                         admin.canSetPassword = true;
+                        admin.canViewOtherTask = true;
                         admin.canViewOtherUser = true;
                         admin.canViewRole = true;
                         admin.canViewTask = true;
+                        admin.canViewStatus = true;
                         admin.canViewMedia = true;
                         projectDatabase.RoleDao().insert(admin);
                     }
@@ -225,9 +229,11 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
         } else {
-            // Set currentFragment
+            // Set currentFragment, pager and bottomNavView which had been cleared when rotating
             currentFragment = getSupportFragmentManager().getFragments()
                     .get(getSupportFragmentManager().getFragments().size() - 1);
+            pager = findViewById(R.id.base_pager);
+            bottomNavView = findViewById(R.id.bottom_nav);
         }
 
         // Get subject, if needed from Intent

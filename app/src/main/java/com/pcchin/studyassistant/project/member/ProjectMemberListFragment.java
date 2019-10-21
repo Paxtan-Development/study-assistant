@@ -26,8 +26,26 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectMemberListFragment extends Fragment {
+    private static final String ARG_ID = "projectID";
+    private static final String ARG_MEMBER_ID = "memberID";
+    private static final String ARG_UPDATE_NAV_VIEW = "updateNavView";
+
     /** Default constructor. **/
     public ProjectMemberListFragment() {
+    }
+
+    /** Used in all instances when accessing a user's profile.
+     * @param memberID the member ID of the project.
+     * @param updateNavView determines whether the navigation view will be updated. **/
+    public static ProjectMemberListFragment newInstance(String projectID, String memberID,
+                                                    boolean updateNavView) {
+        ProjectMemberListFragment fragment = new ProjectMemberListFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, projectID);
+        args.putString(ARG_MEMBER_ID, memberID);
+        args.putBoolean(ARG_UPDATE_NAV_VIEW, updateNavView);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /** Initializes the fragment and the members' info. **/

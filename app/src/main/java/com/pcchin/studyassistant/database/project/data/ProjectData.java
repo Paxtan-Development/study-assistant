@@ -133,6 +133,9 @@ public class ProjectData {
     /** The title of the note subject that is associated to the project. **/
     public String associatedSubject;
 
+    /** Whether the project is still ongoing. **/
+    public boolean projectOngoing;
+
     /** Default constructor.
      * This constructor should not be used in code but is unable to be
      * marked as @Deprecated or @Ignore as it is the default constructor. **/
@@ -176,6 +179,7 @@ public class ProjectData {
         this.statusList = new ArrayList<>();
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
+        this.projectOngoing = true;
     }
 
     /** Constructor used when creating a new project without members.
@@ -212,5 +216,6 @@ public class ProjectData {
         this.statusList = new ArrayList<>();
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
+        this.projectOngoing = true;
     }
 }

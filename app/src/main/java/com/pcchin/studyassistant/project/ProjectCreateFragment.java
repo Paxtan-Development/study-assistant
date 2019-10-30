@@ -64,7 +64,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
                     .allowMainThreadQueries().build();
         } else {
             onBackPressed();

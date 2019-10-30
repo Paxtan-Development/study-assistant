@@ -163,6 +163,11 @@
     <string name="p6_default_role">Default Role</string>
     <string name="p6_project_created">Project created</string>
 
+    <string name="p_status_future">Future</string>
+    <string name="p_status_ongoing">Ongoing</string>
+    <string name="p_status_delayed">Delayed</string>
+    <string name="p_status_completed">Completed</string>
+
     <!-- Strings used in group V -->
     <string name="v1_signup">Sign Up</string>
     <string name="v1_member_created">Member created.</string>

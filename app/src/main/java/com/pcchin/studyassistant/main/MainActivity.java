@@ -61,7 +61,7 @@ import com.pcchin.studyassistant.notes.NotesViewFragment;
 import com.pcchin.studyassistant.notes.misc.ImportSubject;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
+import com.pcchin.studyassistant.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.project.task.ProjectTaskFragment;
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> {
                     ProjectDatabase projectDatabase = Room.databaseBuilder(this,
                             ProjectDatabase.class, DATABASE_PROJECT)
-                            .fallbackToDestructiveMigrationFrom(1, 2, 3)
+                            .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
                             .allowMainThreadQueries().build();
                     RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                     if (admin == null) {
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity
     public void displayFragment(Fragment fragment) {
         // Hides bottomNavView if the project comes from a project fragment
         // and to a non-project fragment
-        if (! (fragment instanceof ProjectInfoFragment || fragment instanceof ProjectMemberFragment
+        if (! (fragment instanceof ProjectInfoFragment || fragment instanceof ProjectMemberListFragment
                 || fragment instanceof ProjectTaskFragment
                 || fragment instanceof ProjectRoleFragment
                 || fragment instanceof ProjectStatusFragment)) {
@@ -472,6 +472,8 @@ public class MainActivity extends AppCompatActivity
             @NonNull
             @Override
             public Fragment getItem(int position) {
+                // Used to be an issue where NotesViewFragment would crash as menu is null,
+                // but it seems to had resolved itself
                 currentFragment = NotesViewFragment.newInstance(subject, position);
                 return currentFragment;
             }

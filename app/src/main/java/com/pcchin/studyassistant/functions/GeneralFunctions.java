@@ -159,7 +159,7 @@ public class GeneralFunctions {
         if (BuildConfig.DEBUG) {
             ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
                     .allowMainThreadQueries().build();
             List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
             for (ProjectData project : projectList) {
@@ -227,7 +227,9 @@ public class GeneralFunctions {
 
             // Set up database
             ProjectDatabase database = Room.databaseBuilder(activity, ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+                    MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                    .allowMainThreadQueries().build();
 
             // Bottom nav view
             if (res == R.menu.menu_p_bottom) {

@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcchin.studyassistant.R;
@@ -36,12 +37,15 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.misc.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
+
+import java.util.Date;
 
 public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
@@ -87,7 +91,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
 
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
                     .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
             // Set title
@@ -156,7 +160,56 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
 
             // TODO: set up table
         }
-        // TODO: Set up layout
+
+        // Set up layout
+        ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
+        ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
+
+        // Set status
+        TextView statusView = returnView.findViewById(R.id.p2_status);
+        Date currentDate = new Date();
+        if (project.projectOngoing) {
+            if (project.expectedStartDate != null && project.expectedStartDate.after(currentDate)
+            && (project.actualStartDate == null || project.actualStartDate.after(currentDate))) {
+                // Project not started if expected start date is in the future
+                // and actual start date is not set or is in the future
+                statusView.setText(R.string.p_status_future);
+            } else if (project.expectedEndDate != null && currentDate.after(project.expectedEndDate)
+            && (project.actualEndDate == null || project.actualEndDate.after(currentDate))) {
+                // Project is considered delayed if current date is past the expected end date
+                // and actual end date is not set or in the future
+                statusView.setText(R.string.p_status_delayed);
+            } else if (project.actualEndDate != null && currentDate.after(project.actualEndDate)) {
+                // Project is considered completed if actual end date is past the current date
+                statusView.setText(R.string.p_status_completed);
+            } else {
+                statusView.setText(R.string.p_status_ongoing);
+            }
+        } else {
+            statusView.setText(R.string.p_status_completed);
+        }
+
+        // Set dates
+        if (project.expectedStartDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
+                    String.format("Expected Start Date: %%s%s",
+                            ConverterFunctions.dateToString(project.expectedStartDate)));
+        }
+        if (project.expectedEndDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
+                    String.format("Expected End Date: %%s%s",
+                            ConverterFunctions.dateToString(project.expectedEndDate)));
+        }
+        if (project.actualStartDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                    String.format("Expected End Date: %%s%s",
+                            ConverterFunctions.dateToString(project.actualStartDate)));
+        }
+        if (project.actualEndDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                    String.format("Expected End Date: %%s%s",
+                            ConverterFunctions.dateToString(project.actualEndDate)));
+        }
         return returnView;
     }
 
@@ -172,17 +225,24 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         if (project.associatedSubject == null) {
             menu.findItem(R.id.p2_menu_notes).setVisible(false);
         }
+
+        // Update menu items according to user privileges
+        boolean modifyInfo = true, viewMedia = true;
         if (project.rolesEnabled && role != null) {
-            // Disable settings and export if user/role cannot edit subject
-            if (!role.canModifyInfo) {
-                menu.findItem(R.id.p2_menu_settings).setVisible(false);
-                menu.findItem(R.id.p2_menu_export).setVisible(false);
-            }
-            // Disable media if user/role cannot edit it
-            if (!role.canViewMedia) {
-                menu.findItem(R.id.p2_menu_media).setVisible(false);
+            modifyInfo = role.canModifyInfo;
+            viewMedia = role.canViewMedia;
+        } else if (member != null) {
+            // Disable settings and export for user without permissions
+            RoleData userRole = projectDatabase.RoleDao().searchByID(member.role);
+            if (userRole != null) {
+                modifyInfo = userRole.canModifyInfo;
+                viewMedia = userRole.canViewMedia;
             }
         }
+        menu.findItem(R.id.p2_menu_settings).setVisible(modifyInfo);
+        menu.findItem(R.id.p2_menu_export).setVisible(modifyInfo);
+        menu.findItem(R.id.p2_menu_media).setVisible(viewMedia);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 

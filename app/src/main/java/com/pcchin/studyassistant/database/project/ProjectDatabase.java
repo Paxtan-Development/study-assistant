@@ -41,7 +41,7 @@ import com.pcchin.studyassistant.database.project.data.TaskData;
  * 2) If only members are enabled, there should be at least 1 member in the project
  * 3) If roles and members are enabled, at least 1 member must have a role that can edit role data **/
 @Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class,
-        StatusData.class}, version=4)
+        StatusData.class}, version=5)
 @TypeConverters(ConverterFunctions.class)
 public abstract class ProjectDatabase extends RoomDatabase {
     public abstract ProjectDao ProjectDao();

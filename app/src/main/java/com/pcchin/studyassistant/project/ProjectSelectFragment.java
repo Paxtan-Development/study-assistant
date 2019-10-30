@@ -51,7 +51,9 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT).allowMainThreadQueries().build();
+                    MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                    .allowMainThreadQueries().build();
             getActivity().setTitle(R.string.projects);
         }
         setHasOptionsMenu(true);

@@ -233,7 +233,6 @@ public class GeneralFunctions {
 
             // Bottom nav view
             if (res == R.menu.menu_p_bottom) {
-                // TODO: Bottom nav menu
                 // Home button
                 navViewMenu.findItem(R.id.p_bottom_home).setOnMenuItemClickListener(item -> {
                     if (!(activity.currentFragment instanceof ProjectInfoFragment)) {

@@ -15,17 +15,20 @@ package com.pcchin.studyassistant.project;
 
 
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
 
+import java.io.File;
 import java.util.Date;
 
 public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
@@ -157,58 +161,74 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             returnView = inflater.inflate(R.layout.fragment_project_info_notable, container, false);
         } else {
             returnView = inflater.inflate(R.layout.fragment_project_info, container, false);
-
             // TODO: set up table
         }
 
-        // Set up layout
-        ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
-        ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
-
-        // Set status
-        TextView statusView = returnView.findViewById(R.id.p2_status);
-        Date currentDate = new Date();
-        if (project.projectOngoing) {
-            if (project.expectedStartDate != null && project.expectedStartDate.after(currentDate)
-            && (project.actualStartDate == null || project.actualStartDate.after(currentDate))) {
-                // Project not started if expected start date is in the future
-                // and actual start date is not set or is in the future
-                statusView.setText(R.string.p_status_future);
-            } else if (project.expectedEndDate != null && currentDate.after(project.expectedEndDate)
-            && (project.actualEndDate == null || project.actualEndDate.after(currentDate))) {
-                // Project is considered delayed if current date is past the expected end date
-                // and actual end date is not set or in the future
-                statusView.setText(R.string.p_status_delayed);
-            } else if (project.actualEndDate != null && currentDate.after(project.actualEndDate)) {
-                // Project is considered completed if actual end date is past the current date
-                statusView.setText(R.string.p_status_completed);
+        if (getContext() != null) {
+            // Set up layout
+            ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
+            if (project.description.length() == 0) {
+                returnView.findViewById(R.id.p2_desc).setVisibility(View.GONE);
             } else {
-                statusView.setText(R.string.p_status_ongoing);
+                ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
             }
-        } else {
-            statusView.setText(R.string.p_status_completed);
-        }
 
-        // Set dates
-        if (project.expectedStartDate != null) {
-            ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
-                    String.format("Expected Start Date: %%s%s",
-                            ConverterFunctions.dateToString(project.expectedStartDate)));
-        }
-        if (project.expectedEndDate != null) {
-            ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
-                    String.format("Expected End Date: %%s%s",
-                            ConverterFunctions.dateToString(project.expectedEndDate)));
-        }
-        if (project.actualStartDate != null) {
-            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
-                    String.format("Expected End Date: %%s%s",
-                            ConverterFunctions.dateToString(project.actualStartDate)));
-        }
-        if (project.actualEndDate != null) {
-            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
-                    String.format("Expected End Date: %%s%s",
-                            ConverterFunctions.dateToString(project.actualEndDate)));
+            // Set icon
+            if (project.hasIcon) {
+                ((ImageView) returnView.findViewById(R.id.p2_icon)).setImageURI(
+                        Uri.fromFile(new File(getContext().getFilesDir()
+                                + "/icons/project/" + project.projectID + ".jpg")));
+            } else {
+                // Center the title if there is no icon
+                returnView.findViewById(R.id.p2_icon).setVisibility(View.GONE);
+                ((TextView) returnView.findViewById(R.id.p2_title)).setGravity(Gravity.CENTER_HORIZONTAL);
+            }
+
+            // Set status
+            TextView statusView = returnView.findViewById(R.id.p2_status);
+            Date currentDate = new Date();
+            if (project.projectOngoing) {
+                if (project.expectedStartDate != null && project.expectedStartDate.after(currentDate)
+                        && (project.actualStartDate == null || project.actualStartDate.after(currentDate))) {
+                    // Project not started if expected start date is in the future
+                    // and actual start date is not set or is in the future
+                    statusView.setText(R.string.p_status_future);
+                } else if (project.expectedEndDate != null && currentDate.after(project.expectedEndDate)
+                        && (project.actualEndDate == null || project.actualEndDate.after(currentDate))) {
+                    // Project is considered delayed if current date is past the expected end date
+                    // and actual end date is not set or in the future
+                    statusView.setText(R.string.p_status_delayed);
+                } else if (project.actualEndDate != null && currentDate.after(project.actualEndDate)) {
+                    // Project is considered completed if actual end date is past the current date
+                    statusView.setText(R.string.p_status_completed);
+                } else {
+                    statusView.setText(R.string.p_status_ongoing);
+                }
+            } else {
+                statusView.setText(R.string.p_status_completed);
+            }
+
+            // Set dates
+            if (project.expectedStartDate != null) {
+                ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
+                        String.format("Expected Start Date: %s",
+                                ConverterFunctions.standardDateFormat.format(project.expectedStartDate)));
+            }
+            if (project.expectedEndDate != null) {
+                ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
+                        String.format("Expected End Date: %s",
+                                ConverterFunctions.standardDateFormat.format(project.expectedEndDate)));
+            }
+            if (project.actualStartDate != null) {
+                ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                        String.format("Actual Start Date: %s",
+                                ConverterFunctions.standardDateFormat.format(project.actualStartDate)));
+            }
+            if (project.actualEndDate != null) {
+                ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                        String.format("Actual End Date: %s",
+                                ConverterFunctions.standardDateFormat.format(project.actualEndDate)));
+            }
         }
         return returnView;
     }

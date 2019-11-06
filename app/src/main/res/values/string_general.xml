@@ -1,0 +1,91 @@
+<!--
+  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!-- General strings -->
+    <string name="app_name">Study Assistant</string>
+    <string name="notes">Notes</string>
+    <string name="projects">Projects</string>
+    <string name="exit">Exit</string>
+    <string name="blank" />
+
+    <string name="create_new">Create New</string>
+    <string name="data_import">Import</string>
+    <string name="data_export">Export</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="del">Delete</string>
+    <string name="close">Close</string>
+    <string name="title">Title</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="home">Home</string>
+    <string name="others">Others</string>
+    <string name="import_from">Import from</string>
+    <string name="importing_subject">Importing Subject…</string>
+    <string name="subject_exported">Subject exported to </string>
+    <string name="enter_password">Enter Password</string>
+    <string name="subject_conflict">Subject Conflict</string>
+    <string name="merge">Merge</string>
+    <string name="rename">Rename</string>
+    <string name="rename_subject">Rename Subject</string>
+    <string name="subject_imported">Subject Imported</string>
+    <string name="select_file">Select File</string>
+    <string name="select_subject_file">Select a .subject file</string>
+    <string name="not_subject_file">The file that is selected is not a .subject file</string>
+    <string name="reenter_password">Re-enter Password</string>
+    <string name="set_blank_password">Leave blank to not set a password.</string>
+    <string name="return_val">Return</string>
+
+    <!-- String used in notifications -->
+    <string name="notif_channel_notes_ID">notes</string>
+    <string name="notif_channel_notes">Notes</string>
+    <string name="notif_channel_notes_desc">Alert for individual notes</string>
+    <string name="notif_channel_update_ID">updater</string>
+    <string name="notif_channel_update">App Update</string>
+    <string name="notif_channel_update_desc">Notify users of a newer app version</string>
+
+    <!-- Strings used in MainActivity -->
+    <string name="a_update_app">Update App</string>
+    <string name="a_new_version">A newer version of the app is available. Would you like to update to the latest version?</string>
+    <string name="a_downloading">Downloading the latest version…</string>
+    <string name="a_app_updating">Updating app…</string>
+    <string name="a_learn_more">Learn More</string>
+
+    <!-- Strings used in group M -->
+    <string name="m_about">About</string>
+    <string name="m1_welcome">Welcome!</string>
+
+    <string name="m2_copyright_p1">© 2019–</string>
+    <string name="m2_copyright_p2">PC Chin</string>
+    <string name="m2_version">Version: </string>
+    <string name="m2_libraries_used">Libraries Used</string>
+    <string name="m2_rss_used">Resources Used</string>
+
+    <string name="m3_new_subject">New Subject…</string>
+    <string name="m3_new_project">New Project…</string>
+    <string name="m3_data_import">Import…</string>
+    <string name="m3_nav_open">Open navigation drawer</string>
+    <string name="m3_nav_close">Close navigation drawer</string>
+
+    <!-- Strings used in group V -->
+    <string name="v1_signup">Sign Up</string>
+    <string name="v1_member_created">Member created.</string>
+    <string name="v1_project_protected">Protected Project</string>
+    <string name="v1_project_protected_password">Enter the password for the project.</string>
+
+    <string name="v2_project_login">Project Login</string>
+    <string name="v2_login">Log In</string>
+    <string name="v2_signup_desc">New member? Sign up here</string>
+    <string name="v2_logging_in">Logging in…</string>
+</resources>

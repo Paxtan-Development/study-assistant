@@ -15,14 +15,12 @@ package com.pcchin.studyassistant.project;
 
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceFragmentCompat;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.pcchin.studyassistant.R;
 
@@ -48,12 +46,17 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat {
         return fragment;
     }
 
+    /** Initializes the fragment. **/
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     /** Retrieve the settings for the project. **/
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
     }
-
 
     /** Displays all the settings needed in the fragment. **/
     @Override

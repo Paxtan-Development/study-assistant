@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Resources used in group N -->
+<resources>
+    <string name="n_change_subj">Change subject</string>
+    <string name="n_last_edited">Last changed: </string>
+    <string name="n_new_alert">New alert</string>
+
+    <string name="n1_new_subject">New Subject</string>
+    <string name="n1_subject_title">Subject title</string>
+
+    <!-- Sorting methods used in Fragment n2 -->
+    <string name="n2_sorting_method">Sort By</string>
+    <string name="n2_sort_alpha_asc">A-Z</string>
+    <string name="n2_sort_alpha_des">Z-A</string>
+    <string name="n2_sort_date_asc">Ascending Date</string>
+    <string name="n2_sort_date_des">Descending Date</string>
+    <string name="n2_subject_renamed">Subject renamed</string>
+
+    <!-- General notes used in Fragment n2 -->
+    <string name="n2_new_note">New note</string>
+    <string name="n2_exporting_subject">Exporting Subject…</string>
+    <string name="n2_del_confirm">Delete subject?</string>
+    <string name="n2_deleted">Subject deleted</string>
+    <string name="n2_note_locked_details">This note has been locked and cannot be edited.</string>
+    <string name="n2_note_has_alert">An alert has been set for the note.</string>
+    <string name="n2_export_format">Export to</string>
+    <string name="n2_password_export">Enter Password for Exported File</string>
+
+    <string name="n3_del_confirm">Delete note?</string>
+    <string name="n3_deleted">Note deleted</string>
+    <string name="n3_lock_note">Lock Note</string>
+    <string name="n3_note_locked">Note locked</string>
+    <string name="n3_note_unlocked">Note unlocked</string>
+    <string name="n3_lock_password">Enter Password to Lock Note</string>
+    <string name="n3_unlock_password">Enter Password to Unlock Note</string>
+    <string name="n3_unlock_note">Unlock Note</string>
+    <string name="n3_set_alert">Set Alert</string>
+    <string name="n3_remove_alert">Remove Alert</string>
+    <string name="n3_set_date">Set the date for the alert</string>
+    <string name="n3_set_time">Set the time for the alert</string>
+    <string name="n3_alert_set">Alert set</string>
+    <string name="n3_alert_cancelled">Alert cancelled</string>
+    <string name="n3_note_exported">Note exported to </string>
+    <string name="n3_confirm_export_note">Export note?</string>
+    <string name="n3_notif_time">Alert Time: </string>
+
+    <string name="n4_save_note">Save note?</string>
+    <string name="n4_note_saved">Note saved</string>
+
+    <string-array name="n_import_subject_format">
+        <item>ZIP File</item>
+        <item>Custom subject (.subject) file</item>
+    </string-array>
+</resources>

@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -471,11 +472,11 @@ public class MainActivity extends AppCompatActivity
                 FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @NonNull
             @Override
+            // getItem does not correspond to the current item selected, DO NOT USE IT AS SUCH
             public Fragment getItem(int position) {
                 // Used to be an issue where NotesViewFragment would crash as menu is null,
-                // but it seems to had resolved itself
-                currentFragment = NotesViewFragment.newInstance(subject, position);
-                return currentFragment;
+                // but it seems to had resolved itself\
+                return NotesViewFragment.newInstance(subject, position);
             }
 
             @Override
@@ -483,7 +484,27 @@ public class MainActivity extends AppCompatActivity
                 return size;
             }
         };
+        // Updates currentFragment to the current item
+        ViewPager.OnPageChangeListener baseAdapterPageChanger = new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // instantiateItem used instead of getItem as getItem returns a new instance of
+                // a fragment instead of an existing one
+                currentFragment = (Fragment) baseAdapter.instantiateItem(findViewById(R.id.base), position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
         pager.setAdapter(baseAdapter);
+        pager.addOnPageChangeListener(baseAdapterPageChanger);
         // Fade out animation included to increase smoothness
         findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
         findViewById(R.id.base).setVisibility(View.GONE);

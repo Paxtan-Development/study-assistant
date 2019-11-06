@@ -164,13 +164,13 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
 
             // Height is set by Total height - bottom of last edited - navigation header height
-            returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     int navBarId = getResources().getIdentifier("navigation_bar_height",
                             "dimen", "android"),
-                    minHeight = endPt.y - returnView.findViewById(R.id.n3_notif_time).getBottom()
-                            - (int) getResources().getDimension(R.dimen.nav_header_height);
+                            minHeight = endPt.y - returnView.findViewById(R.id.n3_notif_time).getBottom()
+                                    - (int) getResources().getDimension(R.dimen.nav_header_height);
                     LinearLayout linearDisplay = returnView.findViewById(R.id.n3_linear);
                     if (navBarId > 0) {
                         minHeight -= getResources().getDimensionPixelSize(navBarId);
@@ -181,7 +181,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     ((TextView) returnView.findViewById(R.id.n3_text)).setMinHeight(minHeight);
                 }
-            });
+            };
+            returnView.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
         }
         return returnView;
     }
@@ -454,7 +455,6 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     .newInstance(notesSubject, notesOrder));
             return true;
         }
-        Log.d("Temp", "Returned false");
         return false;
     }
 

@@ -106,7 +106,6 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         ((Switch) returnView.findViewById(R.id.p6_enable_roles))
                 .setOnCheckedChangeListener((compoundButton, b) -> {
                     enableRoles = b;
-                    Log.d("StudyAssistant - Temp", String.valueOf(enableRoles));
                     if (b) {
                         // Roles are enabled
                         returnView.findViewById(R.id.p6_custom_roles).setVisibility(View.VISIBLE);

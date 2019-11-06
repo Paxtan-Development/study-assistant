@@ -191,7 +191,7 @@ public class GeneralFunctions {
         }
 
         // Add subMenu for other buttons
-        SubMenu otherMenu = currentMenu.addSubMenu(R.string.m3_others);
+        SubMenu otherMenu = currentMenu.addSubMenu(R.string.others);
 
         // Add about button
         MenuItem aboutItem = otherMenu.add(R.string.m_about);

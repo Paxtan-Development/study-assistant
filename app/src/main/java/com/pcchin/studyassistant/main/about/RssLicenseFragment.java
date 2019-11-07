@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -28,7 +27,7 @@ import android.widget.TextView;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 
 public class RssLicenseFragment extends Fragment implements ExtendedFragment {
     /** Default constructor. **/

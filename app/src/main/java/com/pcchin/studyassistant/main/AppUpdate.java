@@ -45,7 +45,7 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
+import com.pcchin.studyassistant.display.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 
 import org.json.JSONArray;

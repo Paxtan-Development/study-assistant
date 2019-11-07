@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.misc;
+package com.pcchin.studyassistant.display;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

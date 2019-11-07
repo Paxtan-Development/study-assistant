@@ -23,14 +23,13 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
 import com.pcchin.studyassistant.main.MainFragment;

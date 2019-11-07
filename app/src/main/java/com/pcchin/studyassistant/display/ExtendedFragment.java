@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.misc;
+package com.pcchin.studyassistant.display;
 
 /** Added to allow OnBackPressed and other functions that is only present in Activities
  * to be implement in Fragments **/

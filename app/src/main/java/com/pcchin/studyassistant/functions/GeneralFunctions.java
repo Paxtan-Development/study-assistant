@@ -44,7 +44,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.main.about.AboutFragment;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
+import com.pcchin.studyassistant.display.AutoDismissDialog;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;

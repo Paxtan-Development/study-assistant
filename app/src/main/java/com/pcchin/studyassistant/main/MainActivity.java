@@ -27,7 +27,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -51,10 +50,10 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesEditFragment;
 import com.pcchin.studyassistant.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
@@ -475,7 +474,7 @@ public class MainActivity extends AppCompatActivity
             // getItem does not correspond to the current item selected, DO NOT USE IT AS SUCH
             public Fragment getItem(int position) {
                 // Used to be an issue where NotesViewFragment would crash as menu is null,
-                // but it seems to had resolved itself\
+                // but it seems to had resolved itself
                 return NotesViewFragment.newInstance(subject, position);
             }
 

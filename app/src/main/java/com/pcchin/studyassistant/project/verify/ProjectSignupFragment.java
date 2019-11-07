@@ -33,7 +33,7 @@ import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 import com.pcchin.studyassistant.misc.RandomString;
 import com.pcchin.studyassistant.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.project.ProjectSelectFragment;

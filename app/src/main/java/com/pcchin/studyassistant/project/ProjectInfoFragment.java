@@ -43,8 +43,8 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
+import com.pcchin.studyassistant.display.AutoDismissDialog;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 import com.pcchin.studyassistant.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.project.member.ProjectMemberFragment;
 

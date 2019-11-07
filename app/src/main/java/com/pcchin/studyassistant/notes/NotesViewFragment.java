@@ -56,8 +56,8 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.misc.AutoDismissDialog;
-import com.pcchin.studyassistant.misc.ExtendedFragment;
+import com.pcchin.studyassistant.display.AutoDismissDialog;
+import com.pcchin.studyassistant.display.ExtendedFragment;
 import com.pcchin.studyassistant.notes.misc.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -167,15 +167,20 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    int navBarId = getResources().getIdentifier("navigation_bar_height",
-                            "dimen", "android"),
-                            minHeight = endPt.y - returnView.findViewById(R.id.n3_notif_time).getBottom()
-                                    - (int) getResources().getDimension(R.dimen.nav_header_height);
-                    LinearLayout linearDisplay = returnView.findViewById(R.id.n3_linear);
-                    if (navBarId > 0) {
-                        minHeight -= getResources().getDimensionPixelSize(navBarId);
-                        linearDisplay.setPadding(0, 0, 0, 24 +
-                                getResources().getDimensionPixelSize(navBarId));
+                    int minHeight = 0;
+                    // Fragment may not be attached to context yet when the function is run,
+                    // and getResources() indirectly relies on getContext() as well
+                    if (getContext() != null) {
+                        int navBarId = getResources().getIdentifier("navigation_bar_height",
+                                "dimen", "android");
+                        minHeight = endPt.y - returnView.findViewById(R.id.n3_notif_time).getBottom()
+                                - (int) getResources().getDimension(R.dimen.nav_header_height);
+                        LinearLayout linearDisplay = returnView.findViewById(R.id.n3_linear);
+                        if (navBarId > 0) {
+                            minHeight -= getResources().getDimensionPixelSize(navBarId);
+                            linearDisplay.setPadding(0, 0, 0, 24 +
+                                    getResources().getDimensionPixelSize(navBarId));
+                        }
                     }
 
                     returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);

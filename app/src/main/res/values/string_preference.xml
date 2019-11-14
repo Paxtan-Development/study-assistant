@@ -17,4 +17,40 @@
     <string name="p3_preference_general">General</string>
     <string name="p3_preference_features">Features</string>
     <string name="p3_preference_date">Date</string>
+
+    <!-- For strings under the general section -->
+    <string name="p3_general_update_title">Update Title</string>
+    <string name="p3_general_update_desc">Update Description</string>
+    <string name="p3_general_set_icon">Set Icon</string>
+    <string name="p3_general_update_icon">Update Icon</string>
+    <string name="p3_general_remove_icon">Remove Icon</string>
+    <string name="p3_general_set_password">Set Password</string>
+    <string name="p3_general_update_password">Update Password</string>
+    <string name="p3_general_remove_password">Remove Password</string>
+    <string name="p3_general_project_completed">Project Completed</string>
+
+    <!-- For strings under the features section -->
+    <string name="p3_features_status">Status Updates</string>
+    <string name="p3_features_merge_task_status">Merge Tasks and Status</string>
+    <string name="p3_features_status_icon">Status Icon</string>
+    <string name="p3_features_displayed_home">Feature displayed on Home</string>
+    <string name="p3_features_related_subject">Set related subject in Notes</string>
+
+    <!-- For strings under the date section -->
+    <string name="p3_date_expected_start_set">Set Expected Start Date</string>
+    <string name="p3_date_expected_start_update">Update Expected Start Date</string>
+    <string name="p3_date_expected_start_remove">Remove Expected Start Date</string>
+    <string name="p3_date_expected_end_set">Set Expected End Date</string>
+    <string name="p3_date_expected_end_update">Update Expected End Date</string>
+    <string name="p3_date_expected_end_remove">Remove Expected End Date</string>
+    <string name="p3_date_actual_start_set">Set Actual Start Date</string>
+    <string name="p3_date_actual_start_update">Update Actual Start Date</string>
+    <string name="p3_date_actual_start_remove">Remove Actual End Date</string>
+    <string name="p3_date_actual_end_set">Set Actual End Date</string>
+    <string name="p3_date_actual_end_update">Update Actual End Date</string>
+    <string name="p3_date_actual_end_remove">Remove Actual End Date</string>
+
+    <!-- For strings under the other section -->
+    <string name="p3_other_settings_info">All other settings can be found in their specific menus</string>
+    <string name="p3_del_project">Delete Project (WARNING: This process is irreversible and all the data list could not be returned)</string>
 </resources>

@@ -14,6 +14,7 @@
 
 <!-- Resources used in group P -->
 <resources>
+    <string name="p_tasks">Tasks</string>
     <string name="p_task">Task</string>
     <string name="p_status">Status</string>
     <string name="p_num">No.</string>
@@ -57,5 +58,13 @@
     <string-array name="p_default_role">
         <item>Admin</item>
         <item>Member</item>
+    </string-array>
+
+    <string-array name="p_status_icon_list">
+        <item>None</item>
+        <item>Circle</item>
+        <item>Triangle</item>
+        <item>Square</item>
+        <item>Diamond</item>
     </string-array>
 </resources>

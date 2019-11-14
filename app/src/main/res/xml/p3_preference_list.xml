@@ -12,21 +12,128 @@
   ~ limitations under the License.
   -->
 
-<!-- TODO: Complete -->
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         app:title="@string/p3_preference_general">
+        <EditTextPreference
+            android:defaultValue="false"
+            android:key="pref_update_title"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/p3_general_update_title" />
+        <EditTextPreference
+            android:defaultValue="false"
+            android:key="pref_update_desc"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/p3_general_update_desc" />
+        <Preference
+            android:key="pref_set_icon"
+            android:title="@string/p3_general_set_icon" />
+        <Preference
+            android:key="pref_update_icon"
+            android:title="@string/p3_general_update_icon" />
+        <Preference
+            android:key="pref_remove_icon"
+            android:title="@string/p3_general_remove_icon" />
+        <Preference
+            android:key="pref_set_password"
+            android:title="@string/p3_general_set_password" />
+        <Preference
+            android:key="pref_update_password"
+            android:title="@string/p3_general_update_password" />
+        <Preference
+            android:key="pref_remove_password"
+            android:title="@string/p3_general_remove_password" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_completed"
+            android:title="@string/p3_general_project_completed" />
     </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/p3_preference_features">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_members"
+            android:title="@string/p_member" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_roles"
+            android:title="@string/p_roles" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_tasks"
+            android:title="@string/p_tasks" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_status"
+            android:title="@string/p3_features_status" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_merge_task_status"
+            android:title="@string/p3_features_merge_task_status" />
+        <ListPreference
+            android:defaultValue="false"
+            android:entries="@array/p_status_icon_list"
+            android:entryValues="pref_status_icon_entry"
+            android:key="pref_status_icon"
+            android:title="@string/p3_features_status_icon" />
+        <ListPreference
+            android:defaultValue="false"
+            android:entries="@array/blank_array"
+            android:entryValues="pref_related_subject_entry"
+            android:key="pref_related_subject"
+            android:title="@string/p3_features_related_subject" />
     </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/p3_preference_date">
+        <Preference
+            android:key="pref_set_expected_start"
+            android:title="@string/p3_date_expected_start_set" />
+        <Preference
+            android:key="pref_update_expected_start"
+            android:title="@string/p3_date_expected_start_update" />
+        <Preference
+            android:key="pref_remove_expected_start"
+            android:title="@string/p3_date_expected_start_remove" />
+        <Preference
+            android:key="pref_set_expected_end"
+            android:title="@string/p3_date_expected_end_set" />
+        <Preference
+            android:key="pref_update_expected_end"
+            android:title="@string/p3_date_expected_end_update" />
+        <Preference
+            android:key="pref_remove_expected_end"
+            android:title="@string/p3_date_expected_end_remove" />
+        <Preference
+            android:key="pref_set_actual_start"
+            android:title="@string/p3_date_actual_start_set" />
+        <Preference
+            android:key="pref_update_actual_start"
+            android:title="@string/p3_date_actual_start_update" />
+        <Preference
+            android:key="pref_remove_actual_start"
+            android:title="@string/p3_date_actual_start_remove" />
+        <Preference
+            android:key="pref_set_actual_end"
+            android:title="@string/p3_date_actual_end_set" />
+        <Preference
+            android:key="pref_update_actual_end"
+            android:title="@string/p3_date_actual_end_update" />
+        <Preference
+            android:key="pref_remove_actual_end"
+            android:title="@string/p3_date_actual_end_remove" />
     </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/others">
+        <Preference
+            android:title="@string/p3_other_settings_info" />
+        <Preference
+            android:key="pref_del_project"
+            android:title="@string/p3_del_project" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -20,6 +20,9 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="buttonStyle">@style/AppTheme.Button</item>
         <item name="android:textViewStyle">@style/AppTheme.TextView</item>
+        <item name="preferenceTheme">
+            @style/PreferenceThemeOverlay.v14.Material
+        </item>
     </style>
 
     <!-- Default button theme -->

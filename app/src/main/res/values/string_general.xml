@@ -88,4 +88,6 @@
     <string name="v2_login">Log In</string>
     <string name="v2_signup_desc">New member? Sign up here</string>
     <string name="v2_logging_in">Logging in…</string>
+
+    <string-array name="blank_array"/>
 </resources>

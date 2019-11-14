@@ -55,7 +55,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat {
     /** Retrieve the settings for the project. **/
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-
+        addPreferencesFromResource(R.xml.p3_preference_list);
     }
 
     /** Displays all the settings needed in the fragment. **/

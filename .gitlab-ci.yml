@@ -7,8 +7,6 @@ job1:
     stage: deploy
     script: 
         - echo "Copying files..."
-        - echo "${CI_BUILDS_DIR}"
-        - echo "${CI_PROJECT_PATH}"
     artifacts:
         name: 'latest.apk'
-        paths: ['/builds/paxtandev/study-assistant/output/latest.apk']
+        paths: ['${CI_BUILDS_DIR}/${CI_PROJECT_PATH}/output/latest.apk']

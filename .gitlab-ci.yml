@@ -7,6 +7,8 @@ job1:
     stage: build
     script: 
         - echo "Copying files..."
+        - ls "/"
+        - ls "/output/"
     artifacts:
         name: 'latest.apk'
         paths: ['/output/latest.apk']

@@ -1,10 +1,12 @@
 image: "hello-world"
 
 stages:
-  - deploy
+    - build
 
-deploy:
-  stage: deploy
-  artifacts:
-    name: 'latest.apk'
-    paths: ['/output/latest.apk']
+job1:
+    stage: build
+    script: 
+        - echo "Copying files..."
+    artifacts:
+        name: 'latest.apk'
+        paths: ['/output/latest.apk']

@@ -28,19 +28,19 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/p3_general_update_desc" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.ImagePreference
             android:key="pref_set_icon"
             android:title="@string/p3_general_set_icon" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.ImagePreference
             android:key="pref_update_icon"
             android:title="@string/p3_general_update_icon" />
         <Preference
             android:key="pref_remove_icon"
             android:title="@string/p3_general_remove_icon" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.PasswordPreference
             android:key="pref_set_password"
             android:title="@string/p3_general_set_password" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.CheckPasswordPreference
             android:key="pref_update_password"
             android:title="@string/p3_general_update_password" />
         <Preference
@@ -76,51 +76,49 @@
             android:title="@string/p3_features_merge_task_status" />
         <ListPreference
             android:defaultValue="false"
-            android:entries="@array/p_status_icon_list"
-            android:entryValues="pref_status_icon_entry"
             android:key="pref_status_icon"
+            android:entries="@array/p_status_icon_list"
             android:title="@string/p3_features_status_icon" />
         <ListPreference
             android:defaultValue="false"
-            android:entries="@array/blank_array"
-            android:entryValues="pref_related_subject_entry"
             android:key="pref_related_subject"
+            android:entries="@array/blank_array"
             android:title="@string/p3_features_related_subject" />
     </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/p3_preference_date">
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_set_expected_start"
             android:title="@string/p3_date_expected_start_set" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_update_expected_start"
             android:title="@string/p3_date_expected_start_update" />
         <Preference
             android:key="pref_remove_expected_start"
             android:title="@string/p3_date_expected_start_remove" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_set_expected_end"
             android:title="@string/p3_date_expected_end_set" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_update_expected_end"
             android:title="@string/p3_date_expected_end_update" />
         <Preference
             android:key="pref_remove_expected_end"
             android:title="@string/p3_date_expected_end_remove" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_set_actual_start"
             android:title="@string/p3_date_actual_start_set" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_update_actual_start"
             android:title="@string/p3_date_actual_start_update" />
         <Preference
             android:key="pref_remove_actual_start"
             android:title="@string/p3_date_actual_start_remove" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_set_actual_end"
             android:title="@string/p3_date_actual_end_set" />
-        <Preference
+        <com.pcchin.studyassistant.project.preference.DateTimePreference
             android:key="pref_update_actual_end"
             android:title="@string/p3_date_actual_end_update" />
         <Preference

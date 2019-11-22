@@ -15,19 +15,38 @@ package com.pcchin.studyassistant.project;
 
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+import androidx.room.Room;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.MemberData;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
+import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.display.ExtendedFragment;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.main.MainActivity;
+import com.pcchin.studyassistant.project.preference.CheckPasswordPreference;
+import com.pcchin.studyassistant.project.preference.ImagePreference;
+import com.pcchin.studyassistant.project.preference.PasswordPreference;
 
-public class ProjectSettingsFragment extends PreferenceFragmentCompat {
+public class ProjectSettingsFragment extends PreferenceFragmentCompat implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
     private static final String ARG_ID2 = "ID2";
     private static final String ARG_IS_MEMBER = "isMember";
+
+    private ProjectDatabase projectDatabase;
+    private ProjectData project;
+
+    // Mutually exclusive unless the project has both of those enabled
+    private MemberData member;
+    private RoleData role;
 
     /** Default constructor. **/
     public ProjectSettingsFragment() {
@@ -50,19 +69,79 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null && getArguments() != null) {
+            String projectID = getArguments().getString(ARG_ID),
+                    id2 = getArguments().getString(ARG_ID2);
+            boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER);
+            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
+                    MainActivity.DATABASE_PROJECT)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                    .allowMainThreadQueries().build();
+            project = projectDatabase.ProjectDao().searchByID(projectID);
+
+            Object[] idValidity = GeneralFunctions.checkIdValidity(getActivity(), projectDatabase,
+                    project, id2, isMember);
+            member = (MemberData) idValidity[1];
+            role = (RoleData) idValidity[2];
+
+            // idValidity[0] is equivalent to hasError
+            if ((boolean) idValidity[0]) {
+                // Return to ProjectSelectFragment if any error is found
+                projectDatabase.close();
+                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+            }
+        }
     }
 
     /** Retrieve the settings for the project. **/
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.p3_preference_list);
+        PreferenceManager pManager = getPreferenceManager();
+        // Get ALL the possible preferences from the preference manager
+        EditTextPreference
+                pUpdateTitle = pManager.findPreference("pref_update_title"),
+                pUpdateDesc = pManager.findPreference("pref_update_desc");
+        SwitchPreference
+                pCompleted = pManager.findPreference("pref_completed"),
+                pMembers = pManager.findPreference("pref_members"),
+                pRoles = pManager.findPreference("pref_roles"),
+                pTasks = pManager.findPreference("pref_tasks"),
+                pStatus = pManager.findPreference("pref_status"),
+                pMergeTaskStatus = pManager.findPreference("pref_merge_task_status");
+        ListPreference
+                pStatusIcon = pManager.findPreference("pref_status_icon"),
+                pRelatedSubject = pManager.findPreference("pref_related_subject");
+        ImagePreference
+                pSetIcon = pManager.findPreference("pref_set_icon"),
+                pUpdateIcon = pManager.findPreference("pref_update_icon");
+        PasswordPreference pSetPassword = pManager.findPreference("pref_set_password");
+        CheckPasswordPreference pUpdatePassword = pManager.findPreference("pref_update_password");
+        Preference pRemoveIcon = pManager.findPreference("pref_remove_icon"),
+                pRemovePassword = pManager.findPreference("pref_remove_password"),
+                pRemoveExpectedStart = pManager.findPreference("pref_remove_expected_start"),
+                pRemoveExpectedEnd = pManager.findPreference("pref_remove_expected_end"),
+                pRemoveActualStart = pManager.findPreference("pref_remove_actual_start"),
+                pRemoveActualEnd = pManager.findPreference("pref_remove_actual_end"),
+                pDeleteProject = pManager.findPreference("pref_del_project");
+        // TODO: Customize settings
     }
 
-    /** Displays all the settings needed in the fragment. **/
+    /** Returns to
+     * @see ProjectInfoFragment **/
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_project_settings, container, false);
+    public boolean onBackPressed() {
+        projectDatabase.close();
+        if (getActivity() != null) {
+            if (member == null) {
+                ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, role.roleID, false, true));
+            } else {
+                ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, member.memberID, true, true));
+            }
+            return true;
+        }
+        return false;
     }
-
 }

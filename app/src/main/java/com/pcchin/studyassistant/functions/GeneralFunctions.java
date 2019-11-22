@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.BuildConfig;
@@ -63,6 +64,9 @@ import java.util.List;
 
 /** General functions used throughout the app **/
 public class GeneralFunctions {
+    /** Constructor made private to simulate static class. **/
+    private GeneralFunctions() {}
+
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(@NonNull final MainActivity activity,
                                final SubjectDatabase database) {
@@ -349,6 +353,56 @@ public class GeneralFunctions {
             database.close();
             activity.bottomNavView.setVisibility(View.VISIBLE);
         }
+    }
+
+    /** Checks the given ids in a project for any errors and returns the correct values if it exists.
+     * If the project has errors, {true, null, null} will be returned.
+     * If the project does not have errors, {false, member, role} will be returned.
+      */
+    public static Object[] checkIdValidity(Activity activity, ProjectDatabase projectDatabase,
+                                                ProjectData project, String id2, boolean isMember) {
+        // Set up values
+        MemberData member = null;
+        RoleData role = null;
+        Object[] responseObject = {true, null, null};
+
+        // Set title
+        if (project == null) {
+            // Project is somehow missing
+            Toast.makeText(activity, R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
+            return responseObject;
+        } else {
+            activity.setTitle(project.projectTitle);
+            if (isMember) {
+                member = projectDatabase.MemberDao().searchByID(id2);
+                if (member == null) {
+                    // Member is somehow missing
+                    Toast.makeText(activity, R.string.p_error_member_not_found, Toast.LENGTH_SHORT).show();
+                    return responseObject;
+                } else if (project.rolesEnabled) {
+                    // Get the associated role if needed
+                    role = projectDatabase.RoleDao().searchByID(member.role);
+                    if (role == null) {
+                        // Role is somehow missing
+                        Toast.makeText(activity, R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
+                        return responseObject;
+                    }
+                }
+            } else {
+                // We can safely assume that members are disabled
+                // Get the associated role if needed
+                role = projectDatabase.RoleDao().searchByID(id2);
+                if (role == null) {
+                    // Role is somehow missing
+                    Toast.makeText(activity, R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
+                    return responseObject;
+                }
+            }
+        }
+        responseObject[0] = false;
+        responseObject[1] = member;
+        responseObject[2] = role;
+        return responseObject;
     }
 
     /** Exits the app.**/

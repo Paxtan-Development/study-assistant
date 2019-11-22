@@ -91,48 +91,21 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             String projectID = getArguments().getString(ARG_ID), id2 = getArguments().getString(ARG_ID2);
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER),
                     updateNavView = getArguments().getBoolean(ARG_UPDATE_NAV_VIEW);
-            boolean hasError = false;
 
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
                     .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
                     .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
-            // Set title
-            if (project == null) {
-                // Project is somehow missing
-                Toast.makeText(getActivity(), R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
-                hasError = true;
-            } else {
-                getActivity().setTitle(project.projectTitle);
-                if (isMember) {
-                    member = projectDatabase.MemberDao().searchByID(id2);
-                    if (member == null) {
-                        // Member is somehow missing
-                        Toast.makeText(getActivity(), R.string.p_error_member_not_found, Toast.LENGTH_SHORT).show();
-                        hasError = true;
-                    } else if (project.rolesEnabled) {
-                        // Get the associated role if needed
-                        role = projectDatabase.RoleDao().searchByID(member.role);
-                        if (role == null) {
-                            // Role is somehow missing
-                            Toast.makeText(getActivity(), R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
-                            hasError = true;
-                        }
-                    }
-                } else {
-                    // We can safely assume that members are disabled
-                    // Get the associated role if needed
-                    role = projectDatabase.RoleDao().searchByID(id2);
-                    if (role == null) {
-                        // Role is somehow missing
-                        Toast.makeText(getActivity(), R.string.p_error_role_not_found, Toast.LENGTH_SHORT).show();
-                        hasError = true;
-                    }
-                }
-            }
 
-            if (hasError) {
+            // Check whether the values provided are valid and returns the required role and member
+            Object[] idValidity = GeneralFunctions.checkIdValidity(getActivity(), projectDatabase,
+                    project, id2, isMember);
+            member = (MemberData) idValidity[1];
+            role = (RoleData) idValidity[2];
+
+            // idValidity[0] is equivalent to hasError
+            if ((boolean) idValidity[0]) {
                 // Return to ProjectSelectFragment (Same as onBackPressed) if any error is found
                 onBackPressed();
             } else if (updateNavView) {

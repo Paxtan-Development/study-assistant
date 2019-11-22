@@ -37,6 +37,9 @@ import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public class SecurityFunctions {
+    /** Constructor made private to simulate static class. **/
+    private SecurityFunctions() {}
+
     /** Process a cipher buffer based on a specific length and
      * @return a specific output. **/
     private static byte[] processCipherBuffer(PaddedBufferedBlockCipher cipher, byte[] original)

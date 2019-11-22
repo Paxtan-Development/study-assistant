@@ -38,3 +38,12 @@ debugTests:
   stage: test
   script:
     - ./gradlew -Pci --console=plain :app:testDebug
+
+stages:
+  - deploy
+
+copy-latest:
+  stage: deploy
+  artifacts:
+    name: 'latest.apk'
+    paths: ['/output/latest.apk']

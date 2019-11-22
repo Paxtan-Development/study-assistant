@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-copy-latest:
+deploy:
   stage: deploy
   artifacts:
     name: 'latest.apk'

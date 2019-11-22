@@ -1,3 +1,5 @@
+image: "hello-world"
+
 stages:
   - deploy
 

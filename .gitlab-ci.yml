@@ -8,7 +8,6 @@ job1:
     script: 
         - echo "Copying files..."
         - ls "/"
-        - ls "/output/"
         - ls "~/"
     artifacts:
         name: 'latest.apk'

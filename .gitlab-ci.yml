@@ -3,7 +3,7 @@ image: "debian"
 stages:
     - deploy
 
-job1:
+latest:
     stage: deploy
     script: 
         - echo "Copying files..."

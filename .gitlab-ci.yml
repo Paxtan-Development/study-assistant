@@ -1,14 +1,15 @@
 image: "debian"
 
 stages:
-    - build
+    - deploy
 
 job1:
-    stage: build
+    stage: deploy
     script: 
         - echo "Copying files..."
         - ls "/"
         - ls "/output/"
+        - ls "~/"
     artifacts:
         name: 'latest.apk'
         paths: ['/output/latest.apk']

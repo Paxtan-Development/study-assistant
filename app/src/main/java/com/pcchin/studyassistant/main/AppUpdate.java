@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -51,8 +52,6 @@ import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -71,17 +70,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @see MainActivity for clarity.
  * Cannot be made static as gitlabReleasesStatusCode needs to be passed on from function to function. **/
 class AppUpdate {
-    private static final String GITLAB = "https://gitlab.com";
-    private static final String GITLAB_API_RELEASES = "https://gitlab.com/api/v4/projects/11826468/releases";
+    private static final String MAIN_API = "https://api.paxtan.dev";
+    private static final String BACKUP_API = "https://paxtandev.herokuapp.com";
+    private static final String UPDATE_PATH = "/study-assistant/latest";
     private static final String GITLAB_RELEASES = "https://gitlab.com/paxtandev/study-assistant/releases";
 
-    private int gitlabReleasesStatusCode;
     private final boolean calledFromNotif;
     private final MainActivity activity;
 
     /** Checks for version updates of the app, doubles as the constructor.
-     * checkGitlabUpdates() separated for clarity. **/
-    AppUpdate(MainActivity activity, boolean calledFromNotif) {
+     * checkServerUpdates() separated for clarity. **/
+    AppUpdate(@NonNull MainActivity activity, boolean calledFromNotif) {
         this.activity = activity;
         this.calledFromNotif = calledFromNotif;
 
@@ -108,7 +107,7 @@ class AppUpdate {
         // Check if there is a newer version of the app
         if (isConnected) {
             if (!isFromPlayStore()) {
-                checkGitlabUpdates();
+                checkServerUpdates();
             }
         }
     }
@@ -123,53 +122,52 @@ class AppUpdate {
         return installer != null && validInstallers.contains(installer);
     }
 
-    /** Checks whether a newer version of the app has been released on GitLab,
+    /** Checks whether a newer version of the app has been released on GitLab through the main api,
+     * and checks the backup API if the main API fails,
      * separated from constructor for clarity,
-     * showGitlabUpdateNotif(JSONArray response) separated for clarity. */
-    private void checkGitlabUpdates() {
+     * showUpdateNotif(JSONArray response) separated for clarity. */
+    private void checkServerUpdates() {
         RequestQueue queue = Volley.newRequestQueue(activity);
-        JsonArrayRequest getReleases = new JsonArrayRequest(GITLAB_API_RELEASES, response -> {
-            SharedPreferences.Editor editor = activity.getSharedPreferences(
-                    activity.getPackageName(), Context.MODE_PRIVATE).edit();
-            editor.putString(MainActivity.SHAREDPREF_GITLAB_RELEASE_JSON, response.toString());
-            editor.apply();
-            showGitlabUpdateNotif(response);
-        }, error -> {
-            if (gitlabReleasesStatusCode == 304) {
-                // Error 304 means that the page remains the same, pulls page from old site
-                SharedPreferences sharedPref = activity.getSharedPreferences(
-                        activity.getPackageName(), Context.MODE_PRIVATE);
-                String oldResponse = sharedPref.getString(MainActivity.SHAREDPREF_GITLAB_RELEASE_JSON, "");
-                try {
-                    JSONArray oldArray = new JSONArray(oldResponse);
-                    showGitlabUpdateNotif(oldArray);
-                } catch (JSONException e) {
-                    Log.d(MainActivity.LOG_APP_NAME, "Data Error: former response " + oldResponse
-                            + " is not a JSON array.");
-                    queue.stop();
-                }
-            } else {
-                Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
-                        error.getMessage() + ":" + error.toString() + " from " + GITLAB_API_RELEASES
-                        + ", stack trace is");
-                error.printStackTrace();
-                queue.stop();
-            }
+
+        // Backup Server
+        JsonArrayRequest getBackupReleases = new JsonArrayRequest(BACKUP_API + UPDATE_PATH,
+                response -> showUpdateNotif(response, BACKUP_API), error -> {
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
+                    error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
+                    + ", stack trace is");
+            error.printStackTrace();
+            queue.stop();
         }) {
             @Override
-            protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
-                gitlabReleasesStatusCode = response.statusCode;
+            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
             }
         };
+
+        // Main Server
+        JsonArrayRequest getReleases = new JsonArrayRequest(MAIN_API + UPDATE_PATH,
+                response -> showUpdateNotif(response, MAIN_API), error -> {
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
+                    error.getMessage() + ":" + error.toString() + " from " + MAIN_API
+                    + ", stack trace is");
+            error.printStackTrace();
+            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
+            queue.add(getBackupReleases);
+        }) {
+            @Override
+            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
+                return super.parseNetworkResponse(response);
+            }
+        };
+
         // Send request
         queue.add(getReleases);
     }
 
     /** Show users the update notification,
-     * separated from checkGitlabUpdates() for clarity,
+     * separated from checkServerUpdates() for clarity,
      * updateViaGitlab(String downloadLink) separated for clarity. **/
-    private void showGitlabUpdateNotif(JSONArray response) {
+    private void showUpdateNotif(@NonNull JSONArray response, String host) {
         try {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
@@ -180,14 +178,9 @@ class AppUpdate {
 
             // Get latest version from releases page
             JSONObject latestVersion = response.getJSONObject(0);
-            if (!Objects.equals(latestVersion.getString("name")
+            if (!Objects.equals(latestVersion.getString("version")
                     .replace("v", ""), BuildConfig.VERSION_NAME)) {
-
-                // Version is not the latest, needs to be updated
-                // The first link in the description is always the download link for the apk
-                String downloadLink = GITLAB + Jsoup.parse(Parser.unescapeEntities(
-                        latestVersion.getString("description_html"), false))
-                        .select("a").first().attr("href");
+                String downloadLink = latestVersion.getString("download");
 
                 if (!calledFromNotif) {
                     // Set up notification
@@ -238,14 +231,14 @@ class AppUpdate {
                         .show(activity.getSupportFragmentManager(), "AppUpdate.1");
             }
         } catch (JSONException e) {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Response returned by " + GITLAB_API_RELEASES
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Response returned by " + host
                     + " invalid, response given is " + response + ", error given is "
                     + e.getMessage());
         }
     }
 
     /** Download and update the newest version of the app via GitLab,
-     * separated from showGitlabUpdateNotif(JSONArray response) for clarity. **/
+     * separated from showUpdateNotif(JSONArray response) for clarity. **/
     private void updateViaGitlab(String downloadLink) {
         // Generate output file name
         // Checks if the /files directory exists, if not it is created

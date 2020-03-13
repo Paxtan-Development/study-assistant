@@ -26,6 +26,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.gemnasium.gradle-plugin" version "0.3"
+}
+
 allprojects {
     repositories {
         google()

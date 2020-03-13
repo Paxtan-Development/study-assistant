@@ -15,12 +15,9 @@ apply plugin: 'com.android.application'
 
 // Load keystore
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('keystore.properties')
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-// Check file error
 try {
-    file(keystoreProperties['keystoreDir'])
+    def keystorePropertiesFile = rootProject.file('keystore.properties')
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ignored) {
     keystoreProperties.put('keystoreDir', '/')
 }

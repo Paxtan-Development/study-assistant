@@ -62,7 +62,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -74,6 +76,10 @@ class AppUpdate {
     private static final String BACKUP_API = "https://paxtandev.herokuapp.com";
     private static final String UPDATE_PATH = "/study-assistant/latest";
     private static final String GITLAB_RELEASES = "https://gitlab.com/paxtandev/study-assistant/releases";
+    /* Example user agent: "Study-Assistant/1.5 ()" */
+    @SuppressWarnings("ConstantConditions")
+    private static final String USER_AGENT = System.getProperty("http.agent","")
+            .replaceAll("^.+?/\\S+", String.format("Study-Assistant/%s", BuildConfig.VERSION_NAME));
 
     private final boolean calledFromNotif;
     private final MainActivity activity;
@@ -129,6 +135,7 @@ class AppUpdate {
     private void checkServerUpdates() {
         RequestQueue queue = Volley.newRequestQueue(activity);
 
+
         // Backup Server
         JsonArrayRequest getBackupReleases = new JsonArrayRequest(BACKUP_API + UPDATE_PATH,
                 response -> showUpdateNotif(response, BACKUP_API), error -> {
@@ -138,6 +145,13 @@ class AppUpdate {
             error.printStackTrace();
             queue.stop();
         }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-agent", USER_AGENT);
+                return headers;
+            }
+
             @Override
             protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
@@ -154,6 +168,13 @@ class AppUpdate {
             Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
             queue.add(getBackupReleases);
         }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-agent", USER_AGENT);
+                return headers;
+            }
+
             @Override
             protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
@@ -326,7 +347,14 @@ class AppUpdate {
                         + ", response given is " + error.getMessage() + ", stack trace is");
                 error.printStackTrace();
                 Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
-            }, null);
+            }, null){
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("User-agent", USER_AGENT);
+                    return headers;
+                }
+            };
 
             if (continueDownload.get()) {
                 queue.add(request);

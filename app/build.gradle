@@ -18,7 +18,11 @@ def keystoreProperties = new Properties()
 try {
     def keystorePropertiesFile = rootProject.file('keystore.properties')
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} catch (FileNotFoundException ignored) {}
+    // logger.debug('Build location: Local')
+} catch (FileNotFoundException ignored) {
+    keystoreProperties.put('keystoreDir', '')
+    // logger.debug('Build location: Cloud')
+}
 
 android {
     signingConfigs {

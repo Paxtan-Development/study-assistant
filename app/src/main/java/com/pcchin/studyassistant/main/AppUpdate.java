@@ -73,10 +73,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Cannot be made static as gitlabReleasesStatusCode needs to be passed on from function to function. **/
 class AppUpdate {
     private static final String MAIN_API = "https://api.paxtan.dev";
-    private static final String BACKUP_API = "https://paxtandev.herokuapp.com";
+    private static final String BACKUP_API = "https://api.pcchin.com";
+    private static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
     private static final String UPDATE_PATH = "/study-assistant/latest";
-    private static final String GITLAB_RELEASES = "https://gitlab.com/paxtandev/study-assistant/releases";
-    /* Example user agent: "Study-Assistant/1.5 ()" */
+    private static final String GITHUB_RELEASES = "https://github.com/Paxtan-Development/study-assistant/releases";
+    /* Example user agent: "Study-Assistant/1.5 (...)" */
     @SuppressWarnings("ConstantConditions")
     private static final String USER_AGENT = System.getProperty("http.agent","")
             .replaceAll("^.+?/\\S+", String.format("Study-Assistant/%s", BuildConfig.VERSION_NAME));
@@ -128,13 +129,34 @@ class AppUpdate {
         return installer != null && validInstallers.contains(installer);
     }
 
-    /** Checks whether a newer version of the app has been released on GitLab through the main api,
+    /** Checks whether a newer version of the app has been released on GitHub through the main api,
      * and checks the backup API if the main API fails,
      * separated from constructor for clarity,
      * showUpdateNotif(JSONArray response) separated for clarity. */
     private void checkServerUpdates() {
         RequestQueue queue = Volley.newRequestQueue(activity);
 
+        // Secondary Backup Server
+        JsonArrayRequest getSecBackupReleases = new JsonArrayRequest(SEC_BACKUP_API + UPDATE_PATH,
+                response -> showUpdateNotif(response, BACKUP_API), error -> {
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
+                    error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
+                    + ", stack trace is");
+            error.printStackTrace();
+            queue.stop();
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-agent", USER_AGENT);
+                return headers;
+            }
+
+            @Override
+            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
+                return super.parseNetworkResponse(response);
+            }
+        };
 
         // Backup Server
         JsonArrayRequest getBackupReleases = new JsonArrayRequest(BACKUP_API + UPDATE_PATH,
@@ -143,7 +165,8 @@ class AppUpdate {
                     error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
                     + ", stack trace is");
             error.printStackTrace();
-            queue.stop();
+            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to secondary backup server");
+            queue.add(getSecBackupReleases);
         }) {
             @Override
             public Map<String, String> getHeaders() {
@@ -187,7 +210,7 @@ class AppUpdate {
 
     /** Show users the update notification,
      * separated from checkServerUpdates() for clarity,
-     * updateViaGitlab(String downloadLink) separated for clarity. **/
+     * updateViaGithub(String downloadLink) separated for clarity. **/
     private void showUpdateNotif(@NonNull JSONArray response, String host) {
         try {
             // Update so that it will not ask again on the same day
@@ -232,13 +255,13 @@ class AppUpdate {
                 DialogInterface.OnShowListener updateListener = dialogInterface -> {
                     ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
                         dialogInterface.dismiss();
-                        updateViaGitlab(downloadLink);
+                        updateViaGithub(downloadLink);
                     });
                     ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
                         // The user should be able to update after coming back from the website
                         activity.safeOnBackPressed();
                         Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(GITLAB_RELEASES));
+                                Uri.parse(GITHUB_RELEASES));
                         activity.startActivity(gitlabReleaseSite);
                     });
                     ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
@@ -260,7 +283,7 @@ class AppUpdate {
 
     /** Download and update the newest version of the app via GitLab,
      * separated from showUpdateNotif(JSONArray response) for clarity. **/
-    private void updateViaGitlab(String downloadLink) {
+    private void updateViaGithub(String downloadLink) {
         // Generate output file name
         // Checks if the /files directory exists, if not it is created
         File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/temp");

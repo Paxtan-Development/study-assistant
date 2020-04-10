@@ -39,6 +39,7 @@ android {
         versionCode 13
         versionName "1.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         vectorDrawables {
             useSupportLibrary true
         }
@@ -83,17 +84,18 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha01'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.android.support:multidex:1.0.3'
 
     // Test implementations
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.3.0-alpha04'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha04'
+    androidTestImplementation 'androidx.test:runner:1.3.0-alpha05'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha05'
 
     // Room implementation
-    implementation 'androidx.room:room-runtime:2.2.4'
-    annotationProcessor 'androidx.room:room-compiler:2.2.4'
+    implementation 'androidx.room:room-runtime:2.2.5'
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
     androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
 
     // External implemented libs
@@ -103,4 +105,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.jsoup:jsoup:1.12.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.62'
+    //noinspection GradleDependency
+    implementation 'com.github.pcchin:licenseview:1.0.1'
 }

@@ -1,4 +1,4 @@
 Copyright 2019 PC Chin.
 <br/>
 <br/>Study Assistant is an app designed to help students in managing their notes and projects.
- More information about the app could be found at its <a href="https://gitlab.com/paxtandev/study-assistant">Gitlab</a> page.
+ More information about the app could be found at its <a href="https://github.com/Paxtan-Development/study-assistant">GitHub</a> page.

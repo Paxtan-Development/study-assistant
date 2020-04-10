@@ -40,16 +40,15 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.display.AutoDismissDialog;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.display.AutoDismissDialog;
 import com.pcchin.studyassistant.misc.VolleyFileDownloadRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -76,7 +75,6 @@ class AppUpdate {
     private static final String BACKUP_API = "https://api.pcchin.com";
     private static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
     private static final String UPDATE_PATH = "/study-assistant/latest";
-    private static final String GITHUB_RELEASES = "https://github.com/Paxtan-Development/study-assistant/releases";
     /* Example user agent: "Study-Assistant/1.5 (...)" */
     @SuppressWarnings("ConstantConditions")
     private static final String USER_AGENT = System.getProperty("http.agent","")
@@ -137,7 +135,7 @@ class AppUpdate {
         RequestQueue queue = Volley.newRequestQueue(activity);
 
         // Secondary Backup Server
-        JsonArrayRequest getSecBackupReleases = new JsonArrayRequest(SEC_BACKUP_API + UPDATE_PATH,
+        JsonObjectRequest getSecBackupReleases = new JsonObjectRequest(SEC_BACKUP_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, BACKUP_API), error -> {
             Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
                     error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
@@ -153,13 +151,13 @@ class AppUpdate {
             }
 
             @Override
-            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
+            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
             }
         };
 
         // Backup Server
-        JsonArrayRequest getBackupReleases = new JsonArrayRequest(BACKUP_API + UPDATE_PATH,
+        JsonObjectRequest getBackupReleases = new JsonObjectRequest(BACKUP_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, BACKUP_API), error -> {
             Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
                     error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
@@ -176,13 +174,13 @@ class AppUpdate {
             }
 
             @Override
-            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
+            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
             }
         };
 
         // Main Server
-        JsonArrayRequest getReleases = new JsonArrayRequest(MAIN_API + UPDATE_PATH,
+        JsonObjectRequest getReleases = new JsonObjectRequest(MAIN_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, MAIN_API), error -> {
             Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
                     error.getMessage() + ":" + error.toString() + " from " + MAIN_API
@@ -199,7 +197,7 @@ class AppUpdate {
             }
 
             @Override
-            protected Response<JSONArray> parseNetworkResponse(@NonNull NetworkResponse response) {
+            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
                 return super.parseNetworkResponse(response);
             }
         };
@@ -211,7 +209,7 @@ class AppUpdate {
     /** Show users the update notification,
      * separated from checkServerUpdates() for clarity,
      * updateViaGithub(String downloadLink) separated for clarity. **/
-    private void showUpdateNotif(@NonNull JSONArray response, String host) {
+    private void showUpdateNotif(@NonNull JSONObject response, String host) {
         try {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
@@ -221,10 +219,10 @@ class AppUpdate {
             editor.apply();
 
             // Get latest version from releases page
-            JSONObject latestVersion = response.getJSONObject(0);
-            if (!Objects.equals(latestVersion.getString("version")
+            if (!Objects.equals(response.getString("version")
                     .replace("v", ""), BuildConfig.VERSION_NAME)) {
-                String downloadLink = latestVersion.getString("download");
+                String downloadLink = response.getString("download");
+                String releaseLink = response.getString("page");
 
                 if (!calledFromNotif) {
                     // Set up notification
@@ -261,7 +259,7 @@ class AppUpdate {
                         // The user should be able to update after coming back from the website
                         activity.safeOnBackPressed();
                         Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(GITHUB_RELEASES));
+                                Uri.parse(releaseLink));
                         activity.startActivity(gitlabReleaseSite);
                     });
                     ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
@@ -338,7 +336,7 @@ class AppUpdate {
                             Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
                             Intent installIntent = new Intent(Intent.ACTION_VIEW);
                             installIntent.setDataAndType(FileProvider.getUriForFile(activity,
-                                    "com.pcchin.studyassistant.provider",
+                                    activity.getPackageName() + ".ContentProvider",
                                     new File(outputFileName)),
                                     "application/vnd.android.package-archive");
                             installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -371,6 +369,7 @@ class AppUpdate {
                 error.printStackTrace();
                 Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
             }, null){
+                @NonNull
                 @Override
                 public Map<String, String> getHeaders() {
                     Map<String, String> headers = new HashMap<>();

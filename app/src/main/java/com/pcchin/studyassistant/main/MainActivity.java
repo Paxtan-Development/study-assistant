@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity
     public Fragment currentFragment;
     // Constants used across fragments
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
-    public static final String SHAREDPREF_GITLAB_RELEASE_JSON = "gitlabReleasesJson";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
     public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";

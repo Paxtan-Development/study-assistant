@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,34 +13,23 @@
 
 package com.pcchin.studyassistant.main.about;
 
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-
+import com.pcchin.licenseview.LicenseView;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.main.MainActivity;
-import com.pcchin.studyassistant.display.AutoDismissDialog;
 import com.pcchin.studyassistant.display.ExtendedFragment;
-
-import java.util.Arrays;
-import java.util.Objects;
+import com.pcchin.studyassistant.main.MainActivity;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,
-            R.array.jsoup_license, R.array.zip4j_license};
+            R.array.jsoup_license, R.array.licenseview_license, R.array.zip4j_license};
 
     /** Default constructor. **/
     public LicenseFragment() { }
@@ -55,73 +44,13 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.blank_list, container, false);
-        LinearLayout returnLayout = returnScroll.findViewById(R.id.blank_linear);
+        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_license, container, false);
+        LicenseView licenseView = returnScroll.findViewById(R.id.m5_linear);
 
         for (int licenseArray : licenseArrays) {
             // Updates license info & OnClickListeners
             String[] infoArray = getResources().getStringArray(licenseArray);
-            if (infoArray.length == 3 && getFragmentManager() != null) {
-                @SuppressLint("InflateParams") LinearLayout licenseDisplay = (LinearLayout) inflater
-                        .inflate(R.layout.license_display, null);
-                // Common functions used by all licenses for neatness
-                ((TextView) licenseDisplay.findViewById(R.id.m4_lib)).setText(infoArray[1]);
-                DialogInterface.OnClickListener[] yListeners = new DialogInterface
-                        .OnClickListener[]{null, (dialogInterface, i1) ->
-                        dialogInterface.dismiss(), null};
-                String[] buttonList = {"", getString(R.string.close), ""};
-
-                if (Objects.equals(infoArray[0], getString(R.string.license_apache_2))) {
-                    // Apache 2.0 license
-                    ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_apache_2);
-                    licenseDisplay.setOnClickListener(view -> {
-                        // TextView needs to be set for each instance to prevent error
-                        TextView licenseView = new TextView(getActivity());
-                        licenseView.setTextSize(18);
-                        licenseView.setPadding(20, 20, 20, 20);
-                        GeneralFunctions.setHtml(licenseView,
-                                infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
-                                        "apache_2_license.txt"));
-                        new AutoDismissDialog(getString(R.string.license_apache_2), licenseView,
-                                buttonList, yListeners).show(getFragmentManager(),
-                                "LicenseFragment.Apache2");
-                    });
-                } else if (Objects.equals(infoArray[0], getString(R.string.license_mit))) {
-                    // MIT license
-                    ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_mit);
-                    licenseDisplay.setOnClickListener(view -> {
-                        // TextView needs to be set for each instance to prevent error
-                        TextView licenseView = new TextView(getActivity());
-                        licenseView.setTextSize(18);
-                        licenseView.setPadding(20, 20, 20, 20);
-                        GeneralFunctions.setHtml(licenseView,
-                                infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
-                                        "mit_license.txt"));
-                        new AutoDismissDialog(getString(R.string.license_mit), licenseView,
-                                buttonList, yListeners).show(getFragmentManager(),
-                                "LicenseFragment.Apache2");
-                    });
-                } else if (Objects.equals(infoArray[0], getString(R.string.license_cc_3_unported))) {
-                    // Creative Commons CC 3.0 Unported
-                    ((TextView) licenseDisplay.findViewById(R.id.m4_type)).setText(R.string.license_cc_3_unported);
-                    licenseDisplay.setOnClickListener(view -> {
-                        // TextView needs to be set for each instance to prevent error
-                        TextView licenseView = new TextView(getActivity());
-                        licenseView.setTextSize(18);
-                        licenseView.setPadding(20, 20, 20, 20);
-                        GeneralFunctions.setHtml(licenseView,
-                                infoArray[2] + FileFunctions.getTxt(inflater.getContext(),
-                                        "cc_3_unported.txt"));
-                        new AutoDismissDialog(getString(R.string.license_cc_3_unported), licenseView,
-                                buttonList, yListeners).show(getFragmentManager(),
-                                "LicenseFragment.Apache2");
-                    });
-                }
-                returnLayout.addView(licenseDisplay);
-            } else {
-                Log.w(MainActivity.LOG_APP_NAME, "XML Error: Incorrect CharSequence[] in " +
-                        "license_display read, value is " + Arrays.toString(infoArray));
-            }
+            licenseView.addLicense(infoArray);
         }
         return returnScroll;
     }

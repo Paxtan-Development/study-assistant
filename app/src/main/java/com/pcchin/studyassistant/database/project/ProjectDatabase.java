@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ import com.pcchin.studyassistant.database.project.data.TaskData;
  * 2) If only members are enabled, there should be at least 1 member in the project
  * 3) If roles and members are enabled, at least 1 member must have a role that can edit role data **/
 @Database(entities={ProjectData.class, MemberData.class, TaskData.class, RoleData.class,
-        StatusData.class}, version=5)
+        StatusData.class}, version=6)
 @TypeConverters(ConverterFunctions.class)
 public abstract class ProjectDatabase extends RoomDatabase {
     public abstract ProjectDao ProjectDao();

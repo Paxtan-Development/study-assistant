@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@ import androidx.room.PrimaryKey;
 
 import com.pcchin.studyassistant.R;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /** The entity for each project. Each project should also have its own folder named after its ID
@@ -89,11 +88,6 @@ public class ProjectData {
     /** Whether members are enabled in the project. **/
     public boolean membersEnabled;
 
-    /** A list of all member IDs in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple members per entity.**/
-    public ArrayList<String> memberList;
-
     /** Whether roles are enabled in the project.
      * If membersEnabled is false but this is true, users would need to sign in with their roles.
      * If membersEnabled is true but this is false, all members would have admin privileges.
@@ -101,27 +95,12 @@ public class ProjectData {
      * If both membersEnabled and this are false, all users would have admin privileges. **/
     public boolean rolesEnabled;
 
-    /** A list of all the roles in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple roles per entity. **/
-    public ArrayList<String> roleList;
-
     /** Whether tasks are enabled in the project. **/
     public boolean taskEnabled;
-
-    /** A list of all the tasks IDs in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple tasks per entity. **/
-    public ArrayList<String> taskList;
 
     /** Whether status updates specifically are enabled in the project.
      * Both taskEnabled and statusEnabled must be true for mergeTaskStatus to be used. **/
     public boolean statusEnabled;
-
-    /** A list of all the status updates in the project.
-     * @see androidx.room.ForeignKey cannot be used in this case as
-     * there are multiple roles per entity. **/
-    public ArrayList<String> statusList;
 
     /** If this is true, tasks and status share the same notes (from Tasks),
      * while if this is false, tasks and status have separate databases. **/
@@ -167,16 +146,9 @@ public class ProjectData {
         this.memberSignupEnabled = true;
         this.memberDefaultRole = memberDefaultRole.roleID;
         this.membersEnabled = true;
-        this.memberList = new ArrayList<>();
-        this.memberList.add(defaultAdmin.memberID);
         this.rolesEnabled = true;
-        this.roleList = new ArrayList<>();
-        this.roleList.add(memberRole.roleID);
-        this.roleList.add(adminRole.roleID);
         this.taskEnabled = true;
-        this.taskList = new ArrayList<>();
         this.statusEnabled = true;
-        this.statusList = new ArrayList<>();
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
         this.projectOngoing = true;
@@ -205,15 +177,9 @@ public class ProjectData {
         this.memberSignupEnabled = true;
         this.memberDefaultRole = memberRole.roleID;
         this.membersEnabled = false;
-        this.memberList = new ArrayList<>();
         this.rolesEnabled = rolesEnabled;
-        this.roleList = new ArrayList<>();
-        this.roleList.add(adminRole.roleID);
-        this.roleList.add(memberRole.roleID);
         this.taskEnabled = true;
-        this.taskList = new ArrayList<>();
         this.statusEnabled = true;
-        this.statusList = new ArrayList<>();
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
         this.projectOngoing = true;

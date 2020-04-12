@@ -105,6 +105,5 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.jsoup:jsoup:1.12.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.62'
-    //noinspection GradleDependency
-    implementation 'com.github.pcchin:licenseview:1.0.1'
+    implementation 'com.pcchin.licenseview:licenseview:1.1.1'
 }

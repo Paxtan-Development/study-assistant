@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
                 new Handler().post(() -> {
                     ProjectDatabase projectDatabase = Room.databaseBuilder(this,
                             ProjectDatabase.class, DATABASE_PROJECT)
-                            .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                            .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
                             .allowMainThreadQueries().build();
                     RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                     if (admin == null) {

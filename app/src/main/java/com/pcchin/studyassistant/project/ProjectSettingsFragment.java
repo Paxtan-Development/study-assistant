@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER);
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
                     .allowMainThreadQueries().build();
             project = projectDatabase.ProjectDao().searchByID(projectID);
 

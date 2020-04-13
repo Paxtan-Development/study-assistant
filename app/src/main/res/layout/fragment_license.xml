@@ -17,7 +17,7 @@
     android:id="@+id/m5_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.about.LicenseFragment">
+    tools:context=".fragment.about.LicenseFragment">
 
     <com.pcchin.licenseview.LicenseView
         android:id="@+id/m5_linear"

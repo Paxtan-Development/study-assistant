@@ -406,7 +406,7 @@ public class GeneralFunctions {
     }
 
     /** Exits the app.**/
-    public static void exitApp(Activity activity) {
+    public static void exitApp(@NonNull Activity activity) {
         activity.moveTaskToBack(true);
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(0);

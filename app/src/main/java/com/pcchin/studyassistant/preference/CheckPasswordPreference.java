@@ -16,10 +16,8 @@ package com.pcchin.studyassistant.preference;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import androidx.preference.Preference;
-
 /** A preference similar to the original preference, but double checks whether the original password is correct. **/
-public class CheckPasswordPreference extends Preference {
+public class CheckPasswordPreference extends AlertDialogPreference {
     // TODO: Complete
     public CheckPasswordPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

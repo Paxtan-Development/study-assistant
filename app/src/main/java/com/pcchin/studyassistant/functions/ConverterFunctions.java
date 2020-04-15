@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /** Functions specifically used to convert from one type of variable to another. **/
-public class ConverterFunctions {
+public final class ConverterFunctions {
     /** Constructor made private to simulate static class. **/
     private ConverterFunctions() {}
 

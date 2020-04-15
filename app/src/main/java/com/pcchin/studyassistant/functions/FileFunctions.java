@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /** Functions used in managing files. **/
-public class FileFunctions {
+public final class FileFunctions {
     /** Constructor made private to simulate static class. **/
     private FileFunctions() {}
 

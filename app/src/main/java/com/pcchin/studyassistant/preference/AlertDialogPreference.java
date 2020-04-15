@@ -19,21 +19,17 @@ import android.util.AttributeSet;
 import androidx.preference.Preference;
 
 /** Display a custom AlertDialogFragmentCompat for the preference. **/
-class AlertDialogPreference extends Preference {
+abstract class AlertDialogPreference extends Preference {
     // TODO: Complete
-    public AlertDialogPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    AlertDialogPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public AlertDialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+    AlertDialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public AlertDialogPreference(Context context, AttributeSet attrs) {
+    AlertDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    public AlertDialogPreference(Context context) {
-        super(context);
     }
 }

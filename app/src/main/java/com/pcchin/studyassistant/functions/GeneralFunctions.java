@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 /** Functions generally used throughout the app. **/
-public class GeneralFunctions {
+public final class GeneralFunctions {
     /** Exits the app.**/
     public static void exitApp(@NonNull Activity activity) {
         activity.moveTaskToBack(true);

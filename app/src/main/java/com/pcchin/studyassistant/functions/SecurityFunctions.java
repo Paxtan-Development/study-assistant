@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
-public class SecurityFunctions {
+public final class SecurityFunctions {
     /** Constructor made private to simulate static class. **/
     private SecurityFunctions() {}
 

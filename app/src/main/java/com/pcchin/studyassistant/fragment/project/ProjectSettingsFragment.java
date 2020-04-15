@@ -17,12 +17,9 @@ package com.pcchin.studyassistant.fragment.project;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
-import androidx.preference.SwitchPreference;
 import androidx.room.Room;
 
 import com.pcchin.studyassistant.R;
@@ -30,14 +27,18 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.preference.CheckPasswordPreference;
-import com.pcchin.studyassistant.preference.ImagePreference;
-import com.pcchin.studyassistant.preference.PasswordPreference;
 
-public class ProjectSettingsFragment extends PreferenceFragmentCompat implements ExtendedFragment {
+public class ProjectSettingsFragment extends PreferenceFragmentCompat implements ExtendedFragment, PreferenceManager.OnPreferenceTreeClickListener {
+    private static final String PREF_ROOT = "pref_menu_root";
+    private static final String PREF_GENERAL = "pref_menu_general";
+    private static final String PREF_FEATURES = "pref_menu_features";
+    private static final String PREF_DATE = "pref_menu_date";
+    private static final String PREF_SECURITY = "pref_menu_security";
+    private String currentPreference = PREF_ROOT;
+
     private static final String ARG_ID = "projectID";
     private static final String ARG_ID2 = "ID2";
     private static final String ARG_IS_MEMBER = "isMember";
@@ -100,50 +101,95 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.p3_preference_list);
         PreferenceManager pManager = getPreferenceManager();
-        // Get ALL the possible preferences from the preference manager
-        EditTextPreference
-                pUpdateTitle = pManager.findPreference("pref_update_title"),
-                pUpdateDesc = pManager.findPreference("pref_update_desc");
-        SwitchPreference
-                pCompleted = pManager.findPreference("pref_completed"),
-                pMembers = pManager.findPreference("pref_members"),
-                pRoles = pManager.findPreference("pref_roles"),
-                pTasks = pManager.findPreference("pref_tasks"),
-                pStatus = pManager.findPreference("pref_status"),
-                pMergeTaskStatus = pManager.findPreference("pref_merge_task_status");
-        ListPreference
-                pStatusIcon = pManager.findPreference("pref_status_icon"),
-                pRelatedSubject = pManager.findPreference("pref_related_subject");
-        ImagePreference
-                pSetIcon = pManager.findPreference("pref_set_icon"),
-                pUpdateIcon = pManager.findPreference("pref_update_icon");
-        PasswordPreference pSetPassword = pManager.findPreference("pref_set_password");
-        CheckPasswordPreference pUpdatePassword = pManager.findPreference("pref_update_password");
-        Preference pRemoveIcon = pManager.findPreference("pref_remove_icon"),
-                pRemovePassword = pManager.findPreference("pref_remove_password"),
-                pRemoveExpectedStart = pManager.findPreference("pref_remove_expected_start"),
-                pRemoveExpectedEnd = pManager.findPreference("pref_remove_expected_end"),
-                pRemoveActualStart = pManager.findPreference("pref_remove_actual_start"),
-                pRemoveActualEnd = pManager.findPreference("pref_remove_actual_end"),
-                pDeleteProject = pManager.findPreference("pref_del_project");
-        // TODO: Customize settings
+        pManager.setOnPreferenceTreeClickListener(this);
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        switch (currentPreference) {
+            case PREF_ROOT:
+                rootPreferenceClick(preference);
+                break;
+            case PREF_GENERAL:
+                generalPreferenceClick(preference);
+                break;
+            case PREF_FEATURES:
+                featuresPreferenceClick(preference);
+                break;
+            case PREF_DATE:
+                datePreferenceClick(preference);
+                break;
+            case PREF_SECURITY:
+                securityPreferenceClick(preference);
+                break;
+        }
+        return false;
+    }
+
+    /** The tree click listeners for the root preferences. **/
+    private void rootPreferenceClick(@NonNull Preference preference) {
+        getPreferenceManager().getPreferenceScreen().removeAll();
+        currentPreference = preference.getKey();
+        switch (preference.getKey()) {
+            case PREF_GENERAL:
+                addPreferencesFromResource(R.xml.p3_general_preference_list);
+                break;
+            case PREF_FEATURES:
+                addPreferencesFromResource(R.xml.p3_features_preference_list);
+                break;
+            case PREF_DATE:
+                addPreferencesFromResource(R.xml.p3_date_preference_list);
+                break;
+            case PREF_SECURITY:
+                addPreferencesFromResource(R.xml.p3_security_preference_list);
+                break;
+        }
+    }
+
+    /** The tree click listeners for the general preferences. **/
+    private void generalPreferenceClick(Preference preference) {
+        // TODO: Complete
+    }
+
+    /** The tree click listeners for the features preferences. **/
+    private void featuresPreferenceClick(Preference preference) {
+        // TODO: Complete
+    }
+
+    /** The tree click listeners for the date preferences. **/
+    private void datePreferenceClick(Preference preference) {
+        // TODO: Complete
+    }
+
+    /** The tree click listeners for the security preferences. **/
+    private void securityPreferenceClick(Preference preference) {
+        // TODO: Complete
     }
 
     /** Returns to
      * @see ProjectInfoFragment **/
     @Override
     public boolean onBackPressed() {
-        projectDatabase.close();
-        if (getActivity() != null) {
-            if (member == null) {
-                ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                        .newInstance(project.projectID, role.roleID, false, true));
-            } else {
-                ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                        .newInstance(project.projectID, member.memberID, true, true));
+        if (currentPreference.equals(PREF_ROOT)) {
+            // Returns to ProjectInfoFragment
+            projectDatabase.close();
+            if (getActivity() != null) {
+                if (member == null) {
+                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                            .newInstance(project.projectID, role.roleID, false, true));
+                } else {
+                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                            .newInstance(project.projectID, member.memberID, true, true));
+                }
+                return true;
             }
+            return false;
+        } else {
+            // Returns to the main preferences menu
+            getPreferenceManager().getPreferenceScreen().removeAll();
+            addPreferencesFromResource(R.xml.p3_preference_list);
+            currentPreference = PREF_ROOT;
             return true;
         }
-        return false;
     }
 }

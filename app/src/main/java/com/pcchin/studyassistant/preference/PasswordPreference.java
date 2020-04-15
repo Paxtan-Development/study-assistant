@@ -19,7 +19,7 @@ import android.util.AttributeSet;
 import androidx.preference.Preference;
 
 /** The preference that adds a password with double checks. **/
-public class PasswordPreference extends Preference {
+public class PasswordPreference extends AlertDialogPreference {
     // TODO: Complete
     public PasswordPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

@@ -62,7 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Functions used for UI elements in the app. **/
-public class UIFunctions {
+public final class UIFunctions {
     /** Constructor made private to simulate static class. **/
     private UIFunctions() {}
 

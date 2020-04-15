@@ -16,10 +16,8 @@ package com.pcchin.studyassistant.preference;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import androidx.preference.Preference;
-
 /** A custom date and time selecter for preferences. **/
-public class DateTimePreference extends Preference {
+public class DateTimePreference extends AlertDialogPreference {
     // TODO: Complete
     public DateTimePreference(Context context, AttributeSet attrs) {
         super(context, attrs);

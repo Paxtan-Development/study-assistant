@@ -15,21 +15,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="pref_menu_general">
     <EditTextPreference
-        android:defaultValue="false"
+        android:defaultValue="@string/blank"
         android:key="pref_update_title"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/p3_general_update_title" />
     <EditTextPreference
-        android:defaultValue="false"
+        android:defaultValue="@string/blank"
         android:key="pref_update_desc"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/p3_general_update_desc" />
-    <com.pcchin.studyassistant.preference.ImagePreference
+    <Preference
         android:key="pref_set_icon"
         android:title="@string/p3_general_set_icon" />
-    <com.pcchin.studyassistant.preference.ImagePreference
+    <Preference
         android:key="pref_update_icon"
         android:title="@string/p3_general_update_icon" />
     <Preference

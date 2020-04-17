@@ -14,37 +14,37 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="pref_menu_date">
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_set_expected_start"
         android:title="@string/p3_date_expected_start_set" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_update_expected_start"
         android:title="@string/p3_date_expected_start_update" />
     <Preference
         android:key="pref_remove_expected_start"
         android:title="@string/p3_date_expected_start_remove" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_set_expected_end"
         android:title="@string/p3_date_expected_end_set" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_update_expected_end"
         android:title="@string/p3_date_expected_end_update" />
     <Preference
         android:key="pref_remove_expected_end"
         android:title="@string/p3_date_expected_end_remove" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_set_actual_start"
         android:title="@string/p3_date_actual_start_set" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_update_actual_start"
         android:title="@string/p3_date_actual_start_update" />
     <Preference
         android:key="pref_remove_actual_start"
         android:title="@string/p3_date_actual_start_remove" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_set_actual_end"
         android:title="@string/p3_date_actual_end_set" />
-    <com.pcchin.studyassistant.preference.DateTimePreference
+    <com.pcchin.dtpreference.DatePreference
         android:key="pref_update_actual_end"
         android:title="@string/p3_date_actual_end_update" />
     <Preference

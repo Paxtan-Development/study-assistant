@@ -210,10 +210,12 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 if (!Objects.equals(projectPass1.getEditText().getText().toString(),
                         projectPass2.getEditText().getText().toString())) {
                     // Both passwords are not the same
-                    projectPass1.setErrorEnabled(true);
-                    projectPass1.setError(getString(R.string.error_password_unequal));
+                    projectPass2.setErrorEnabled(true);
+                    projectPass2.setError(getString(R.string.error_password_unequal));
                     allInputCorrect = false;
-                } else if (projectPass1.getEditText().getText().length() > 0 &&
+                }
+
+                if (projectPass1.getEditText().getText().length() > 0 &&
                         projectPass1.getEditText().getText().toString().length() < 8) {
                     // Password length is too small
                     projectPass1.setErrorEnabled(true);
@@ -246,10 +248,11 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     if (!Objects.equals(memberPass1.getEditText().getText().toString(),
                             memberPass2.getEditText().getText().toString())) {
                         // Both passwords are not the same
-                        memberPass1.setErrorEnabled(true);
-                        memberPass1.setError(getString(R.string.error_password_unequal));
+                        memberPass2.setErrorEnabled(true);
+                        memberPass2.setError(getString(R.string.error_password_unequal));
                         allInputCorrect = false;
-                    } else if (memberPass1.getEditText().getText().length() > 0 &&
+                    }
+                    if (memberPass1.getEditText().getText().length() > 0 &&
                             memberPass1.getEditText().getText().toString().length() < 8) {
                         // Password length is too small
                         memberPass1.setErrorEnabled(true);

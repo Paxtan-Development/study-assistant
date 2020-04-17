@@ -150,36 +150,33 @@ public class MainActivity extends AppCompatActivity
             }
 
             // Set up Admin & Member roles in database for projects
-            // TODO: Remove statement once completed
-            if (BuildConfig.DEBUG) {
-                new Handler().post(() -> {
-                    ProjectDatabase projectDatabase = Room.databaseBuilder(this,
-                            ProjectDatabase.class, DATABASE_PROJECT)
-                            .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                            .allowMainThreadQueries().build();
-                    RoleData admin = projectDatabase.RoleDao().searchByID("admin");
-                    if (admin == null) {
-                        admin = new RoleData("admin", "", "Admin", "", "");
-                        admin.canDeleteProject = true;
-                        admin.canModifyInfo = true;
-                        admin.canModifyOtherTask = true;
-                        admin.canModifyOtherUser = true;
-                        admin.canModifyOwnTask = true;
-                        admin.canModifyRole = true;
-                        admin.canModifyOtherStatus = true;
-                        admin.canPostStatus = true;
-                        admin.canSetPassword = true;
-                        admin.canViewOtherTask = true;
-                        admin.canViewOtherUser = true;
-                        admin.canViewRole = true;
-                        admin.canViewTask = true;
-                        admin.canViewStatus = true;
-                        admin.canViewMedia = true;
-                        projectDatabase.RoleDao().insert(admin);
-                    }
-                    projectDatabase.close();
-                });
-            }
+            new Handler().post(() -> {
+                ProjectDatabase projectDatabase = Room.databaseBuilder(this,
+                        ProjectDatabase.class, DATABASE_PROJECT)
+                        .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+                        .allowMainThreadQueries().build();
+                RoleData admin = projectDatabase.RoleDao().searchByID("admin");
+                if (admin == null) {
+                    admin = new RoleData("admin", "", "Admin", "", "");
+                    admin.canDeleteProject = true;
+                    admin.canModifyInfo = true;
+                    admin.canModifyOtherTask = true;
+                    admin.canModifyOtherUser = true;
+                    admin.canModifyOwnTask = true;
+                    admin.canModifyRole = true;
+                    admin.canModifyOtherStatus = true;
+                    admin.canPostStatus = true;
+                    admin.canSetPassword = true;
+                    admin.canViewOtherTask = true;
+                    admin.canViewOtherUser = true;
+                    admin.canViewRole = true;
+                    admin.canViewTask = true;
+                    admin.canViewStatus = true;
+                    admin.canViewMedia = true;
+                    projectDatabase.RoleDao().insert(admin);
+                }
+                projectDatabase.close();
+            });
 
             // Delete any past export files
             new Handler().post(() -> {

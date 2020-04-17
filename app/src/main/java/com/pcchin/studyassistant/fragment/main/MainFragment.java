@@ -61,8 +61,7 @@ public class MainFragment extends Fragment implements ExtendedFragment {
         });
 
         returnView.findViewById(R.id.m1_projects).setOnClickListener(v -> {
-            // TODO: Remove statement once completed
-            if (getActivity() != null && BuildConfig.DEBUG) {
+            if (getActivity() != null) {
                 ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
             }
         });

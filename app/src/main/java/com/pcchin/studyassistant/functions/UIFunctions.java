@@ -158,40 +158,37 @@ public final class UIFunctions {
 
         // Add projects
         SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
-        // TODO: Remove statement once completed
-        if (BuildConfig.DEBUG) {
-            ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
-            List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
-            for (ProjectData project : projectList) {
-                MenuItem projItem = projMenu.add(project.projectTitle);
-                projItem.setOnMenuItemClickListener(menuItem -> {
-                    activity.closeDrawer();
-                    activity.safeOnBackPressed();
-                    activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-                    return false;
-                });
-            }
-
-            // Add New Project Button
-            MenuItem newProj = projMenu.add(R.string.m3_new_project);
-            newProj.setOnMenuItemClickListener(item -> {
+        ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
+                MainActivity.DATABASE_PROJECT)
+                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+                .allowMainThreadQueries().build();
+        List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
+        for (ProjectData project : projectList) {
+            MenuItem projItem = projMenu.add(project.projectTitle);
+            projItem.setOnMenuItemClickListener(menuItem -> {
                 activity.closeDrawer();
                 activity.safeOnBackPressed();
-                activity.displayFragment(new ProjectCreateFragment());
-                return true;
-            });
-
-            // Add Import Project button
-            MenuItem projImport = projMenu.add(R.string.m3_data_import);
-            projImport.setOnMenuItemClickListener(item -> {
-                // TODO: Import projects
-                activity.closeDrawer();
-                return true;
+                activity.displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+                return false;
             });
         }
+
+        // Add New Project Button
+        MenuItem newProj = projMenu.add(R.string.m3_new_project);
+        newProj.setOnMenuItemClickListener(item -> {
+            activity.closeDrawer();
+            activity.safeOnBackPressed();
+            activity.displayFragment(new ProjectCreateFragment());
+            return true;
+        });
+
+        // Add Import Project button
+        MenuItem projImport = projMenu.add(R.string.m3_data_import);
+        projImport.setOnMenuItemClickListener(item -> {
+            // TODO: Import projects
+            activity.closeDrawer();
+            return true;
+        });
 
         // Add subMenu for other buttons
         SubMenu otherMenu = currentMenu.addSubMenu(R.string.others);

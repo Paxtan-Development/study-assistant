@@ -52,5 +52,6 @@
     <string name="p3_date_actual_end_remove">Remove Actual End Date</string>
 
     <!-- For strings under the other section -->
-    <string name="p3_del_project">Delete Project (WARNING: This process is irreversible and all the data list could not be returned)</string>
+    <string name="p3_del_project">Delete Project</string>
+    <string name="p3_del_project_msg">WARNING: This process is irreversible and all the data list could not be returned. Are you sure that you want to delete this project?</string>
 </resources>

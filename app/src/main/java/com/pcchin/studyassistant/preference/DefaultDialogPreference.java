@@ -19,32 +19,24 @@ import android.util.AttributeSet;
 
 import androidx.preference.DialogPreference;
 
-import com.pcchin.studyassistant.R;
+/** The preference that shows a dialog and displays 2 buttons.
+ * An integer would be stored if the positive button is pressed. **/
+public class DefaultDialogPreference extends DialogPreference {
 
-/** The preference that adds a password with double checks. **/
-public class PasswordPreference extends DialogPreference {
-    public PasswordPreference(Context context, AttributeSet attrs) {
+    public DefaultDialogPreference(Context context) {
+        super(context);
+    }
+
+    public DefaultDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PasswordPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DefaultDialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public PasswordPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public DefaultDialogPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
-    /** Stores the password for it to be handled within ProjectSettingsFragment. **/
-    void setPassword(String hashedPass) {
-        persistString(hashedPass);
-        getOnPreferenceChangeListener().onPreferenceChange(this, hashedPass);
-    }
-
-    /** Returns the layout resource of the DatePicker. **/
-    @Override
-    public int getDialogLayoutResource() {
-        return R.layout.pref_password_edittext;
     }
 
     /** Stub as nothing is stored in the SharedPreference. **/
@@ -57,5 +49,11 @@ public class PasswordPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(Object defaultValue) {
 
+    }
+
+    /** Stores a value into the SharedPreference when the positive value is clicked. **/
+    void positiveClicked() {
+        persistInt(0);
+        getOnPreferenceChangeListener().onPreferenceChange(this, 0);
     }
 }

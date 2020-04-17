@@ -219,7 +219,7 @@ public class ImportSubject {
 
                 if (subjInfo.size() >= 2) {
                     title = subjInfo.get(0);
-                    listOrder = Integer.valueOf(subjInfo.get(1));
+                    listOrder = Integer.parseInt(subjInfo.get(1));
                 }
                 for (int i = 3; i < subjInfo.size(); i+=5) {
                     ArrayList<String> currentNoteInfo = new ArrayList<>();
@@ -498,6 +498,7 @@ public class ImportSubject {
                 for (int i = 0; i < oldContentsSize; i++) {
                     if (Objects.equals(note, oldContents.get(i))) {
                         notePresent = true;
+                        break;
                     }
                 }
 

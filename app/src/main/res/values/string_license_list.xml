@@ -25,6 +25,12 @@
             bouncycastle.org&quot;&gt;http://www.bouncycastle.org&lt;/a&gt;)</item>
     </string-array>
 
+    <string-array name="dtpreference_license">
+        <item>dtpreference</item>
+        <item>@string/license_apache_2</item>
+        <item>Copyright © 2020 &lt;a href=&quot;https://github.com/pc-chin&quot;&gt;PC Chin&lt;/a&gt;</item>
+    </string-array>
+
     <string-array name="jsoup_license">
         <item>jsoup</item>
         <item>@string/license_mit</item>

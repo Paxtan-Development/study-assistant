@@ -61,7 +61,8 @@ public class ProjectData {
      * getFilesDir() + /icons/project/ + projectID.jpg **/
     public boolean hasIcon;
 
-    /** The resource file pointing to the icon for the project status. **/
+    /** The resource file pointing to the icon for the project status.
+     * For projects without status icons, R.string.blank is used. **/
     public int projectStatusIcon;
 
     /** The date that the project is expected to start. **/

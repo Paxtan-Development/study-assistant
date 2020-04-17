@@ -16,14 +16,19 @@
     android:key="pref_menu_security">
     <com.pcchin.studyassistant.preference.PasswordPreference
         android:key="pref_set_password"
-        android:title="@string/p3_general_set_password" />
-    <com.pcchin.studyassistant.preference.CheckPasswordPreference
+        android:title="@string/p3_general_set_password"
+        android:defaultValue="@string/blank" />
+    <com.pcchin.studyassistant.preference.PasswordPreference
         android:key="pref_update_password"
-        android:title="@string/p3_general_update_password" />
+        android:title="@string/p3_general_update_password"
+        android:defaultValue="@string/blank"/>
     <Preference
         android:key="pref_remove_password"
         android:title="@string/p3_general_remove_password" />
-    <Preference
+    <com.pcchin.studyassistant.preference.DefaultDialogPreference
         android:key="pref_del_project"
-        android:title="@string/p3_del_project" />
+        android:title="@string/p3_del_project"
+        android:dialogMessage="@string/p3_del_project_msg"
+        android:positiveButtonText="@string/del"
+        android:negativeButtonText="@android:string/cancel"/>
 </PreferenceScreen>

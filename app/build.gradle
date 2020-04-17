@@ -83,9 +83,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha02'
-    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.google.android.material:material:1.2.0-alpha06'
     implementation 'com.android.support:multidex:1.0.3'
 
     // Test implementations
@@ -98,12 +98,15 @@ dependencies {
     annotationProcessor 'androidx.room:room-compiler:2.2.5'
     androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
 
+    // Own libraries
+    implementation 'com.pcchin.licenseview:licenseview:1.1.1'
+    implementation 'com.pcchin.dtpreference:dtpreference:1.1.1'
+
     // External implemented libs
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'net.lingala.zip4j:zip4j:2.1.2'
-    implementation 'org.apache.commons:commons-lang3:3.9'
-    implementation 'org.jsoup:jsoup:1.12.1'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.62'
-    implementation 'com.pcchin.licenseview:licenseview:1.1.1'
+    implementation 'net.lingala.zip4j:zip4j:2.5.1'
+    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
 }

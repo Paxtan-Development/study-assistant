@@ -38,10 +38,12 @@
         android:defaultValue="false"
         android:key="pref_status_icon"
         android:entries="@array/p_status_icon_list"
+        android:entryValues="@array/p_status_icon_list"
         android:title="@string/p3_features_status_icon" />
     <ListPreference
         android:defaultValue="false"
         android:key="pref_related_subject"
         android:entries="@array/blank_array"
+        android:entryValues="@array/blank_array"
         android:title="@string/p3_features_related_subject" />
 </PreferenceScreen>

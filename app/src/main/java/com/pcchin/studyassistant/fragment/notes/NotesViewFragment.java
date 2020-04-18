@@ -227,7 +227,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getContext(), R.string
                     .error_write_permission_denied, Toast.LENGTH_SHORT).show();
-        } else if (getFragmentManager() != null) {
+        } else {
             new AutoDismissDialog(getString(R.string.data_export),
                     getString(R.string.n3_confirm_export_note),
                     new String[]{getString(android.R.string.ok),
@@ -239,13 +239,13 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                 Toast.makeText(getContext(), getString(R.string.n3_note_exported) + outputText,
                         Toast.LENGTH_SHORT).show();
                 }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
-                    .show(getFragmentManager(), "NotesViewFragment.1");
+                    .show(getParentFragmentManager(), "NotesViewFragment.1");
         }
     }
 
     /** Prevents the note from being able to be edited. **/
     public void onLockPressed() {
-        if (getContext() != null && getFragmentManager() != null) {
+        if (getContext() != null) {
             @SuppressLint("InflateParams") TextInputLayout inputLayout =
                     (TextInputLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
             if (inputLayout.getEditText() != null) {
@@ -288,14 +288,14 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     getActivity().invalidateOptionsMenu();
                 }
             }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
-                    .show(getFragmentManager(), "NotesViewFragment.2");
+                    .show(getParentFragmentManager(), "NotesViewFragment.2");
         }
     }
 
     /** Unlocks the note. If there is no password, the note will be unlocked immediately.
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
-        if (getContext() != null && getFragmentManager() != null) {
+        if (getContext() != null) {
             SubjectDatabase database = Room.databaseBuilder(getContext(),
                     SubjectDatabase.class, MainActivity.DATABASE_NOTES)
                     .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
@@ -341,7 +341,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     new AutoDismissDialog(getString(R.string.n3_unlock_password), inputLayout,
                             new String[]{getString(android.R.string.ok),
                                     getString(android.R.string.cancel), ""},
-                            passwordListener).show(getFragmentManager(), "NotesViewFragment.3");
+                            passwordListener).show(getParentFragmentManager(), "NotesViewFragment.3");
                 } else {
                     // Unlocks immediately
                     removeLock(contents, database, subject);
@@ -376,7 +376,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     public void onCancelAlertPressed() {
         if (getContext() != null) {
             AlarmManager manager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-            PendingIntent cancelIntent = getNotifyReceiverIntent(Integer.valueOf(notesInfo.get(5)));
+            PendingIntent cancelIntent = getNotifyReceiverIntent(Integer.parseInt(notesInfo.get(5)));
 
             if (manager != null) {
                 manager.cancel(cancelIntent);
@@ -405,50 +405,48 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
 
     /** Deletes the note from the subject. **/
     public void onDeletePressed() {
-        if (getFragmentManager() != null) {
-            new AutoDismissDialog(getString(R.string.del), getString(R.string.n3_del_confirm),
-                    new String[]{getString(R.string.del), getString(android.R.string.cancel), ""},
-                    new DialogInterface.OnClickListener[]{(dialog, which) -> {
-                        if (getActivity() != null) {
-                            // Delete listener
-                            AlarmManager manager = (AlarmManager) getActivity()
-                                    .getSystemService(Context.ALARM_SERVICE);
-                            if (manager != null && notesInfo.size() >= 5 && notesInfo.get(5) != null) {
-                                PendingIntent alertIntent = getNotifyReceiverIntent(
-                                        Integer.valueOf(notesInfo.get(5)));
-                                manager.cancel(alertIntent);
-                            }
-
-                            SubjectDatabase database = Room.databaseBuilder(getActivity(),
-                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                    .allowMainThreadQueries().build();
-                            NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
-                            if (notesSubject != null) {
-                                // Check if contents is valid
-                                ArrayList<ArrayList<String>> contents = currentSubject.contents;
-                                if (contents != null) {
-                                    if (notesOrder < contents.size()) {
-                                        contents.remove(notesOrder);
-                                    }
-                                } else {
-                                    contents = new ArrayList<>();
-                                }
-                                // Update value in notes
-                                currentSubject.contents = contents;
-                                database.SubjectDao().update(currentSubject);
-                                database.close();
-                                ((MainActivity) getActivity()).displayFragment
-                                        (NotesSubjectFragment.newInstance(notesSubject));
-                            } else {
-                                // In case the note somehow doesn't have a subject
-                                ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
-                            }
-                            Toast.makeText(getContext(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
+        new AutoDismissDialog(getString(R.string.del), getString(R.string.n3_del_confirm),
+                new String[]{getString(R.string.del), getString(android.R.string.cancel), ""},
+                new DialogInterface.OnClickListener[]{(dialog, which) -> {
+                    if (getActivity() != null) {
+                        // Delete listener
+                        AlarmManager manager = (AlarmManager) getActivity()
+                                .getSystemService(Context.ALARM_SERVICE);
+                        if (manager != null && notesInfo.size() >= 5 && notesInfo.get(5) != null) {
+                            PendingIntent alertIntent = getNotifyReceiverIntent(
+                                    Integer.parseInt(notesInfo.get(5)));
+                            manager.cancel(alertIntent);
                         }
-                    }, (dialog, which) -> dialog.dismiss(), null})
-                    .show(getFragmentManager(), "NotesViewFragment.4");
-        }
+
+                        SubjectDatabase database = Room.databaseBuilder(getActivity(),
+                                SubjectDatabase.class, MainActivity.DATABASE_NOTES)
+                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                                .allowMainThreadQueries().build();
+                        NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
+                        if (notesSubject != null) {
+                            // Check if contents is valid
+                            ArrayList<ArrayList<String>> contents = currentSubject.contents;
+                            if (contents != null) {
+                                if (notesOrder < contents.size()) {
+                                    contents.remove(notesOrder);
+                                }
+                            } else {
+                                contents = new ArrayList<>();
+                            }
+                            // Update value in notes
+                            currentSubject.contents = contents;
+                            database.SubjectDao().update(currentSubject);
+                            database.close();
+                            ((MainActivity) getActivity()).displayFragment
+                                    (NotesSubjectFragment.newInstance(notesSubject));
+                        } else {
+                            // In case the note somehow doesn't have a subject
+                            ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
+                        }
+                        Toast.makeText(getContext(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
+                    }
+                }, (dialog, which) -> dialog.dismiss(), null})
+                .show(getParentFragmentManager(), "NotesViewFragment.4");
     }
 
     /** Returns to

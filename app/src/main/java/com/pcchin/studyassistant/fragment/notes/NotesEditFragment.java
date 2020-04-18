@@ -178,7 +178,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
 
     /** Changes the subject that the note will be saved to. **/
     public void onSubjPressed() {
-        if (getContext() != null && getFragmentManager() != null) {
+        if (getContext() != null) {
             final Spinner subjListSpinner = new Spinner(getContext());
             // Get all subject titles
             List<String> subjTitleList = new ArrayList<>();
@@ -214,7 +214,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                         targetSubjContents = database.SubjectDao()
                                 .search(targetNotesSubject).contents;
                     }, (dialog, which) -> dialog.dismiss(), null})
-                    .show(getFragmentManager(), "NotesEditFragment.1");
+                    .show(getParentFragmentManager(), "NotesEditFragment.1");
         }
     }
 
@@ -245,7 +245,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 previousIntent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, previousNote.get(2));
                 previousIntent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, notesSubject);
                 previousIntent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
-                manager.cancel(PendingIntent.getBroadcast(getContext(), Integer.valueOf(
+                manager.cancel(PendingIntent.getBroadcast(getContext(), Integer.parseInt(
                         previousNote.get(5)), previousIntent, 0));
 
                 // Set new notification
@@ -260,11 +260,11 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             manager.setExactAndAllowWhileIdle(AlarmManager.RTC, targetDate.getTime(),
                                     PendingIntent.getBroadcast(getContext(),
-                                            Integer.valueOf(previousNote.get(5)), newIntent, 0));
+                                            Integer.parseInt(previousNote.get(5)), newIntent, 0));
                         } else {
                             manager.setExact(AlarmManager.RTC, targetDate.getTime(), PendingIntent
                                     .getBroadcast(getContext(),
-                                            Integer.valueOf(previousNote.get(5)), newIntent, 0));
+                                            Integer.parseInt(previousNote.get(5)), newIntent, 0));
                         }
                         // Updates value to note
                         updatedNote.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDate));
@@ -339,16 +339,14 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
      * @see MainActivity safeOnBackPressed() **/
     @Override
     public boolean onBackPressed() {
-        if (getFragmentManager() != null) {
-            new AutoDismissDialog(getString(R.string.return_val), getString(R.string.n4_save_note),
-                    new String[]{getString(R.string.yes), getString(R.string.no),
-                            getString(android.R.string.cancel)},
-                    new DialogInterface.OnClickListener[]{
-                            (dialogInterface, i) -> onSavePressed(),
-                            (dialogInterface, i) -> onCancelPressed(),
-                            (dialogInterface, i) -> dialogInterface.dismiss()})
-                    .show(getFragmentManager(), "NotesEditFragment.2");
-        }
+        new AutoDismissDialog(getString(R.string.return_val), getString(R.string.n4_save_note),
+                new String[]{getString(R.string.yes), getString(R.string.no),
+                        getString(android.R.string.cancel)},
+                new DialogInterface.OnClickListener[]{
+                        (dialogInterface, i) -> onSavePressed(),
+                        (dialogInterface, i) -> onCancelPressed(),
+                        (dialogInterface, i) -> dialogInterface.dismiss()})
+                .show(getParentFragmentManager(), "NotesEditFragment.2");
         return true;
     }
 }

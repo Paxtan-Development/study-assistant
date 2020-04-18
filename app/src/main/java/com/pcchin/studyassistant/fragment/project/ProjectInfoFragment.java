@@ -253,7 +253,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
      * If the subject is not found, an alert will display asking if the user would
      * like to delete the related subject from the project. **/
     public void onNotesPressed() {
-        if (project.associatedSubject != null && getActivity() != null && getFragmentManager() != null) {
+        if (project.associatedSubject != null && getActivity() != null) {
             // Opens subject database
             SubjectDatabase subjDatabase = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
                     MainActivity.DATABASE_NOTES)
@@ -272,7 +272,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                             getActivity().invalidateOptionsMenu();
                         }, null, null});
                 subjDialog.setDismissListener(dialogInterface -> subjDatabase.close());
-                subjDialog.show(getFragmentManager(), "ProjectInfoFragment.1");
+                subjDialog.show(getParentFragmentManager(), "ProjectInfoFragment.1");
             } else {
                 subjDatabase.close();
                 projectDatabase.close();

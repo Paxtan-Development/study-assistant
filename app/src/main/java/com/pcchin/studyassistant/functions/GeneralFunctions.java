@@ -29,10 +29,8 @@ public final class GeneralFunctions {
 
     /** Reloads a fragment. **/
     public static void reloadFragment(@NonNull Fragment target) {
-        if (target.getFragmentManager() != null) {
-            target.getFragmentManager().beginTransaction()
-                    .detach(target)
-                    .attach(target).commit();
-        }
+        target.getParentFragmentManager().beginTransaction()
+                .detach(target)
+                .attach(target).commit();
     }
 }

@@ -285,7 +285,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
 
     /** Creates a new note with a given title. **/
     public void onNewNotePressed() {
-        if (getActivity() != null && getFragmentManager() != null) {
+        if (getActivity() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
             // End icon has been set in XML file
@@ -318,13 +318,13 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
             new AutoDismissDialog(getString(R.string.n2_new_note), popupView,
                     new String[]{getString(android.R.string.ok),
                             getString(android.R.string.cancel), ""}, nListener)
-                    .show(getFragmentManager(), "NotesSubjectFragment.1");
+                    .show(getParentFragmentManager(), "NotesSubjectFragment.1");
         }
     }
 
     /** Change the method which the notes are sorted. **/
     public void onSortPressed() {
-        if (getContext() != null && getFragmentManager() != null) {
+        if (getContext() != null) {
             @SuppressLint("InflateParams") final Spinner sortingSpinner = (Spinner) getLayoutInflater().inflate
                     (R.layout.n2_sorting_spinner, null);
 
@@ -350,13 +350,13 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         sortNotes(subject1);
                         GeneralFunctions.reloadFragment(this);
                     }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
-                    .show(getFragmentManager(), "NotesSubjectFragment.2");
+                    .show(getParentFragmentManager(), "NotesSubjectFragment.2");
         }
     }
 
     /** Renames the subject to another one. **/
     public void onRenamePressed() {
-        if (getActivity() != null && getFragmentManager() != null) {
+        if (getActivity() != null) {
             @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
                     getLayoutInflater().inflate(R.layout.popup_edittext, null);
             // End icon has been set in XML file
@@ -399,7 +399,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
             new AutoDismissDialog(getString(R.string.rename_subject), popupView,
                     new String[]{getString(R.string.rename),
                             getString(android.R.string.cancel), ""}, nListener)
-                    .show(getFragmentManager(), "NotesSubjectFragment.3");
+                    .show(getParentFragmentManager(), "NotesSubjectFragment.3");
         }
     }
 
@@ -411,7 +411,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getContext(), R.string
                     .error_write_permission_denied, Toast.LENGTH_SHORT).show();
-        } else if (getFragmentManager() != null) {
+        } else {
             new AutoDismissDialog(getString(R.string.n2_export_format),
                     R.array.n_import_subject_format, (dialogInterface, i) ->
                     new Handler().post(() -> {
@@ -422,7 +422,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         }
                     }), new String[]{"", getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{null, null, null})
-                    .show(getFragmentManager(), "NotesSubjectFragment.4");
+                    .show(getParentFragmentManager(), "NotesSubjectFragment.4");
         }
     }
 
@@ -430,38 +430,36 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
      * Separated from onExportPressed() for clarity,
      * exportZip() separated for clarity. **/
     private void askZipPassword() {
-        if (getFragmentManager() != null) {
-            @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
-                    getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            if (inputLayout.getEditText() != null) {
-                inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            }
-            inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-            inputLayout.setHint(getString(R.string.set_blank_password));
-
-            DialogInterface.OnShowListener passwordListener = dialogInterface -> {
-                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setOnClickListener(view -> {
-                    String inputText = "";
-                    if (inputLayout.getEditText() != null) {
-                        inputText = inputLayout.getEditText().getText().toString();
-                    }
-                    if (inputText.length() == 0 || inputText.length() >= 8) {
-                        exportZip(inputText);
-                    } else {
-                        inputLayout.setErrorEnabled(true);
-                        inputLayout.setError(getString(R.string.error_password_short));
-                    }
-                    dialogInterface.dismiss();
-                });
-                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
-                        .setOnClickListener(view -> dialogInterface.dismiss());
-            };
-            new AutoDismissDialog(getString(R.string.enter_password), inputLayout, new String[]{
-                    getString(android.R.string.ok), getString(android.R.string.cancel), ""},
-                    passwordListener).show(getFragmentManager(), "NotesSubjectFragment.5");
+        @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
+                getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        if (inputLayout.getEditText() != null) {
+            inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
+        inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+        inputLayout.setHint(getString(R.string.set_blank_password));
+
+        DialogInterface.OnShowListener passwordListener = dialogInterface -> {
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setOnClickListener(view -> {
+                        String inputText = "";
+                        if (inputLayout.getEditText() != null) {
+                            inputText = inputLayout.getEditText().getText().toString();
+                        }
+                        if (inputText.length() == 0 || inputText.length() >= 8) {
+                            exportZip(inputText);
+                        } else {
+                            inputLayout.setErrorEnabled(true);
+                            inputLayout.setError(getString(R.string.error_password_short));
+                        }
+                        dialogInterface.dismiss();
+                    });
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
+                    .setOnClickListener(view -> dialogInterface.dismiss());
+        };
+        new AutoDismissDialog(getString(R.string.enter_password), inputLayout, new String[]{
+                getString(android.R.string.ok), getString(android.R.string.cancel), ""},
+                passwordListener).show(getParentFragmentManager(), "NotesSubjectFragment.5");
     }
 
     /** Export the subject to a ZIP file.
@@ -560,148 +558,144 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     /** Export the subject as a password-protected byte[] as a .subject file,
      * separated from onExportSubject() for clarity. **/
     private void exportSubject() {
-        if (getFragmentManager() != null) {
-            @SuppressLint("InflateParams") TextInputLayout inputText = (TextInputLayout) getLayoutInflater()
-                    .inflate(R.layout.popup_edittext, null);
-            if (inputText.getEditText() != null) {
-                inputText.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            }
-            inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-            inputText.setHint(getString(R.string.set_blank_password));
-            DialogInterface.OnShowListener exportListener = dialogInterface -> {
-                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                    // Check if password is too short, must be 8 characters in length
-                    String responseText = "";
-                    if (inputText.getEditText() != null) {
-                        responseText = inputText.getEditText().getText().toString();
-                    }
-                    if (responseText.length() == 0 || responseText.length() >= 8) {
-                        // Set output file name
-                        String outputFileName = "/storage/emulated/0/Download/" + notesSubject
-                                + ".subject";
-                        int count = 0;
-                        while (new File(outputFileName).exists()) {
-                            outputFileName = "/storage/emulated/0/Download/" + notesSubject
-                                    + "(" + count + ").subject";
-                        }
-
-                        // Check if the file can be created
-                        String finalOutputFileName = outputFileName;
-                        String finalResponseText = responseText;
-                        dialogInterface.dismiss();
-                        String finalResponseText1 = responseText;
-                        new Handler().post(() -> {
-                            try {
-                                // Get permission to read and write files
-                                File outputFile = new File(finalOutputFileName);
-                                if (outputFile.createNewFile()) {
-                                    Toast.makeText(getContext(), R.string.n2_exporting_subject,
-                                            Toast.LENGTH_SHORT).show();
-
-                                    // Export the file
-                                    // The length of the title is exported first, followed by the title.
-                                    // Then, the subject's sort order is listed
-                                    // and the encrypted contents are stored.
-                                    FileOutputStream outputStream = new FileOutputStream(outputFile);
-                                    outputStream.write(ConverterFunctions.intToBytes(notesSubject
-                                            .getBytes().length));
-                                    outputStream.write(notesSubject.getBytes());
-                                    outputStream.write(ConverterFunctions
-                                            .intToBytes(subjectDatabase.SubjectDao()
-                                                    .search(notesSubject).sortOrder));
-                                    if (finalResponseText1.length() >= 8) {
-                                        outputStream.write(1);
-                                        outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
-                                                finalResponseText, notesArray));
-                                    } else {
-                                        outputStream.write(0);
-                                        outputStream.write(ConverterFunctions
-                                                .doubleArrayToJson(notesArray).getBytes());
-                                    }
-                                    outputStream.flush();
-                                    outputStream.close();
-                                    Toast.makeText(getContext(), getString(R.string.subject_exported)
-                                            + outputFile, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
-                                            + finalOutputFileName + " cannot be created.");
-                                    Toast.makeText(getContext(), R.string.n2_error_file_not_created,
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (FileNotFoundException e) {
-                                Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
-                                        + finalOutputFileName + " not found, stack trace is");
-                                e.printStackTrace();
-                                dialogInterface.dismiss();
-                            } catch (IOException e) {
-                                Log.e(MainActivity.LOG_APP_NAME, "File Error: An IO Exception"
-                                        + " occurred on file " + finalOutputFileName + ", stack trace is");
-                                e.printStackTrace();
-                                dialogInterface.dismiss();
-                            }
-                        });
-                    } else {
-                        inputText.setErrorEnabled(true);
-                        inputText.setError(getString(R.string.error_password_short));
-                    }
-                });
-                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                        dialogInterface.dismiss());
-            };
-            new AutoDismissDialog(getString(R.string.n2_password_export), inputText,
-                    new String[]{getString(android.R.string.ok),
-                            getString(android.R.string.cancel), ""}, exportListener)
-                    .show(getFragmentManager(), "NotesSubjectFragment.6");
+        @SuppressLint("InflateParams") TextInputLayout inputText = (TextInputLayout) getLayoutInflater()
+                .inflate(R.layout.popup_edittext, null);
+        if (inputText.getEditText() != null) {
+            inputText.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
+        inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+        inputText.setHint(getString(R.string.set_blank_password));
+        DialogInterface.OnShowListener exportListener = dialogInterface -> {
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                // Check if password is too short, must be 8 characters in length
+                String responseText = "";
+                if (inputText.getEditText() != null) {
+                    responseText = inputText.getEditText().getText().toString();
+                }
+                if (responseText.length() == 0 || responseText.length() >= 8) {
+                    // Set output file name
+                    String outputFileName = "/storage/emulated/0/Download/" + notesSubject
+                            + ".subject";
+                    int count = 0;
+                    while (new File(outputFileName).exists()) {
+                        outputFileName = "/storage/emulated/0/Download/" + notesSubject
+                                + "(" + count + ").subject";
+                    }
+
+                    // Check if the file can be created
+                    String finalOutputFileName = outputFileName;
+                    String finalResponseText = responseText;
+                    dialogInterface.dismiss();
+                    String finalResponseText1 = responseText;
+                    new Handler().post(() -> {
+                        try {
+                            // Get permission to read and write files
+                            File outputFile = new File(finalOutputFileName);
+                            if (outputFile.createNewFile()) {
+                                Toast.makeText(getContext(), R.string.n2_exporting_subject,
+                                        Toast.LENGTH_SHORT).show();
+
+                                // Export the file
+                                // The length of the title is exported first, followed by the title.
+                                // Then, the subject's sort order is listed
+                                // and the encrypted contents are stored.
+                                FileOutputStream outputStream = new FileOutputStream(outputFile);
+                                outputStream.write(ConverterFunctions.intToBytes(notesSubject
+                                        .getBytes().length));
+                                outputStream.write(notesSubject.getBytes());
+                                outputStream.write(ConverterFunctions
+                                        .intToBytes(subjectDatabase.SubjectDao()
+                                                .search(notesSubject).sortOrder));
+                                if (finalResponseText1.length() >= 8) {
+                                    outputStream.write(1);
+                                    outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject,
+                                            finalResponseText, notesArray));
+                                } else {
+                                    outputStream.write(0);
+                                    outputStream.write(ConverterFunctions
+                                            .doubleArrayToJson(notesArray).getBytes());
+                                }
+                                outputStream.flush();
+                                outputStream.close();
+                                Toast.makeText(getContext(), getString(R.string.subject_exported)
+                                        + outputFile, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
+                                        + finalOutputFileName + " cannot be created.");
+                                Toast.makeText(getContext(), R.string.n2_error_file_not_created,
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (FileNotFoundException e) {
+                            Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
+                                    + finalOutputFileName + " not found, stack trace is");
+                            e.printStackTrace();
+                            dialogInterface.dismiss();
+                        } catch (IOException e) {
+                            Log.e(MainActivity.LOG_APP_NAME, "File Error: An IO Exception"
+                                    + " occurred on file " + finalOutputFileName + ", stack trace is");
+                            e.printStackTrace();
+                            dialogInterface.dismiss();
+                        }
+                    });
+                } else {
+                    inputText.setErrorEnabled(true);
+                    inputText.setError(getString(R.string.error_password_short));
+                }
+            });
+            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
+                    dialogInterface.dismiss());
+        };
+        new AutoDismissDialog(getString(R.string.n2_password_export), inputText,
+                new String[]{getString(android.R.string.ok),
+                        getString(android.R.string.cancel), ""}, exportListener)
+                .show(getParentFragmentManager(), "NotesSubjectFragment.6");
     }
 
     /** Deletes the current subject and returns to
      * @see NotesSelectFragment **/
     public void onDeletePressed() {
-        if (getFragmentManager() != null) {
-            new AutoDismissDialog(getString(R.string.del), getString(R.string.n2_del_confirm),
-                    new String[]{getString(R.string.del),
-                            getString(android.R.string.cancel), ""},
-                    new DialogInterface.OnClickListener[]{(dialog, which) -> {
-                        if (getActivity() != null) {
-                            // Delete phantom alerts
-                            for (ArrayList<String> note: notesArray) {
-                                AlarmManager manager = (AlarmManager) getActivity()
-                                        .getSystemService(Context.ALARM_SERVICE);
-                                if (manager != null && note.size() >= 6 && note.get(5) != null
-                                        && note.get(0) != null && note.get(2) != null) {
-                                    // Get PendingIntent for note alert
-                                    Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
-                                    intent.putExtra(MainActivity.INTENT_VALUE_TITLE, note.get(0));
-                                    intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, note.get(2));
-                                    intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, note.get(5));
-                                    PendingIntent alertIntent = PendingIntent.getBroadcast(
-                                            getActivity(), Integer.valueOf(note.get(5)), intent, 0);
+        new AutoDismissDialog(getString(R.string.del), getString(R.string.n2_del_confirm),
+                new String[]{getString(R.string.del),
+                        getString(android.R.string.cancel), ""},
+                new DialogInterface.OnClickListener[]{(dialog, which) -> {
+                    if (getActivity() != null) {
+                        // Delete phantom alerts
+                        for (ArrayList<String> note: notesArray) {
+                            AlarmManager manager = (AlarmManager) getActivity()
+                                    .getSystemService(Context.ALARM_SERVICE);
+                            if (manager != null && note.size() >= 6 && note.get(5) != null
+                                    && note.get(0) != null && note.get(2) != null) {
+                                // Get PendingIntent for note alert
+                                Intent intent = new Intent(getActivity(), NotesNotifyReceiver.class);
+                                intent.putExtra(MainActivity.INTENT_VALUE_TITLE, note.get(0));
+                                intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, note.get(2));
+                                intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, note.get(5));
+                                PendingIntent alertIntent = PendingIntent.getBroadcast(
+                                        getActivity(), Integer.parseInt(note.get(5)), intent, 0);
 
-                                    manager.cancel(alertIntent);
-                                }
+                                manager.cancel(alertIntent);
                             }
-
-                            // Delete subject
-                            SubjectDatabase database = Room.databaseBuilder(getActivity(),
-                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                    .allowMainThreadQueries().build();
-                            NotesSubject delTarget = database.SubjectDao().search(notesSubject);
-                            if (delTarget != null) {
-                                database.SubjectDao().delete(delTarget);
-                            }
-                            database.close();
-                            // Return to NotesSelectFragment
-                            Toast.makeText(getContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
-                            UIFunctions.updateNavView((MainActivity) getActivity());
-                            subjectDatabase.close();
-                            ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
                         }
-                    }, (dialog, which) -> dialog.dismiss(), null})
-                    .show(getFragmentManager(), "NotesSubjectFragment.7");
-        }
+
+                        // Delete subject
+                        SubjectDatabase database = Room.databaseBuilder(getActivity(),
+                                SubjectDatabase.class, MainActivity.DATABASE_NOTES)
+                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
+                                .allowMainThreadQueries().build();
+                        NotesSubject delTarget = database.SubjectDao().search(notesSubject);
+                        if (delTarget != null) {
+                            database.SubjectDao().delete(delTarget);
+                        }
+                        database.close();
+                        // Return to NotesSelectFragment
+                        Toast.makeText(getContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
+                        UIFunctions.updateNavView((MainActivity) getActivity());
+                        subjectDatabase.close();
+                        ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
+                    }
+                }, (dialog, which) -> dialog.dismiss(), null})
+                .show(getParentFragmentManager(), "NotesSubjectFragment.7");
     }
 
     /** Returns to

@@ -73,7 +73,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getFragmentManager() != null) {
+        if (getActivity() != null) {
             projectDatabase = Room.databaseBuilder(getActivity(),
                     ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
                     .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
@@ -152,7 +152,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
                                         getString(android.R.string.cancel), ""},
                                 passwordDialogListener);
                         passwordDialog.setCancellable(false);
-                        passwordDialog.show(getFragmentManager(), "ProjectLoginFragment.1");
+                        passwordDialog.show(getParentFragmentManager(), "ProjectLoginFragment.1");
                     }
                 } else {
                     // All users will be logged in as admin if roles & members are not enabled

@@ -1,4 +1,8 @@
 # Study Assistant
+[![Release](https://badgen.net/github/release/Paxtan-Development/study-assistant/stable)](https://github.com/Paxtan-Development/study-assistant/releases)
+[![Lines of Code](https://badgen.net/codeclimate/loc/Paxtan-Development/study-assistant)](/)
+[![Maintainability](https://api.codeclimate.com/v1/badges/97cf7ed9b1087dbd5e75/maintainability)](https://codeclimate.com/github/Paxtan-Development/study-assistant/maintainability)
+[![Technical Debt](https://badgen.net/codeclimate/tech-debt/Paxtan-Development/study-assistant)](https://codeclimate.com/github/Paxtan-Development/study-assistant/)
 An app that help students to monitor their notes and projects.
 
 ## Installation
@@ -13,7 +17,9 @@ If you wish to compile in a version other than debug, you would need to set up t
 - `keystorePass`: The password to access your keystore.
 
 ## Contribution
-Any contribution is welcome. Feel free to add any issues or pull requests to the repository.
+Any contribution is welcome, feel free to add any issues or pull requests to the repository.
+
+Before you contribute, do read through the [Code of Conduct](/CODE_OF_CONDUCT.md).
 
 ## License
 This project is licensed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. All licenses for the media / libraries used can be found in the About page of the compiled app.

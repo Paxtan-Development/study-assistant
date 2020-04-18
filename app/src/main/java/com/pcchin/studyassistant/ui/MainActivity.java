@@ -50,22 +50,22 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.utils.network.AppUpdate;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesViewFragment;
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.utils.network.AppUpdate;
+import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 import java.io.File;
 import java.util.Date;
@@ -217,13 +217,16 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-            // Only check for updates once a day
-            if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
-                new Handler().post(() -> new AppUpdate(MainActivity.this, true));
-            } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                            .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.standardDateFormat.format(new Date()))) {
-                new Handler().post(() -> new AppUpdate(MainActivity.this, false));
+            // Only check for updates once a day for non-beta users
+            //noinspection ConstantConditions
+            if (!BuildConfig.BUILD_TYPE.equals("beta")) {
+                if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
+                    new Handler().post(() -> new AppUpdate(MainActivity.this, true));
+                } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+                                .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                        ConverterFunctions.standardDateFormat.format(new Date()))) {
+                    new Handler().post(() -> new AppUpdate(MainActivity.this, false));
+                }
             }
         } else {
             // Set currentFragment, pager and bottomNavView which had been cleared when rotating

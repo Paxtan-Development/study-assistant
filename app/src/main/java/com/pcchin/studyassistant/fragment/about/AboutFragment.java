@@ -13,6 +13,8 @@
 
 package com.pcchin.studyassistant.fragment.about;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -72,6 +74,11 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
             if (getActivity() != null) {
                 ((MainActivity) getActivity()).displayFragment(new RssLicenseFragment());
             }
+        });
+        returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
+            startActivity(intent);
         });
 
         // Set license text

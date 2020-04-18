@@ -3,6 +3,7 @@
 [![Lines of Code](https://badgen.net/codeclimate/loc/Paxtan-Development/study-assistant)](/)
 [![Maintainability](https://api.codeclimate.com/v1/badges/97cf7ed9b1087dbd5e75/maintainability)](https://codeclimate.com/github/Paxtan-Development/study-assistant/maintainability)
 [![Technical Debt](https://badgen.net/codeclimate/tech-debt/Paxtan-Development/study-assistant)](https://codeclimate.com/github/Paxtan-Development/study-assistant/)
+
 An app that help students to monitor their notes and projects.
 
 ## Installation

@@ -74,7 +74,9 @@ public class AppUpdate {
     private static final String MAIN_API = "https://api.paxtan.dev";
     private static final String BACKUP_API = "https://api.pcchin.com";
     private static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
-    private static final String UPDATE_PATH = "/study-assistant/latest";
+    @SuppressWarnings("ConstantConditions")
+    private static final String UPDATE_PATH = BuildConfig.BUILD_TYPE.equals("beta")
+            ? "/study-assistant/beta" : "/study-assistant/latest";
     /* Example user agent: "Study-Assistant/1.5 (...)" */
     @SuppressWarnings("ConstantConditions")
     private static final String USER_AGENT = System.getProperty("http.agent","")

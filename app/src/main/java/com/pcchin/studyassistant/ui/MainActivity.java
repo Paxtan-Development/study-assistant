@@ -218,15 +218,12 @@ public class MainActivity extends AppCompatActivity
             });
 
             // Only check for updates once a day for non-beta users
-            //noinspection ConstantConditions
-            if (!BuildConfig.BUILD_TYPE.equals("beta")) {
-                if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
-                    new Handler().post(() -> new AppUpdate(MainActivity.this, true));
-                } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                                .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                        ConverterFunctions.standardDateFormat.format(new Date()))) {
-                    new Handler().post(() -> new AppUpdate(MainActivity.this, false));
-                }
+            if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
+                new Handler().post(() -> new AppUpdate(MainActivity.this, true));
+            } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
+                            .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                    ConverterFunctions.standardDateFormat.format(new Date()))) {
+                new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
         } else {
             // Set currentFragment, pager and bottomNavView which had been cleared when rotating

@@ -46,7 +46,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
@@ -73,26 +72,42 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    public BottomNavigationView bottomNavView;
-    public ViewPager pager;
-    public Fragment currentFragment;
-    // Constants used across fragments
+    // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
+
+    // General intent constants
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
     public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";
     public static final String INTENT_VALUE_REQUEST_CODE = "requestCode";
+
+    // Intent constants for notes
     public static final String INTENT_VALUE_SUBJECT = "subject";
     public static final String INTENT_VALUE_MESSAGE = "message";
     public static final String INTENT_VALUE_TITLE = "title";
+
+    // Intent constants for projects
+    public static final String INTENT_PROJECT_ID = "projectID";
+    public static final String INTENT_ID2 = "id2";
+    public static final String INTENT_IS_MEMBER = "isMember";
+
+    // Intent codes
+    public static final int SELECT_ZIP_FILE = 300;
+    public static final int SELECT_SUBJECT_FILE = 301;
+    public static final int SELECT_PROJECT_ICON = 302;
+
+    // Permission codes
+    private static final int EXTERNAL_STORAGE_PERMISSION = 200;
+    public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
+
+    // Other constants
     public static final String DATABASE_NOTES = "notesSubject";
     public static final String DATABASE_PROJECT = "projectDatabase";
     public static final String LOG_APP_NAME = "StudyAssistant";
 
-    private static final int EXTERNAL_STORAGE_PERMISSION = 200;
-    public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
-    public static final int SELECT_ZIP_FILE = 300;
-    public static final int SELECT_SUBJECT_FILE = 301;
+    public BottomNavigationView bottomNavView;
+    public ViewPager pager;
+    public Fragment currentFragment;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -424,6 +439,10 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }
+            } else if (requestCode == SELECT_PROJECT_ICON) {
+                // TODO: Forward image to project settings
+            } else {
+                // TODO: Import media to project
             }
         }
     }

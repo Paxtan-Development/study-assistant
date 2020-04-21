@@ -14,8 +14,10 @@
 package com.pcchin.studyassistant.fragment.project;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -46,7 +48,9 @@ import com.pcchin.studyassistant.preference.PasswordPreferenceDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
 
+import java.io.File;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,6 +63,8 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     private static final String PREF_DATE = "pref_menu_date";
     private static final String PREF_SECURITY = "pref_menu_security";
     private String currentPrefRoot = PREF_ROOT;
+    private String id2;
+    private boolean isMember;
 
     private static final String ARG_ID = "projectID";
     private static final String ARG_ID2 = "ID2";
@@ -94,9 +100,9 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null && getArguments() != null) {
-            String projectID = getArguments().getString(ARG_ID),
-                    id2 = getArguments().getString(ARG_ID2);
-            boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER);
+            String projectID = getArguments().getString(ARG_ID);
+            id2 = getArguments().getString(ARG_ID2);
+            isMember = getArguments().getBoolean(ARG_IS_MEMBER);
             projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
                     MainActivity.DATABASE_PROJECT)
                     .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
@@ -143,7 +149,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                 datePreferenceClick(preference);
                 break;
             case PREF_SECURITY:
-                securityPreferenceClick(preference);
+                securityPreferenceClick();
                 break;
         }
         return false;
@@ -157,21 +163,38 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
 
     /** The tree click listeners for the general preferences. **/
     private void generalPreferenceClick(@NonNull Preference preference) {
-        switch(preference.getKey()) {
-            case "pref_set_icon":
-            case "pref_update_icon":
-                // TODO: Set icon
-                break;
-            case "pref_remove_icon":
-                // TODO: Remove icon
-                break;
+        if (getActivity() != null) {
+            String iconLocation = getActivity().getFilesDir().toString() + "/icons/project/"
+                    + project.projectID + ".jpg";
+            switch (preference.getKey()) {
+                case "pref_set_icon":
+                case "pref_update_icon":
+                    // Set icon, continued in MainActivity
+                    projectDatabase.close();
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.putExtra(MainActivity.INTENT_PROJECT_ID, project.projectID);
+                    intent.putExtra(MainActivity.INTENT_IS_MEMBER, isMember);
+                    intent.putExtra(MainActivity.INTENT_ID2, id2);
+                    startActivityForResult(intent, MainActivity.SELECT_PROJECT_ICON);
+                    break;
+                case "pref_remove_icon":
+                    // Remove icon
+                    File iconFile = new File(iconLocation);
+                    if (iconFile.delete()) {
+                        project.hasIcon = false;
+                    } else {
+                        Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
+            updateProject();
         }
     }
 
     /** The tree click listeners for the feature preferences. **/
     private void featurePreferenceClick(Preference preference) {
         switch(preference.getKey()) {
-            // TODO: Set default icon value
             case "pref_status_icon":
                 switch(project.projectStatusIcon) {
                     case R.string.blank:
@@ -180,6 +203,11 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                     case R.drawable.status_ic_circle:
                         ((ListPreference) preference).setValue("Circle");
                         break;
+                    case R.drawable.status_ic_triangle:
+                        ((ListPreference) preference).setValue("Triangle");
+                        break;
+                    case R.drawable.status_ic_square:
+                        ((ListPreference) preference).setValue("Square");
                 }
                 break;
             case "pref_related_subject":
@@ -192,23 +220,26 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     private void datePreferenceClick(Preference preference) {
         switch(preference.getKey()) {
             case "pref_remove_expected_start":
-                // TODO: Remove expected start date
+                project.expectedStartDate = null;
                 break;
             case "pref_remove_expected_end":
-                // TODO: Remove expected end date
+                project.expectedEndDate = null;
                 break;
             case "pref_remove_actual_start":
-                // TODO: Remove actual start date
+                project.actualStartDate = null;
                 break;
             case "pref_remove_actual_end":
-                // TODO: Remove actual end date
+                project.actualEndDate = null;
                 break;
         }
+        updateProject();
     }
 
     /** The tree click listeners for the security preferences. **/
-    private void securityPreferenceClick(Preference preference) {
-        // TODO: Remove password
+    private void securityPreferenceClick() {
+        project.projectPass = "";
+        project.projectProtected = false;
+        updateProject();
     }
 
     /** Delegates the show/hide of preferences to their own functions. **/
@@ -346,7 +377,6 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                 securityPrefChanged(preference, newValue);
                 break;
         }
-        displayPreference(currentPrefRoot);
         return false;
     }
 
@@ -354,42 +384,61 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     private void generalPrefChanged(Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case "pref_update_title":
-                // TODO: Update title
+                // Set activity title
+                if (getActivity() != null) {
+                    getActivity().setTitle((String) newValue);
+                }
+                project.projectTitle = (String) newValue;
                 break;
             case "pref_update_desc":
-                // TODO: Update description
+                project.description = (String) newValue;
                 break;
             case "pref_completed":
-                // TODO: Update projectCompleted
+                project.projectOngoing = !(boolean) newValue;
                 break;
         }
+        updateProject();
     }
 
     /** Detects the value change of feature preferences. **/
     private void featurePrefChanged(Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case "pref_members":
-                // TODO: Update membersEnabled
+                project.membersEnabled = (boolean) newValue;
                 break;
             case "pref_roles":
-                // TODO: Update rolesEnabled
+                project.rolesEnabled = (boolean) newValue;
                 break;
             case "pref_tasks":
-                // TODO: Update tasksEnabled
+                project.taskEnabled = (boolean) newValue;
                 break;
             case "pref_status":
-                // TODO: Update statusEnabled
+                project.statusEnabled = (boolean) newValue;
                 break;
             case "pref_merge_task_status":
-                // TODO: Update mergeTaskStatus
+                project.mergeTaskStatus = (boolean) newValue;
                 break;
             case "pref_status_icon":
-                // TODO: Update status icon
+                switch ((String) newValue) {
+                    case "None":
+                        project.projectStatusIcon = R.string.blank;
+                        break;
+                    case "Circle":
+                        project.projectStatusIcon = R.drawable.status_ic_circle;
+                        break;
+                    case "Triangle":
+                        project.projectStatusIcon = R.drawable.status_ic_triangle;
+                        break;
+                    case "Square":
+                        project.projectStatusIcon = R.drawable.status_ic_square;
+                        break;
+                }
                 break;
             case "pref_related_subject":
-                // TODO: Update related subject
+                project.associatedSubject = (String) newValue;
                 break;
         }
+        updateProject();
     }
 
     /** Detects the value change of date preferences. **/
@@ -397,32 +446,45 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         switch(preference.getKey()) {
             case "pref_set_expected_start":
             case "pref_update_expected_start":
-                // TODO: Set expected start date
+                project.expectedStartDate = new Date((long) newValue);
                 break;
             case "pref_set_expected_end":
             case "pref_update_expected_end":
-                // TODO: Set expected end date
+                project.expectedEndDate = new Date((long) newValue);
                 break;
             case "pref_set_actual_start":
             case "pref_update_actual_start":
-                // TODO: Set actual start date
+                project.actualStartDate = new Date((long) newValue);
                 break;
             case "pref_set_actual_end":
             case "pref_update_actual_end":
-                // TODO: Set actual end date
+                project.actualEndDate = new Date((long) newValue);
                 break;
         }
+        updateProject();
     }
 
     /** Detects the value change of security preferences. **/
     private void securityPrefChanged(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case "pref_set_password":
+                project.projectProtected = true;
             case "pref_update_password":
-                // TODO: Save project password
+                // Project password is already hashed within the preference
+                project.projectPass = (String) newValue;
+                updateProject();
                 break;
             case "pref_del_project":
-                // TODO: Delete project
+                // Delete the project would kick you back to ProjectSelectFragment
+                // Handler used here to reduce lag
+                if (getActivity() != null) {
+                    new Handler().postDelayed(() -> {
+                        projectDatabase.ProjectDao().delete(project);
+                        Toast.makeText(getContext(), R.string.p3_project_deleted, Toast.LENGTH_SHORT).show();
+                        UIFunctions.updateNavView((MainActivity) getActivity());
+                        ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+                    }, 0);
+                }
                 break;
         }
     }
@@ -450,6 +512,12 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             // Let super handle it
             super.onDisplayPreferenceDialog(preference);
         }
+    }
+
+    /** Updates the project and updates the current preference page. **/
+    private void updateProject() {
+        projectDatabase.ProjectDao().update(project);
+        displayPreference(currentPrefRoot);
     }
 
     /** Gets the dialog fragments for date preferences. **/

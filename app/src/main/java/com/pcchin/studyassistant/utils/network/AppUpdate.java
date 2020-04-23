@@ -113,11 +113,7 @@ public class AppUpdate {
         }
 
         // Check if there is a newer version of the app
-        if (isConnected) {
-            if (!isFromPlayStore()) {
-                checkServerUpdates();
-            }
-        }
+        if (isConnected && !isFromPlayStore()) checkServerUpdates();
     }
 
     /** Checks if the app is downloaded from the Play Store, separated for clarity. **/
@@ -138,66 +134,12 @@ public class AppUpdate {
         RequestQueue queue = Volley.newRequestQueue(activity);
 
         // Secondary Backup Server
-        JsonObjectRequest getSecBackupReleases = new JsonObjectRequest(SEC_BACKUP_API + UPDATE_PATH, null,
-                response -> showUpdateNotif(response, BACKUP_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), SEC_BACKUP_API));
-            error.printStackTrace();
-            queue.stop();
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-agent", USER_AGENT);
-                return headers;
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
-                return super.parseNetworkResponse(response);
-            }
-        };
-
+        JsonObjectRequest getSecBackupReleases = getReleasesRequest(SEC_BACKUP_API, queue,
+                null);
         // Backup Server
-        JsonObjectRequest getBackupReleases = new JsonObjectRequest(BACKUP_API + UPDATE_PATH, null,
-                response -> showUpdateNotif(response, BACKUP_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), BACKUP_API));
-            error.printStackTrace();
-            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to secondary backup server");
-            queue.add(getSecBackupReleases);
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-agent", USER_AGENT);
-                return headers;
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
-                return super.parseNetworkResponse(response);
-            }
-        };
-
+        JsonObjectRequest getBackupReleases = getReleasesRequest(BACKUP_API, queue, getSecBackupReleases);
         // Main Server
-        JsonObjectRequest getReleases = new JsonObjectRequest(MAIN_API + UPDATE_PATH, null,
-                response -> showUpdateNotif(response, MAIN_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), MAIN_API));
-            error.printStackTrace();
-            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
-            queue.add(getBackupReleases);
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-agent", USER_AGENT);
-                return headers;
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
-                return super.parseNetworkResponse(response);
-            }
-        };
+        JsonObjectRequest getReleases = getReleasesRequest(MAIN_API, queue, getBackupReleases);
 
         // Send request
         queue.add(getReleases);
@@ -276,7 +218,7 @@ public class AppUpdate {
         }
     }
 
-    /** Download and update the newest version of the app via GitLab,
+    /** Download and update the newest version of the app via Github,
      * separated from showUpdateNotif(JSONArray response) for clarity. **/
     private void updateViaGithub(String downloadLink) {
         // Generate output file name
@@ -382,10 +324,33 @@ public class AppUpdate {
         }
     }
 
-    /** Generates an error string based on the error message,
-     * called when Volley returns an unknown error.  **/
-    private static String genErrorString(String name, String msg, String url) {
-        return "Network Error: Volley returned error " + name + ":" + msg + " from " + url
-                + STACK_CASE_IS;
+    /** Generates the GET request for the release. **/
+    @NonNull
+    private JsonObjectRequest getReleasesRequest(String apiUrl, RequestQueue queue,
+                                                 JsonObjectRequest secondaryRelease) {
+        return new JsonObjectRequest(apiUrl + UPDATE_PATH, null,
+                response -> showUpdateNotif(response, apiUrl), error -> {
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error "
+                    + error.getMessage() + ":" + error.toString() + " from " + apiUrl + STACK_CASE_IS );
+            error.printStackTrace();
+            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
+            if (secondaryRelease == null) {
+                queue.stop();
+            } else {
+                queue.add(secondaryRelease);
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-agent", USER_AGENT);
+                return headers;
+            }
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(@NonNull NetworkResponse response) {
+                return super.parseNetworkResponse(response);
+            }
+        };
     }
 }

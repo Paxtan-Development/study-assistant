@@ -58,18 +58,8 @@ public class AutoDismissDialog extends DialogFragment {
      * @param displayView is the view that would be displayed in the AlertDialog.
      * @param buttonList is the display values for all 3 buttons. **/
     public AutoDismissDialog(String title, View displayView, String[] buttonList) {
-        DialogInterface.OnClickListener[] yListeners = new DialogInterface
-                .OnClickListener[]{null, null, null};
-        if (buttonList.length == 3) {
-            this.title = title;
-            this.displayView = displayView;
-            this.buttonList = buttonList;
-            this.yListeners = yListeners;
-            this.contentType = DIALOG_CONTENT_VIEW;
-            this.autoDismiss = true;
-        } else {
-            throw new IllegalArgumentException(ERROR_LENGTH_BTN_LIST);
-        }
+        this(title, displayView, buttonList, new DialogInterface
+                .OnClickListener[]{null, null, null});
     }
 
     /** Constructor used for showing a message with auto dismiss after a button press.

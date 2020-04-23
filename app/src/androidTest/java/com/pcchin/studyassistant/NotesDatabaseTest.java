@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
+import androidx.annotation.NonNull;
 import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
@@ -44,7 +45,7 @@ public class NotesDatabaseTest {
     public NotesDatabaseTest() {
         testHelper = new MigrationTestHelper(
                         InstrumentationRegistry.getInstrumentation(),
-                        SubjectDatabase.class.getCanonicalName(),
+                        Objects.requireNonNull(SubjectDatabase.class.getCanonicalName()),
                         new FrameworkSQLiteOpenHelperFactory());
     }
 
@@ -53,24 +54,10 @@ public class NotesDatabaseTest {
     public void migration_1to2_data_integrity() throws NoSuchFieldException, IOException {
         SupportSQLiteDatabase db_v1 = testHelper.createDatabase(TEST_DB_NAME, 1);
         Random rand = new Random();
-        for (int i = 0; i < rand.nextInt(TEST_COUNT); i++) {
-            String testTitle = AndroidTestFunctions.randomString(TEST_COUNT);
-            if (!Objects.equals(testTitle, testUser)) {
-                db_v1.execSQL("INSERT INTO notesSubject (_title, contents) VALUES ("
-                + AndroidTestFunctions.randomString(TEST_COUNT) + ", "
-                + AndroidTestFunctions.randomString(TEST_COUNT) + ");");
-            }
-        }
+        insertNotes(rand, db_v1);
         db_v1.execSQL("INSERT INTO notesSubject (_title, contents) VALUES ("
                 + testUser + ", " + testContents + ");");
-        for (int i = 0; i < rand.nextInt(TEST_COUNT); i++) {
-            String testTitle = AndroidTestFunctions.randomString(TEST_COUNT);
-            if (!Objects.equals(testTitle, testUser)) {
-                db_v1.execSQL("INSERT INTO notesSubject (_title, contents) VALUES ("
-                        + AndroidTestFunctions.randomString(TEST_COUNT) + ", "
-                        + AndroidTestFunctions.randomString(TEST_COUNT) + ");");
-            }
-        }
+        insertNotes(rand, db_v1);
         db_v1.close();
 
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true,
@@ -84,6 +71,17 @@ public class NotesDatabaseTest {
             Assert.assertEquals(subject.sortOrder, TEST_COUNT);
         } else {
             throw new NoSuchFieldException("User not found in notes.");
+        }
+    }
+
+    private void insertNotes(@NonNull Random rand, SupportSQLiteDatabase db_v1) {
+        for (int i = 0; i < rand.nextInt(TEST_COUNT); i++) {
+            String testTitle = AndroidTestFunctions.randomString(TEST_COUNT);
+            if (!Objects.equals(testTitle, testUser)) {
+                db_v1.execSQL("INSERT INTO notesSubject (_title, contents) VALUES ("
+                        + AndroidTestFunctions.randomString(TEST_COUNT) + ", "
+                        + AndroidTestFunctions.randomString(TEST_COUNT) + ");");
+            }
         }
     }
 }

@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
+    private static final String SHA_512 = "SHA-512";
     private static final String SHA_MISSING_ERROR = "Cryptography Error: Algorithm SHA-512 " +
             "not found in MessageDigest.";
 
@@ -78,7 +79,7 @@ public final class SecurityFunctions {
         byte[] originalByte = null;
         // 1) SHA
         try {
-            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             originalByte = shaDigest.digest(original.getBytes());
         } catch (NoSuchAlgorithmException e) {
             Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
@@ -97,7 +98,7 @@ public final class SecurityFunctions {
 
         // 2) SHA
         try {
-            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             originalByte = shaDigest.digest(originalByte);
         } catch (NoSuchAlgorithmException e) {
             Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
@@ -114,7 +115,7 @@ public final class SecurityFunctions {
         byte[] originalByte = null, hashedPassword = null;
         // 1) SHA
         try {
-            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             originalByte = shaDigest.digest(original.getBytes());
             hashedPassword = shaDigest.digest(salt.getBytes());
         } catch (NoSuchAlgorithmException e) {
@@ -122,7 +123,12 @@ public final class SecurityFunctions {
         }
 
         // 2) PBKDF
-        originalByte = pbkdf2(originalByte, salt.getBytes(), 10000);
+        try {
+            originalByte = pbkdf2(originalByte, salt.getBytes(), 10000);
+        } catch (NullPointerException e) {
+            Log.e(MainActivity.LOG_APP_NAME, "PBKDF2 cipher throws NullPointerException, " +
+                    "error is " + e.toString());
+        }
 
         // 3) Blowfish
         originalByte = blowfish(originalByte, hashedPassword, true);
@@ -138,7 +144,7 @@ public final class SecurityFunctions {
 
         // 2) SHA
         try {
-            MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
+            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             ivBytes = shaDigest.digest(iv.getBytes());
         } catch (NoSuchAlgorithmException e) {
             Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);

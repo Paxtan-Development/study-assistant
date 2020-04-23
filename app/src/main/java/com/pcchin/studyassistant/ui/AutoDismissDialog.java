@@ -32,6 +32,10 @@ public class AutoDismissDialog extends DialogFragment {
     private static final int DIALOG_CONTENT_VIEW = 2;
     private static final int DIALOG_CONTENT_LIST = 3;
 
+    private static final String ERROR_LENGTH_BTN_LIST = "Length of buttonList is not 3";
+    private static final String ERROR_LENGTH_BTN_OR_LISTENER = "Length of buttonList is not 3 or " +
+            "length of yListeners is not 3";
+
     private String title, message;
     private String[] buttonList;
     private int contentType, arrayRes;
@@ -64,7 +68,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_VIEW;
             this.autoDismiss = true;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_LIST);
         }
     }
 
@@ -83,8 +87,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_MESSAGE;
             this.autoDismiss = true;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3 or " +
-                    "length of yListeners is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_OR_LISTENER);
         }
     }
 
@@ -103,8 +106,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_VIEW;
             this.autoDismiss = true;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3 or " +
-                    "length of yListeners is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_OR_LISTENER);
         }
     }
 
@@ -125,8 +127,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_LIST;
             this.autoDismiss = true;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3 or " +
-                    "length of yListeners is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_OR_LISTENER);
         }
     }
 
@@ -146,7 +147,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_MESSAGE;
             this.autoDismiss = false;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_LIST);
         }
     }
 
@@ -166,7 +167,7 @@ public class AutoDismissDialog extends DialogFragment {
             this.contentType = DIALOG_CONTENT_VIEW;
             this.autoDismiss = false;
         } else {
-            throw new IllegalArgumentException("Length of buttonList is not 3");
+            throw new IllegalArgumentException(ERROR_LENGTH_BTN_LIST);
         }
     }
 

@@ -139,9 +139,7 @@ public class AppUpdate {
         // Secondary Backup Server
         JsonObjectRequest getSecBackupReleases = new JsonObjectRequest(SEC_BACKUP_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, BACKUP_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
-                    error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
-                    + ", stack trace is");
+            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), SEC_BACKUP_API));
             error.printStackTrace();
             queue.stop();
         }) {
@@ -161,9 +159,7 @@ public class AppUpdate {
         // Backup Server
         JsonObjectRequest getBackupReleases = new JsonObjectRequest(BACKUP_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, BACKUP_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
-                    error.getMessage() + ":" + error.toString() + " from " + BACKUP_API
-                    + ", stack trace is");
+            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), BACKUP_API));
             error.printStackTrace();
             Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to secondary backup server");
             queue.add(getSecBackupReleases);
@@ -184,9 +180,7 @@ public class AppUpdate {
         // Main Server
         JsonObjectRequest getReleases = new JsonObjectRequest(MAIN_API + UPDATE_PATH, null,
                 response -> showUpdateNotif(response, MAIN_API), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error " +
-                    error.getMessage() + ":" + error.toString() + " from " + MAIN_API
-                    + ", stack trace is");
+            Log.d(MainActivity.LOG_APP_NAME, genErrorString(error.getMessage(), error.toString(), MAIN_API));
             error.printStackTrace();
             Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
             queue.add(getBackupReleases);
@@ -384,5 +378,12 @@ public class AppUpdate {
                 queue.add(request);
             }
         }
+    }
+
+    /** Generates an error string based on the error message,
+     * called when Volley returns an unknown error.  **/
+    private static String genErrorString(String name, String msg, String url) {
+        return "Network Error: Volley returned error " + name + ":" + msg + " from " + url
+                + ", stack trace is";
     }
 }

@@ -37,6 +37,8 @@ import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
+    private static final String SHA_MISSING_ERROR = "Cryptography Error: Algorithm SHA-512 " +
+            "not found in MessageDigest.";
 
     /** Constructor made private to simulate static class. **/
     private SecurityFunctions() {}
@@ -79,8 +81,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
             originalByte = shaDigest.digest(original.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
-                    " MessageDigest.");
+            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 2) Blowfish
@@ -99,8 +100,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
             originalByte = shaDigest.digest(originalByte);
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
-                    " MessageDigest.");
+            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 3) Blowfish
@@ -118,8 +118,7 @@ public final class SecurityFunctions {
             originalByte = shaDigest.digest(original.getBytes());
             hashedPassword = shaDigest.digest(salt.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
-                    " MessageDigest.");
+            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 2) PBKDF
@@ -142,8 +141,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance("SHA-512");
             ivBytes = shaDigest.digest(iv.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "Cryptography Error: Algorithm SHA-512 not found in" +
-                    " MessageDigest.");
+            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 3) AES

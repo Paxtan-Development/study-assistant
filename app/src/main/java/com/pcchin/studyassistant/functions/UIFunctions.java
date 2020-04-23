@@ -15,14 +15,7 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.room.Room;
 import android.content.DialogInterface;
-import androidx.annotation.NonNull;
-
-import com.google.android.material.navigation.NavigationView;
-
 import android.os.Build;
 import android.os.Handler;
 import android.text.Html;
@@ -35,21 +28,20 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputLayout;
-import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
 import com.pcchin.studyassistant.fragment.project.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
@@ -57,6 +49,9 @@ import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
+import com.pcchin.studyassistant.ui.AutoDismissDialog;
+import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,10 +117,7 @@ public final class UIFunctions {
         Menu currentMenu = navView.getMenu();
 
         // Add subjects
-        final SubjectDatabase subjectDatabase = Room.databaseBuilder(activity, SubjectDatabase.class,
-                MainActivity.DATABASE_NOTES)
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                .allowMainThreadQueries().build();
+        final SubjectDatabase subjectDatabase = GeneralFunctions.getSubjectDatabase(activity);
         SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);
         List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
         for (final NotesSubject subject: subjectList) {
@@ -158,10 +150,7 @@ public final class UIFunctions {
 
         // Add projects
         SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
-        ProjectDatabase projectDatabase = Room.databaseBuilder(activity, ProjectDatabase.class,
-                MainActivity.DATABASE_PROJECT)
-                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                .allowMainThreadQueries().build();
+        ProjectDatabase projectDatabase = GeneralFunctions.getProjectDatabase(activity);
         List<ProjectData> projectList = projectDatabase.ProjectDao().getAllProjects();
         for (ProjectData project : projectList) {
             MenuItem projItem = projMenu.add(project.projectTitle);
@@ -226,10 +215,7 @@ public final class UIFunctions {
             Menu navViewMenu = activity.bottomNavView.getMenu();
 
             // Set up database
-            ProjectDatabase database = Room.databaseBuilder(activity, ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            ProjectDatabase database = GeneralFunctions.getProjectDatabase(activity);
 
             // Bottom nav view
             if (res == R.menu.menu_p_bottom) {

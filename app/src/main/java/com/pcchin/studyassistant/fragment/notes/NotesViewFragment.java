@@ -44,20 +44,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -101,10 +99,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
 
         if (getContext() != null) {
             // Get notes required from notes
-            SubjectDatabase database = Room.databaseBuilder(getContext(), SubjectDatabase.class,
-                    MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
             ArrayList<ArrayList<String>> allNotes = database
                     .SubjectDao().search(notesSubject).contents;
 
@@ -263,10 +258,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                 if (inputLayout.getEditText() != null) {
                     inputText = inputLayout.getEditText().getText().toString();
                 }
-                SubjectDatabase database = Room.databaseBuilder(getContext(),
-                        SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                        .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                        .allowMainThreadQueries().build();
+                SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                 NotesSubject subject = database.SubjectDao().search(notesSubject);
                 ArrayList<ArrayList<String>> contents = subject.contents;
 
@@ -296,10 +288,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
         if (getContext() != null) {
-            SubjectDatabase database = Room.databaseBuilder(getContext(),
-                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
             NotesSubject subject = database.SubjectDao().search(notesSubject);
             ArrayList<ArrayList<String>> contents = subject.contents;
 
@@ -384,9 +373,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                 if (getActivity() != null) {
                     notesInfo.set(4, null);
                     notesInfo.set(5, null);
-                    SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                            MainActivity.DATABASE_NOTES).allowMainThreadQueries()
-                            .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+                    SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                     NotesSubject subject = database.SubjectDao().search(notesSubject);
                     if (subject != null) {
                         ArrayList<ArrayList<String>> updateArray = subject.contents;
@@ -418,10 +405,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                             manager.cancel(alertIntent);
                         }
 
-                        SubjectDatabase database = Room.databaseBuilder(getActivity(),
-                                SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                .allowMainThreadQueries().build();
+                        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                         NotesSubject currentSubject = database.SubjectDao().search(notesSubject);
                         if (notesSubject != null) {
                             // Check if contents is valid
@@ -503,10 +487,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                     FileFunctions.checkNoteIntegrity(notesInfo);
                     notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
                     notesInfo.set(5, String.valueOf(requestCode));
-                    SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                            MainActivity.DATABASE_NOTES)
-                            .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                            .allowMainThreadQueries().build();
+                    SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                     NotesSubject subject = database.SubjectDao().search(notesSubject);
                     if (subject != null) {
                         ArrayList<ArrayList<String>> updateArray = subject.contents;
@@ -530,7 +511,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
                         hasAlert = true;
                         Toast.makeText(getContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
                     }
-                    GeneralFunctions.reloadFragment(this);
+                    GeneralFunctions.reloadFragment(NotesViewFragment.this);
                 }
             } else {
                 // The time selected is in the past

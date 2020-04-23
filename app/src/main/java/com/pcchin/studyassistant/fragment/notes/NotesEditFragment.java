@@ -13,8 +13,6 @@
 
 package com.pcchin.studyassistant.fragment.notes;
 
-import androidx.room.Room;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -22,9 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,15 +32,18 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.text.ParseException;
@@ -110,10 +108,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null && getActivity() != null) {
-            database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                    MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            database = GeneralFunctions.getSubjectDatabase(getActivity());
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);

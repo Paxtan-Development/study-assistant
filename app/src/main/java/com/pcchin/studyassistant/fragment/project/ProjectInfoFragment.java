@@ -17,11 +17,6 @@ package com.pcchin.studyassistant.fragment.project;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.room.Room;
-
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,21 +26,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.ui.AutoDismissDialog;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.ui.MainActivity;
 
 import java.io.File;
 import java.util.Date;
@@ -91,10 +89,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER),
                     updateNavView = getArguments().getBoolean(ARG_UPDATE_NAV_VIEW);
 
-            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
             // Check whether the values provided are valid and returns the required role and member
@@ -255,10 +250,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     public void onNotesPressed() {
         if (project.associatedSubject != null && getActivity() != null) {
             // Opens subject database
-            SubjectDatabase subjDatabase = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                    MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            SubjectDatabase subjDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
             NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
             if (targetSubject == null) {
                 // Ask the user whether to remove the associated subject

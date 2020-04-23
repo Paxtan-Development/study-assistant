@@ -23,12 +23,11 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.room.Room;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.MainActivity;
 
 import java.util.ArrayList;
@@ -53,10 +52,7 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         }
 
         // Clear data from database
-        SubjectDatabase database = Room.databaseBuilder(context, SubjectDatabase.class,
-                MainActivity.DATABASE_NOTES)
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                .allowMainThreadQueries().build();
+        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(context);
         NotesSubject subject = database.SubjectDao().search(subjectTitle);
         if (subject != null) {
             ArrayList<ArrayList<String>> notesList = subject.contents;

@@ -27,19 +27,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.ui.MainActivity;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -397,10 +396,7 @@ public class ImportSubject {
     private void importSubjectToDatabase(String title, ArrayList<ArrayList<String>> contents,
                                          int sortOrder) {
         if (title.length() > 0) {
-            SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                    MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            SubjectDatabase database = GeneralFunctions.getSubjectDatabase(activity);
             // Import to notes
             if (database.SubjectDao().search(title) != null) {
                 // Subject conflict
@@ -440,10 +436,7 @@ public class ImportSubject {
             inputLayout.getEditText().setText(title);
         }
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-        SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                MainActivity.DATABASE_NOTES)
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                .allowMainThreadQueries().build();
+        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(activity);
 
         DialogInterface.OnShowListener renameListener = dialogInterface -> {
             ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
@@ -481,10 +474,7 @@ public class ImportSubject {
      * Notes that are exactly the same will not be re-imported,
      * sort order will inherit the original subject stored on the notes. **/
     private void mergeSubjects(String title, ArrayList<ArrayList<String>> newContent) {
-        SubjectDatabase database = Room.databaseBuilder(activity, SubjectDatabase.class,
-                MainActivity.DATABASE_NOTES)
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                .allowMainThreadQueries().build();
+        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(activity);
         NotesSubject editSubject = database.SubjectDao().search(title);
         ArrayList<ArrayList<String>> oldContents = editSubject.contents;
 

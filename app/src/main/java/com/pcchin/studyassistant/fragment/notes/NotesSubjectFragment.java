@@ -15,10 +15,6 @@ package com.pcchin.studyassistant.fragment.notes;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-
-import androidx.core.content.ContextCompat;
-import androidx.room.Room;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,10 +23,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
@@ -45,20 +37,24 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.utils.misc.SortingComparators;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.SecurityFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.ui.AutoDismissDialog;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.utils.misc.SortingComparators;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 import com.pcchin.studyassistant.utils.notes.NotesSortAdaptor;
 
@@ -125,10 +121,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            subjectDatabase = Room.databaseBuilder(getActivity(),
-                                    SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                    .allowMainThreadQueries().build();
+            subjectDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
 
             // Get basic info & set title
             if (getArguments() != null) {
@@ -348,7 +341,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         subjectDatabase.SubjectDao().update(subject1);
                         dialogInterface.dismiss();
                         sortNotes(subject1);
-                        GeneralFunctions.reloadFragment(this);
+                        GeneralFunctions.reloadFragment(NotesSubjectFragment.this);
                     }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
                     .show(getParentFragmentManager(), "NotesSubjectFragment.2");
         }
@@ -679,10 +672,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         }
 
                         // Delete subject
-                        SubjectDatabase database = Room.databaseBuilder(getActivity(),
-                                SubjectDatabase.class, MainActivity.DATABASE_NOTES)
-                                .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                                .allowMainThreadQueries().build();
+                        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                         NotesSubject delTarget = database.SubjectDao().search(notesSubject);
                         if (delTarget != null) {
                             database.SubjectDao().delete(delTarget);

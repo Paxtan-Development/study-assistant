@@ -38,7 +38,7 @@ public class PasswordPreference extends DialogPreference {
     /** Stores the password for it to be handled within ProjectSettingsFragment. **/
     void setPassword(String hashedPass) {
         persistString(hashedPass);
-        getOnPreferenceChangeListener().onPreferenceChange(this, hashedPass);
+        getOnPreferenceChangeListener().onPreferenceChange(PasswordPreference.this, hashedPass);
     }
 
     /** Returns the layout resource of the DatePicker. **/

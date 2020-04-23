@@ -54,6 +54,6 @@ public class DefaultDialogPreference extends DialogPreference {
     /** Stores a value into the SharedPreference when the positive value is clicked. **/
     void positiveClicked() {
         persistInt(0);
-        getOnPreferenceChangeListener().onPreferenceChange(this, 0);
+        getOnPreferenceChangeListener().onPreferenceChange(DefaultDialogPreference.this, 0);
     }
 }

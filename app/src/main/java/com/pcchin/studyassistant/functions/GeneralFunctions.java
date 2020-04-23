@@ -14,9 +14,16 @@
 package com.pcchin.studyassistant.functions;
 
 import android.app.Activity;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+
+import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.ui.MainActivity;
 
 /** Functions generally used throughout the app. **/
 public final class GeneralFunctions {
@@ -32,5 +39,22 @@ public final class GeneralFunctions {
         target.getParentFragmentManager().beginTransaction()
                 .detach(target)
                 .attach(target).commit();
+    }
+
+    /** Returns the subject database. **/
+    @NonNull
+    public static SubjectDatabase getSubjectDatabase(Context context) {
+        return Room.databaseBuilder(context, SubjectDatabase.class,
+                MainActivity.DATABASE_NOTES).allowMainThreadQueries()
+                .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+    }
+
+    /** Returns the project database. **/
+    @NonNull
+    public static ProjectDatabase getProjectDatabase(Context context) {
+        return Room.databaseBuilder(context, ProjectDatabase.class,
+                MainActivity.DATABASE_PROJECT)
+                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+                .allowMainThreadQueries().build();
     }
 }

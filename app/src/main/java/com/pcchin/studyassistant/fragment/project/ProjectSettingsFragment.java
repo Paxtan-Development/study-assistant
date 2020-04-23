@@ -28,18 +28,17 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
-import androidx.room.Room;
 
 import com.pcchin.dtpreference.DatePreference;
 import com.pcchin.dtpreference.dialog.DatePreferenceDialog;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.DefaultDialogPreference;
 import com.pcchin.studyassistant.preference.DefaultDialogPreferenceDialog;
@@ -103,10 +102,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             String projectID = getArguments().getString(ARG_ID);
             id2 = getArguments().getString(ARG_ID2);
             isMember = getArguments().getBoolean(ARG_IS_MEMBER);
-            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
             Object[] idValidity = UIFunctions.checkIdValidity(getActivity(), projectDatabase,
@@ -128,7 +124,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.p3_preference_list);
         PreferenceManager pManager = getPreferenceManager();
-        pManager.setOnPreferenceTreeClickListener(this);
+        pManager.setOnPreferenceTreeClickListener(ProjectSettingsFragment.this);
     }
 
     /** Delegates the preference click listeners to their own functions. **/
@@ -193,7 +189,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** The tree click listeners for the feature preferences. **/
-    private void featurePreferenceClick(Preference preference) {
+    private void featurePreferenceClick(@NonNull Preference preference) {
         switch(preference.getKey()) {
             case "pref_status_icon":
                 switch(project.projectStatusIcon) {
@@ -217,7 +213,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** The tree click listeners for the date preferences. **/
-    private void datePreferenceClick(Preference preference) {
+    private void datePreferenceClick(@NonNull Preference preference) {
         switch(preference.getKey()) {
             case "pref_remove_expected_start":
                 project.expectedStartDate = null;
@@ -274,7 +270,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                 if (!currentPref.getClass().equals(Preference.class)) {
                     // Don't set up listeners for plain preferences as they are handled through clicks
                     // This allows for the preferences to be less resource intensive
-                    currentPref.setOnPreferenceChangeListener(this);
+                    currentPref.setOnPreferenceChangeListener(ProjectSettingsFragment.this);
                 }
             }
         }, 0);
@@ -305,9 +301,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         // Handler for setting related subject as database access is needed
         new Handler().postDelayed(() -> {
             if (getActivity() != null) {
-                SubjectDatabase database = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                        MainActivity.DATABASE_NOTES).allowMainThreadQueries()
-                        .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+                SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
                 List<NotesSubject> subjectList = database.SubjectDao().getAll();
                 CharSequence[] subjectNameList = new CharSequence[subjectList.size()];
                 for (int i = 0; i < subjectList.size(); i++) {
@@ -381,7 +375,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Detects the value change of general preferences. **/
-    private void generalPrefChanged(Preference preference, Object newValue) {
+    private void generalPrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case "pref_update_title":
                 // Set activity title
@@ -401,7 +395,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Detects the value change of feature preferences. **/
-    private void featurePrefChanged(Preference preference, Object newValue) {
+    private void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case "pref_members":
                 project.membersEnabled = (boolean) newValue;
@@ -442,7 +436,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Detects the value change of date preferences. **/
-    private void datePrefChanged(Preference preference, Object newValue) {
+    private void datePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case "pref_set_expected_start":
             case "pref_update_expected_start":
@@ -465,7 +459,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Detects the value change of security preferences. **/
-    private void securityPrefChanged(Preference preference, Object newValue) {
+    private void securityPrefChanged(@NonNull Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case "pref_set_password":
                 project.projectProtected = true;
@@ -506,7 +500,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         }
         if (dialogFragment != null) {
             // If it is one of our preferences, show it
-            dialogFragment.setTargetFragment(this, 0);
+            dialogFragment.setTargetFragment(ProjectSettingsFragment.this, 0);
             dialogFragment.show(getParentFragmentManager(), "ProjectSettingsFragment.1");
         } else {
             // Let super handle it
@@ -590,6 +584,20 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             displayPreference(PREF_ROOT);
             currentPrefRoot = PREF_ROOT;
             return true;
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
         }
     }
 }

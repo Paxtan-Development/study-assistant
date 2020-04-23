@@ -25,7 +25,6 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
@@ -33,6 +32,7 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.MainActivity;
@@ -61,10 +61,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
         } else {
             onBackPressed();
         }

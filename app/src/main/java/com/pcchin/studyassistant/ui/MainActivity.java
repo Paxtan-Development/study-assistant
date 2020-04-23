@@ -41,7 +41,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.room.Room;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -62,9 +61,11 @@ import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.utils.network.AppUpdate;
 import com.pcchin.studyassistant.utils.notes.ImportSubject;
+import com.pcchin.studyassistant.utils.project.ImportProjectIcon;
 
 import java.io.File;
 import java.util.Date;
@@ -118,15 +119,15 @@ public class MainActivity extends AppCompatActivity
         // Check if app is opened to process files
         Uri intentUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
         if (intentUri != null) {
-            String receiveFilePath = FileFunctions.getRealPathFromUri(this, intentUri);
+            String receiveFilePath = FileFunctions.getRealPathFromUri(MainActivity.this, intentUri);
             // Check if file type matches the required file types
             if (receiveFilePath.endsWith(".subject")) {
-                new ImportSubject(this).importSubjectFile(receiveFilePath);
+                new ImportSubject(MainActivity.this).importSubjectFile(receiveFilePath);
             } else if (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
                 || receiveFilePath.endsWith(".Zip")) {
-                new ImportSubject(this).importZipConfirm(receiveFilePath);
+                new ImportSubject(MainActivity.this).importZipConfirm(receiveFilePath);
             } else {
-                Toast.makeText(this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
             }
         }
         pager = findViewById(R.id.base_pager);
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity
 
             // Get permission to read and write files
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                    .checkSelfPermission(this, Manifest.permission
+                    .checkSelfPermission(MainActivity.this, Manifest.permission
                     .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -166,10 +167,7 @@ public class MainActivity extends AppCompatActivity
 
             // Set up Admin & Member roles in database for projects
             new Handler().post(() -> {
-                ProjectDatabase projectDatabase = Room.databaseBuilder(this,
-                        ProjectDatabase.class, DATABASE_PROJECT)
-                        .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                        .allowMainThreadQueries().build();
+                ProjectDatabase projectDatabase = GeneralFunctions.getProjectDatabase(MainActivity.this);
                 RoleData admin = projectDatabase.RoleDao().searchByID("admin");
                 if (admin == null) {
                     admin = new RoleData("admin", "", "Admin", "", "");
@@ -262,12 +260,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.m3_nav_open, R.string.m3_nav_close);
+               MainActivity.this, drawer, toolbar, R.string.m3_nav_open, R.string.m3_nav_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(MainActivity.this);
 
-        UIFunctions.updateNavView(this);
+        UIFunctions.updateNavView(MainActivity.this);
     }
 
     /** Delegates the items that are selected on the menu to the respective fragments. **/
@@ -416,7 +414,7 @@ public class MainActivity extends AppCompatActivity
                                            @NonNull int[] grantResults) {
         if (requestCode == EXTERNAL_STORAGE_PERMISSION) {
             if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, R.string.error_write_permission_denied,
+                Toast.makeText(MainActivity.this, R.string.error_write_permission_denied,
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -428,19 +426,20 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data.getData() != null) {
-            String targetFile = FileFunctions.getRealPathFromUri(this, data.getData());
+            String targetFile = FileFunctions.getRealPathFromUri(MainActivity.this, data.getData());
             if (requestCode == SELECT_ZIP_FILE) {
                 // Sample URI:
                 // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
-                new ImportSubject(this).importZipConfirm(targetFile);
+                new ImportSubject(MainActivity.this).importZipConfirm(targetFile);
             } else if (requestCode == SELECT_SUBJECT_FILE) {
                 if (targetFile.endsWith(".subject")) {
-                    new ImportSubject(this).importSubjectFile(targetFile);
+                    new ImportSubject(MainActivity.this).importSubjectFile(targetFile);
                 } else {
-                    Toast.makeText(this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == SELECT_PROJECT_ICON) {
                 // TODO: Forward image to project settings
+                new ImportProjectIcon(MainActivity.this).start();
             } else {
                 // TODO: Import media to project
             }
@@ -544,7 +543,7 @@ public class MainActivity extends AppCompatActivity
         View view = getCurrentFocus();
         //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
-            view = new View(this);
+            view = new View(MainActivity.this);
         }
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);

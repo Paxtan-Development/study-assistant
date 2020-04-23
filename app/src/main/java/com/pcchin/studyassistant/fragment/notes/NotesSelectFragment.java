@@ -14,11 +14,7 @@
 package com.pcchin.studyassistant.fragment.notes;
 
 import android.annotation.SuppressLint;
-import androidx.room.Room;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,18 +24,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.fragment.main.MainFragment;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 import java.util.List;
-
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     private SubjectDatabase subjectDatabase;
@@ -52,10 +50,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            subjectDatabase = Room.databaseBuilder(getActivity(), SubjectDatabase.class,
-                    MainActivity.DATABASE_NOTES)
-                    .addMigrations(NotesSubjectMigration.MIGRATION_1_2)
-                    .allowMainThreadQueries().build();
+            subjectDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
             getActivity().setTitle(R.string.notes);
         }
         setHasOptionsMenu(true);

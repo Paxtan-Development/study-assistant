@@ -21,7 +21,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -39,6 +38,7 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
@@ -74,10 +74,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            projectDatabase = Room.databaseBuilder(getActivity(),
-                    ProjectDatabase.class, MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
             if (getArguments() != null) {
                 project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
             }

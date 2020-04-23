@@ -17,7 +17,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +29,7 @@ import android.widget.LinearLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
@@ -49,10 +49,7 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            projectDatabase = Room.databaseBuilder(getActivity(), ProjectDatabase.class,
-                    MainActivity.DATABASE_PROJECT)
-                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
-                    .allowMainThreadQueries().build();
+            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
             getActivity().setTitle(R.string.projects);
         }
         setHasOptionsMenu(true);

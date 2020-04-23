@@ -19,7 +19,7 @@
     android:id="@+id/p6_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.project.ProjectCreateFragment">
+    tools:context=".fragment.project.create.ProjectCreateFragment">
 
     <LinearLayout
         android:id="@+id/p6"

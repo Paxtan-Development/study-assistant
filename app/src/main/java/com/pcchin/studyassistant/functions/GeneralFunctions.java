@@ -23,7 +23,9 @@ import androidx.room.Room;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 /** Functions generally used throughout the app. **/
 public final class GeneralFunctions {
@@ -56,5 +58,31 @@ public final class GeneralFunctions {
                 MainActivity.DATABASE_PROJECT)
                 .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
                 .allowMainThreadQueries().build();
+    }
+
+    /** Generates a valid String based on its type. **/
+    public static String generateValidProjectString(@NonNull RandomString rand, int type,
+                                                    ProjectDatabase projectDatabase) {
+        String returnString = rand.nextString();
+        switch (type) {
+            case ProjectCreateFragment.TYPE_PROJECT:
+                while (projectDatabase.ProjectDao().searchByID(returnString) != null) {
+                    returnString = rand.nextString();
+                }
+                break;
+            case ProjectCreateFragment.TYPE_MEMBER:
+                while (projectDatabase.MemberDao().searchByID(returnString) != null) {
+                    returnString = rand.nextString();
+                }
+                break;
+            case ProjectCreateFragment.TYPE_ROLE:
+                while (projectDatabase.RoleDao().searchByID(returnString) != null) {
+                    returnString = rand.nextString();
+                }
+                break;
+            default:
+                returnString = "";
+        }
+        return returnString;
     }
 }

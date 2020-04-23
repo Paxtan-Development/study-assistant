@@ -81,6 +81,7 @@ public class AppUpdate {
     @SuppressWarnings("ConstantConditions")
     private static final String USER_AGENT = System.getProperty("http.agent","")
             .replaceAll("^.+?/\\S+", String.format("Study-Assistant/%s", BuildConfig.VERSION_NAME));
+    private static final String STACK_CASE_IS = ", stack trace is";
 
     private final boolean calledFromNotif;
     private final MainActivity activity;
@@ -344,12 +345,13 @@ public class AppUpdate {
                         }
                     }
                 } catch (FileNotFoundException e) {
-                    Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName + " not found, stack trace is ");
+                    Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName
+                            + " not found" + STACK_CASE_IS);
                     e.printStackTrace();
                     Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
                 } catch (IOException e2) {
                     Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
-                            + ", stack trace is");
+                            + STACK_CASE_IS);
                     e2.printStackTrace();
                     Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
@@ -361,7 +363,7 @@ public class AppUpdate {
             }, error -> {
                 downloadDialog.dismiss();
                 Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
-                        + ", response given is " + error.getMessage() + ", stack trace is");
+                        + ", response given is " + error.getMessage() + STACK_CASE_IS);
                 error.printStackTrace();
                 Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
             }, null){
@@ -384,6 +386,6 @@ public class AppUpdate {
      * called when Volley returns an unknown error.  **/
     private static String genErrorString(String name, String msg, String url) {
         return "Network Error: Volley returned error " + name + ":" + msg + " from " + url
-                + ", stack trace is";
+                + STACK_CASE_IS;
     }
 }

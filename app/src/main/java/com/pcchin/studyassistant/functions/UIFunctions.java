@@ -42,7 +42,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.fragment.project.ProjectCreateFragment;
+import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;

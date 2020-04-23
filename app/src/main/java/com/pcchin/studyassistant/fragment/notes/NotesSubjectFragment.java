@@ -76,7 +76,8 @@ import java.util.Date;
 
 public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_SUBJECT = "noteSubject",
-            ARG_PREV = "previousOrder";
+            ARG_PREV = "previousOrder",
+            DOWNLOAD_FOLDER = "/storage/emulated/0/Download/";
     private static final int MAXLINES = 4;
 
     private static final int[] sortingList = new int[]{NotesSubject.SORT_ALPHABETICAL_ASC,
@@ -465,7 +466,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
             try {
                 // Creates ZIP file
                 String exportFilePath = FileFunctions.generateValidFile(
-                        "/storage/emulated/0/Download/" + notesSubject, ".zip");
+                        DOWNLOAD_FOLDER + notesSubject, ".zip");
                 ZipFile exportFile;
                 if (password.length() >= 8) {
                     exportFile = new ZipFile(exportFilePath, password.toCharArray());
@@ -567,11 +568,11 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                 }
                 if (responseText.length() == 0 || responseText.length() >= 8) {
                     // Set output file name
-                    String outputFileName = "/storage/emulated/0/Download/" + notesSubject
+                    String outputFileName = DOWNLOAD_FOLDER + notesSubject
                             + ".subject";
                     int count = 0;
                     while (new File(outputFileName).exists()) {
-                        outputFileName = "/storage/emulated/0/Download/" + notesSubject
+                        outputFileName = DOWNLOAD_FOLDER + notesSubject
                                 + "(" + count + ").subject";
                     }
 

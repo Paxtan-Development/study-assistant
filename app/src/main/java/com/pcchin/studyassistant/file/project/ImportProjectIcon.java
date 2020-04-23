@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.utils.project;
+package com.pcchin.studyassistant.file.project;
 
 import com.pcchin.studyassistant.ui.MainActivity;
 

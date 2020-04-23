@@ -48,6 +48,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.file.notes.ImportSubjectSubject;
+import com.pcchin.studyassistant.file.notes.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
@@ -64,8 +66,7 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.utils.network.AppUpdate;
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
-import com.pcchin.studyassistant.utils.project.ImportProjectIcon;
+import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 
 import java.io.File;
 import java.util.Date;
@@ -122,10 +123,10 @@ public class MainActivity extends AppCompatActivity
             String receiveFilePath = FileFunctions.getRealPathFromUri(MainActivity.this, intentUri);
             // Check if file type matches the required file types
             if (receiveFilePath.endsWith(".subject")) {
-                new ImportSubject(MainActivity.this).importSubjectFile(receiveFilePath);
+                new ImportSubjectSubject(MainActivity.this).importSubjectFile(receiveFilePath);
             } else if (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
                 || receiveFilePath.endsWith(".Zip")) {
-                new ImportSubject(MainActivity.this).importZipConfirm(receiveFilePath);
+                new ImportSubjectZip(MainActivity.this).importZipConfirm(receiveFilePath);
             } else {
                 Toast.makeText(MainActivity.this, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
             }
@@ -420,8 +421,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** External intent is returned here from picking a file from
-     * @see ImportSubject . The file would be sent back to a new ImportSubject to be imported. **/
+    /** External intent is returned here from picking a file from the following:
+     * @see ImportSubjectZip
+     * @see ImportSubjectSubject
+     * @see ImportProjectIcon
+     * The file would be sent back to a new ImportSubject to be imported. **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -430,10 +434,10 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == SELECT_ZIP_FILE) {
                 // Sample URI:
                 // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
-                new ImportSubject(MainActivity.this).importZipConfirm(targetFile);
+                new ImportSubjectZip(MainActivity.this).importZipConfirm(targetFile);
             } else if (requestCode == SELECT_SUBJECT_FILE) {
                 if (targetFile.endsWith(".subject")) {
-                    new ImportSubject(MainActivity.this).importSubjectFile(targetFile);
+                    new ImportSubjectSubject(MainActivity.this).importSubjectFile(targetFile);
                 } else {
                     Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }

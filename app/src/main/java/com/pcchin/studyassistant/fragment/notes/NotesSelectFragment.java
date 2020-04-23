@@ -30,12 +30,12 @@ import androidx.fragment.app.Fragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.file.notes.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 import java.util.List;
 
@@ -100,7 +100,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
 
     /** Imports an existing zip/.subject file. **/
     public void onImportPressed() {
-        new Handler().post(() -> ImportSubject.displayImportDialog((MainActivity) getActivity()));
+        new Handler().post(() -> ImportSubjectStatic.displayImportDialog((MainActivity) getActivity()));
     }
 
     /** Returns to

@@ -40,10 +40,11 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.file.notes.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
+import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
@@ -51,7 +52,6 @@ import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.MainActivity;
-import com.pcchin.studyassistant.utils.notes.ImportSubject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,7 +144,7 @@ public final class UIFunctions {
         MenuItem subjImport = subjMenu.add(R.string.m3_data_import);
         subjImport.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            new Handler().post(() -> ImportSubject.displayImportDialog(activity));
+            new Handler().post(() -> ImportSubjectStatic.displayImportDialog(activity));
             return true;
         });
 

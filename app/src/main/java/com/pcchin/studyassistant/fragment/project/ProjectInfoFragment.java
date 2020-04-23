@@ -38,6 +38,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
+import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;

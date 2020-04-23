@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.project;
+package com.pcchin.studyassistant.fragment.project.settings;
 
 
 import android.content.Intent;
@@ -38,6 +38,8 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
+import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
+import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.DefaultDialogPreference;
@@ -67,7 +69,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             ARG_IS_MEMBER = "isMember";
 
     private ProjectDatabase projectDatabase;
-    private ProjectData project;
+    public ProjectData project;
 
     // Mutually exclusive unless the project has both of those enabled
     private MemberData member;
@@ -163,7 +165,6 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                 case PreferenceString.PREF_SET_ICON:
                 case PreferenceString.PREF_UPDATE_ICON:
                     // Set icon, continued in MainActivity
-                    projectDatabase.close();
                     Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.putExtra(MainActivity.INTENT_PROJECT_ID, project.projectID);
@@ -314,29 +315,24 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
 
     /** Customize the date preferences. **/
     private void customizeDatePreference() {
-        if (project.expectedStartDate == null) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_EXPECTED_START))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_EXPECTED_START))).setVisible(false);
+        customizeDatePref(project.expectedStartDate, PreferenceString.PREF_SET_EXPECTED_START,
+                PreferenceString.PREF_UPDATE_EXPECTED_START, PreferenceString.PREF_REMOVE_EXPECTED_START);
+        customizeDatePref(project.expectedEndDate, PreferenceString.PREF_SET_EXPECTED_END,
+                PreferenceString.PREF_UPDATE_EXPECTED_END, PreferenceString.PREF_REMOVE_EXPECTED_END);
+        customizeDatePref(project.actualStartDate, PreferenceString.PREF_SET_ACTUAL_START,
+                PreferenceString.PREF_UPDATE_ACTUAL_START, PreferenceString.PREF_REMOVE_ACTUAL_START);
+        customizeDatePref(project.actualEndDate, PreferenceString.PREF_SET_ACTUAL_END,
+                PreferenceString.PREF_UPDATE_ACTUAL_END, PreferenceString.PREF_REMOVE_ACTUAL_END);
+    }
+
+    /** Customize the preference of a specific date. **/
+    private void customizeDatePref(Date date, String setPref,
+                                   String updatePref, String deletePref) {
+        if (date == null) {
+            ((Preference) Objects.requireNonNull(findPreference(updatePref))).setVisible(false);
+            ((Preference) Objects.requireNonNull(findPreference(deletePref))).setVisible(false);
         } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_EXPECTED_START))).setVisible(false);
-        }
-        if (project.expectedEndDate == null) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_EXPECTED_END))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_EXPECTED_END))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_EXPECTED_END))).setVisible(false);
-        }
-        if (project.actualStartDate == null) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_ACTUAL_START))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_ACTUAL_START))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_ACTUAL_START))).setVisible(false);
-        }
-        if (project.actualEndDate == null) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_ACTUAL_END))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_ACTUAL_END))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_ACTUAL_END))).setVisible(false);
+            ((Preference) Objects.requireNonNull(findPreference(setPref))).setVisible(false);
         }
     }
 
@@ -354,130 +350,23 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         // No need for PREF_ROOT as it is handled in the tree click listeners
+        ProjectSettingsFragmentChange change = new ProjectSettingsFragmentChange(
+                ProjectSettingsFragment.this, (MainActivity) getActivity());
         switch (currentPrefRoot) {
             case PreferenceString.PREF_MENU_GENERAL:
-                generalPrefChanged(preference, newValue);
+                change.generalPrefChanged(preference, newValue);
                 break;
             case PreferenceString.PREF_MENU_FEATURES:
-                featurePrefChanged(preference, newValue);
+                change.featurePrefChanged(preference, newValue);
                 break;
             case PreferenceString.PREF_MENU_DATE:
-                datePrefChanged(preference, newValue);
+                change.datePrefChanged(preference, newValue);
                 break;
             case PreferenceString.PREF_MENU_SECURITY:
-                securityPrefChanged(preference, newValue);
+                change.securityPrefChanged(preference, newValue, projectDatabase);
                 break;
         }
         return false;
-    }
-
-    /** Detects the value change of general preferences. **/
-    private void generalPrefChanged(@NonNull Preference preference, Object newValue) {
-        switch(preference.getKey()) {
-            case PreferenceString.PREF_UPDATE_TITLE:
-                // Set activity title
-                if (getActivity() != null) {
-                    getActivity().setTitle((String) newValue);
-                }
-                project.projectTitle = (String) newValue;
-                break;
-            case PreferenceString.PREF_UPDATE_DESC:
-                project.description = (String) newValue;
-                break;
-            case PreferenceString.PREF_COMPLETED:
-                project.projectOngoing = !(boolean) newValue;
-                break;
-        }
-        updateProject();
-    }
-
-    /** Detects the value change of feature preferences. **/
-    private void featurePrefChanged(@NonNull Preference preference, Object newValue) {
-        switch(preference.getKey()) {
-            case PreferenceString.PREF_MEMBERS:
-                project.membersEnabled = (boolean) newValue;
-                break;
-            case PreferenceString.PREF_ROLES:
-                project.rolesEnabled = (boolean) newValue;
-                break;
-            case PreferenceString.PREF_TASKS:
-                project.taskEnabled = (boolean) newValue;
-                break;
-            case PreferenceString.PREF_STATUS:
-                project.statusEnabled = (boolean) newValue;
-                break;
-            case PreferenceString.PREF_MERGE_TASK_STATUS:
-                project.mergeTaskStatus = (boolean) newValue;
-                break;
-            case PreferenceString.PREF_STATUS_ICON:
-                switch ((String) newValue) {
-                    case "None":
-                        project.projectStatusIcon = R.string.blank;
-                        break;
-                    case "Circle":
-                        project.projectStatusIcon = R.drawable.status_ic_circle;
-                        break;
-                    case "Triangle":
-                        project.projectStatusIcon = R.drawable.status_ic_triangle;
-                        break;
-                    case "Square":
-                        project.projectStatusIcon = R.drawable.status_ic_square;
-                        break;
-                }
-                break;
-            case PreferenceString.PREF_RELATED_SUBJECT:
-                project.associatedSubject = (String) newValue;
-                break;
-        }
-        updateProject();
-    }
-
-    /** Detects the value change of date preferences. **/
-    private void datePrefChanged(@NonNull Preference preference, Object newValue) {
-        switch(preference.getKey()) {
-            case PreferenceString.PREF_SET_EXPECTED_START:
-            case PreferenceString.PREF_UPDATE_EXPECTED_START:
-                project.expectedStartDate = new Date((long) newValue);
-                break;
-            case PreferenceString.PREF_SET_EXPECTED_END:
-            case PreferenceString.PREF_UPDATE_EXPECTED_END:
-                project.expectedEndDate = new Date((long) newValue);
-                break;
-            case PreferenceString.PREF_SET_ACTUAL_START:
-            case PreferenceString.PREF_UPDATE_ACTUAL_START:
-                project.actualStartDate = new Date((long) newValue);
-                break;
-            case PreferenceString.PREF_SET_ACTUAL_END:
-            case PreferenceString.PREF_UPDATE_ACTUAL_END:
-                project.actualEndDate = new Date((long) newValue);
-                break;
-        }
-        updateProject();
-    }
-
-    /** Detects the value change of security preferences. **/
-    private void securityPrefChanged(@NonNull Preference preference, Object newValue) {
-        switch (preference.getKey()) {
-            case PreferenceString.PREF_SET_PASSWORD:
-                project.projectProtected = true;
-            case PreferenceString.PREF_UPDATE_PASSWORD:
-                // Project password is already hashed within the preference
-                project.projectPass = (String) newValue;
-                updateProject();
-                break;
-            case PreferenceString.PREF_DELETE_PROJECT:
-                // Delete the project would kick you back to ProjectSelectFragment
-                // Handler used here to reduce lag
-                if (getActivity() != null) {
-                    new Handler().postDelayed(() -> {
-                        projectDatabase.ProjectDao().delete(project);
-                        Toast.makeText(getContext(), R.string.p3_project_deleted, Toast.LENGTH_SHORT).show();
-                        UIFunctions.updateNavView((MainActivity) getActivity());
-                        ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-                    }, 0);
-                }
-                break;
-        }
     }
 
     /** Display the preference dialogs of custom dialog preferences.
@@ -506,7 +395,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Updates the project and updates the current preference page. **/
-    private void updateProject() {
+    void updateProject() {
         projectDatabase.ProjectDao().update(project);
         displayPreference(currentPrefRoot);
     }

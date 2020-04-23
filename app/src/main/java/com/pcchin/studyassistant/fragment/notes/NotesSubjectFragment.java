@@ -477,10 +477,9 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                     ArrayList<File> exportFilesList = new ArrayList<>();
 
                     // Export all the note's data to a text .subj file
-                    try {
-                        String infoTempOutputPath = FileFunctions.generateValidFile(
-                                tempExportFolder + notesSubject, ".subj");
-                        FileWriter infoTempOutput = new FileWriter(infoTempOutputPath);
+                    String infoTempOutputPath = FileFunctions.generateValidFile(
+                            tempExportFolder + notesSubject, ".subj");
+                    try (FileWriter infoTempOutput = new FileWriter(infoTempOutputPath)) {
                         NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
                         infoTempOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
 

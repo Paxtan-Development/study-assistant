@@ -1,0 +1,9 @@
+engines:
+  # ... CONFIG CONTENT ...
+  sonar-java:
+    enabled: true
+    # ... CONFIG CONTENT ...
+    checks:
+      squid:S1186:
+        enabled: false
+# ... CONFIG CONTENT ...

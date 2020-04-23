@@ -75,8 +75,8 @@ import java.util.Collections;
 import java.util.Date;
 
 public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
-    private static final String ARG_SUBJECT = "noteSubject";
-    private static final String ARG_PREV = "previousOrder";
+    private static final String ARG_SUBJECT = "noteSubject",
+            ARG_PREV = "previousOrder";
     private static final int MAXLINES = 4;
 
     private static final int[] sortingList = new int[]{NotesSubject.SORT_ALPHABETICAL_ASC,

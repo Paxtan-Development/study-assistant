@@ -26,10 +26,10 @@ import android.view.ViewGroup;
 import com.pcchin.studyassistant.R;
 
 public class ProjectTaskFragment extends Fragment {
-    private static final String ARG_ID = "projectID";
-    private static final String ARG_ID2 = "ID2";
-    private static final String ARG_IS_MEMBER = "isMember";
-    private static final String ARG_UPDATE_NAV_VIEW = "updateNavView";
+    private static final String ARG_ID = "projectID",
+            ARG_ID2 = "ID2",
+            ARG_IS_MEMBER = "isMember",
+            ARG_UPDATE_NAV_VIEW = "updateNavView";
 
     /** Default constructor. **/
     public ProjectTaskFragment() {

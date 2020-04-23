@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
+
     /** Constructor made private to simulate static class. **/
     private SecurityFunctions() {}
 

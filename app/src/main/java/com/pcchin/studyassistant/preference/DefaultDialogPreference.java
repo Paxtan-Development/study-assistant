@@ -48,7 +48,7 @@ public class DefaultDialogPreference extends DialogPreference {
     /** Stub as nothing is stored in the SharedPreference. **/
     @Override
     protected void onSetInitialValue(Object defaultValue) {
-
+        // Stub as nothing is stored in the SharedPreference.
     }
 
     /** Stores a value into the SharedPreference when the positive value is clicked. **/

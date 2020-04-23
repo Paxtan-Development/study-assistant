@@ -201,12 +201,10 @@ public class ImportSubject {
                 ArrayList<ArrayList<String>> notesInfo = new ArrayList<>();
                 for (File file: fileList) {
                     if (file.getAbsolutePath().endsWith(".subj")) {
-                        try {
-                            Scanner scanner = new Scanner(file);
+                        try (Scanner scanner = new Scanner(file)) {
                             while (scanner.hasNext()) {
                                 subjInfo.add(scanner.next());
                             }
-                            scanner.close();
                         } catch (FileNotFoundException e) {
                             Log.e(MainActivity.LOG_APP_NAME, "File Error: " + file.getAbsolutePath()
                                 + " not found despite contained in file list of parent folder. " +
@@ -240,9 +238,11 @@ public class ImportSubject {
                         if (fileName.endsWith(".txt")) {
                             // Get text contents from file
                             StringBuilder fileContents = new StringBuilder();
-                            Scanner currentFileScanner = new Scanner(file);
-                            while (currentFileScanner.hasNext()) {
-                                fileContents.append(currentFileScanner.next()).append("\n");
+                            // Try-by-resources
+                            try (Scanner currentFileScanner = new Scanner(file)) {
+                                while (currentFileScanner.hasNext()) {
+                                    fileContents.append(currentFileScanner.next()).append("\n");
+                                }
                             }
 
                             // Check if any notes match the info stored in the subject
@@ -315,8 +315,7 @@ public class ImportSubject {
         // Check if file exists
         File targetFile = new File(path);
         if (targetFile.exists() && targetFile.isFile()) {
-            try {
-                FileInputStream inputStream = new FileInputStream(targetFile);
+            try (FileInputStream inputStream = new FileInputStream(targetFile)) {
                 int fileSize = (int) inputStream.getChannel().size();
                 // Length of title is first 4 bytes, title follows next
                 int titleLength = ConverterFunctions.bytesToInt(FileFunctions.getBytesFromFile(4, inputStream));

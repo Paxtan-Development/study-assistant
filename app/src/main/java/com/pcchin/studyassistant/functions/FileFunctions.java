@@ -41,11 +41,9 @@ public final class FileFunctions {
     /** Generates a .txt file based on a path and its contents. **/
     public static void exportTxt(String path, String contents) {
         // Get permission to read and write files
-            try {
-                FileWriter outputNote = new FileWriter(path);
+            try (FileWriter outputNote = new FileWriter(path)) {
                 outputNote.write(contents);
                 outputNote.flush();
-                outputNote.close();
             } catch (IOException e) {
                 Log.d(MainActivity.LOG_APP_NAME, "File Error: IO Exception occurred when exporting "
                         + "note with path , stack trace is");

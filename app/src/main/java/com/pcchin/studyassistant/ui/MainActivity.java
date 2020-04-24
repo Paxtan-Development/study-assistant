@@ -66,6 +66,7 @@ import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.utils.network.AppUpdate;
 import com.pcchin.studyassistant.file.project.ImportProjectIcon;
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(MainActivity.this);
 
-        UIFunctions.updateNavView(MainActivity.this);
+        NavViewFunctions.updateNavView(MainActivity.this);
     }
 
     /** Delegates the items that are selected on the menu to the respective fragments. **/

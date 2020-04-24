@@ -36,8 +36,8 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
@@ -171,7 +171,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     // Go to project info
                     Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
-                        UIFunctions.updateNavView((MainActivity) getActivity());
+                        NavViewFunctions.updateNavView((MainActivity) getActivity());
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                 .newInstance(projectID, initialMember.memberID,
                                         true, true));
@@ -193,7 +193,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     // Go to project info
                     Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
-                        UIFunctions.updateNavView((MainActivity) getActivity());
+                        NavViewFunctions.updateNavView((MainActivity) getActivity());
                         ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
                                 .newInstance(projectID, adminRole.roleID,
                                         false, true));

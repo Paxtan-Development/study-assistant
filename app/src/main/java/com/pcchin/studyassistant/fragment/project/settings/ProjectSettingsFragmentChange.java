@@ -22,7 +22,7 @@ import androidx.preference.Preference;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.MainActivity;
 
@@ -137,7 +137,7 @@ final class ProjectSettingsFragmentChange {
                 new Handler().postDelayed(() -> {
                     projectDatabase.ProjectDao().delete(fragment.project);
                     Toast.makeText(activity, R.string.p3_project_deleted, Toast.LENGTH_SHORT).show();
-                    UIFunctions.updateNavView(activity);
+                    NavViewFunctions.updateNavView(activity);
                     activity.displayFragment(new ProjectSelectFragment());
                 }, 0);
                 break;

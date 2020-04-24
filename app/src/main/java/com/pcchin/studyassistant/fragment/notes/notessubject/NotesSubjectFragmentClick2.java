@@ -38,7 +38,7 @@ import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectZip;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
@@ -109,7 +109,7 @@ public class NotesSubjectFragmentClick2 {
         // Display new subject
         Toast.makeText(fragment.getActivity(), R.string.n2_subject_renamed,
                 Toast.LENGTH_SHORT).show();
-        UIFunctions.updateNavView(activity);
+        NavViewFunctions.updateNavView(activity);
         activity.displayFragment(NotesSubjectFragment
                 .newInstance(popupInputText));
     }
@@ -160,7 +160,7 @@ public class NotesSubjectFragmentClick2 {
         database.close();
         // Return to NotesSelectFragment
         Toast.makeText(fragment.getContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
-        UIFunctions.updateNavView((MainActivity) activity);
+        NavViewFunctions.updateNavView((MainActivity) activity);
         fragment.subjectDatabase.close();
         ((MainActivity) activity).displayFragment(new NotesSelectFragment());
     }

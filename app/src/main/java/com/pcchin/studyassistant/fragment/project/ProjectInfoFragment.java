@@ -41,6 +41,7 @@ import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
 import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.BottomNavViewFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
@@ -106,10 +107,10 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             } else if (updateNavView) {
                 // Set up navigation menu for members and roles respectively only if requested
                 if (isMember) {
-                    UIFunctions.updateBottomNavView((MainActivity) getActivity(),
+                    BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
                             R.menu.menu_p_bottom, project, member, null);
                 } else {
-                    UIFunctions.updateBottomNavView((MainActivity) getActivity(),
+                    BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
                             R.menu.menu_p_bottom, project, null, role);
                 }
             }

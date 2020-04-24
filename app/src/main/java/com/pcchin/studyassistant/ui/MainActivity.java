@@ -48,13 +48,15 @@ import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.file.notes.ImportSubjectSubject;
-import com.pcchin.studyassistant.file.notes.ImportSubjectZip;
+import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
+import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesViewFragment;
+import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragmentClick1;
+import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragmentClick2;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
@@ -291,50 +293,40 @@ public class MainActivity extends AppCompatActivity
 
             // When NotesSubjectFragment is activated
             case R.id.n2_new_note:
-                ((NotesSubjectFragment) currentFragment).onNewNotePressed();
+                new NotesSubjectFragmentClick1((NotesSubjectFragment) currentFragment).onNewNotePressed();
                 break;
-
             case R.id.n2_sort:
-                ((NotesSubjectFragment) currentFragment).onSortPressed();
+                new NotesSubjectFragmentClick1((NotesSubjectFragment) currentFragment).onSortPressed();
                 break;
-
             case R.id.n2_rename:
-                ((NotesSubjectFragment) currentFragment).onRenamePressed();
+                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onRenamePressed();
                 break;
-
             case R.id.n2_export:
-                ((NotesSubjectFragment) currentFragment).onExportPressed();
+                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onExportPressed();
                 break;
-
             case R.id.n2_del:
-                ((NotesSubjectFragment) currentFragment).onDeletePressed();
+                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onDeletePressed();
                 break;
 
             // When NotesViewFragment is activated
             case R.id.n3_edit:
                 ((NotesViewFragment) currentFragment).onEditPressed();
                 break;
-
             case R.id.n3_export:
                 ((NotesViewFragment) currentFragment).onExportPressed();
                 break;
-
             case R.id.n3_lock:
                 ((NotesViewFragment) currentFragment).onLockPressed();
                 break;
-
             case R.id.n3_notif:
                 ((NotesViewFragment) currentFragment).onAlertPressed();
                 break;
-
             case R.id.n3_cancel_notif:
                 ((NotesViewFragment) currentFragment).onCancelAlertPressed();
                 break;
-
             case R.id.n3_unlock:
                 ((NotesViewFragment) currentFragment).onUnlockPressed();
                 break;
-
             case R.id.n3_del:
                 ((NotesViewFragment) currentFragment).onDeletePressed();
                 break;
@@ -343,11 +335,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.n4_subj:
                 ((NotesEditFragment) currentFragment).onSubjPressed();
                 break;
-
             case R.id.n4_save:
                 ((NotesEditFragment) currentFragment).onSavePressed();
                 break;
-
             case R.id.n4_cancel:
                 ((NotesEditFragment) currentFragment).onCancelPressed();
                 break;
@@ -356,19 +346,15 @@ public class MainActivity extends AppCompatActivity
             case R.id.p2_menu_user:
                 ((ProjectInfoFragment) currentFragment).onUserPressed();
                 break;
-
             case R.id.p2_menu_notes:
                 ((ProjectInfoFragment) currentFragment).onNotesPressed();
                 break;
-
             case R.id.p2_menu_settings:
                 ((ProjectInfoFragment) currentFragment).onSettingsPressed();
                 break;
-
             case R.id.p2_menu_media:
                 ((ProjectInfoFragment) currentFragment).onMediaPressed();
                 break;
-
             case R.id.p2_menu_export:
                 ((ProjectInfoFragment) currentFragment).onExportPressed();
                 break;

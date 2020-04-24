@@ -40,9 +40,9 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.file.notes.ImportSubjectStatic;
+import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
@@ -58,6 +58,7 @@ import java.util.List;
 
 /** Functions used for UI elements in the app. **/
 public final class UIFunctions {
+    // TODO: Refactor class
     /** Constructor made private to simulate static class. **/
     private UIFunctions() {}
 
@@ -208,133 +209,134 @@ public final class UIFunctions {
         if (member == null && role == null) {
             throw new IllegalArgumentException("MemberData member and RoleData role cannot be " +
                     "null in the same arguments");
-        } else {
-            // Reset menu
-            activity.bottomNavView.getMenu().clear();
-            activity.bottomNavView.inflateMenu(res);
-            Menu navViewMenu = activity.bottomNavView.getMenu();
+        }
 
-            // Set up database
-            ProjectDatabase database = GeneralFunctions.getProjectDatabase(activity);
+        // No else statement needed as error is thrown in if statement
+        // Reset menu
+        activity.bottomNavView.getMenu().clear();
+        activity.bottomNavView.inflateMenu(res);
+        Menu navViewMenu = activity.bottomNavView.getMenu();
 
-            // Bottom nav view
-            if (res == R.menu.menu_p_bottom) {
-                // Home button
-                navViewMenu.findItem(R.id.p_bottom_home).setOnMenuItemClickListener(item -> {
-                    if (!(activity.currentFragment instanceof ProjectInfoFragment)) {
-                        if (member == null) {
-                            // Default to role
-                            activity.displayFragment(ProjectInfoFragment
-                                    .newInstance(project.projectID, role.roleID, false, false));
-                        } else {
-                            activity.displayFragment(ProjectInfoFragment
+        // Set up database
+        ProjectDatabase database = GeneralFunctions.getProjectDatabase(activity);
+
+        // Bottom nav view
+        if (res == R.menu.menu_p_bottom) {
+            // Home button
+            navViewMenu.findItem(R.id.p_bottom_home).setOnMenuItemClickListener(item -> {
+                if (!(activity.currentFragment instanceof ProjectInfoFragment)) {
+                    if (member == null) {
+                        // Default to role
+                        activity.displayFragment(ProjectInfoFragment
+                                .newInstance(project.projectID, role.roleID, false, false));
+                    } else {
+                        activity.displayFragment(ProjectInfoFragment
+                                .newInstance(project.projectID, member.memberID, true, false));
+                    }
+                }
+                return true;
+            });
+
+            // Members button
+            if (project.membersEnabled && member != null && database.RoleDao().searchByID(member.role) != null
+                    && (database.RoleDao().searchByID(member.role).canViewOtherUser ||
+                    database.RoleDao().searchByID(member.role).canModifyOtherUser)) {
+                navViewMenu.findItem(R.id.p_bottom_members).setOnMenuItemClickListener(item -> {
+                    if (!(activity.currentFragment instanceof ProjectMemberListFragment)) {
+                        activity.displayFragment(ProjectMemberListFragment
+                                .newInstance(project.projectID, member.memberID, false));
+                    }
+                    return true;
+                });
+            } else {
+                navViewMenu.findItem(R.id.p_bottom_members).setVisible(false);
+            }
+
+            // Tasks button
+            if (project.taskEnabled && (
+                    // Member has privileges
+                    (member != null && database.RoleDao().searchByID(member.role) != null
+                            && (database.RoleDao().searchByID(member.role).canViewOtherTask ||
+                            database.RoleDao().searchByID(member.role).canModifyOtherTask ||
+                            database.RoleDao().searchByID(member.role).canViewTask ||
+                            database.RoleDao().searchByID(member.role).canModifyOwnTask)) ||
+
+                            // Role has privileges
+                            (role != null && (role.canViewOtherTask || role.canModifyOtherTask
+                                    || role.canViewTask || role.canModifyOwnTask)))) {
+                navViewMenu.findItem(R.id.p_bottom_task).setOnMenuItemClickListener(item -> {
+                    if (!(activity.currentFragment instanceof ProjectTaskFragment)) {
+                        if (member != null) {
+                            activity.displayFragment(ProjectTaskFragment
                                     .newInstance(project.projectID, member.memberID, true, false));
+                        } else {
+                            activity.displayFragment(ProjectTaskFragment
+                                    .newInstance(project.projectID, role.roleID, false, false));
                         }
                     }
                     return true;
                 });
-
-                // Members button
-                if (project.membersEnabled && member != null && database.RoleDao().searchByID(member.role) != null
-                    && (database.RoleDao().searchByID(member.role).canViewOtherUser ||
-                        database.RoleDao().searchByID(member.role).canModifyOtherUser)) {
-                    navViewMenu.findItem(R.id.p_bottom_members).setOnMenuItemClickListener(item -> {
-                        if (!(activity.currentFragment instanceof ProjectMemberListFragment)) {
-                            activity.displayFragment(ProjectMemberListFragment
-                                    .newInstance(project.projectID, member.memberID, false));
-                        }
-                        return true;
-                    });
-                } else {
-                    navViewMenu.findItem(R.id.p_bottom_members).setVisible(false);
-                }
-
-                // Tasks button
-                if (project.taskEnabled && (
-                        // Member has privileges
-                        (member != null && database.RoleDao().searchByID(member.role) != null
-                        && (database.RoleDao().searchByID(member.role).canViewOtherTask ||
-                        database.RoleDao().searchByID(member.role).canModifyOtherTask ||
-                        database.RoleDao().searchByID(member.role).canViewTask ||
-                        database.RoleDao().searchByID(member.role).canModifyOwnTask)) ||
-
-                        // Role has privileges
-                        (role != null && (role.canViewOtherTask || role.canModifyOtherTask
-                            || role.canViewTask || role.canModifyOwnTask)))) {
-                    navViewMenu.findItem(R.id.p_bottom_task).setOnMenuItemClickListener(item -> {
-                        if (!(activity.currentFragment instanceof ProjectTaskFragment)) {
-                            if (member != null) {
-                                activity.displayFragment(ProjectTaskFragment
-                                        .newInstance(project.projectID, member.memberID, true, false));
-                            } else {
-                                activity.displayFragment(ProjectTaskFragment
-                                        .newInstance(project.projectID, role.roleID, false, false));
-                            }
-                        }
-                        return true;
-                    });
-                } else {
-                    navViewMenu.findItem(R.id.p_bottom_task).setVisible(false);
-                }
-
-                // Roles button
-                if (project.rolesEnabled && (
-                        // Member has privileges
-                        (member != null && database.RoleDao().searchByID(member.role) != null
-                        && (database.RoleDao().searchByID(member.role).canViewRole ||
-                        database.RoleDao().searchByID(member.role).canModifyRole)) ||
-
-                        // Role has privileges
-                        (role != null && (role.canViewRole || role.canModifyRole)))) {
-                    navViewMenu.findItem(R.id.p_bottom_role).setOnMenuItemClickListener(item -> {
-                        if (!(activity.currentFragment instanceof ProjectRoleFragment)) {
-                            if (member != null) {
-                                activity.displayFragment(ProjectRoleFragment
-                                        .newInstance(project.projectID, member.memberID, true, false));
-                            } else {
-                                activity.displayFragment(ProjectRoleFragment
-                                        .newInstance(project.projectID, role.roleID, false, false));
-                            }
-                        }
-                        return true;
-                    });
-                } else {
-                    navViewMenu.findItem(R.id.p_bottom_role).setVisible(false);
-                }
-
-                // Status button
-                if (project.statusEnabled && (
-                        // Member has privileges
-                        (member != null && database.RoleDao().searchByID(member.role) != null
-                                && (database.RoleDao().searchByID(member.role).canModifyOtherStatus ||
-                                database.RoleDao().searchByID(member.role).canPostStatus ||
-                                database.RoleDao().searchByID(member.role).canViewStatus)) ||
-
-                                // Role has privileges
-                                (role != null && (role.canModifyOtherStatus || role.canPostStatus
-                                        || role.canViewStatus)))) {
-                    navViewMenu.findItem(R.id.p_bottom_status).setOnMenuItemClickListener(item -> {
-                        if (!(activity.currentFragment instanceof ProjectStatusFragment)) {
-                            if (member != null) {
-                                activity.displayFragment(ProjectStatusFragment
-                                        .newInstance(project.projectID, member.memberID, true, false));
-                            } else {
-                                activity.displayFragment(ProjectStatusFragment
-                                        .newInstance(project.projectID, role.roleID, false, false));
-                            }
-                        }
-                        return true;
-                    });
-                } else {
-                    navViewMenu.findItem(R.id.p_bottom_status).setVisible(false);
-                }
             } else {
-                // TODO: File Manager menu
+                navViewMenu.findItem(R.id.p_bottom_task).setVisible(false);
             }
 
-            database.close();
-            activity.bottomNavView.setVisibility(View.VISIBLE);
+            // Roles button
+            if (project.rolesEnabled && (
+                    // Member has privileges
+                    (member != null && database.RoleDao().searchByID(member.role) != null
+                            && (database.RoleDao().searchByID(member.role).canViewRole ||
+                            database.RoleDao().searchByID(member.role).canModifyRole)) ||
+
+                            // Role has privileges
+                            (role != null && (role.canViewRole || role.canModifyRole)))) {
+                navViewMenu.findItem(R.id.p_bottom_role).setOnMenuItemClickListener(item -> {
+                    if (!(activity.currentFragment instanceof ProjectRoleFragment)) {
+                        if (member != null) {
+                            activity.displayFragment(ProjectRoleFragment
+                                    .newInstance(project.projectID, member.memberID, true, false));
+                        } else {
+                            activity.displayFragment(ProjectRoleFragment
+                                    .newInstance(project.projectID, role.roleID, false, false));
+                        }
+                    }
+                    return true;
+                });
+            } else {
+                navViewMenu.findItem(R.id.p_bottom_role).setVisible(false);
+            }
+
+            // Status button
+            if (project.statusEnabled && (
+                    // Member has privileges
+                    (member != null && database.RoleDao().searchByID(member.role) != null
+                            && (database.RoleDao().searchByID(member.role).canModifyOtherStatus ||
+                            database.RoleDao().searchByID(member.role).canPostStatus ||
+                            database.RoleDao().searchByID(member.role).canViewStatus)) ||
+
+                            // Role has privileges
+                            (role != null && (role.canModifyOtherStatus || role.canPostStatus
+                                    || role.canViewStatus)))) {
+                navViewMenu.findItem(R.id.p_bottom_status).setOnMenuItemClickListener(item -> {
+                    if (!(activity.currentFragment instanceof ProjectStatusFragment)) {
+                        if (member != null) {
+                            activity.displayFragment(ProjectStatusFragment
+                                    .newInstance(project.projectID, member.memberID, true, false));
+                        } else {
+                            activity.displayFragment(ProjectStatusFragment
+                                    .newInstance(project.projectID, role.roleID, false, false));
+                        }
+                    }
+                    return true;
+                });
+            } else {
+                navViewMenu.findItem(R.id.p_bottom_status).setVisible(false);
+            }
+        } else {
+            // TODO: File Manager menu
         }
+
+        database.close();
+        activity.bottomNavView.setVisibility(View.VISIBLE);
     }
 
     /** Checks the given ids in a project for any errors and returns the correct values if it exists.

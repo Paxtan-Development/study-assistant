@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.file.notes;
+package com.pcchin.studyassistant.file.notes.importsubj;
 
 import android.Manifest;
 import android.content.ActivityNotFoundException;

@@ -36,7 +36,7 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
 import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
@@ -245,7 +245,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Goes to
-     * @see com.pcchin.studyassistant.fragment.notes.NotesSubjectFragment for the related subject.
+     * @see NotesSubjectFragment for the related subject.
      * If the subject is not found, an alert will display asking if the user would
      * like to delete the related subject from the project. **/
     public void onNotesPressed() {

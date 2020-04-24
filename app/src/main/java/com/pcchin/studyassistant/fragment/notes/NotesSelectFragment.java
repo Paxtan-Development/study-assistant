@@ -32,7 +32,7 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;

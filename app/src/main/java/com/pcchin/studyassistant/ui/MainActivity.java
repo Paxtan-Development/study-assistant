@@ -53,10 +53,12 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesViewFragment;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragmentClick1;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragmentClick2;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick1;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick2;
+import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragmentClick1;
+import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragmentClick2;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
@@ -311,25 +313,25 @@ public class MainActivity extends AppCompatActivity
 
             // When NotesViewFragment is activated
             case R.id.n3_edit:
-                ((NotesViewFragment) currentFragment).onEditPressed();
+                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onEditPressed();
                 break;
             case R.id.n3_export:
-                ((NotesViewFragment) currentFragment).onExportPressed();
+                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onExportPressed();
                 break;
             case R.id.n3_lock:
-                ((NotesViewFragment) currentFragment).onLockPressed();
-                break;
-            case R.id.n3_notif:
-                ((NotesViewFragment) currentFragment).onAlertPressed();
-                break;
-            case R.id.n3_cancel_notif:
-                ((NotesViewFragment) currentFragment).onCancelAlertPressed();
+                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onLockPressed();
                 break;
             case R.id.n3_unlock:
-                ((NotesViewFragment) currentFragment).onUnlockPressed();
+                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onUnlockPressed();
+                break;
+            case R.id.n3_notif:
+                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onAlertPressed();
+                break;
+            case R.id.n3_cancel_notif:
+                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onCancelAlertPressed();
                 break;
             case R.id.n3_del:
-                ((NotesViewFragment) currentFragment).onDeletePressed();
+                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onDeletePressed();
                 break;
 
             // When NotesEditFragment is selected

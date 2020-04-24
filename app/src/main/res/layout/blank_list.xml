@@ -17,7 +17,7 @@
     android:id="@+id/blank_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.notes.notessubject.NotesSubjectFragment">
+    tools:context=".fragment.notes.subject.NotesSubjectFragment">
 
     <LinearLayout
         android:id="@+id/blank_linear"

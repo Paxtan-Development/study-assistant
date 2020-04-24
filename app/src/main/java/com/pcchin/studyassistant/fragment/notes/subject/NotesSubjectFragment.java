@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.notes.notessubject;
+package com.pcchin.studyassistant.fragment.notes.subject;
 
 import android.app.Activity;
 import android.os.Bundle;

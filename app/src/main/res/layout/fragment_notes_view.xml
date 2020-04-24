@@ -17,7 +17,7 @@
     android:id="@+id/n3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.notes.NotesViewFragment">
+    tools:context=".fragment.notes.view.NotesViewFragment">
 
     <LinearLayout
         android:id="@+id/n3_linear"

@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
 import com.pcchin.studyassistant.ui.MainActivity;

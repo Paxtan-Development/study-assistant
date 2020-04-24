@@ -38,7 +38,7 @@ import androidx.fragment.app.Fragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.fragment.notes.notessubject.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
@@ -95,7 +95,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
      * @param subject is the title of the selected subject.
      * @param order is the order of the note in the subject. **/
     @NonNull
-    static NotesEditFragment newInstance(String subject, int order) {
+    public static NotesEditFragment newInstance(String subject, int order) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, subject);

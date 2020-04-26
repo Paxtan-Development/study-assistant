@@ -105,6 +105,20 @@
             android:text="@string/m2_bug_report"
             android:textSize="18sp" />
 
+        <Button
+            android:id="@+id/m2_feature_suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="20sp"
+            android:paddingStart="20sp"
+            android:paddingTop="10sp"
+            android:paddingEnd="20sp"
+            android:paddingBottom="10sp"
+            android:text="@string/m2_feature_suggestion"
+            android:textSize="18sp" />
+
         <TextView
             android:id="@+id/m2_apache"
             android:layout_width="match_parent"

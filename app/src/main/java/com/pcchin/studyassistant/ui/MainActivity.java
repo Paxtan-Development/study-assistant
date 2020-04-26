@@ -453,12 +453,9 @@ public class MainActivity extends AppCompatActivity
 
         // Display the fragment
         // The lines need to be executed in this order to allow a smooth transition
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.base, fragment)
+        getSupportFragmentManager().beginTransaction().replace(R.id.base, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
-        if (pager.getAdapter() != null) {
-            pager.setAdapter(null);
-        }
+        if (pager.getAdapter() != null) pager.setAdapter(null);
         pager.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
         pager.setVisibility(View.GONE);
         findViewById(R.id.base).setVisibility(View.VISIBLE);
@@ -518,7 +515,6 @@ public class MainActivity extends AppCompatActivity
         pager.setVisibility(View.VISIBLE);
         hideKeyboard();
     }
-
 
     /** Closes the navigation drawer. **/
     public void closeDrawer() {

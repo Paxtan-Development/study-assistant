@@ -1,9 +1,16 @@
+# Required to adjust maintainability checks
+version: "2"
+checks:
+  argument-count:
+    config:
+      threshold: 5
+  method-complexity:
+    config:
+      threshold: 15 # Based on sonar-java
 engines:
-  # ... CONFIG CONTENT ...
   sonar-java:
     enabled: true
-    # ... CONFIG CONTENT ...
-    checks:
+      checks:
       # Most switches do not need to have default
       squid:SwitchLastCaseIsDefaultCheck:
         enabled: false
@@ -16,4 +23,3 @@ engines:
       # Check if the string "password" is in string constants, triggered too many false positives
       squid:S2068:
         enabled: false
-# ... CONFIG CONTENT ...

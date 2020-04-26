@@ -36,7 +36,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class AboutFragment extends Fragment implements ExtendedFragment {
-
     /** Default Constructor. **/
     public AboutFragment() {}
 
@@ -78,6 +77,11 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
         returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
+            startActivity(intent);
+        });
+        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSc-VlEWcEDGsQIZCQNw14wS4opc72-DY2C5V6XrjrriKOdk8A/viewform?usp=sf_link"));
             startActivity(intent);
         });
 

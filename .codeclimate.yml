@@ -3,7 +3,7 @@ version: "2"
 checks:
   argument-count:
     config:
-      threshold: 5
+      threshold: 5 # Some functions have / require 5 arguments
   method-complexity:
     config:
       threshold: 15 # Based on sonar-java
@@ -17,12 +17,6 @@ plugins:
     checks:
       # Most switches do not need to have default
       squid:SwitchLastCaseIsDefaultCheck:
-        enabled: false
-      # Check if case statements are broken, some switches need to fall through
-      squid:S128:
-        enabled: false
-      # Check if function is empty, explanations are often in JavaDoc
-      squid:S1186:
         enabled: false
       # Check if the string "password" is in string constants, triggered too many false positives
       squid:S2068:

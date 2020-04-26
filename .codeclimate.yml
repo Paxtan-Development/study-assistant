@@ -7,7 +7,7 @@ checks:
   method-complexity:
     config:
       threshold: 15 # Based on sonar-java
-engines:
+plugins:
   sonar-java:
     enabled: true
       checks:

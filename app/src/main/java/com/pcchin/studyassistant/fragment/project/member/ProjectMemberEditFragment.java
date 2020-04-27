@@ -27,6 +27,7 @@ import com.pcchin.studyassistant.R;
 public class ProjectMemberEditFragment extends Fragment {
     /** Default constructor. **/
     public ProjectMemberEditFragment() {
+        // Default constructor.
     }
 
     /** Initializes the fragment and the member's info. **/

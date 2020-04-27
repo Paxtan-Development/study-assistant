@@ -26,6 +26,7 @@ public class SecurityTest {
 
     /** Default constructor. **/
     public SecurityTest() {
+        // Default constructor.
     }
 
     /** Check if the encryption function for the .subject files work. **/

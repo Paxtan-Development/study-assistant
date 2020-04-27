@@ -33,6 +33,7 @@ public class ProjectStatusFragment extends Fragment {
 
     /** Default constructor. **/
     public ProjectStatusFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

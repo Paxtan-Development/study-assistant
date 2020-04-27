@@ -58,6 +58,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
 
     /** Default constructor. **/
     public ProjectLoginFragment() {
+        // Default constructor.
     }
 
     /** Constructor used when attempting to access the project. **/
@@ -145,8 +146,6 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
 
                         AutoDismissDialog passwordDialog = new AutoDismissDialog(
                                 getString(R.string.v1_project_protected), passwordLayout,
-                                new String[]{getString(android.R.string.ok),
-                                        getString(android.R.string.cancel), ""},
                                 passwordDialogListener);
                         passwordDialog.setCancellable(false);
                         passwordDialog.show(getParentFragmentManager(), "ProjectLoginFragment.1");

@@ -74,8 +74,6 @@ public class ImportSubjectZip {
                         .setOnClickListener(view -> dialogInterface.dismiss());
             };
             new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout,
-                    new String[]{activity.getString(android.R.string.ok),
-                            activity.getString(android.R.string.cancel), null},
                     passwordListener).show(activity.getSupportFragmentManager(),
                     "ImportSubject.2");
         } else {

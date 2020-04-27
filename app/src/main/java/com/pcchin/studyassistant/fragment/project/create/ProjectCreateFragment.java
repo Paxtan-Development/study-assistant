@@ -54,7 +54,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
 
     /** Default constructor. **/
     public ProjectCreateFragment() {
-
+        // Default constructor.
     }
 
     /** Initializes the fragments and the project database. **/

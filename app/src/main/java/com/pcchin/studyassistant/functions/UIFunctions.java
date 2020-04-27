@@ -62,8 +62,7 @@ public final class UIFunctions {
                     });
             ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> dialog.dismiss());
         };
-        new AutoDismissDialog(activity.getString(R.string.n1_new_subject), popupView, new String[]{activity.getString(android.R.string.ok),
-                        activity.getString(android.R.string.cancel), ""}, subjectListener)
+        new AutoDismissDialog(activity.getString(R.string.n1_new_subject), popupView, subjectListener)
                         .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
     }
 

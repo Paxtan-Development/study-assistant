@@ -106,9 +106,7 @@ public class ImportSubjectSubject {
             ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
                     dialogInterface.dismiss());
         };
-        new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout,
-                new String[]{activity.getString(android.R.string.ok),
-                        activity.getString(android.R.string.cancel), ""}, importListener)
+        new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout, importListener)
                 .show(activity.getSupportFragmentManager(), "ImportSubject.3");
     }
 

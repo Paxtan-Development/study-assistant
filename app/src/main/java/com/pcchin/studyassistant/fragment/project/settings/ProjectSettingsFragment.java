@@ -77,6 +77,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
 
     /** Default constructor. **/
     public ProjectSettingsFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

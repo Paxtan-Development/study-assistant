@@ -61,7 +61,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Functions that are unable to fit inside
  * @see AppUpdate **/
 class AppUpdate2 {
-    private static final String STACK_CASE_IS = ", stack trace is";
+    private static final String STACK_TRACE_IS = ", stack trace is";
 
     private MainActivity activity;
     private boolean calledFromNotif;
@@ -76,7 +76,6 @@ class AppUpdate2 {
      * separated from checkServerUpdates() for clarity,
      * updateViaGithub(String downloadLink) separated for clarity. **/
     void showUpdateNotif(@NonNull JSONObject response, String host) {
-        // TODO: Refactor function
         try {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
@@ -86,59 +85,8 @@ class AppUpdate2 {
             editor.apply();
 
             // Get latest version from releases page
-            if (!Objects.equals(response.getString("version")
-                    .replace("v", ""), BuildConfig.VERSION_NAME)) {
-                String downloadLink = response.getString("download");
-                String releaseLink = response.getString("page");
-
-                if (!calledFromNotif) {
-                    // Set up notification
-                    Intent intent = new Intent(activity, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(MainActivity.INTENT_VALUE_DISPLAY_UPDATE, true);
-                    PendingIntent pendingIntent = PendingIntent
-                            .getActivity(activity, 0, intent, 0);
-                    NotificationCompat.Builder notif = new NotificationCompat.Builder
-                            (activity, activity.getPackageName())
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(activity.getString(R.string.app_name))
-                            .setContentText(activity.getString(R.string.a_update_app))
-                            .setContentIntent(pendingIntent)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                            .setLights(Color.BLUE, 2000, 0)
-                            .setVibrate(new long[]{0, 250, 250, 250, 250})
-                            .setAutoCancel(true);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        notif.setChannelId(activity.getString(R.string.notif_channel_update_ID));
-                    }
-                    NotificationManagerCompat manager = NotificationManagerCompat.from(activity);
-                    manager.notify(activity.getTaskId(), notif.build());
-                }
-
-                // Set up dialog
-                DialogInterface.OnShowListener updateListener = dialogInterface -> {
-                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                        dialogInterface.dismiss();
-                        updateViaGithub(downloadLink);
-                    });
-                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
-                        // The user should be able to update after coming back from the website
-                        activity.safeOnBackPressed();
-                        Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(releaseLink));
-                        activity.startActivity(gitlabReleaseSite);
-                    });
-                    ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
-                            view -> dialogInterface.dismiss());
-                };
-                new AutoDismissDialog(activity.getString(R.string.a_update_app),
-                        activity.getString(R.string.a_new_version), new String[]
-                        {activity.getString(android.R.string.yes),
-                                activity.getString(android.R.string.no),
-                                activity.getString(R.string.a_learn_more)}, updateListener)
-                        .show(activity.getSupportFragmentManager(), "AppUpdate.1");
-            }
+            if (!Objects.equals(response.getString("version").replace("v", ""),
+                    BuildConfig.VERSION_NAME)) getVersionLinks(response);
         } catch (JSONException e) {
             Log.d(MainActivity.LOG_APP_NAME, "Network Error: Response returned by " + host
                     + " invalid, response given is " + response + ", error given is "
@@ -146,10 +94,67 @@ class AppUpdate2 {
         }
     }
 
+    /** Get the download and release links and show them within the dialog. **/
+    private void getVersionLinks(@NonNull JSONObject response) throws JSONException {
+        String downloadLink = response.getString("download");
+        String releaseLink = response.getString("page");
+        if (!calledFromNotif) showUpdateAvailableNotif();
+
+        // Set up dialog
+        DialogInterface.OnShowListener updateListener = dialogInterface ->
+                setUpdateDialogListeners((AlertDialog) dialogInterface, downloadLink, releaseLink);
+        new AutoDismissDialog(activity.getString(R.string.a_update_app),
+                activity.getString(R.string.a_new_version), new String[]
+                {activity.getString(android.R.string.yes),
+                        activity.getString(android.R.string.no),
+                        activity.getString(R.string.a_learn_more)}, updateListener)
+                .show(activity.getSupportFragmentManager(), "AppUpdate.1");
+    }
+
+    /** Sets the onClickListeners for the buttons for the update dialog. **/
+    private void setUpdateDialogListeners(@NonNull AlertDialog dialogInterface,
+                                          String downloadLink, String releaseLink) {
+        dialogInterface.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+            dialogInterface.dismiss();
+            updateViaGithub(downloadLink);
+        });
+        dialogInterface.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
+            // The user should be able to update after coming back from the website
+            activity.safeOnBackPressed();
+            Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(releaseLink));
+            activity.startActivity(gitlabReleaseSite);
+        });
+        dialogInterface.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
+                view -> dialogInterface.dismiss());
+    }
+
+    /** Displays a notification that an update is available. **/
+    private void showUpdateAvailableNotif() {
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(MainActivity.INTENT_VALUE_DISPLAY_UPDATE, true);
+        PendingIntent pendingIntent = PendingIntent
+                .getActivity(activity, 0, intent, 0);
+        NotificationCompat.Builder notif = new NotificationCompat.Builder
+                (activity, activity.getPackageName())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(activity.getString(R.string.app_name))
+                .setContentText(activity.getString(R.string.a_update_app))
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setLights(Color.BLUE, 2000, 0)
+                .setVibrate(new long[]{0, 250, 250, 250, 250})
+                .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) notif.setChannelId(activity.getString(R.string.notif_channel_update_ID));
+        NotificationManagerCompat manager = NotificationManagerCompat.from(activity);
+        manager.notify(activity.getTaskId(), notif.build());
+    }
+
     /** Download and update the newest version of the app via Github,
      * separated from showUpdateNotif(JSONArray response) for clarity. **/
     private void updateViaGithub(String downloadLink) {
-        // TODO: Refactor function
         // Generate output file name
         // Checks if the /files directory exists, if not it is created
         File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/temp");
@@ -162,94 +167,123 @@ class AppUpdate2 {
             AtomicBoolean continueDownload = new AtomicBoolean(true);
             ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
             progressBar.setIndeterminate(true);
-            DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
-                Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
-                queue.stop();
-                continueDownload.set(false);
-            };
-            AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
-                    .getString(R.string.a_downloading), progressBar,
-                    new String[]{activity.getString(android.R.string.cancel), "", ""});
-            downloadDialog.setCancellable(false);
-            downloadDialog.setDismissListener(dismissListener);
-            downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
+            displayDownloadDialog(queue, continueDownload, progressBar, downloadLink, outputFileName);
+        }
+    }
 
-            VolleyFileDownloadRequest request = new VolleyFileDownloadRequest(Request.Method.GET,
-                    downloadLink, response -> {
-                try {
-                    downloadDialog.dismiss();
-                    queue.stop();
-                    if (response != null) {
-                        File outputFile = new File(outputFileName);
-                        if (outputFile.createNewFile()) {
-                            SharedPreferences.Editor editor = activity.getSharedPreferences(
-                                    activity.getPackageName(), Context.MODE_PRIVATE).edit();
-                            editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
-                            editor.apply();
+    /** Displays the download dialog and starts the download process. **/
+    private void displayDownloadDialog(RequestQueue queue, @NonNull AtomicBoolean continueDownload,
+                                       ProgressBar progressBar, String downloadLink, String outputFileName) {
+        DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
+            Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
+            queue.stop();
+            continueDownload.set(false);
+        };
+        AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
+                .getString(R.string.a_downloading), progressBar,
+                new String[]{activity.getString(android.R.string.cancel), "", ""});
+        downloadDialog.setCancellable(false);
+        downloadDialog.setDismissListener(dismissListener);
+        downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
+        VolleyFileDownloadRequest request = getDownloadRequest(downloadDialog, queue, downloadLink, outputFileName);
+        if (continueDownload.get()) {
+            queue.add(request);
+        }
+    }
 
-                            // Write output file with buffer
-                            InputStream input = new ByteArrayInputStream(response);
-                            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
-                            byte[] data = new byte[1024];
-                            int count;
-                            while ((count = input.read(data)) != -1) {
-                                output.write(data, 0, count);
-                            }
-                            output.flush();
-                            output.close();
-                            input.close();
+    /** Returns the download request for the APK file. **/
+    @NonNull
+    private VolleyFileDownloadRequest getDownloadRequest(AutoDismissDialog downloadDialog,
+        RequestQueue queue, String downloadLink, String outputFileName) {
+        return new VolleyFileDownloadRequest(Request.Method.GET, downloadLink,
+                response -> tryCreateApk(downloadDialog, queue, response, outputFileName), error -> {
+            downloadDialog.dismiss();
+            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
+                    + ", response given is " + error.getMessage() + STACK_TRACE_IS);
+            error.printStackTrace();
+            Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
+        }, null){
+            @NonNull
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-agent", AppUpdate.USER_AGENT);
+                return headers;
+            }
+        };
+    }
 
-                            // Install app
-                            activity.safeOnBackPressed();
-                            Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
-                            Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                            installIntent.setDataAndType(FileProvider.getUriForFile(activity,
-                                    activity.getPackageName() + ".ContentProvider",
-                                    new File(outputFileName)),
-                                    "application/vnd.android.package-archive");
-                            installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            activity.startActivity(installIntent);
-                        } else {
-                            Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + outputFileName
-                                    + " could not be created.");
-                            Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } catch (FileNotFoundException e) {
-                    Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName
-                            + " not found" + STACK_CASE_IS);
-                    e.printStackTrace();
-                    Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
-                } catch (IOException e2) {
-                    Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
-                            + STACK_CASE_IS);
-                    e2.printStackTrace();
-                    Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Log.d(MainActivity.LOG_APP_NAME, "Error: Volley download request failed " +
-                            "in middle of operation with error");
-                    e.printStackTrace();
-                    Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
-                }
-            }, error -> {
-                downloadDialog.dismiss();
-                Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
-                        + ", response given is " + error.getMessage() + STACK_CASE_IS);
-                error.printStackTrace();
-                Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
-            }, null){
-                @NonNull
-                @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("User-agent", AppUpdate.USER_AGENT);
-                    return headers;
-                }
-            };
+    /** The try / catch blocks for createApk. **/
+    private void tryCreateApk(AutoDismissDialog downloadDialog, RequestQueue queue,
+                              byte[] response, String outputFileName) {
+        try {
+            createApk(downloadDialog, queue, response, outputFileName);
+        } catch (FileNotFoundException e) {
+            Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName
+                    + " not found" + STACK_TRACE_IS);
+            e.printStackTrace();
+            Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
+        } catch (IOException e2) {
+            Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
+                    + STACK_TRACE_IS);
+            e2.printStackTrace();
+            Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.d(MainActivity.LOG_APP_NAME, "Error: Volley download request failed " +
+                    "in middle of operation with error");
+            e.printStackTrace();
+            Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
+        }
+    }
 
-            if (continueDownload.get()) {
-                queue.add(request);
+    /** Creates the APK file in the downloads directory. **/
+    private void createApk(@NonNull AutoDismissDialog downloadDialog, @NonNull RequestQueue queue,
+                           byte[] response, String outputFileName) throws IOException {
+        downloadDialog.dismiss();
+        queue.stop();
+        if (response != null) {
+            File outputFile = new File(outputFileName);
+            if (outputFile.createNewFile()) {
+                writeApk(response, outputFileName, outputFile);
+            } else {
+                Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + outputFileName
+                        + " could not be created.");
+                Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    /** Writes the downloaded APK into the file. **/
+    private void writeApk(byte[] response, String outputFileName, File outputFile) throws IOException {
+        SharedPreferences.Editor editor = activity.getSharedPreferences(
+                activity.getPackageName(), Context.MODE_PRIVATE).edit();
+        editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
+        editor.apply();
+
+        // Write output file with buffer
+        InputStream input = new ByteArrayInputStream(response);
+        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
+        byte[] data = new byte[1024];
+        int count;
+        while ((count = input.read(data)) != -1) {
+            output.write(data, 0, count);
+        }
+        output.flush();
+        output.close();
+        input.close();
+        installApp(outputFileName);
+    }
+
+    /** Installs the new app from the given file path. **/
+    private void installApp(String outputFileName) {
+        activity.safeOnBackPressed();
+        Toast.makeText(activity, R.string.a_app_updating, Toast.LENGTH_SHORT).show();
+        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+        installIntent.setDataAndType(FileProvider.getUriForFile(activity,
+                activity.getPackageName() + ".ContentProvider",
+                new File(outputFileName)),
+                "application/vnd.android.package-archive");
+        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.startActivity(installIntent);
     }
 }

@@ -93,9 +93,7 @@ class ImportSubject {
         DialogInterface.OnShowListener renameListener =
                 dialogInterface -> setRenameDialogPositiveListener(dialogInterface, inputLayout, database, contents, sortOrder);
         AutoDismissDialog renameDialog = new AutoDismissDialog(
-                activity.getString(R.string.rename_subject), inputLayout,
-                new String[]{activity.getString(android.R.string.ok),
-                        activity.getString(android.R.string.cancel), ""}, renameListener);
+                activity.getString(R.string.rename_subject), inputLayout, renameListener);
         renameDialog.setDismissListener(dialogInterface -> database.close());
         renameDialog.show(activity.getSupportFragmentManager(), "ImportSubject.5");
     }

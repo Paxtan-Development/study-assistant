@@ -28,6 +28,7 @@ import com.pcchin.studyassistant.R;
 public class ProjectTaskEditFragment extends Fragment {
     /** Default constructor. **/
     public ProjectTaskEditFragment() {
+        // Default constructor.
     }
 
     /** Initializes the fragment and the task's info. **/

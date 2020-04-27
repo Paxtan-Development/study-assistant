@@ -51,8 +51,7 @@ public class NotesSubjectFragmentClick1 {
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
                         .setOnClickListener(v -> dialog.dismiss());
             };
-            new AutoDismissDialog(fragment.getString(R.string.n2_new_note), popupView, new String[]{fragment.getString(android.R.string.ok),
-                    fragment.getString(android.R.string.cancel), ""}, nListener)
+            new AutoDismissDialog(fragment.getString(R.string.n2_new_note), popupView, nListener)
                     .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.1");
         }
     }
@@ -102,8 +101,6 @@ public class NotesSubjectFragmentClick1 {
     /** Display the dialog for selecting a sorting method. **/
     private void displaySortDialog(Spinner sortingSpinner) {
         new AutoDismissDialog(fragment.getString(R.string.n2_sorting_method), sortingSpinner,
-                new String[]{fragment.getString(android.R.string.ok),
-                        fragment.getString(android.R.string.cancel), ""},
                 new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
                     // Update value in notes
                     NotesSubject subject1 = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);

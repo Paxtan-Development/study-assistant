@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity
         ViewPager.OnPageChangeListener baseAdapterPageChanger = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                // Not needed
             }
 
             @Override
@@ -504,12 +504,16 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                // Not needed
             }
         };
         pager.setAdapter(baseAdapter);
         pager.addOnPageChangeListener(baseAdapterPageChanger);
-        // Fade out animation included to increase smoothness
+        fadeToNote();
+    }
+
+    /** Fades out to another note to increase smoothness. **/
+    private void fadeToNote() {
         findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
         findViewById(R.id.base).setVisibility(View.GONE);
         pager.setVisibility(View.VISIBLE);

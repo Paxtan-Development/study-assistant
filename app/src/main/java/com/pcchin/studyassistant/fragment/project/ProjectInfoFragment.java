@@ -64,6 +64,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
 
     /** Default constructor. **/
     public ProjectInfoFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

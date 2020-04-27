@@ -46,6 +46,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
 
     /** Default constructor. **/
     public ProjectSignupFragment() {
+        // Default constructor.
     }
 
     /** Constructor used when signing up for a new profile. **/

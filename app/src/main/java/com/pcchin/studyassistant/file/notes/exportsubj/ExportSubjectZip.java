@@ -73,9 +73,8 @@ public class ExportSubjectZip {
 
         DialogInterface.OnShowListener passwordListener =
                 dialogInterface -> setPositiveBtn(dialogInterface, inputLayout);
-        new AutoDismissDialog(fragment.getString(R.string.enter_password), inputLayout, new String[]{
-                fragment.getString(android.R.string.ok), fragment.getString(android.R.string.cancel), ""},
-                passwordListener).show(fragment.getParentFragmentManager(), "NotesSubjectFragment.5");
+        new AutoDismissDialog(fragment.getString(R.string.enter_password), inputLayout, passwordListener)
+                .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.5");
     }
 
     /** Sets the positive button on the zip password dialog. **/

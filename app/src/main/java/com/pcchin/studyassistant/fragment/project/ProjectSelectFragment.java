@@ -43,6 +43,7 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
 
     /** Default constructor. **/
     public ProjectSelectFragment() {
+        // Default constructor.
     }
 
     /** Initializes the fragments and the projects. **/

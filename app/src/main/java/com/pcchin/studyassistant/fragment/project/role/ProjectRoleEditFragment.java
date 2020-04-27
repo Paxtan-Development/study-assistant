@@ -28,6 +28,7 @@ import com.pcchin.studyassistant.R;
 public class ProjectRoleEditFragment extends Fragment {
     /** Default constructor. **/
     public ProjectRoleEditFragment() {
+        // Default constructor.
     }
 
     /** Initializes the fragment and the role's info. **/

@@ -73,9 +73,7 @@ public class ExportSubjectSubject {
             ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
                     dialogInterface.dismiss());
         };
-        new AutoDismissDialog(fragment.getString(R.string.n2_password_export), inputText,
-                new String[]{fragment.getString(android.R.string.ok),
-                        fragment.getString(android.R.string.cancel), ""}, exportListener)
+        new AutoDismissDialog(fragment.getString(R.string.n2_password_export), inputText, exportListener)
                 .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.6");
     }
 
@@ -112,7 +110,9 @@ public class ExportSubjectSubject {
             // Get permission to read and write files
             File outputFile = new File(finalOutputFileName);
             if (outputFile.createNewFile()) {
-                exportSubjectFile(outputFile, finalResponseText, finalResponseText1);
+                try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                    exportSubjectFile(finalOutputFileName, finalResponseText, finalResponseText1, outputStream);
+                }
             } else {
                 Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
                         + finalOutputFileName + " cannot be created.");
@@ -133,13 +133,14 @@ public class ExportSubjectSubject {
     }
 
     /** Creates and export the .subject file. **/
-    private void exportSubjectFile(File outputFile, String finalResponseText,
-                                   @NonNull String finalResponseText1) throws IOException {
+    private void exportSubjectFile(String finalOutputFileName, String finalResponseText,
+                                   @NonNull String finalResponseText1,
+                                   @NonNull FileOutputStream outputStream)
+            throws IOException {
         Toast.makeText(fragment.getContext(), R.string.n2_exporting_subject, Toast.LENGTH_SHORT).show();
         // Export the file
         // The length of the title is exported first, followed by the title.
         // Then, the subject's sort order is listed and the encrypted contents are stored.
-        FileOutputStream outputStream = new FileOutputStream(outputFile);
         outputStream.write(ConverterFunctions.intToBytes(notesSubject.getBytes().length));
         outputStream.write(notesSubject.getBytes());
         outputStream.write(ConverterFunctions.intToBytes(sortOrder));
@@ -153,6 +154,6 @@ public class ExportSubjectSubject {
         outputStream.flush();
         outputStream.close();
         Toast.makeText(fragment.getContext(), fragment.getString(R.string.subject_exported)
-                        + outputFile, Toast.LENGTH_SHORT).show();
+                        + finalOutputFileName, Toast.LENGTH_SHORT).show();
     }
 }

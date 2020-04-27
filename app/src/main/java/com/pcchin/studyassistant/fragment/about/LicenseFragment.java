@@ -33,7 +33,9 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
             R.array.licenseview_license, R.array.zip4j_license};
 
     /** Default constructor. **/
-    public LicenseFragment() { }
+    public LicenseFragment() {
+        // Default constructor.
+    }
 
     /** Initializes the fragment. Nothing to see here. **/
     @Override

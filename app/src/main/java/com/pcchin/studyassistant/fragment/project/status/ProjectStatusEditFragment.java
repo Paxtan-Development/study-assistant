@@ -28,6 +28,7 @@ import com.pcchin.studyassistant.R;
 public class ProjectStatusEditFragment extends Fragment {
     /** Default constructor. **/
     public ProjectStatusEditFragment() {
+        // Default constructor.
     }
 
     /** Initializes the fragment and the status' info. **/

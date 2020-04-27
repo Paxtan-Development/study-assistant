@@ -32,6 +32,7 @@ public class ProjectMediaFragment extends Fragment {
 
     /** Default constructor. **/
     public ProjectMediaFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

@@ -31,7 +31,9 @@ import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 public class RssLicenseFragment extends Fragment implements ExtendedFragment {
     /** Default constructor. **/
-    public RssLicenseFragment() { }
+    public RssLicenseFragment() {
+        // Default constructor.
+    }
 
     /** Initializes the fragment. Nothing to see here. **/
     @Override

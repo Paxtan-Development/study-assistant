@@ -33,6 +33,7 @@ public class ProjectRoleFragment extends Fragment {
 
     /** Default constructor. **/
     public ProjectRoleFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

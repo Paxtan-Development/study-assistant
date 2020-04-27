@@ -56,6 +56,6 @@ public class PasswordPreference extends DialogPreference {
     /** Stub as nothing is stored in the SharedPreference. **/
     @Override
     protected void onSetInitialValue(Object defaultValue) {
-
+        // Stub as nothing is stored in the SharedPreference.
     }
 }

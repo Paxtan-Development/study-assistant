@@ -33,6 +33,7 @@ public class ProjectTaskFragment extends Fragment {
 
     /** Default constructor. **/
     public ProjectTaskFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when creating new project.

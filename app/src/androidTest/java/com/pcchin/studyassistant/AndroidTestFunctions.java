@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ import java.util.Random;
 /** Functions used in tests. **/
 class AndroidTestFunctions {
     /** Returns the notes after it has been migrated. **/
+    @NonNull
     static SubjectDatabase getNotesDatabaseAftMigration(@NonNull MigrationTestHelper migrationTestHelper,
                                                         String databaseName,
                                                         Migration... migrations) {
@@ -55,6 +56,7 @@ class AndroidTestFunctions {
 
     /** Generate an ArrayList with random values.
      * @param count defines the max number of children in the array. **/
+    @NonNull
     static ArrayList<ArrayList<String>> randomArray(int count) {
         Random rand = new Random();
         ArrayList<ArrayList<String>> returnList = new ArrayList<>();

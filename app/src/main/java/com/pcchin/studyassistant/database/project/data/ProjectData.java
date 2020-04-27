@@ -120,7 +120,7 @@ public class ProjectData {
      * This constructor should not be used in code but is unable to be
      * marked as @Deprecated or @Ignore as it is the default constructor. **/
     public ProjectData() {
-
+        // Default constructor, should not be used in code.
     }
 
     /** Constructor used when creating a new project with members.

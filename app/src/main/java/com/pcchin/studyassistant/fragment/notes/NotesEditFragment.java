@@ -201,8 +201,6 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
 
             // Show dialog
             new AutoDismissDialog(getString(R.string.n_change_subj), subjListSpinner,
-                    new String[]{getString(android.R.string.ok),
-                            getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{(dialog, which) -> {
                         subjModified = true;
                         targetNotesSubject = subjListSpinner.getSelectedItem().toString();

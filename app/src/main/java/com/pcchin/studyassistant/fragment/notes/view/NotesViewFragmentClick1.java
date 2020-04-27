@@ -67,8 +67,7 @@ public class NotesViewFragmentClick1 {
         } else {
             new AutoDismissDialog(fragment.getString(R.string.data_export),
                     fragment.getString(R.string.n3_confirm_export_note),
-                    new String[]{fragment.getString(android.R.string.ok),
-                            fragment.getString(android.R.string.cancel), ""}, new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+                    new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
                 dialogInterface.dismiss();
                 String outputText = FileFunctions.generateValidFile("/storage/emulated/0/Download/"
                         + fragment.notesInfo.get(0), ".txt");
@@ -92,8 +91,6 @@ public class NotesViewFragmentClick1 {
             inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
             inputLayout.setHint(fragment.getString(R.string.set_blank_password));
             new AutoDismissDialog(fragment.getString(R.string.n3_lock_password), inputLayout,
-                    new String[]{fragment.getString(android.R.string.ok),
-                            fragment.getString(android.R.string.cancel), ""},
                     new DialogInterface.OnClickListener[]{(dialogInterface, i) ->
                             getLockedNoteValue(inputLayout), (dialogInterface, i) -> dialogInterface.dismiss(), null})
                     .show(fragment.getParentFragmentManager(), "NotesViewFragment.2");
@@ -169,8 +166,6 @@ public class NotesViewFragmentClick1 {
                         subject, contents, inputLayout);
         // Asks user for password
         new AutoDismissDialog(fragment.getString(R.string.n3_unlock_password), inputLayout,
-                new String[]{fragment.getString(android.R.string.ok),
-                        fragment.getString(android.R.string.cancel), ""},
                 passwordListener).show(fragment.getParentFragmentManager(), "NotesViewFragment.3");
     }
 

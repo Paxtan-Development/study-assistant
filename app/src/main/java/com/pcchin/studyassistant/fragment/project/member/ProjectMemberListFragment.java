@@ -32,6 +32,7 @@ public class ProjectMemberListFragment extends Fragment {
 
     /** Default constructor. **/
     public ProjectMemberListFragment() {
+        // Default constructor.
     }
 
     /** Used in all instances when accessing a user's profile.

@@ -36,7 +36,9 @@ public class MainFragment extends Fragment implements ExtendedFragment {
     private boolean doubleBackToExitPressedOnce;
 
     /** Default constructor. **/
-    public MainFragment() {}
+    public MainFragment() {
+        // Default constructor.
+    }
 
     /** Initialize fragment. Nothing to see here. **/
     @Override

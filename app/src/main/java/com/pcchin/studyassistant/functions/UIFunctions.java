@@ -43,7 +43,9 @@ import java.util.ArrayList;
 /** Functions used for UI elements in the app. **/
 public final class UIFunctions {
     /** Constructor made private to simulate static class. **/
-    private UIFunctions() {}
+    private UIFunctions() {
+        // Constructor made private to simulate static class.
+    }
 
     /** Shows the dialog to add a new subject to the notes list **/
     public static void showNewSubject(@NonNull final MainActivity activity,

@@ -34,7 +34,9 @@ import java.util.Objects;
 /** Functions specifically used to convert from one type of variable to another. **/
 public final class ConverterFunctions {
     /** Constructor made private to simulate static class. **/
-    private ConverterFunctions() {}
+    private ConverterFunctions() {
+        // Constructor made private to simulate static class.
+    }
 
     /** The ISO-8601 compliant date and time format.  **/
     private static final SimpleDateFormat isoDateTimeFormat =

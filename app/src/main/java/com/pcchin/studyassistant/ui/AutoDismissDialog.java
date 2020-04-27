@@ -32,6 +32,8 @@ public class AutoDismissDialog extends DialogFragment {
     private static final int DIALOG_CONTENT_VIEW = 2;
     private static final int DIALOG_CONTENT_LIST = 3;
 
+    private static final String OK = "OK";
+    private static final String CANCEL = "Cancel";
     private static final String ERROR_LENGTH_BTN_LIST = "Length of buttonList is not 3";
     private static final String ERROR_LENGTH_BTN_OR_LISTENER = "Length of buttonList is not 3 or " +
             "length of yListeners is not 3";
@@ -63,21 +65,21 @@ public class AutoDismissDialog extends DialogFragment {
     }
 
     /** Constructor used for showing a view with auto dismiss after a button pass.
-     * The button list of new String[]{"OK", "Cancel", ""} will be used as the default button list.
+     * The button list of new String[]{OK, CANCEL, ""} will be used as the default button list.
      * @param title is the title of the AlertDialog.
      * @param displayView is the view that would be displayed in the AlertDialog.
      * @param yListeners are the listeners that would be used in the AlertDialog. **/
     public AutoDismissDialog(String title, View displayView, DialogInterface.OnClickListener[] yListeners) {
-        this(title, displayView, new String[]{"Ok", "Cancel", ""}, yListeners);
+        this(title, displayView, new String[]{OK, CANCEL, ""}, yListeners);
     }
 
     /** Constructor used for showing a view with auto dismiss after a button pass.
-     * The button list of new String[]{"OK", "Cancel", ""} will be used as the default button list.
+     * The button list of new String[]{OK, CANCEL, ""} will be used as the default button list.
      * @param title is the title of the AlertDialog.
      * @param message is the message of the AlertDialog.
      * @param yListeners are the listeners that would be used in the AlertDialog. **/
     public AutoDismissDialog(String title, String message, DialogInterface.OnClickListener[] yListeners) {
-        this(title, message, new String[]{"Ok", "Cancel", ""}, yListeners);
+        this(title, message, new String[]{OK, CANCEL, ""}, yListeners);
     }
 
     /** Constructor used for showing a message with auto dismiss after a button press.
@@ -160,12 +162,12 @@ public class AutoDismissDialog extends DialogFragment {
     }
 
     /** Constructor used for showing a view with auto dismiss after a button pass.
-     * The button list of new String[]{"OK", "Cancel", ""} will be used as the default button list.
+     * The button list of new String[]{OK, CANCEL, ""} will be used as the default button list.
      * @param title is the title of the AlertDialog.
      * @param displayView is the view that would be displayed in the AlertDialog.
      * @param nListener is the OnShowListener that would be used in the AlertDialog. **/
     public AutoDismissDialog(String title, View displayView, DialogInterface.OnShowListener nListener) {
-        this(title, displayView, new String[]{"Ok", "Cancel", ""}, nListener);
+        this(title, displayView, new String[]{OK, CANCEL, ""}, nListener);
     }
 
     /** Constructor used for showing a view which would only dismiss after the

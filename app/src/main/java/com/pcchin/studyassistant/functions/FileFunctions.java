@@ -36,7 +36,9 @@ import java.util.ArrayList;
 /** Functions used in managing files. **/
 public final class FileFunctions {
     /** Constructor made private to simulate static class. **/
-    private FileFunctions() {}
+    private FileFunctions() {
+        // Constructor made private to simulate static class.
+    }
 
     /** Generates a .txt file based on a path and its contents. **/
     public static void exportTxt(String path, String contents) {

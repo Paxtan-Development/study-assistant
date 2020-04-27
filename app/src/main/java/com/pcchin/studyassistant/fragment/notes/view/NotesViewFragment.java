@@ -51,7 +51,9 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     boolean hasAlert;
 
     /** Default constructor. **/
-    public NotesViewFragment() {}
+    public NotesViewFragment() {
+        // Default constructor.
+    }
 
     /** Used when viewing a note.
      * @param subject is the title of the subject.

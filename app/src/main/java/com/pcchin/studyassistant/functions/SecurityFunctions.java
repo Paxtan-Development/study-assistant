@@ -42,7 +42,9 @@ public final class SecurityFunctions {
             "not found in MessageDigest.";
 
     /** Constructor made private to simulate static class. **/
-    private SecurityFunctions() {}
+    private SecurityFunctions() {
+        // Constructor made private to simulate static class.
+    }
 
     /** Process a cipher buffer based on a specific length and
      * @return a specific output. **/

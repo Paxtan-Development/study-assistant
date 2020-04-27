@@ -44,7 +44,9 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     private SubjectDatabase subjectDatabase;
 
     /** Default constructor. **/
-    public NotesSelectFragment() {}
+    public NotesSelectFragment() {
+        // Default constructor.
+    }
 
     /** Initializes the fragment and the notes. **/
     @Override

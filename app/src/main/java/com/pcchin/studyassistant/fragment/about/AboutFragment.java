@@ -37,7 +37,9 @@ import java.util.Locale;
 
 public class AboutFragment extends Fragment implements ExtendedFragment {
     /** Default Constructor. **/
-    public AboutFragment() {}
+    public AboutFragment() {
+        // Default constructor.
+    }
 
     /** Initializes the fragment. Nothing to see here. **/
     @Override

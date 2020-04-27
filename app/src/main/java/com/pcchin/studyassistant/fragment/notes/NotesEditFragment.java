@@ -75,7 +75,9 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     private ArrayList<ArrayList<String>> targetSubjContents;
 
     /** Default constructor. **/
-    public NotesEditFragment() {}
+    public NotesEditFragment() {
+        // Default constructor.
+    }
 
     /** Used when creating a new note.
      * @param title is the title of the new note, without subject.

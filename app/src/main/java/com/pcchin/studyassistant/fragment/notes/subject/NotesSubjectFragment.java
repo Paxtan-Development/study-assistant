@@ -61,7 +61,9 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     int previousOrder;
 
     /** Default constructor. **/
-    public NotesSubjectFragment() {}
+    public NotesSubjectFragment() {
+        // Default constructor.
+    }
 
     /** Used in all except when returning from a NotesViewFragment.
      * @param subject is the subject that is displayed. **/

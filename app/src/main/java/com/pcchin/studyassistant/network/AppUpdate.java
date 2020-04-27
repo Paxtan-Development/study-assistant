@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.utils.network;
+package com.pcchin.studyassistant.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

@@ -70,7 +70,7 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.utils.network.AppUpdate;
+import com.pcchin.studyassistant.network.AppUpdate;
 import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 
 import java.io.File;

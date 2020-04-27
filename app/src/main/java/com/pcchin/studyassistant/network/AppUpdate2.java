@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.utils.network;
+package com.pcchin.studyassistant.network;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -262,16 +262,17 @@ class AppUpdate2 {
 
         // Write output file with buffer
         InputStream input = new ByteArrayInputStream(response);
-        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
-        byte[] data = new byte[1024];
-        int count;
-        while ((count = input.read(data)) != -1) {
-            output.write(data, 0, count);
+        try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+            byte[] data = new byte[1024];
+            int count;
+            while ((count = input.read(data)) != -1) {
+                output.write(data, 0, count);
+            }
+            output.flush();
+            output.close();
+            input.close();
+            installApp(outputFileName);
         }
-        output.flush();
-        output.close();
-        input.close();
-        installApp(outputFileName);
     }
 
     /** Installs the new app from the given file path. **/

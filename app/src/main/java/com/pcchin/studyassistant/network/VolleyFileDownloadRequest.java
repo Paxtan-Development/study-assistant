@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.utils.network;
+package com.pcchin.studyassistant.network;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -27,8 +27,8 @@ public class VolleyFileDownloadRequest extends Request<byte[]> {
     private final Map<String, String> dlParams;
 
     /** Default constructor. **/
-    public VolleyFileDownloadRequest(int method, String mUrl ,Response.Listener<byte[]> listener,
-                                    Response.ErrorListener errorListener, HashMap<String, String> params) {
+    VolleyFileDownloadRequest(int method, String mUrl, Response.Listener<byte[]> listener,
+                              Response.ErrorListener errorListener, HashMap<String, String> params) {
         super(method, mUrl, errorListener);
         setShouldCache(false);
         requestResponse = listener;

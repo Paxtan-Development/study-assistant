@@ -16,8 +16,9 @@ package com.pcchin.studyassistant.activity;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
+import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
+import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick1;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick2;
@@ -94,13 +95,13 @@ final class MainActivityOptions {
 
             // When NotesEditFragment is selected
             case R.id.n4_subj:
-                ((NotesEditFragment) currentFragment).onSubjPressed();
+                new NotesEditFragmentClick((NotesEditFragment) currentFragment).onSubjPressed();
                 break;
             case R.id.n4_save:
-                ((NotesEditFragment) currentFragment).onSavePressed();
+                new NotesEditFragmentClick((NotesEditFragment) currentFragment).onSavePressed();
                 break;
             case R.id.n4_cancel:
-                ((NotesEditFragment) currentFragment).onCancelPressed();
+                new NotesEditFragmentClick((NotesEditFragment) currentFragment).onCancelPressed();
                 break;
 
             // When ProjectInfoFragment is selected

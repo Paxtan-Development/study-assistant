@@ -4,9 +4,6 @@ checks:
   argument-count:
     config:
       threshold: 6 # Some functions have / require 6 arguments
-  file-lines:
-    config:
-      threshold: 300 # Additional 50 lines for breathing room
   method-complexity:
     config:
       threshold: 15 # Based on sonar-java

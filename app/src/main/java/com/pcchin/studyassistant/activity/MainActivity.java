@@ -52,7 +52,8 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
+import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
+import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
@@ -425,7 +426,7 @@ public class MainActivity extends AppCompatActivity
      * when a function redirects to an external app/fragment. **/
     public void safeOnBackPressed() {
         if (currentFragment instanceof NotesEditFragment) {
-            ((NotesEditFragment) currentFragment).onSavePressed();
+            new NotesEditFragmentClick((NotesEditFragment) currentFragment).onSavePressed();
         }
     }
 }

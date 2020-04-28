@@ -29,7 +29,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
+import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;

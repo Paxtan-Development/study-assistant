@@ -20,7 +20,7 @@
     android:layout_margin="20sp"
     android:baselineAligned="false"
     android:orientation="vertical"
-    tools:context=".fragment.notes.NotesEditFragment">
+    tools:context=".fragment.notes.edit.NotesEditFragment">
 
     <EditText
         android:id="@+id/n4_title"

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.activity.MainActivity;
 
@@ -39,7 +40,7 @@ public final class ImportSubjectStatic {
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MainActivity.EXTERNAL_STORAGE_READ_PERMISSION);
+                    ActivityConstants.EXTERNAL_STORAGE_READ_PERMISSION);
         }
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -63,14 +64,14 @@ public final class ImportSubjectStatic {
                         "application/x-zip-compressed"};
                 fileSelectIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeType);
                 activity.startActivityForResult(Intent.createChooser(fileSelectIntent,
-                        activity.getString(R.string.select_file)), MainActivity.SELECT_ZIP_FILE);
+                        activity.getString(R.string.select_file)), ActivityConstants.SELECT_ZIP_FILE);
             } else {
                 Toast.makeText(activity, R.string.select_subject_file, Toast.LENGTH_SHORT).show();
-                activity.startActivityForResult(fileSelectIntent, MainActivity.SELECT_SUBJECT_FILE);
+                activity.startActivityForResult(fileSelectIntent, ActivityConstants.SELECT_SUBJECT_FILE);
             }
         } catch (ActivityNotFoundException e) {
             Toast.makeText(activity, R.string.error_file_manager_not_found, Toast.LENGTH_SHORT).show();
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: This device appears to "
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: This device appears to "
                     + "not have a file manager. Stack trace is");
             e.printStackTrace();
         }

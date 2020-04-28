@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
@@ -75,7 +76,7 @@ class ImportSubject {
             }
             database.close();
         } else {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: Title of subject in ZIP file  invalid.");
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Title of subject in ZIP file  invalid.");
             Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
         }
     }
@@ -120,7 +121,7 @@ class ImportSubject {
                 inputLayout.setErrorEnabled(true);
                 inputLayout.setError(activity.getString(R.string.error_subject_exists));
             } else {
-                Log.w(MainActivity.LOG_APP_NAME, "TextInputLayout Error: getEditText() for " +
+                Log.w(ActivityConstants.LOG_APP_NAME, "TextInputLayout Error: getEditText() for " +
                         "AlertDialog in ImportSubject.showRenameDialog not found.");
             }
         });

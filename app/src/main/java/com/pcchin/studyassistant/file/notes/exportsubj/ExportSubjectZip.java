@@ -25,12 +25,12 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -107,7 +107,7 @@ public class ExportSubjectZip {
             try {
                 createZipFile(tempExportFolder, password);
             } catch (ZipException e) {
-                Log.e(MainActivity.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
+                Log.e(ActivityConstants.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
                         "exporting a subject. Stack trace is ");
                 e.printStackTrace();
                 Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
@@ -130,7 +130,7 @@ public class ExportSubjectZip {
         if (new File(tempExportFolder).mkdir()) {
             populateZipFile(tempExportFolder, password, exportFile, exportFilePath);
         } else {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
                     + " cannot be created.");
             Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
         }
@@ -154,7 +154,7 @@ public class ExportSubjectZip {
 
         // Delete temp folder
         if (!FileFunctions.deleteDir(new File(tempExportFolder))) {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: Temporary folder "
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Temporary folder "
                     + tempExportFolder + " could not be deleted.");
         }
         Toast.makeText(fragment.getContext(), fragment.getString(R.string.subject_exported)
@@ -176,7 +176,7 @@ public class ExportSubjectZip {
             // Rename temp info output path to .subj file
             exportFilesList.add(new File(infoTempOutputPath));
         } catch (IOException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: Writing subject " + notesSubject
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Writing subject " + notesSubject
                     + " failed. Stack trace is");
             e.printStackTrace();
         }

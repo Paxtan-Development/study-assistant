@@ -36,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
@@ -239,19 +240,19 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
             if (manager != null && previousNote.size() >= 6 && previousNote.get(5) != null) {
                 // Delete old notification
                 Intent previousIntent = new Intent(getActivity(), NotesNotifyReceiver.class);
-                previousIntent.putExtra(MainActivity.INTENT_VALUE_TITLE, previousNote.get(0));
-                previousIntent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, previousNote.get(2));
-                previousIntent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, notesSubject);
-                previousIntent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
+                previousIntent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, previousNote.get(0));
+                previousIntent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, previousNote.get(2));
+                previousIntent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, notesSubject);
+                previousIntent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
                 manager.cancel(PendingIntent.getBroadcast(getContext(), Integer.parseInt(
                         previousNote.get(5)), previousIntent, 0));
 
                 // Set new notification
                 Intent newIntent = new Intent(getActivity(), NotesNotifyReceiver.class);
-                newIntent.putExtra(MainActivity.INTENT_VALUE_TITLE, updatedNote.get(0));
-                newIntent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, updatedNote.get(2));
-                newIntent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, targetNotesSubject);
-                newIntent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
+                newIntent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, updatedNote.get(0));
+                newIntent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, updatedNote.get(2));
+                newIntent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, targetNotesSubject);
+                newIntent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
                 try {
                     Date targetDate = ConverterFunctions.standardDateTimeFormat.parse(previousNote.get(4));
                     if (targetDate != null) {
@@ -269,7 +270,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                         updatedNote.set(5, previousNote.get(5));
                     }
                 } catch (ParseException e) {
-                    Log.w(MainActivity.LOG_APP_NAME, "Parse Error: Date " + previousNote.get(4)
+                    Log.w(ActivityConstants.LOG_APP_NAME, "Parse Error: Date " + previousNote.get(4)
                             + " could not be parsed under standard date time format.");
                 }
             }

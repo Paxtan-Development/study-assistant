@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectSubject;
@@ -173,9 +174,9 @@ public class NotesSubjectFragmentClick2 {
                     && note.get(0) != null && note.get(2) != null) {
                 // Get PendingIntent for note alert
                 Intent intent = new Intent(fragment.getActivity(), NotesNotifyReceiver.class);
-                intent.putExtra(MainActivity.INTENT_VALUE_TITLE, note.get(0));
-                intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, note.get(2));
-                intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, note.get(5));
+                intent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, note.get(0));
+                intent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, note.get(2));
+                intent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, note.get(5));
                 PendingIntent alertIntent = PendingIntent.getBroadcast(
                         fragment.getActivity(), Integer.parseInt(note.get(5)), intent, 0);
 

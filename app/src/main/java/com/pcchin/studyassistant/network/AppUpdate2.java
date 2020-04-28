@@ -37,6 +37,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
@@ -80,7 +81,7 @@ class AppUpdate2 {
             // Update so that it will not ask again on the same day
             SharedPreferences.Editor editor =
                     activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
-            editor.putString(MainActivity.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
+            editor.putString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
                     .standardDateFormat.format(new Date()));
             editor.apply();
 
@@ -88,7 +89,7 @@ class AppUpdate2 {
             if (!Objects.equals(response.getString("version").replace("v", ""),
                     BuildConfig.VERSION_NAME)) getVersionLinks(response);
         } catch (JSONException e) {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Response returned by " + host
+            Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Response returned by " + host
                     + " invalid, response given is " + response + ", error given is "
                     + e.getMessage());
         }
@@ -133,7 +134,7 @@ class AppUpdate2 {
     private void showUpdateAvailableNotif() {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(MainActivity.INTENT_VALUE_DISPLAY_UPDATE, true);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, true);
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(activity, 0, intent, 0);
         NotificationCompat.Builder notif = new NotificationCompat.Builder
@@ -175,7 +176,7 @@ class AppUpdate2 {
     private void displayDownloadDialog(RequestQueue queue, @NonNull AtomicBoolean continueDownload,
                                        ProgressBar progressBar, String downloadLink, String outputFileName) {
         DialogInterface.OnDismissListener dismissListener = dialogInterface -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
+            Log.d(ActivityConstants.LOG_APP_NAME, "Notification: Download of latest APK cancelled");
             queue.stop();
             continueDownload.set(false);
         };
@@ -198,7 +199,7 @@ class AppUpdate2 {
         return new VolleyFileDownloadRequest(Request.Method.GET, downloadLink,
                 response -> tryCreateApk(downloadDialog, queue, response, outputFileName), error -> {
             downloadDialog.dismiss();
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley file download request failed"
+            Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley file download request failed"
                     + ", response given is " + error.getMessage() + STACK_TRACE_IS);
             error.printStackTrace();
             Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
@@ -219,17 +220,17 @@ class AppUpdate2 {
         try {
             createApk(downloadDialog, queue, response, outputFileName);
         } catch (FileNotFoundException e) {
-            Log.d(MainActivity.LOG_APP_NAME, "File Error: File" + outputFileName
+            Log.d(ActivityConstants.LOG_APP_NAME, "File Error: File" + outputFileName
                     + " not found" + STACK_TRACE_IS);
             e.printStackTrace();
             Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
         } catch (IOException e2) {
-            Log.d(MainActivity.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
+            Log.d(ActivityConstants.LOG_APP_NAME, "File Error: An IOException occurred at " + outputFileName
                     + STACK_TRACE_IS);
             e2.printStackTrace();
             Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Log.d(MainActivity.LOG_APP_NAME, "Error: Volley download request failed " +
+            Log.d(ActivityConstants.LOG_APP_NAME, "Error: Volley download request failed " +
                     "in middle of operation with error");
             e.printStackTrace();
             Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
@@ -246,7 +247,7 @@ class AppUpdate2 {
             if (outputFile.createNewFile()) {
                 writeApk(response, outputFileName, outputFile);
             } else {
-                Log.d(MainActivity.LOG_APP_NAME, "File Error: File " + outputFileName
+                Log.d(ActivityConstants.LOG_APP_NAME, "File Error: File " + outputFileName
                         + " could not be created.");
                 Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
             }
@@ -257,7 +258,7 @@ class AppUpdate2 {
     private void writeApk(byte[] response, String outputFileName, File outputFile) throws IOException {
         SharedPreferences.Editor editor = activity.getSharedPreferences(
                 activity.getPackageName(), Context.MODE_PRIVATE).edit();
-        editor.putString(MainActivity.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
+        editor.putString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
         editor.apply();
 
         // Write output file with buffer

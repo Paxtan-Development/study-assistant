@@ -16,7 +16,7 @@ package com.pcchin.studyassistant.functions;
 import android.util.Base64;
 import android.util.Log;
 
-import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -84,7 +84,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             originalByte = shaDigest.digest(original.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
+            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 2) Blowfish
@@ -103,7 +103,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             originalByte = shaDigest.digest(originalByte);
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
+            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 3) Blowfish
@@ -121,14 +121,14 @@ public final class SecurityFunctions {
             originalByte = shaDigest.digest(original.getBytes());
             hashedPassword = shaDigest.digest(salt.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
+            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 2) PBKDF
         try {
             originalByte = pbkdf2(originalByte, salt.getBytes(), 10000);
         } catch (NullPointerException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "PBKDF2 cipher throws NullPointerException, " +
+            Log.e(ActivityConstants.LOG_APP_NAME, "PBKDF2 cipher throws NullPointerException, " +
                     "error is " + e.toString());
         }
 
@@ -149,7 +149,7 @@ public final class SecurityFunctions {
             MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
             ivBytes = shaDigest.digest(iv.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            Log.e(MainActivity.LOG_APP_NAME, SHA_MISSING_ERROR);
+            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
         }
 
         // 3) AES
@@ -188,10 +188,10 @@ public final class SecurityFunctions {
         try {
             original = processCipherBuffer(aes, original);
         } catch (InvalidCipherTextException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "Cipher text in AES encryption invalid. Stack trace is ");
+            Log.w(ActivityConstants.LOG_APP_NAME, "Cipher text in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
         } catch (DataLengthException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "Data length in AES encryption invalid. Stack trace is ");
+            Log.w(ActivityConstants.LOG_APP_NAME, "Data length in AES encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
         return original;
@@ -206,10 +206,10 @@ public final class SecurityFunctions {
         try {
             original = processCipherBuffer(blowfish, original);
         } catch (InvalidCipherTextException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "Cipher text in Blowfish encryption invalid. Stack trace is ");
+            Log.w(ActivityConstants.LOG_APP_NAME, "Cipher text in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
         } catch (DataLengthException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "Data length in Blowfish encryption invalid. Stack trace is ");
+            Log.w(ActivityConstants.LOG_APP_NAME, "Data length in Blowfish encryption invalid. Stack trace is ");
             e.printStackTrace();
         }
         return original;

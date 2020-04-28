@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
@@ -40,10 +41,10 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Show notification
-        String title = intent.getStringExtra(MainActivity.INTENT_VALUE_TITLE);
-        String message = intent.getStringExtra(MainActivity.INTENT_VALUE_MESSAGE);
-        String subjectTitle = intent.getStringExtra(MainActivity.INTENT_VALUE_SUBJECT);
-        String requestCode = intent.getStringExtra(MainActivity.INTENT_VALUE_REQUEST_CODE);
+        String title = intent.getStringExtra(ActivityConstants.INTENT_VALUE_TITLE);
+        String message = intent.getStringExtra(ActivityConstants.INTENT_VALUE_MESSAGE);
+        String subjectTitle = intent.getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
+        String requestCode = intent.getStringExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE);
         if (title == null || title.length() == 0) {
             title = context.getPackageName();
         }
@@ -70,8 +71,8 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         // Display a notification
         Intent startIntent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(MainActivity.INTENT_VALUE_START_FRAGMENT, true);
-        intent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, subjectTitle);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, true);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, subjectTitle);
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(context, 0, startIntent, 0);
         NotificationCompat.Builder notif = new NotificationCompat.Builder(context, context.getPackageName())

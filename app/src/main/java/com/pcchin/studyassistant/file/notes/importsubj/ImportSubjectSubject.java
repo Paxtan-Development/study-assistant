@@ -25,6 +25,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -54,13 +55,13 @@ public class ImportSubjectSubject {
             try (FileInputStream inputStream = new FileInputStream(targetFile)) {
                 processSubjectFile(inputStream, path);
             } catch (IOException e) {
-                Log.e(MainActivity.LOG_APP_NAME, "File Error: File " + path + " could not be read"
+                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + path + " could not be read"
                         + " by FileInputStream. Stack trace is");
                 Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         } else {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: File " + path + " is not found.");
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + path + " is not found.");
             Toast.makeText(activity, "The file " + path + " appears to be missing.",
                     Toast.LENGTH_SHORT).show();
         }
@@ -135,7 +136,7 @@ public class ImportSubjectSubject {
         // Subject is not encrypted
         String contentString = new String(content);
         if (ConverterFunctions.doubleJsonToArray(contentString) == null) {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: The .subject file "
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: The .subject file "
                     + path + " could not be imported as its content is incorrect.");
             Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
         } else {

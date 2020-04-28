@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.activity.MainActivity;
 
@@ -45,11 +46,11 @@ public class ImportSubjectZip {
             if (new ZipFile(path).isValidZipFile()) {
                 displayZipDialog(path);
             } else {
-                Log.e(MainActivity.LOG_APP_NAME, "File Error: ZIP file " + path + " is invalid.");
+                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: ZIP file " + path + " is invalid.");
                 Toast.makeText(activity, R.string.error_zip_corrupt, Toast.LENGTH_SHORT).show();
             }
         } catch (ZipException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: ZIP processing error occurred while "
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: ZIP processing error occurred while "
                     + " importing a subject, stack trace is");
             Toast.makeText(activity, R.string.error_zip_import, Toast.LENGTH_SHORT).show();
             e.printStackTrace();

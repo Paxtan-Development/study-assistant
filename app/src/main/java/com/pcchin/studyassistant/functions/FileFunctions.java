@@ -21,7 +21,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +47,7 @@ public final class FileFunctions {
                 outputNote.write(contents);
                 outputNote.flush();
             } catch (IOException e) {
-                Log.d(MainActivity.LOG_APP_NAME, "File Error: IO Exception occurred when exporting "
+                Log.d(ActivityConstants.LOG_APP_NAME, "File Error: IO Exception occurred when exporting "
                         + "note with path , stack trace is");
                 e.printStackTrace();
             }
@@ -127,7 +127,7 @@ public final class FileFunctions {
             stream.read(returnByte);
             return returnByte;
         } catch (IOException e) {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: byte[] of size " + byteAmt + " could not "
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: byte[] of size " + byteAmt + " could not "
                     + "be retrieved from input stream of file " + stream + ". Stack trace is");
             e.printStackTrace();
             return new byte[0];
@@ -150,7 +150,7 @@ public final class FileFunctions {
                 return "";
             }
         } catch (Exception e) {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: Uri" + uri.toString() + "could not be "
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Uri" + uri.toString() + "could not be "
                 + "parsed as a path. Stack trace is");
             e.printStackTrace();
             return "";

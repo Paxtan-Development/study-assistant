@@ -32,6 +32,7 @@ import androidx.preference.SwitchPreference;
 import com.pcchin.dtpreference.DatePreference;
 import com.pcchin.dtpreference.dialog.DatePreferenceDialog;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -168,10 +169,10 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                     // Set icon, continued in MainActivity
                     Intent intent = new Intent();
                     intent.setType("image/*");
-                    intent.putExtra(MainActivity.INTENT_PROJECT_ID, project.projectID);
-                    intent.putExtra(MainActivity.INTENT_IS_MEMBER, isMember);
-                    intent.putExtra(MainActivity.INTENT_ID2, id2);
-                    startActivityForResult(intent, MainActivity.SELECT_PROJECT_ICON);
+                    intent.putExtra(ActivityConstants.INTENT_PROJECT_ID, project.projectID);
+                    intent.putExtra(ActivityConstants.INTENT_IS_MEMBER, isMember);
+                    intent.putExtra(ActivityConstants.INTENT_ID2, id2);
+                    startActivityForResult(intent, ActivityConstants.SELECT_PROJECT_ICON);
                     break;
                 case PreferenceString.PREF_REMOVE_ICON:
                     // Remove icon

@@ -29,6 +29,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.BuildConfig;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 
 import org.json.JSONObject;
@@ -125,10 +126,10 @@ public class AppUpdate {
                                                  JsonObjectRequest secondaryRelease) {
         return new JsonObjectRequest(apiUrl + UPDATE_PATH, null,
                 response -> new AppUpdate2(activity, calledFromNotif).showUpdateNotif(response, apiUrl), error -> {
-            Log.d(MainActivity.LOG_APP_NAME, "Network Error: Volley returned error "
+            Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
                     + error.getMessage() + ":" + error.toString() + " from " + apiUrl + STACK_CASE_IS );
             error.printStackTrace();
-            Log.d(MainActivity.LOG_APP_NAME, "Attempting to connect to backup server");
+            Log.d(ActivityConstants.LOG_APP_NAME, "Attempting to connect to backup server");
             if (secondaryRelease == null) {
                 queue.stop();
             } else {

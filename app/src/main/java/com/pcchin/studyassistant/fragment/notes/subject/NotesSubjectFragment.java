@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
@@ -147,7 +148,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                         }
                     }
                 } catch (ParseException e) {
-                    Log.w(MainActivity.LOG_APP_NAME, "Parse Error: Failed to parse date "
+                    Log.w(ActivityConstants.LOG_APP_NAME, "Parse Error: Failed to parse date "
                             + note.get(4) + " as standard date time.");
                 }
             }

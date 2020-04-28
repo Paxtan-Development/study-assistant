@@ -74,39 +74,6 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    // Shared preference constants
-    public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
-    public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
-
-    // General intent constants
-    public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
-    public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";
-    public static final String INTENT_VALUE_REQUEST_CODE = "requestCode";
-
-    // Intent constants for notes
-    public static final String INTENT_VALUE_SUBJECT = "subject";
-    public static final String INTENT_VALUE_MESSAGE = "message";
-    public static final String INTENT_VALUE_TITLE = "title";
-
-    // Intent constants for projects
-    public static final String INTENT_PROJECT_ID = "projectID";
-    public static final String INTENT_ID2 = "id2";
-    public static final String INTENT_IS_MEMBER = "isMember";
-
-    // Intent codes
-    public static final int SELECT_ZIP_FILE = 300;
-    public static final int SELECT_SUBJECT_FILE = 301;
-    public static final int SELECT_PROJECT_ICON = 302;
-
-    // Permission codes
-    private static final int EXTERNAL_STORAGE_PERMISSION = 200;
-    public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
-
-    // Other constants
-    public static final String DATABASE_NOTES = "notesSubject";
-    public static final String DATABASE_PROJECT = "projectDatabase";
-    public static final String LOG_APP_NAME = "StudyAssistant";
-
     public BottomNavigationView bottomNavView;
     public ViewPager pager;
     public Fragment currentFragment;
@@ -163,7 +130,7 @@ public class MainActivity extends AppCompatActivity
                     .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        EXTERNAL_STORAGE_PERMISSION);
+                        ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
             }
 
             // Set up Admin & Member roles in database for projects
@@ -210,32 +177,32 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 SharedPreferences sharedPref = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-                String pastUpdateFilePath = sharedPref.getString(SHAREDPREF_APP_UPDATE_PATH, "");
+                String pastUpdateFilePath = sharedPref.getString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, "");
                 if (pastUpdateFilePath.length() != 0) {
                     File pastUpdateFile = new File(pastUpdateFilePath);
                     if (pastUpdateFile.exists()) {
                         if (pastUpdateFile.delete()) {
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString(SHAREDPREF_APP_UPDATE_PATH,"");
+                            editor.putString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH,"");
                             editor.apply();
                         } else {
-                            Log.w(LOG_APP_NAME, "File Error: File "
+                            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: File "
                                     + pastUpdateFilePath + " could not be deleted.");
                         }
                     } else {
                         // File has already been removed
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(SHAREDPREF_APP_UPDATE_PATH, "");
+                        editor.putString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, "");
                         editor.apply();
                     }
                 }
             });
 
             // Only check for updates once a day for non-beta users
-            if (getIntent().getBooleanExtra(INTENT_VALUE_DISPLAY_UPDATE, false)) {
+            if (getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, true));
             } else if (!Objects.equals(getSharedPreferences(getPackageName(), MODE_PRIVATE)
-                            .getString(SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                            .getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
                     ConverterFunctions.standardDateFormat.format(new Date()))) {
                 new Handler().post(() -> new AppUpdate(MainActivity.this, false));
             }
@@ -248,8 +215,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Get subject, if needed from Intent
-        if (getIntent().getBooleanExtra(INTENT_VALUE_START_FRAGMENT, false)) {
-            String targetSubject = getIntent().getStringExtra(INTENT_VALUE_SUBJECT);
+        if (getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, false)) {
+            String targetSubject = getIntent().getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
             displayFragment(NotesSubjectFragment.newInstance(targetSubject));
         }
 
@@ -313,7 +280,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == EXTERNAL_STORAGE_PERMISSION) {
+        if (requestCode == ActivityConstants.EXTERNAL_STORAGE_PERMISSION) {
             if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, R.string.error_write_permission_denied,
                         Toast.LENGTH_SHORT).show();
@@ -331,17 +298,17 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data.getData() != null) {
             String targetFile = FileFunctions.getRealPathFromUri(MainActivity.this, data.getData());
-            if (requestCode == SELECT_ZIP_FILE) {
+            if (requestCode == ActivityConstants.SELECT_ZIP_FILE) {
                 // Sample URI:
                 // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
                 new ImportSubjectZip(MainActivity.this).importZipConfirm(targetFile);
-            } else if (requestCode == SELECT_SUBJECT_FILE) {
+            } else if (requestCode == ActivityConstants.SELECT_SUBJECT_FILE) {
                 if (targetFile.endsWith(".subject")) {
                     new ImportSubjectSubject(MainActivity.this).importSubjectFile(targetFile);
                 } else {
                     Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == SELECT_PROJECT_ICON) {
+            } else if (requestCode == ActivityConstants.SELECT_PROJECT_ICON) {
                 // TODO: Forward image to project settings
                 new ImportProjectIcon(MainActivity.this).start();
             } else {

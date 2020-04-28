@@ -29,6 +29,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
@@ -134,7 +135,7 @@ public class NotesViewFragmentClick2 {
     /** Inserts the alarm and resets the menu. **/
     private void insertAlarm(AlarmManager manager, PendingIntent alarmIntent, Calendar targetDateTime) {
         if (manager != null) {
-            Log.w(MainActivity.LOG_APP_NAME, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+            Log.w(ActivityConstants.LOG_APP_NAME, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // User may use note alert to do important things, so
                 // they would need to be called when when idle
@@ -236,10 +237,10 @@ public class NotesViewFragmentClick2 {
      * @see NotesNotifyReceiver **/
     private PendingIntent getNotifyReceiverIntent(int requestCode) {
         Intent intent = new Intent(fragment.getActivity(), NotesNotifyReceiver.class);
-        intent.putExtra(MainActivity.INTENT_VALUE_TITLE, fragment.notesInfo.get(0));
-        intent.putExtra(MainActivity.INTENT_VALUE_MESSAGE, fragment.notesInfo.get(2));
-        intent.putExtra(MainActivity.INTENT_VALUE_SUBJECT, fragment.notesSubject);
-        intent.putExtra(MainActivity.INTENT_VALUE_REQUEST_CODE, fragment.notesInfo.get(5));
+        intent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, fragment.notesInfo.get(0));
+        intent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, fragment.notesInfo.get(2));
+        intent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, fragment.notesSubject);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, fragment.notesInfo.get(5));
         return PendingIntent.getBroadcast(fragment.getActivity(), requestCode, intent, 0);
     }
 }

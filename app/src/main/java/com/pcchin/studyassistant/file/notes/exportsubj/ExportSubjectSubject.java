@@ -26,11 +26,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -114,18 +114,18 @@ public class ExportSubjectSubject {
                     exportSubjectFile(finalOutputFileName, finalResponseText, finalResponseText1, outputStream);
                 }
             } else {
-                Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
+                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
                         + finalOutputFileName + " cannot be created.");
                 Toast.makeText(fragment.getContext(), R.string.n2_error_file_not_created,
                         Toast.LENGTH_SHORT).show();
             }
         } catch (FileNotFoundException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: File "
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
                     + finalOutputFileName + " not found, stack trace is");
             e.printStackTrace();
             dialogInterface.dismiss();
         } catch (IOException e) {
-            Log.e(MainActivity.LOG_APP_NAME, "File Error: An IO Exception"
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: An IO Exception"
                     + " occurred on file " + finalOutputFileName + ", stack trace is");
             e.printStackTrace();
             dialogInterface.dismiss();

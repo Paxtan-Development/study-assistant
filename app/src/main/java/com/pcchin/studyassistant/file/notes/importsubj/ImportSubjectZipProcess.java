@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
@@ -65,7 +66,7 @@ class ImportSubjectZipProcess {
         if (tempInputDir.exists() && tempInputDir.isDirectory()) {
             getZipFiles(inputFile, tempInputDir);
         } else {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: Folder "+ tempInputDirPath
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Folder "+ tempInputDirPath
                     + " is not found");
             Toast.makeText(activity, R.string.file_error, Toast.LENGTH_SHORT).show();
         }
@@ -84,7 +85,7 @@ class ImportSubjectZipProcess {
         if (title.length() > 0) {
             new ImportSubject(activity).importSubjectToDatabase(title, content, listOrder);
         } else {
-            Log.w(MainActivity.LOG_APP_NAME, "File Error: Title of subject in ZIP file "
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Title of subject in ZIP file "
                     + inputFile.getFile().getAbsolutePath() + " invalid.");
             Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
         }
@@ -130,7 +131,7 @@ class ImportSubjectZipProcess {
             try {
                 processFile(file, notesInfo, content);
             } catch (FileNotFoundException e) {
-                Log.e(MainActivity.LOG_APP_NAME, "File Error: ");
+                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: ");
                 e.printStackTrace();
             }
         }
@@ -206,7 +207,7 @@ class ImportSubjectZipProcess {
                 try (Scanner scanner = new Scanner(file)) {
                     while (scanner.hasNext()) subjInfo.add(scanner.next());
                 } catch (FileNotFoundException e) {
-                    Log.e(MainActivity.LOG_APP_NAME, "File Error: " + file.getAbsolutePath()
+                    Log.e(ActivityConstants.LOG_APP_NAME, "File Error: " + file.getAbsolutePath()
                             + " not found despite contained in file list of parent folder. " +
                             "Stack trace is");
                     e.printStackTrace();

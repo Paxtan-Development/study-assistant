@@ -20,11 +20,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 /** Functions generally used throughout the app. **/
@@ -47,7 +47,7 @@ public final class GeneralFunctions {
     @NonNull
     public static SubjectDatabase getSubjectDatabase(Context context) {
         return Room.databaseBuilder(context, SubjectDatabase.class,
-                MainActivity.DATABASE_NOTES).allowMainThreadQueries()
+                ActivityConstants.DATABASE_NOTES).allowMainThreadQueries()
                 .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
     }
 
@@ -55,7 +55,7 @@ public final class GeneralFunctions {
     @NonNull
     public static ProjectDatabase getProjectDatabase(Context context) {
         return Room.databaseBuilder(context, ProjectDatabase.class,
-                MainActivity.DATABASE_PROJECT)
+                ActivityConstants.DATABASE_PROJECT)
                 .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
                 .allowMainThreadQueries().build();
     }

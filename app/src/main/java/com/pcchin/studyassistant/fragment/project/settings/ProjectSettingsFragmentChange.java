@@ -28,14 +28,16 @@ import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.Date;
 
-/** Functions that are called when preferences in ProjectSettingsFragment are changed. **/
+/** Functions that are called when a preference is changed in
+ * @see ProjectSettingsFragment **/
 final class ProjectSettingsFragmentChange {
     private ProjectSettingsFragment fragment;
     private MainActivity activity;
 
-    ProjectSettingsFragmentChange(ProjectSettingsFragment fragment, MainActivity activity) {
+    /** Constructor for the class as fragment needs to be passed on. **/
+    ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = activity;
+        this.activity = (MainActivity) fragment.getActivity();
     }
 
     /** Detects the value change of general preferences. **/

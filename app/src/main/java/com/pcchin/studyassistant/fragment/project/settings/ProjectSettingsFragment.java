@@ -17,24 +17,18 @@ package com.pcchin.studyassistant.fragment.project.settings;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreference;
 
 import com.pcchin.dtpreference.DatePreference;
-import com.pcchin.dtpreference.dialog.DatePreferenceDialog;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
@@ -49,28 +43,16 @@ import com.pcchin.studyassistant.preference.PasswordPreference;
 import com.pcchin.studyassistant.preference.PasswordPreferenceDialog;
 import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
-
-import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 
 public class ProjectSettingsFragment extends PreferenceFragmentCompat implements ExtendedFragment,
         PreferenceManager.OnPreferenceTreeClickListener,
         Preference.OnPreferenceChangeListener {
-
-    private String currentPrefRoot = PreferenceString.PREF_MENU_ROOT;
+    public ProjectData project;
+    String currentPrefRoot = PreferenceString.PREF_MENU_ROOT;
     private String id2;
     private boolean isMember;
-
-    private static final String ARG_ID = "projectID",
-            ARG_ID2 = "ID2",
-            ARG_IS_MEMBER = "isMember";
-
+    private static final String ARG_ID = "projectID", ARG_ID2 = "ID2", ARG_IS_MEMBER = "isMember";
     private ProjectDatabase projectDatabase;
-    public ProjectData project;
 
     // Mutually exclusive unless the project has both of those enabled
     private MemberData member;
@@ -131,138 +113,69 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     /** Delegates the preference click listeners to their own functions. **/
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        // No PREF_FEATURES as they have no features available
+        ProjectSettingsFragmentClick click = new ProjectSettingsFragmentClick(ProjectSettingsFragment.this);
         switch (currentPrefRoot) {
             case PreferenceString.PREF_MENU_ROOT:
-                rootPreferenceClick(preference);
+                click.rootPreferenceClick(preference);
                 break;
             case PreferenceString.PREF_MENU_GENERAL:
-                generalPreferenceClick(preference);
+                click.generalPreferenceClick(preference);
                 break;
             case PreferenceString.PREF_MENU_FEATURES:
-                featurePreferenceClick(preference);
+                click.featurePreferenceClick(preference);
                 break;
             case PreferenceString.PREF_MENU_DATE:
-                datePreferenceClick(preference);
+                click.datePreferenceClick(preference);
                 break;
             case PreferenceString.PREF_MENU_SECURITY:
-                securityPreferenceClick();
+                click.securityPreferenceClick(preference);
                 break;
         }
         return false;
     }
 
-    /** The tree click listeners for the root preferences. **/
-    private void rootPreferenceClick(@NonNull Preference preference) {
-        currentPrefRoot = preference.getKey();
-        displayPreference(currentPrefRoot);
+    /** Starts the intent to pick an icon. **/
+    void startPickIconIntent() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(ActivityConstants.INTENT_PROJECT_ID, project.projectID);
+        intent.putExtra(ActivityConstants.INTENT_IS_MEMBER, isMember);
+        intent.putExtra(ActivityConstants.INTENT_ID2, id2);
+        startActivityForResult(intent, ActivityConstants.SELECT_PROJECT_ICON);
     }
 
-    /** The tree click listeners for the general preferences. **/
-    private void generalPreferenceClick(@NonNull Preference preference) {
-        if (getActivity() != null) {
-            String iconLocation = getActivity().getFilesDir().toString() + "/icons/project/"
-                    + project.projectID + ".jpg";
-            switch (preference.getKey()) {
-                case PreferenceString.PREF_SET_ICON:
-                case PreferenceString.PREF_UPDATE_ICON:
-                    // Set icon, continued in MainActivity
-                    Intent intent = new Intent();
-                    intent.setType("image/*");
-                    intent.putExtra(ActivityConstants.INTENT_PROJECT_ID, project.projectID);
-                    intent.putExtra(ActivityConstants.INTENT_IS_MEMBER, isMember);
-                    intent.putExtra(ActivityConstants.INTENT_ID2, id2);
-                    startActivityForResult(intent, ActivityConstants.SELECT_PROJECT_ICON);
-                    break;
-                case PreferenceString.PREF_REMOVE_ICON:
-                    // Remove icon
-                    File iconFile = new File(iconLocation);
-                    if (iconFile.delete()) {
-                        project.hasIcon = false;
-                    } else {
-                        Toast.makeText(getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-            updateProject();
-        }
-    }
-
-    /** The tree click listeners for the feature preferences. **/
-    private void featurePreferenceClick(@NonNull Preference preference) {
-        switch(preference.getKey()) {
-            case PreferenceString.PREF_STATUS_ICON:
-                switch(project.projectStatusIcon) {
-                    case R.string.blank:
-                        ((ListPreference) preference).setValue("None");
-                        break;
-                    case R.drawable.status_ic_circle:
-                        ((ListPreference) preference).setValue("Circle");
-                        break;
-                    case R.drawable.status_ic_triangle:
-                        ((ListPreference) preference).setValue("Triangle");
-                        break;
-                    case R.drawable.status_ic_square:
-                        ((ListPreference) preference).setValue("Square");
-                }
-                break;
-            case PreferenceString.PREF_RELATED_SUBJECT:
-                ((ListPreference) preference).setValue(project.associatedSubject);
-                break;
-        }
-    }
-
-    /** The tree click listeners for the date preferences. **/
-    private void datePreferenceClick(@NonNull Preference preference) {
-        switch(preference.getKey()) {
-            case PreferenceString.PREF_REMOVE_EXPECTED_START:
-                project.expectedStartDate = null;
-                break;
-            case PreferenceString.PREF_REMOVE_EXPECTED_END:
-                project.expectedEndDate = null;
-                break;
-            case PreferenceString.PREF_REMOVE_ACTUAL_START:
-                project.actualStartDate = null;
-                break;
-            case PreferenceString.PREF_REMOVE_ACTUAL_END:
-                project.actualEndDate = null;
-                break;
-        }
-        updateProject();
-    }
-
-    /** The tree click listeners for the security preferences. **/
-    private void securityPreferenceClick() {
-        project.projectPass = "";
-        project.projectProtected = false;
-        updateProject();
-    }
-
-    /** Delegates the show/hide of preferences to their own functions. **/
-    private void displayPreference(@NonNull String key) {
-        // No need to customize PREF_ROOT as there is nothing to customize
+    /** Delegates the show/hide of preferences to their own functions within
+     * @see ProjectSettingsFragmentCustomize
+     * No need to customize PREF_ROOT as there is nothing to customize. **/
+    void displayPreference(@NonNull String key) {
+        ProjectSettingsFragmentCustomize customize = new ProjectSettingsFragmentCustomize(ProjectSettingsFragment.this);
         switch (key) {
             case PreferenceString.PREF_MENU_ROOT:
                 setPreferencesFromResource(R.xml.p3_preference_list, key);
                 break;
             case PreferenceString.PREF_MENU_GENERAL:
                 setPreferencesFromResource(R.xml.p3_general_preference_list, key);
-                customizeGeneralPreference();
+                customize.customizeGeneralPreference();
                 break;
             case PreferenceString.PREF_MENU_FEATURES:
                 setPreferencesFromResource(R.xml.p3_features_preference_list, key);
-                customizeFeaturePreference();
+                customize.customizeFeaturePreference();
                 break;
             case PreferenceString.PREF_MENU_DATE:
                 setPreferencesFromResource(R.xml.p3_date_preference_list, key);
-                customizeDatePreference();
+                customize.customizeDatePreference();
                 break;
             case PreferenceString.PREF_MENU_SECURITY:
                 setPreferencesFromResource(R.xml.p3_security_preference_list, key);
-                customizeSecurityPreference();
+                customize.customizeSecurityPreference();
                 break;
         }
-        // Recursively register listener (Inside Handler to reduce lag)
+        registerPrefListener();
+    }
+
+    /** Recursively register listeners for the preferences.
+     * This is done inside a handler to reduce lag. **/
+    private void registerPrefListener() {
         new Handler().postDelayed(() -> {
             PreferenceScreen pScreen = getPreferenceManager().getPreferenceScreen();
             for (int i = 0; i < pScreen.getPreferenceCount(); i++) {
@@ -276,84 +189,12 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         }, 0);
     }
 
-    /** Customize the general preferences. **/
-    private void customizeGeneralPreference() {
-        ((EditTextPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_TITLE)))
-                .setText(project.projectTitle);
-        ((EditTextPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_DESC)))
-                .setText(project.description);
-        if (project.hasIcon) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_ICON))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_ICON))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_ICON))).setVisible(false);
-        }
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_COMPLETED))).setChecked(!project.projectOngoing);
-    }
-
-    /** Customize the feature preferences. **/
-    private void customizeFeaturePreference() {
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_MEMBERS))).setChecked(project.membersEnabled);
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_ROLES))).setChecked(project.rolesEnabled);
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_TASKS))).setChecked(project.taskEnabled);
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_STATUS))).setChecked(project.statusEnabled);
-        ((SwitchPreference) Objects.requireNonNull(findPreference(PreferenceString.PREF_MERGE_TASK_STATUS))).setChecked(project.mergeTaskStatus);
-        // Handler for setting related subject as database access is needed
-        new Handler().postDelayed(() -> {
-            if (getActivity() != null) {
-                SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
-                List<NotesSubject> subjectList = database.SubjectDao().getAll();
-                CharSequence[] subjectNameList = new CharSequence[subjectList.size()];
-                for (int i = 0; i < subjectList.size(); i++) {
-                    subjectNameList[i] = subjectList.get(i).title;
-                }
-                ListPreference subjectPreference = Objects.requireNonNull(findPreference(PreferenceString.PREF_RELATED_SUBJECT));
-                subjectPreference.setEntries(subjectNameList);
-                subjectPreference.setEntryValues(subjectNameList);
-                database.close();
-            }
-        }, 0);
-    }
-
-    /** Customize the date preferences. **/
-    private void customizeDatePreference() {
-        customizeDatePref(project.expectedStartDate, PreferenceString.PREF_SET_EXPECTED_START,
-                PreferenceString.PREF_UPDATE_EXPECTED_START, PreferenceString.PREF_REMOVE_EXPECTED_START);
-        customizeDatePref(project.expectedEndDate, PreferenceString.PREF_SET_EXPECTED_END,
-                PreferenceString.PREF_UPDATE_EXPECTED_END, PreferenceString.PREF_REMOVE_EXPECTED_END);
-        customizeDatePref(project.actualStartDate, PreferenceString.PREF_SET_ACTUAL_START,
-                PreferenceString.PREF_UPDATE_ACTUAL_START, PreferenceString.PREF_REMOVE_ACTUAL_START);
-        customizeDatePref(project.actualEndDate, PreferenceString.PREF_SET_ACTUAL_END,
-                PreferenceString.PREF_UPDATE_ACTUAL_END, PreferenceString.PREF_REMOVE_ACTUAL_END);
-    }
-
-    /** Customize the preference of a specific date. **/
-    private void customizeDatePref(Date date, String setPref,
-                                   String updatePref, String deletePref) {
-        if (date == null) {
-            ((Preference) Objects.requireNonNull(findPreference(updatePref))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(deletePref))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(setPref))).setVisible(false);
-        }
-    }
-
-    /** Customize the security preferences. **/
-    private void customizeSecurityPreference() {
-        if (project.projectPass.length() == 0) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_PW))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_PW))).setVisible(false);
-        } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_PW))).setVisible(false);
-        }
-    }
-
-    /** Delegates the value change of preferences to their own functions. **/
+    /** Delegates the value change of preferences to their own functions within
+     * @see ProjectSettingsFragmentChange **/
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         // No need for PREF_ROOT as it is handled in the tree click listeners
-        ProjectSettingsFragmentChange change = new ProjectSettingsFragmentChange(
-                ProjectSettingsFragment.this, (MainActivity) getActivity());
+        ProjectSettingsFragmentChange change = new ProjectSettingsFragmentChange(ProjectSettingsFragment.this);
         switch (currentPrefRoot) {
             case PreferenceString.PREF_MENU_GENERAL:
                 change.generalPrefChanged(preference, newValue);
@@ -379,7 +220,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         // DatePreference, TimePreference or DateTimePreference
         DialogFragment dialogFragment = null;
         if (preference instanceof DatePreference) {
-            dialogFragment = getDatePreferenceDialog((DatePreference) preference);
+            dialogFragment = ProjectSettingsFragmentStatic.getDatePreferenceDialog(ProjectSettingsFragment.this, (DatePreference) preference);
         } else if (preference instanceof PasswordPreference) {
             dialogFragment = PasswordPreferenceDialog.newInstance(preference.getKey(), project.salt);
         } else if (preference instanceof DefaultDialogPreference) {
@@ -400,53 +241,6 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     void updateProject() {
         projectDatabase.ProjectDao().update(project);
         displayPreference(currentPrefRoot);
-    }
-
-    /** Gets the dialog fragments for date preferences. **/
-    private DatePreferenceDialog getDatePreferenceDialog(@NonNull DatePreference preference) {
-        long currentDate = Calendar.getInstance().getTimeInMillis();
-        switch (preference.getKey()) {
-            case PreferenceString.PREF_SET_EXPECTED_START:
-            case PreferenceString.PREF_UPDATE_EXPECTED_START:
-                // Expected start date must be before expected end date
-                if (project.expectedEndDate == null) {
-                    return DatePreferenceDialog.newInstance(preference.getKey());
-                } else {
-                    return DatePreferenceDialog.newInstance(preference.getKey(),
-                            -1, project.expectedEndDate.getTime())
-                            .setInitialDate(project.expectedStartDate.getTime());
-                }
-            case PreferenceString.PREF_SET_EXPECTED_END:
-            case PreferenceString.PREF_UPDATE_EXPECTED_END:
-                // Expected end date must be after expected start date
-                if (project.expectedStartDate == null) {
-                    return DatePreferenceDialog.newInstance(preference.getKey());
-                } else {
-                    return DatePreferenceDialog.newInstance(preference.getKey(),
-                            project.expectedStartDate.getTime(), -1)
-                            .setInitialDate(project.expectedEndDate.getTime());
-                }
-            case PreferenceString.PREF_SET_ACTUAL_START:
-            case PreferenceString.PREF_UPDATE_ACTUAL_START:
-                // Actual start date must be in the past and before the actual end date
-                if (project.actualEndDate == null) {
-                    return DatePreferenceDialog.newInstance(preference.getKey(), -1, currentDate);
-                } else {
-                    return DatePreferenceDialog.newInstance(preference.getKey(), -1, project.actualEndDate.getTime())
-                            .setInitialDate(project.actualEndDate.getTime());
-                }
-            case PreferenceString.PREF_SET_ACTUAL_END:
-            case PreferenceString.PREF_UPDATE_ACTUAL_END:
-                // Actual end date must be in the past and after the actual start date
-                if (project.actualStartDate == null) {
-                    return DatePreferenceDialog.newInstance(preference.getKey(), -1, currentDate);
-                } else {
-                    return DatePreferenceDialog.newInstance(preference.getKey(),
-                            project.actualStartDate.getTime(), currentDate)
-                            .setInitialDate(project.actualStartDate.getTime());
-                }
-        }
-        return null;
     }
 
     /** Returns to

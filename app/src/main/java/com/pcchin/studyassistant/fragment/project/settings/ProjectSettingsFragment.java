@@ -48,7 +48,7 @@ import com.pcchin.studyassistant.preference.PasswordPreference;
 import com.pcchin.studyassistant.preference.PasswordPreferenceDialog;
 import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.io.File;
 import java.util.Calendar;

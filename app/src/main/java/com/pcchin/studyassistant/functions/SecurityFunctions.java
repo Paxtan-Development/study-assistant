@@ -16,7 +16,7 @@ package com.pcchin.studyassistant.functions;
 import android.util.Base64;
 import android.util.Log;
 
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;

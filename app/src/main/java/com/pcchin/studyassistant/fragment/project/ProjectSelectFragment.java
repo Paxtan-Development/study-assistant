@@ -32,7 +32,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
 

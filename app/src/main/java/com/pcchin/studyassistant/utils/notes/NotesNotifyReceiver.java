@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Objects;

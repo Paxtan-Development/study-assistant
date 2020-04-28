@@ -40,7 +40,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

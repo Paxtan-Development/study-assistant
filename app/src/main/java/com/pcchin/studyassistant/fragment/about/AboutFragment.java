@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 

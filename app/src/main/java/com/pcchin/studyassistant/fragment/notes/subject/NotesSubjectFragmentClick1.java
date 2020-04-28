@@ -26,7 +26,7 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesSortAdaptor;
 
 /** 1st class for the functions for the onClickListeners in the fragment. **/

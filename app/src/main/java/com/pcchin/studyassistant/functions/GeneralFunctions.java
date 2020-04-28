@@ -24,7 +24,7 @@ import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 /** Functions generally used throughout the app. **/

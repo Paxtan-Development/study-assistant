@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.ui;
+package com.pcchin.studyassistant.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -50,17 +50,12 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
+import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesEditFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
-import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick1;
-import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick2;
-import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragmentClick1;
-import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragmentClick2;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
-import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
@@ -71,7 +66,7 @@ import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.network.AppUpdate;
-import com.pcchin.studyassistant.file.project.ImportProjectIcon;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.io.File;
 import java.util.Date;
@@ -277,91 +272,7 @@ public class MainActivity extends AppCompatActivity
     /** Delegates the items that are selected on the menu to the respective fragments. **/
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()) {
-            // When NotesSelectFragment or ProjectSelectFragment is activated
-            case R.id.menu_new_subj:
-                if (currentFragment instanceof NotesSelectFragment) {
-                    ((NotesSelectFragment) currentFragment).onNewSubjectPressed();
-                } else {
-                    ((ProjectSelectFragment) currentFragment).onNewProjectPressed();
-                }
-                break;
-            case R.id.menu_import:
-                if (currentFragment instanceof  NotesSelectFragment) {
-                    ((NotesSelectFragment) currentFragment).onImportPressed();
-                } else {
-                    ((ProjectSelectFragment) currentFragment).onImportPressed();
-                }
-                break;
-
-            // When NotesSubjectFragment is activated
-            case R.id.n2_new_note:
-                new NotesSubjectFragmentClick1((NotesSubjectFragment) currentFragment).onNewNotePressed();
-                break;
-            case R.id.n2_sort:
-                new NotesSubjectFragmentClick1((NotesSubjectFragment) currentFragment).onSortPressed();
-                break;
-            case R.id.n2_rename:
-                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onRenamePressed();
-                break;
-            case R.id.n2_export:
-                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onExportPressed();
-                break;
-            case R.id.n2_del:
-                new NotesSubjectFragmentClick2((NotesSubjectFragment) currentFragment).onDeletePressed();
-                break;
-
-            // When NotesViewFragment is activated
-            case R.id.n3_edit:
-                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onEditPressed();
-                break;
-            case R.id.n3_export:
-                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onExportPressed();
-                break;
-            case R.id.n3_lock:
-                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onLockPressed();
-                break;
-            case R.id.n3_unlock:
-                new NotesViewFragmentClick1((NotesViewFragment) currentFragment).onUnlockPressed();
-                break;
-            case R.id.n3_notif:
-                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onAlertPressed();
-                break;
-            case R.id.n3_cancel_notif:
-                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onCancelAlertPressed();
-                break;
-            case R.id.n3_del:
-                new NotesViewFragmentClick2((NotesViewFragment) currentFragment).onDeletePressed();
-                break;
-
-            // When NotesEditFragment is selected
-            case R.id.n4_subj:
-                ((NotesEditFragment) currentFragment).onSubjPressed();
-                break;
-            case R.id.n4_save:
-                ((NotesEditFragment) currentFragment).onSavePressed();
-                break;
-            case R.id.n4_cancel:
-                ((NotesEditFragment) currentFragment).onCancelPressed();
-                break;
-
-            // When ProjectInfoFragment is selected
-            case R.id.p2_menu_user:
-                ((ProjectInfoFragment) currentFragment).onUserPressed();
-                break;
-            case R.id.p2_menu_notes:
-                ((ProjectInfoFragment) currentFragment).onNotesPressed();
-                break;
-            case R.id.p2_menu_settings:
-                ((ProjectInfoFragment) currentFragment).onSettingsPressed();
-                break;
-            case R.id.p2_menu_media:
-                ((ProjectInfoFragment) currentFragment).onMediaPressed();
-                break;
-            case R.id.p2_menu_export:
-                ((ProjectInfoFragment) currentFragment).onExportPressed();
-                break;
-        }
+        MainActivityOptions.processOption(item.getItemId(), currentFragment);
         return true;
     }
 

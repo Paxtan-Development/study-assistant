@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 public class RssLicenseFragment extends Fragment implements ExtendedFragment {

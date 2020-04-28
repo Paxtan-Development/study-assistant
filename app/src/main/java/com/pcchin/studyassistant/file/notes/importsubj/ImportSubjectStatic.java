@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 /** Static functions used  in ImportSubject. **/
 public final class ImportSubjectStatic {

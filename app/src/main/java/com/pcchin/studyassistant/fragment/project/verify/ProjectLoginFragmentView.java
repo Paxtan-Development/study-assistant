@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;

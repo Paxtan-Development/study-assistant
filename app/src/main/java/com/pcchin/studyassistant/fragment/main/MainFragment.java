@@ -23,14 +23,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 public class MainFragment extends Fragment implements ExtendedFragment {
     private boolean doubleBackToExitPressedOnce;

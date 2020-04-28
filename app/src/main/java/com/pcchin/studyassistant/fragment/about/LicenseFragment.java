@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment;
 import com.pcchin.licenseview.LicenseView;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,

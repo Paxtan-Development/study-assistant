@@ -34,7 +34,7 @@ import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Objects;

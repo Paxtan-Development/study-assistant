@@ -13,7 +13,7 @@
 
 package com.pcchin.studyassistant.file.project;
 
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 /** A class used to import the image icon for a specific project.
  * As this class extends Thread, it should be used as such as well. **/

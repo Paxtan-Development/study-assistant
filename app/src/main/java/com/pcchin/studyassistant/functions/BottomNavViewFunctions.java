@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragme
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 /** Functions used for updating the bottom navigation view within the app. **/
 public final class BottomNavViewFunctions {

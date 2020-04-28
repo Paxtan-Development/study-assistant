@@ -24,7 +24,7 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.Date;
 

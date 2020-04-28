@@ -40,7 +40,7 @@ import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.util.ArrayList;

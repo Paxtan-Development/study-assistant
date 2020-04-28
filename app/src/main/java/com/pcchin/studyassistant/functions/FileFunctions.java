@@ -21,7 +21,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;

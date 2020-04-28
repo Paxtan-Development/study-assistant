@@ -31,7 +31,7 @@ import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.List;
 

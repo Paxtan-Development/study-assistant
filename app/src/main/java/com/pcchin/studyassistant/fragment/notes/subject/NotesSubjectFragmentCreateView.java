@@ -25,7 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.ui.MainActivity;
+import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
 

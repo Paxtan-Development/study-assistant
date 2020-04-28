@@ -18,6 +18,9 @@ plugins:
   sonar-java:
     enabled: true
     checks:
+      # End switch statement with break, disabled as many options needed to fall through
+      squid:S128:
+        enabled: false
       # Most switches do not need to have default
       squid:SwitchLastCaseIsDefaultCheck:
         enabled: false

@@ -50,6 +50,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
     }
 
     /** Constructor used when signing up for a new profile. **/
+    @NonNull
     public static ProjectSignupFragment newInstance(String projectID) {
         ProjectSignupFragment fragment = new ProjectSignupFragment();
         Bundle args = new Bundle();
@@ -81,11 +82,9 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
 
     /** Sets up the layout for the sign up info. **/
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View returnView = inflater.inflate(R.layout.fragment_project_signup, container, false);
         ((TextView) returnView.findViewById(R.id.v1_title)).setText(project.projectTitle);
-
         TextInputLayout usernameInput = returnView.findViewById(R.id.v1_username_input),
                 passwordInput1 = returnView.findViewById(R.id.v1_password1_input),
                 passwordInput2 = returnView.findViewById(R.id.v1_password2_input),
@@ -95,72 +94,86 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
         if (getActivity() != null) {
             returnView.findViewById(R.id.v1_return).setOnClickListener(view -> {
                 projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(
-                        ProjectLoginFragment.newInstance(project.projectID));
+                ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
             });
             returnView.findViewById(R.id.v1_signup).setOnClickListener(view -> {
                 // Get all inputs
                 usernameInput.setErrorEnabled(false);
                 passwordInput1.setErrorEnabled(false);
                 passwordInput2.setErrorEnabled(false);
-                if (usernameInput.getEditText() != null && passwordInput1.getEditText() != null
-                        && passwordInput2.getEditText() != null && fullnameInput.getEditText() != null) {
-                    // Check username
-                    String usernameText = usernameInput.getEditText().getText().toString(),
-                            passwordText1 = passwordInput1.getEditText().getText().toString(),
-                            passwordText2 = passwordInput2.getEditText().getText().toString(),
-                            fullName = fullnameInput.getEditText().getText().toString();
-                    if (usernameText.length() == 0) {
-                        // Username is blank
-                        usernameInput.setErrorEnabled(true);
-                        usernameInput.setError(getString(R.string.v_error_username_blank));
-                    } else if (usernameText.replaceAll("\\s+", "").length()
-                            != usernameText.length()) {
-                        // Username contains whitespace
-                        usernameInput.setErrorEnabled(true);
-                        usernameInput.setError(getString(R.string.v_error_username_whitespace));
-                    } else if (projectDatabase.MemberDao().searchInProjectByUsername
-                            (project.projectID, usernameText) != null) {
-                        // Username has been taken
-                        usernameInput.setErrorEnabled(true);
-                        usernameInput.setError(getString(R.string.v_error_username_taken));
-                    } else if (!Objects.equals(passwordText1, passwordText2)) {
-                        // Checks if both passwords are the same
-                        passwordInput2.setErrorEnabled(true);
-                        passwordInput2.setError(getString(R.string.error_password_unequal));
-                    } else if (passwordText1.length() > 0 && passwordText1.length() < 8) {
-                        // Password is too short
-                        passwordInput1.setErrorEnabled(true);
-                        passwordInput1.setError(getString(R.string.error_password_short));
-                    } else {
-                        // Generate member ID
-                        RandomString randomID = new RandomString(48);
-                        String memberID = randomID.nextString();
-                        while (projectDatabase.MemberDao().searchByID(memberID) != null) {
-                            memberID = randomID.nextString();
-                        }
-                        // Generate salt
-                        String salt = new RandomString(40).nextString();
-                        if (passwordText1.length() == 0) {
-                            projectDatabase.MemberDao().insert(new MemberData(memberID,
-                                    project.projectID, usernameText, fullName, salt,
-                                    "", project.memberDefaultRole));
-                        } else {
-                            String hashedPass = SecurityFunctions
-                                    .memberHash(passwordText1, salt, project.salt);
-                            projectDatabase.MemberDao().insert(new MemberData(memberID,
-                                    project.projectID, usernameText, fullName, salt,
-                                    hashedPass, project.memberDefaultRole));
-                        }
-                        projectDatabase.close();
-                        Toast.makeText(getActivity(), R.string.v1_member_created, Toast.LENGTH_SHORT).show();
-                        ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                .newInstance(project.projectID, memberID, true, true));
-                    }
-                }
+                checkUsername1(usernameInput, passwordInput1, passwordInput2, fullnameInput);
             });
         }
         return returnView;
+    }
+
+    /** 1st part of the function for checking the validity of the username. **/
+    private void checkUsername1(@NonNull TextInputLayout usernameInput, @NonNull TextInputLayout passwordInput1,
+                                @NonNull TextInputLayout passwordInput2, @NonNull TextInputLayout fullnameInput) {
+        String usernameText = Objects.requireNonNull(usernameInput.getEditText()).getText().toString(),
+                passwordText1 = Objects.requireNonNull(passwordInput1.getEditText()).getText().toString(),
+                passwordText2 = Objects.requireNonNull(passwordInput2.getEditText()).getText().toString(),
+                fullName = Objects.requireNonNull(fullnameInput.getEditText()).getText().toString();
+        if (usernameText.length() == 0) {
+            // Username is blank
+            usernameInput.setErrorEnabled(true);
+            usernameInput.setError(getString(R.string.v_error_username_blank));
+        } else if (usernameText.replaceAll("\\s+", "").length() != usernameText.length()) {
+            // Username contains whitespace
+            usernameInput.setErrorEnabled(true);
+            usernameInput.setError(getString(R.string.v_error_username_whitespace));
+        } else if (projectDatabase.MemberDao().searchInProjectByUsername
+                (project.projectID, usernameText) != null) {
+            // Username has been taken
+            usernameInput.setErrorEnabled(true);
+            usernameInput.setError(getString(R.string.v_error_username_taken));
+        } else checkUsername2(passwordInput1, passwordInput2, passwordText1, passwordText2, usernameText, fullName);
+    }
+
+    /** 2nd part of the function for checking the validity of the username. **/
+    private void checkUsername2(TextInputLayout passwordInput1, TextInputLayout passwordInput2,
+                                String passwordText1, String passwordText2,
+                                String usernameText, String fullName) {
+        if (!Objects.equals(passwordText1, passwordText2)) {
+            // Checks if both passwords are the same
+            passwordInput2.setErrorEnabled(true);
+            passwordInput2.setError(getString(R.string.error_password_unequal));
+        } else if (passwordText1.length() > 0 && passwordText1.length() < 8) {
+            // Password is too short
+            passwordInput1.setErrorEnabled(true);
+            passwordInput1.setError(getString(R.string.error_password_short));
+        } else {
+            // Generate member ID
+            RandomString randomID = new RandomString(48);
+            String memberID = randomID.nextString();
+            while (projectDatabase.MemberDao().searchByID(memberID) != null) {
+                memberID = randomID.nextString();
+            }
+            createMember((MainActivity) getActivity(), memberID,
+                    usernameText, fullName, passwordText1);
+        }
+    }
+
+    /** Creates a member based on the given memberID. **/
+    private void createMember(MainActivity activity, String memberID, String usernameText,
+                              String fullName, @NonNull String passwordText1) {
+        // Generate salt
+        String salt = new RandomString(40).nextString();
+        if (passwordText1.length() == 0) {
+            projectDatabase.MemberDao().insert(new MemberData(memberID,
+                    project.projectID, usernameText, fullName, salt,
+                    "", project.memberDefaultRole));
+        } else {
+            String hashedPass = SecurityFunctions
+                    .memberHash(passwordText1, salt, project.salt);
+            projectDatabase.MemberDao().insert(new MemberData(memberID,
+                    project.projectID, usernameText, fullName, salt,
+                    hashedPass, project.memberDefaultRole));
+        }
+        projectDatabase.close();
+        Toast.makeText(activity, R.string.v1_member_created, Toast.LENGTH_SHORT).show();
+        activity.displayFragment(ProjectInfoFragment.newInstance(project.projectID, memberID,
+                true, true));
     }
 
     /** Return to

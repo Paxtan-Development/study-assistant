@@ -39,9 +39,9 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
 import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
+import com.pcchin.studyassistant.functions.BottomNavViewFunctions;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.functions.BottomNavViewFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
@@ -91,7 +91,6 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             String projectID = getArguments().getString(ARG_ID), id2 = getArguments().getString(ARG_ID2);
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER),
                     updateNavView = getArguments().getBoolean(ARG_UPDATE_NAV_VIEW);
-
             projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
@@ -100,26 +99,29 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                     project, id2, isMember);
             member = (MemberData) idValidity[1];
             role = (RoleData) idValidity[2];
-
-            // idValidity[0] is equivalent to hasError
-            if ((boolean) idValidity[0]) {
-                // Return to ProjectSelectFragment (Same as onBackPressed) if any error is found
-                onBackPressed();
-            } else if (updateNavView) {
-                // Set up navigation menu for members and roles respectively only if requested
-                if (isMember) {
-                    BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
-                            R.menu.menu_p_bottom, project, member, null);
-                } else {
-                    BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
-                            R.menu.menu_p_bottom, project, null, role);
-                }
-            }
+            checkValidity((boolean) idValidity[0], updateNavView, isMember);
         } else {
             // getActivity() is somehow null, returns to previous fragment.
             onBackPressed();
         }
         setHasOptionsMenu(true);
+    }
+
+    /** Check the validity of the data given. **/
+    private void checkValidity(boolean hasError, boolean updateNavView, boolean isMember) {
+        if (hasError) {
+            // Return to ProjectSelectFragment (Same as onBackPressed) if any error is found
+            onBackPressed();
+        } else if (updateNavView) {
+            // Set up navigation menu for members and roles respectively only if requested
+            if (isMember) {
+                BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
+                        R.menu.menu_p_bottom, project, member, null);
+            } else {
+                BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
+                        R.menu.menu_p_bottom, project, null, role);
+            }
+        }
     }
 
     /** Sets up the layout for the fragment. **/
@@ -137,70 +139,73 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         if (getContext() != null) {
             // Set up layout
             ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
-            if (project.description.length() == 0) {
-                returnView.findViewById(R.id.p2_desc).setVisibility(View.GONE);
-            } else {
-                ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
-            }
-
-            // Set icon
-            if (project.hasIcon) {
-                ((ImageView) returnView.findViewById(R.id.p2_icon)).setImageURI(
-                        Uri.fromFile(new File(getContext().getFilesDir()
-                                + "/icons/project/" + project.projectID + ".jpg")));
-            } else {
-                // Center the title if there is no icon
-                returnView.findViewById(R.id.p2_icon).setVisibility(View.GONE);
-                ((TextView) returnView.findViewById(R.id.p2_title)).setGravity(Gravity.CENTER_HORIZONTAL);
-            }
-
-            // Set status
-            TextView statusView = returnView.findViewById(R.id.p2_status);
-            Date currentDate = new Date();
-            if (project.projectOngoing) {
-                if (project.expectedStartDate != null && project.expectedStartDate.after(currentDate)
-                        && (project.actualStartDate == null || project.actualStartDate.after(currentDate))) {
-                    // Project not started if expected start date is in the future
-                    // and actual start date is not set or is in the future
-                    statusView.setText(R.string.p_status_future);
-                } else if (project.expectedEndDate != null && currentDate.after(project.expectedEndDate)
-                        && (project.actualEndDate == null || project.actualEndDate.after(currentDate))) {
-                    // Project is considered delayed if current date is past the expected end date
-                    // and actual end date is not set or in the future
-                    statusView.setText(R.string.p_status_delayed);
-                } else if (project.actualEndDate != null && currentDate.after(project.actualEndDate)) {
-                    // Project is considered completed if actual end date is past the current date
-                    statusView.setText(R.string.p_status_completed);
-                } else {
-                    statusView.setText(R.string.p_status_ongoing);
-                }
-            } else {
-                statusView.setText(R.string.p_status_completed);
-            }
-
-            // Set dates
-            if (project.expectedStartDate != null) {
-                ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
-                        String.format("Expected Start Date: %s",
-                                ConverterFunctions.standardDateFormat.format(project.expectedStartDate)));
-            }
-            if (project.expectedEndDate != null) {
-                ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
-                        String.format("Expected End Date: %s",
-                                ConverterFunctions.standardDateFormat.format(project.expectedEndDate)));
-            }
-            if (project.actualStartDate != null) {
-                ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
-                        String.format("Actual Start Date: %s",
-                                ConverterFunctions.standardDateFormat.format(project.actualStartDate)));
-            }
-            if (project.actualEndDate != null) {
-                ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
-                        String.format("Actual End Date: %s",
-                                ConverterFunctions.standardDateFormat.format(project.actualEndDate)));
-            }
+            if (project.description.length() == 0) returnView.findViewById(R.id.p2_desc).setVisibility(View.GONE);
+            else ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
+            displayProjectIcon(returnView);
+            displayProjectStatus(returnView.findViewById(R.id.p2_status));
+            displayProjectDates(returnView);
         }
         return returnView;
+    }
+
+    /** Displays the icon for the project if it exists. **/
+    private void displayProjectIcon(View returnView) {
+        if (project.hasIcon) {
+            ((ImageView) returnView.findViewById(R.id.p2_icon)).setImageURI(Uri.fromFile(
+                    new File(requireContext().getFilesDir() + "/icons/project/"
+                            + project.projectID + ".jpg")));
+        } else {
+            // Center the title if there is no icon
+            returnView.findViewById(R.id.p2_icon).setVisibility(View.GONE);
+            ((TextView) returnView.findViewById(R.id.p2_title)).setGravity(Gravity.CENTER_HORIZONTAL);
+        }
+    }
+
+    /** Display the status of the project. **/
+    private void displayProjectStatus(TextView statusView) {
+        Date currentDate = new Date();
+        if (project.projectOngoing) {
+            if (project.expectedStartDate != null && project.expectedStartDate.after(currentDate)
+                    && (project.actualStartDate == null || project.actualStartDate.after(currentDate))) {
+                // Project not started if expected start date is in the future and actual start date is not set or is in the future
+                statusView.setText(R.string.p_status_future);
+            } else if (project.expectedEndDate != null && currentDate.after(project.expectedEndDate)
+                    && (project.actualEndDate == null || project.actualEndDate.after(currentDate))) {
+                // Project is considered delayed if current date is past the expected end date and actual end date is not set or in the future
+                statusView.setText(R.string.p_status_delayed);
+            } else if (project.actualEndDate != null && currentDate.after(project.actualEndDate)) {
+                // Project is considered completed if actual end date is past the current date
+                statusView.setText(R.string.p_status_completed);
+            } else {
+                statusView.setText(R.string.p_status_ongoing);
+            }
+        } else {
+            statusView.setText(R.string.p_status_completed);
+        }
+    }
+
+    /** Display the date values for the project. **/
+    private void displayProjectDates(View returnView) {
+        if (project.expectedStartDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
+                    String.format("Expected Start Date: %s",
+                            ConverterFunctions.standardDateFormat.format(project.expectedStartDate)));
+        }
+        if (project.expectedEndDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
+                    String.format("Expected End Date: %s",
+                            ConverterFunctions.standardDateFormat.format(project.expectedEndDate)));
+        }
+        if (project.actualStartDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                    String.format("Actual Start Date: %s",
+                            ConverterFunctions.standardDateFormat.format(project.actualStartDate)));
+        }
+        if (project.actualEndDate != null) {
+            ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
+                    String.format("Actual End Date: %s",
+                            ConverterFunctions.standardDateFormat.format(project.actualEndDate)));
+        }
     }
 
     /** Sets up the menu for the fragment. **/

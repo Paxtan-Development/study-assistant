@@ -42,6 +42,8 @@ import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.ui.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
+import java.util.Objects;
+
 public class ProjectCreateFragment extends Fragment implements ExtendedFragment {
     // Variables used in generateValidString
     public static final int TYPE_PROJECT = 0;
@@ -178,7 +180,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     }
                 } else {
                     // Members are not enabled
-                    if (projectPass1.getEditText().getText().length() == 0) {
+                    if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
                                 projectName.getEditText().getText().toString(), projectSalt,
                                 "", enableRoles, adminRole, memberRole));
@@ -190,6 +192,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                                 enableRoles, adminRole, memberRole));
                     }
                     projectDatabase.close();
+
                     // Go to project info
                     Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {

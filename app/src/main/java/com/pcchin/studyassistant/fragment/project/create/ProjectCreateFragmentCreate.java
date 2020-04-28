@@ -107,9 +107,9 @@ final class ProjectCreateFragmentCreate {
     }
 
     /** Creates the initial member based on the given info. **/
-    static MemberData createInitialMember(RandomString idRand, RandomString saltRand,
+    static MemberData createInitialMember(RandomString idRand, @NonNull RandomString saltRand,
                                           String projectID, String projectSalt, String adminRoleID,
-                                          TextInputLayout memberName,
+                                          @NonNull TextInputLayout memberName,
                                           TextInputLayout memberPass1,
                                           ProjectDatabase projectDatabase) {
         MemberData initialMember = null;

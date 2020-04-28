@@ -124,9 +124,9 @@ final class ProjectSettingsFragmentChange {
     void securityPrefChanged(@NonNull Preference preference, Object newValue,
                              ProjectDatabase projectDatabase) {
         switch (preference.getKey()) {
-            case PreferenceString.PREF_SET_PASSWORD:
+            case PreferenceString.PREF_SET_PW:
                 fragment.project.projectProtected = true;
-            case PreferenceString.PREF_UPDATE_PASSWORD:
+            case PreferenceString.PREF_UPDATE_PW:
                 // Project password is already hashed within the preference
                 fragment.project.projectPass = (String) newValue;
                 fragment.updateProject();

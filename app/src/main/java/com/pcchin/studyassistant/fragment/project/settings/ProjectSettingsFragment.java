@@ -340,10 +340,10 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     /** Customize the security preferences. **/
     private void customizeSecurityPreference() {
         if (project.projectPass.length() == 0) {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_PASSWORD))).setVisible(false);
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_PASSWORD))).setVisible(false);
+            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_UPDATE_PW))).setVisible(false);
+            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_REMOVE_PW))).setVisible(false);
         } else {
-            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_PASSWORD))).setVisible(false);
+            ((Preference) Objects.requireNonNull(findPreference(PreferenceString.PREF_SET_PW))).setVisible(false);
         }
     }
 

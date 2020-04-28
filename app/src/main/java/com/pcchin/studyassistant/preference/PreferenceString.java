@@ -54,8 +54,8 @@ public final class PreferenceString {
             PREF_REMOVE_ACTUAL_END = "pref_remove_actual_end";
 
     // String literals for security preferences
-    public static final String PREF_SET_PASSWORD = "pref_set_password",
-            PREF_UPDATE_PASSWORD = "pref_update_password",
-            PREF_REMOVE_PASSWORD = "pref_remove_password",
+    public static final String PREF_SET_PW = "pref_set_password",
+            PREF_UPDATE_PW = "pref_update_password",
+            PREF_REMOVE_PW = "pref_remove_password",
             PREF_DELETE_PROJECT = "pref_del_project";
 }

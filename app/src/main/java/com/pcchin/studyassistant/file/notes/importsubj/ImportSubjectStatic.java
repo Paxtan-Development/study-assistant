@@ -31,6 +31,10 @@ import com.pcchin.studyassistant.activity.MainActivity;
 
 /** Static functions used  in ImportSubject. **/
 public final class ImportSubjectStatic {
+    private ImportSubjectStatic() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Displays the import dialog for whether to import from a ZIP or a .subject file.
      * Separated from the constructor as this function will startActivityForResult
      * before continuing on with the rest of the functions in the class. **/

@@ -25,6 +25,9 @@ import com.pcchin.studyassistant.utils.misc.RandomString;
 
 /** Functions used when creating a project in ProjectCreateFragment. **/
 final class ProjectCreateFragmentCreate {
+    private ProjectCreateFragmentCreate() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /** Creates the admin role based on the given info. **/
     @NonNull

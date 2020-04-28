@@ -15,6 +15,10 @@ package com.pcchin.studyassistant.activity;
 
 /** Constants used in MainActivity. **/
 public final class ActivityConstants {
+    private ActivityConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";

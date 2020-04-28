@@ -37,6 +37,10 @@ import java.util.List;
 
 /** Functions used for updating the navigation view within the app. **/
 public final class NavViewFunctions {
+    private NavViewFunctions() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Updates the NavigationView in
      * @see MainActivity **/
     public static void updateNavView(@NonNull final MainActivity activity) {

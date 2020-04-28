@@ -24,6 +24,10 @@ import java.util.Date;
 
 /** Comparators used to sort special classes/cases **/
 public class SortingComparators {
+    private SortingComparators() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Comparator that sorts an ArrayList by the first string of the array.  **/
     public static final Comparator<ArrayList<String>> firstValComparator = (a, b) -> {
                 if (a != null && a.size() > 0

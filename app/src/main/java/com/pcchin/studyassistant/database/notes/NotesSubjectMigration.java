@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 PC Chin. All rights reserved.
+ * Copyright 2020 PC Chin. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 /** Functions to migrate the notesSubject notes from one version to another. **/
 public class NotesSubjectMigration {
+    private NotesSubjectMigration() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Migrates the Database from 1 to 2. Adds a sortOrder column. **/
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

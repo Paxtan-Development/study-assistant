@@ -15,6 +15,10 @@ package com.pcchin.studyassistant.preference;
 
 /** Stores all the string preferences used in the app. **/
 public final class PreferenceString {
+    private PreferenceString() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // String literals for menus
     public static final String PREF_MENU_ROOT = "pref_menu_root",
             PREF_MENU_GENERAL = "pref_menu_general",

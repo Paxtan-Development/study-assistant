@@ -3,10 +3,10 @@ version: "2"
 checks:
   argument-count:
     config:
-      threshold: 5 # Some functions have / require 5 arguments
+      threshold: 6 # Some functions have / require 6 arguments
   file-lines:
     config:
-      threshold: 300 # Additional 50 lines for copyright / import statements
+      threshold: 300 # Additional 50 lines for breathing room
   method-complexity:
     config:
       threshold: 15 # Based on sonar-java

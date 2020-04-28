@@ -32,6 +32,10 @@ import com.pcchin.studyassistant.activity.MainActivity;
 
 /** Functions used for updating the bottom navigation view within the app. **/
 public final class BottomNavViewFunctions {
+    private BottomNavViewFunctions() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Updates the bottom NavigationView to either the project's menu or the media selection's menu. **/
     public static void updateBottomNavView(MainActivity activity, int res, ProjectData project,
                                            MemberData member, RoleData role) {

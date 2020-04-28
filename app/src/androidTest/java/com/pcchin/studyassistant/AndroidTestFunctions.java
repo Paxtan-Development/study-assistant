@@ -27,7 +27,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /** Functions used in tests. **/
-class AndroidTestFunctions {
+final class AndroidTestFunctions {
+    private AndroidTestFunctions() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** Returns the notes after it has been migrated. **/
     @NonNull
     static SubjectDatabase getNotesDatabaseAftMigration(@NonNull MigrationTestHelper migrationTestHelper,

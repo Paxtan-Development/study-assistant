@@ -123,7 +123,6 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 projectDatabase.RoleDao().insert(adminRole);
                 projectDatabase.RoleDao().insert(memberRole);
 
-                // Create the project
                 String projectSalt = GeneralFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
                         projectDatabase), projectPass;
                 if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
@@ -138,61 +137,71 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                             projectID, projectSalt, adminRole.roleID,
                             memberName, memberPass1, projectDatabase);
                     projectDatabase.MemberDao().insert(initialMember);
-
-                    // Different types of project creation for different constructors
-                    if (enableRoles) {
-                        // Set default role according to user preference
-                        Spinner roleSpinner = returnView.findViewById(R.id.p6_default_role_input);
-                        RoleData defaultRole =
-                                roleSpinner.getSelectedItemPosition() == 0 ? adminRole : memberRole;
-
-                        projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                Objects.requireNonNull(projectName.getEditText()).getText().toString(),
-                                projectSalt, projectPass, memberRole, adminRole,
-                                initialMember, defaultRole));
-                    } else {
-                        projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                Objects.requireNonNull(projectName.getEditText()).getText().toString(),
-                                projectSalt, projectPass, memberRole, adminRole,
-                                initialMember, adminRole));
-                    }
-                    projectDatabase.close();
-
-                    // Go to project info
-                    Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
-                    if (getActivity() != null) {
-                        NavViewFunctions.updateNavView((MainActivity) getActivity());
-                        ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                .newInstance(projectID, initialMember.memberID,
-                                        true, true));
-                    }
+                    createProjectWithMembers(returnView, adminRole, memberRole, initialMember,
+                            projectName, projectID, projectSalt, projectPass);
                 } else {
-                    // Members are not enabled
-                    if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
-                        projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
-                                "", enableRoles, adminRole, memberRole));
-                    } else {
-                        projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
-                                SecurityFunctions.projectHash(
-                                        projectPass1.getEditText().getText().toString(), projectSalt),
-                                enableRoles, adminRole, memberRole));
-                    }
-                    projectDatabase.close();
-
-                    // Go to project info
-                    Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
-                    if (getActivity() != null) {
-                        NavViewFunctions.updateNavView((MainActivity) getActivity());
-                        ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                                .newInstance(projectID, adminRole.roleID,
-                                        false, true));
-                    }
+                    createProjectWithoutMembers(adminRole, memberRole, projectID, projectSalt, projectName, projectPass1);
                 }
             }
         });
         return returnView;
+    }
+
+    /** Create a project with members enabled. **/
+    private void createProjectWithMembers(View returnView, RoleData adminRole, RoleData memberRole,
+                                          MemberData initialMember, TextInputLayout projectName,
+                                          String projectID, String projectSalt, String projectPass) {
+        // Different types of project creation for different constructors
+        if (enableRoles) {
+            // Set default role according to user preference
+            Spinner roleSpinner = returnView.findViewById(R.id.p6_default_role_input);
+            RoleData defaultRole = roleSpinner.getSelectedItemPosition() == 0 ? adminRole : memberRole;
+
+            projectDatabase.ProjectDao().insert(new ProjectData(projectID,
+                    Objects.requireNonNull(projectName.getEditText()).getText().toString(),
+                    projectSalt, projectPass, memberRole, adminRole,
+                    initialMember, defaultRole));
+        } else {
+            projectDatabase.ProjectDao().insert(new ProjectData(projectID,
+                    Objects.requireNonNull(projectName.getEditText()).getText().toString(),
+                    projectSalt, projectPass, memberRole, adminRole,
+                    initialMember, adminRole));
+        }
+        projectDatabase.close();
+
+        // Go to project info
+        Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            NavViewFunctions.updateNavView((MainActivity) getActivity());
+            ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                    .newInstance(projectID, initialMember.memberID,
+                            true, true));
+        }
+    }
+
+    /** Create a project without members enabled. **/
+    private void createProjectWithoutMembers(RoleData adminRole, RoleData memberRole,
+                                             String projectID, String projectSalt,
+                                             TextInputLayout projectName, @NonNull TextInputLayout projectPass1) {
+        if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
+            projectDatabase.ProjectDao().insert(new ProjectData(projectID,
+                    Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
+                    "", enableRoles, adminRole, memberRole));
+        } else {
+            projectDatabase.ProjectDao().insert(new ProjectData(projectID,
+                    Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
+                    SecurityFunctions.projectHash(projectPass1.getEditText().getText().toString(), projectSalt),
+                    enableRoles, adminRole, memberRole));
+        }
+        projectDatabase.close();
+
+        // Go to project info
+        Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            NavViewFunctions.updateNavView((MainActivity) getActivity());
+            ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
+                    .newInstance(projectID, adminRole.roleID, false, true));
+        }
     }
 
     /** Initializes the "Enable Members" switch, used in onCreateView. **/

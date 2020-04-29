@@ -23,6 +23,8 @@ import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
+import java.util.Objects;
+
 /** Functions used when creating a project in ProjectCreateFragment. **/
 final class ProjectCreateFragmentCreate {
     private ProjectCreateFragmentCreate() {
@@ -37,8 +39,7 @@ final class ProjectCreateFragmentCreate {
                                      TextInputLayout customAdminPass1,
                                      ProjectDatabase projectDatabase) {
         RoleData adminRole;
-        if (customAdmin && customAdminName.getEditText() != null
-                && customAdminPass1.getEditText() != null) {
+        if (customAdmin && customAdminName.getEditText() != null && customAdminPass1.getEditText() != null) {
             if (customAdminPass1.getEditText().getText().length() > 0) {
                 // Admin with password
                 String adminSalt = saltRand.nextString();
@@ -50,14 +51,19 @@ final class ProjectCreateFragmentCreate {
             } else {
                 adminRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
                         ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
-                        customAdminName.getEditText().getText().toString(),
-                        saltRand.nextString(), "");
+                        customAdminName.getEditText().getText().toString(), saltRand.nextString(), "");
             }
         } else {
             adminRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     "Admin", saltRand.nextString(), "");
         }
+        setAdminPrivileges(adminRole);
+        return adminRole;
+    }
+
+    /** Sets the permissions for the admin role. **/
+    private static void setAdminPrivileges(@NonNull RoleData adminRole) {
         adminRole.canDeleteProject = true;
         adminRole.canModifyInfo = true;
         adminRole.canModifyOtherTask = true;
@@ -73,7 +79,6 @@ final class ProjectCreateFragmentCreate {
         adminRole.canViewTask = true;
         adminRole.canViewStatus = true;
         adminRole.canViewMedia = true;
-        return adminRole;
     }
 
     /** Creates the member role based on the given info. **/
@@ -85,26 +90,36 @@ final class ProjectCreateFragmentCreate {
                                       ProjectDatabase projectDatabase) {
         RoleData memberRole;
         // Creates member role
-        if (customMember && customMemberName.getEditText() != null
-                && customMemberPass1.getEditText() != null) {
-            if (customMemberPass1.getEditText().getText().length() > 0) {
-                // Admin with password
-                String memberSalt = saltRand.nextString();
-                memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
-                        ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
-                        customMemberName.getEditText().getText().toString(),
-                        memberSalt, SecurityFunctions.roleHash(customMemberPass1
-                        .getEditText().getText().toString(), memberSalt));
-            } else {
-                memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
-                        ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
-                        customMemberName.getEditText().getText().toString(),
-                        saltRand.nextString(), "");
-            }
+        if (customMember) {
+            memberRole = getCustomMemberRole(projectDatabase, projectID, idRand, saltRand,
+                    customMemberName, customMemberPass1);
         } else {
             memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     "Member", saltRand.nextString(), "");
+        }
+        return memberRole;
+    }
+
+    /** Gets a custom member role based on the inputs provided by the user. **/
+    @NonNull
+    private static RoleData getCustomMemberRole(ProjectDatabase projectDatabase, String projectID,
+                                                RandomString idRand, RandomString saltRand,
+                                                TextInputLayout customMemberName, @NonNull TextInputLayout customMemberPass1) {
+        RoleData memberRole;
+        if (Objects.requireNonNull(customMemberPass1.getEditText()).getText().length() > 0) {
+            // Admin with password
+            String memberSalt = saltRand.nextString();
+            memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+                    ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
+                    Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
+                    memberSalt, SecurityFunctions.roleHash(customMemberPass1
+                    .getEditText().getText().toString(), memberSalt));
+        } else {
+            memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+                    ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
+                    Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
+                    saltRand.nextString(), "");
         }
         return memberRole;
     }

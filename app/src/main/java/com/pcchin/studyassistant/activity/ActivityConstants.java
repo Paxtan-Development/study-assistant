@@ -33,16 +33,9 @@ public final class ActivityConstants {
     public static final String INTENT_VALUE_MESSAGE = "message";
     public static final String INTENT_VALUE_TITLE = "title";
 
-    // Intent constants for projects
-    public static final String INTENT_PROJECT_ID = "projectID";
-    public static final String INTENT_ID2 = "id2";
-    public static final String INTENT_IS_MEMBER = "isMember";
-
     // Intent codes
     public static final int SELECT_ZIP_FILE = 300;
     public static final int SELECT_SUBJECT_FILE = 301;
-    public static final int SELECT_PROJECT_ICON = 302;
-    public static final int EXTERNAL_STORAGE_READ_PERMISSION = 201;
 
     // Other constants
     public static final String DATABASE_NOTES = "notesSubject";

@@ -95,10 +95,12 @@ class ProjectLoginFragmentView {
     /** Check if the password entered for the member is correct. **/
     private void checkMemberPass(@NonNull TextInputLayout passwordInputLayout,
                                  @NonNull MemberData targetMember) {
+        String inputPassword = Objects.requireNonNull(passwordInputLayout.getEditText()).getText().toString();
         // Check if password entered is correct
-        String hashedPassword = SecurityFunctions.memberHash(Objects.requireNonNull(
-                passwordInputLayout.getEditText()).getText().toString(), targetMember.salt, project.salt);
-        if (Objects.equals(hashedPassword, targetMember.memberPass)) {
+        String hashedPassword = SecurityFunctions.memberHash(inputPassword, targetMember.salt, project.salt);
+        // Allows logging in with blank password if the password for the member is blank as well
+        if (Objects.equals(hashedPassword, targetMember.memberPass) ||
+                (inputPassword.length() == 0 && targetMember.memberPass.length() == 0)) {
             projectDatabase.close();
             activity.displayFragment(ProjectInfoFragment.newInstance(project.projectID,
                     targetMember.memberID, true, true));

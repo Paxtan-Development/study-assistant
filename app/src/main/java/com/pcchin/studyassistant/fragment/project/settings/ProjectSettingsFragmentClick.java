@@ -52,7 +52,7 @@ final class ProjectSettingsFragmentClick {
             switch (preference.getKey()) {
                 case PreferenceString.PREF_SET_ICON:
                 case PreferenceString.PREF_UPDATE_ICON:
-                    fragment.startPickIconIntent();
+                    fragment.startIconPicker();
                     break;
                 case PreferenceString.PREF_REMOVE_ICON:
                     // Remove icon

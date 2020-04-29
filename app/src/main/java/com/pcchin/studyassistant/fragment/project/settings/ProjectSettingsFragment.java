@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.fragment.project.settings;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -25,9 +24,9 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.pcchin.dtpreference.DatePreference;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
@@ -134,14 +133,14 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         return false;
     }
 
-    /** Starts the intent to pick an icon. **/
-    void startPickIconIntent() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(ActivityConstants.INTENT_PROJECT_ID, project.projectID);
-        intent.putExtra(ActivityConstants.INTENT_IS_MEMBER, isMember);
-        intent.putExtra(ActivityConstants.INTENT_ID2, id2);
-        startActivityForResult(intent, ActivityConstants.SELECT_PROJECT_ICON);
+    /** Starts the image picker to pick an icon. **/
+    void startIconPicker() {
+        // Activity is used here instead of the fragment as the inline data handling requires a FragmentActivity
+        ImagePicker.Companion.with(requireActivity())
+                .cropSquare()
+                .compress(1024)
+                .start();
+        ((MainActivity) requireActivity()).setProjectInfo(project.projectID, id2, isMember);
     }
 
     /** Delegates the show/hide of preferences to their own functions within

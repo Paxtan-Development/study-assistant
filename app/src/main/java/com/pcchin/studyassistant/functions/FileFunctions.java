@@ -137,7 +137,7 @@ public final class FileFunctions {
     }
 
     /** Returns the absolute path of a path from the given URI.
-     * If the Uri is invalid, an empty string would be returned. **/
+     * If the Uri is invalid or no such file exists, it would return null. **/
     public static String getRealPathFromUri(Context context, Uri uri){
         Cursor cursor = null;
         try {
@@ -149,13 +149,13 @@ public final class FileFunctions {
                 cursor.moveToFirst();
                 return cursor.getString(column_index);
             } else {
-                return "";
+                return null;
             }
         } catch (Exception e) {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Uri" + uri.toString() + "could not be "
                 + "parsed as a path. Stack trace is");
             e.printStackTrace();
-            return "";
+            return null;
         } finally {
             if (cursor != null) {
                 cursor.close();

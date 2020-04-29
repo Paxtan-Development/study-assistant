@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -32,12 +33,14 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
-import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
@@ -45,17 +48,29 @@ import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
+import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
     public ViewPager pager;
     public Fragment currentFragment;
+
+    // Values that are only used when processing the ID
+    private String projectID;
+    private String id2;
+    private boolean isMember;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -97,6 +112,7 @@ public class MainActivity extends AppCompatActivity
             // the onBackPressed, hence its a special case
             ((NotesViewFragment) currentFragment).onBackPressed();
         } else {
+            closeDrawer();
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
             if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
                 super.onBackPressed();
@@ -119,28 +135,73 @@ public class MainActivity extends AppCompatActivity
     /** External intent is returned here from picking a file from the following:
      * @see ImportSubjectZip
      * @see ImportSubjectSubject
-     * @see ImportProjectIcon
      * The file would be sent back to a new ImportSubject to be imported. **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data.getData() != null) {
             String targetFile = FileFunctions.getRealPathFromUri(MainActivity.this, data.getData());
+            boolean imagePicked = false;
+            if (targetFile == null) {
+                targetFile = ImagePicker.Companion.getFilePath(data);
+                imagePicked = true;
+            }
+
             if (requestCode == ActivityConstants.SELECT_ZIP_FILE) {
-                // Sample URI:
-                // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
+                // Select zip file
                 new ImportSubjectZip(MainActivity.this).importZipConfirm(targetFile);
             } else if (requestCode == ActivityConstants.SELECT_SUBJECT_FILE) {
-                if (targetFile.endsWith(".subject")) {
+                // Select .subject file
+                if (targetFile != null && targetFile.endsWith(".subject")) {
                     new ImportSubjectSubject(MainActivity.this).importSubjectFile(targetFile);
                 } else {
                     Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == ActivityConstants.SELECT_PROJECT_ICON) {
-                new ImportProjectIcon(MainActivity.this, data).start();
-            } else {
+            } else if (imagePicked && targetFile != null) {
+                updateIcon(targetFile);
+            } else if (targetFile != null) {
                 // TODO: Import media to project
+            } else {
+                // File could not be processed.
+                Toast.makeText(MainActivity.this, R.string.file_error, Toast.LENGTH_SHORT).show();
+                Log.e(ActivityConstants.LOG_APP_NAME,
+                        String.format("File Error: The intent received with request code %s is unable to be processed", requestCode));
             }
+        }
+    }
+
+    /** Updates the icon of the project specified earlier. **/
+    private void updateIcon(String targetFile) {
+        try {
+            String iconPath = GeneralFunctions.getProjectIconPath(MainActivity.this, projectID);
+            FileFunctions.copyFile(new File(targetFile), new File(iconPath));
+            new Thread(() -> {
+                ProjectDatabase database = GeneralFunctions.getProjectDatabase(MainActivity.this);
+                ProjectData project = database.ProjectDao().searchByID(projectID);
+                project.hasIcon = true;
+                database.ProjectDao().update(project);
+                runOnUiThread(this::startProjectSettings);
+            }).start();
+            Toast.makeText(MainActivity.this, R.string.p3_general_icon_updated, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, R.string.file_error, Toast.LENGTH_SHORT).show();
+            Log.e(ActivityConstants.LOG_APP_NAME, String.format("File Error: Unable to be update " +
+                    "the icon of project ID %s from targetFile %s", projectID, targetFile));
+            e.printStackTrace();
+        }
+    }
+
+    /** Go to the settings page if it is not at the settings for the imported project. **/
+    private void startProjectSettings() {
+        if (currentFragment instanceof ProjectSettingsFragment
+                && Objects.equals(((ProjectSettingsFragment) currentFragment)
+                .project.projectID, projectID)) {
+            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
+        } else {
+            // Start the settings page for that project
+            safeOnBackPressed();
+            displayFragment(ProjectSettingsFragment.newInstance(projectID, id2, isMember));
+            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
         }
     }
 
@@ -183,6 +244,13 @@ public class MainActivity extends AppCompatActivity
         pager.setAdapter(baseAdapter);
         pager.addOnPageChangeListener(baseAdapterPageChanger);
         fadeToNote();
+    }
+
+    /** Set the info of the project based on the given project info. **/
+    public void setProjectInfo(String projectID, String id2, boolean isMember) {
+        this.projectID = projectID;
+        this.id2 = id2;
+        this.isMember = isMember;
     }
 
     /** Gets the pager adapter for the notes. **/

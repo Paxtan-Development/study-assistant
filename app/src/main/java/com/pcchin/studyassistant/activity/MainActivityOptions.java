@@ -28,7 +28,8 @@ import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragmentClick2;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 
-/** A class created specifically for processing the options in the options menu of MainActivity. **/
+/** A class created specifically for processing the options in the options menu of
+ * @see MainActivity **/
 final class MainActivityOptions {
     private MainActivityOptions() {
         throw new IllegalStateException("Utility class");

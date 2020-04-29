@@ -110,19 +110,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                         customMemberPass2)) allInputCorrect = false;
             }
 
-            if (allInputCorrect && projectName.getEditText() != null
-                    && projectPass1.getEditText() != null
-                    && projectPass2.getEditText() != null
-                    && memberName.getEditText() != null
-                    && memberPass1.getEditText() != null
-                    && memberPass2.getEditText() != null
-                    && customAdminName.getEditText() != null
-                    && customAdminPass1.getEditText() != null
-                    && customAdminPass2.getEditText() != null
-                    && customMemberName.getEditText() != null
-                    && customMemberPass1.getEditText() != null
-                    && customMemberPass2.getEditText() != null) {
-
+            if (allInputCorrect) {
                 // Creates admin role
                 RandomString idRand = new RandomString(48),
                         saltRand = new RandomString(40);
@@ -138,7 +126,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 // Create the project
                 String projectSalt = GeneralFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
                         projectDatabase), projectPass;
-                if (projectPass1.getEditText().getText().length() == 0) {
+                if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                     projectPass = "";
                 } else {
                     projectPass = SecurityFunctions.projectHash(projectPass1.getEditText()
@@ -159,12 +147,12 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                                 roleSpinner.getSelectedItemPosition() == 0 ? adminRole : memberRole;
 
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectName.getEditText().getText().toString(),
+                                Objects.requireNonNull(projectName.getEditText()).getText().toString(),
                                 projectSalt, projectPass, memberRole, adminRole,
                                 initialMember, defaultRole));
                     } else {
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectName.getEditText().getText().toString(),
+                                Objects.requireNonNull(projectName.getEditText()).getText().toString(),
                                 projectSalt, projectPass, memberRole, adminRole,
                                 initialMember, adminRole));
                     }
@@ -182,11 +170,11 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     // Members are not enabled
                     if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectName.getEditText().getText().toString(), projectSalt,
+                                Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
                                 "", enableRoles, adminRole, memberRole));
                     } else {
                         projectDatabase.ProjectDao().insert(new ProjectData(projectID,
-                                projectName.getEditText().getText().toString(), projectSalt,
+                                Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
                                 SecurityFunctions.projectHash(
                                         projectPass1.getEditText().getText().toString(), projectSalt),
                                 enableRoles, adminRole, memberRole));
@@ -219,19 +207,23 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                             returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.VISIBLE);
                         }
                     } else {
-                        // Members are disabled
-                        LinearLayout memberGrp = returnView.findViewById(R.id.p6_first_member);
-                        memberGrp.setVisibility(View.GONE);
-                        returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.GONE);
-
-                        // Disable all error dialogs
-                        for (int i = 0; i < memberGrp.getChildCount(); i++) {
-                            if (memberGrp.getChildAt(i) instanceof TextInputLayout) {
-                                ((TextInputLayout) memberGrp.getChildAt(i)).setErrorEnabled(false);
-                            }
-                        }
+                        disableMembers(returnView);
                     }
                 });
+    }
+
+    /** Disable the member related LicenseViews and their visibilities. **/
+    private void disableMembers(@NonNull View returnView) {
+        LinearLayout memberGrp = returnView.findViewById(R.id.p6_first_member);
+        memberGrp.setVisibility(View.GONE);
+        returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.GONE);
+
+        // Disable all error dialogs
+        for (int i = 0; i < memberGrp.getChildCount(); i++) {
+            if (memberGrp.getChildAt(i) instanceof TextInputLayout) {
+                ((TextInputLayout) memberGrp.getChildAt(i)).setErrorEnabled(false);
+            }
+        }
     }
 
     /** Initializes the "Enable Roles" switch, used in onCreateView. **/
@@ -246,24 +238,27 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                             returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.VISIBLE);
                         }
                     } else {
-                        // Roles are disabled
-                        LinearLayout roleGrp = returnView.findViewById(R.id.p6_custom_roles);
-                        roleGrp.setVisibility(View.GONE);
-                        returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.GONE);
-
-                        // Disable all error dialogs in child LinearLayouts
-                        for (int i = 0; i < roleGrp.getChildCount(); i++) {
-                            if (roleGrp.getChildAt(i) instanceof LinearLayout) {
-                                LinearLayout subLayout = (LinearLayout) roleGrp.getChildAt(i);
-                                for (int j = 0; j < subLayout.getChildCount(); j++) {
-                                    if (subLayout.getChildAt(j) instanceof TextInputLayout) {
-                                        ((TextInputLayout) subLayout.getChildAt(j)).setErrorEnabled(false);
-                                    }
-                                }
-                            }
-                        }
+                        disableRoles(returnView);
                     }
                 });
+    }
+
+    /** Disable the role related LicenseViews and their visibilities. **/
+    private void disableRoles(@NonNull View returnView) {
+        LinearLayout roleGrp = returnView.findViewById(R.id.p6_custom_roles);
+        roleGrp.setVisibility(View.GONE);
+        returnView.findViewById(R.id.p6_default_role_layout).setVisibility(View.GONE);
+
+        // Disable all error dialogs in child LinearLayouts
+        for (int i = 0; i < roleGrp.getChildCount(); i++) {
+            if (roleGrp.getChildAt(i) instanceof LinearLayout) {
+                LinearLayout subLayout = (LinearLayout) roleGrp.getChildAt(i);
+                for (int j = 0; j < subLayout.getChildCount(); j++) {
+                    if (subLayout.getChildAt(j) instanceof TextInputLayout)
+                        ((TextInputLayout) subLayout.getChildAt(j)).setErrorEnabled(false);
+                }
+            }
+        }
     }
 
     /** Initializes the "Custom Admin" switch, used in onCreateView. **/

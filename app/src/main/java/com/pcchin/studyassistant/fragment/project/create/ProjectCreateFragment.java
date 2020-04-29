@@ -162,14 +162,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     projectSalt, projectPass, memberRole, adminRole, initialMember, adminRole));
         }
         projectDatabase.close();
-
-        // Go to project info
-        Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
-        if (getActivity() != null) {
-            NavViewFunctions.updateNavView((MainActivity) getActivity());
-            ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                    .newInstance(projectID, initialMember.memberID, true, true));
-        }
+        startProjectInfo(projectID, initialMember.memberID, true);
     }
 
     /** Create a project without members enabled. **/
@@ -187,13 +180,17 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                     enableRoles, adminRole, memberRole));
         }
         projectDatabase.close();
+        startProjectInfo(projectID, adminRole.roleID, false);
+    }
 
+    /** Go to the project info fragment. **/
+    private void startProjectInfo(String projectID, String id2, boolean isMember) {
         // Go to project info
         Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
         if (getActivity() != null) {
             NavViewFunctions.updateNavView((MainActivity) getActivity());
             ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                    .newInstance(projectID, adminRole.roleID, false, true));
+                    .newInstance(projectID, id2, isMember, true));
         }
     }
 

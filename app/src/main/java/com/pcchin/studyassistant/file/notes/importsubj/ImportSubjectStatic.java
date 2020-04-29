@@ -39,13 +39,6 @@ public final class ImportSubjectStatic {
      * Separated from the constructor as this function will startActivityForResult
      * before continuing on with the rest of the functions in the class. **/
     public static void displayImportDialog(MainActivity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                .checkSelfPermission(activity, Manifest.permission
-                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    ActivityConstants.EXTERNAL_STORAGE_READ_PERMISSION);
-        }
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
             new AutoDismissDialog(activity.getString(R.string.import_from), R.array.n_import_subject_format,

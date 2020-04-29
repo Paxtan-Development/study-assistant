@@ -147,7 +147,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     /** Delegates the show/hide of preferences to their own functions within
      * @see ProjectSettingsFragmentCustomize
      * No need to customize PREF_ROOT as there is nothing to customize. **/
-    void displayPreference(@NonNull String key) {
+    public void displayPreference(@NonNull String key) {
         ProjectSettingsFragmentCustomize customize = new ProjectSettingsFragmentCustomize(ProjectSettingsFragment.this);
         switch (key) {
             case PreferenceString.PREF_MENU_ROOT:

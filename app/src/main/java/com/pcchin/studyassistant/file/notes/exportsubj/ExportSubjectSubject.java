@@ -116,7 +116,7 @@ public class ExportSubjectSubject {
             } else {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
                         + finalOutputFileName + " cannot be created.");
-                Toast.makeText(fragment.getContext(), R.string.n2_error_file_not_created,
+                Toast.makeText(fragment.requireContext(), R.string.n2_error_file_not_created,
                         Toast.LENGTH_SHORT).show();
             }
         } catch (FileNotFoundException e) {
@@ -137,7 +137,7 @@ public class ExportSubjectSubject {
                                    @NonNull String finalResponseText1,
                                    @NonNull FileOutputStream outputStream)
             throws IOException {
-        Toast.makeText(fragment.getContext(), R.string.n2_exporting_subject, Toast.LENGTH_SHORT).show();
+        Toast.makeText(fragment.requireContext(), R.string.n2_exporting_subject, Toast.LENGTH_SHORT).show();
         // Export the file
         // The length of the title is exported first, followed by the title.
         // Then, the subject's sort order is listed and the encrypted contents are stored.
@@ -153,7 +153,7 @@ public class ExportSubjectSubject {
         }
         outputStream.flush();
         outputStream.close();
-        Toast.makeText(fragment.getContext(), fragment.getString(R.string.subject_exported)
+        Toast.makeText(fragment.requireContext(), fragment.getString(R.string.subject_exported)
                         + finalOutputFileName, Toast.LENGTH_SHORT).show();
     }
 }

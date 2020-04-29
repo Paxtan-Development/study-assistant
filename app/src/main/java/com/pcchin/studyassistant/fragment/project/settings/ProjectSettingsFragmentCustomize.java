@@ -39,7 +39,7 @@ final class ProjectSettingsFragmentCustomize {
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentCustomize(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** Customize the general preferences. **/

@@ -59,11 +59,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-        } else {
-            onBackPressed();
-        }
+        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
     }
 
     /** Sets up the layout for the fragment. **/
@@ -82,7 +78,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         // Creates project if conditions are met
         returnView.findViewById(R.id.p6_create).setOnClickListener(view -> {
             boolean allInputCorrect = true;
-            ProjectCreateFragmentCheck check = new ProjectCreateFragmentCheck(getContext());
+            ProjectCreateFragmentCheck check = new ProjectCreateFragmentCheck(requireContext());
 
             // Check for all requirements
             TextInputLayout projectName = returnView.findViewById(R.id.p6_name_input),
@@ -186,24 +182,19 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
     /** Go to the project info fragment. **/
     private void startProjectInfo(String projectID, String id2, boolean isMember) {
         // Go to project info
-        Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
-        if (getActivity() != null) {
-            NavViewFunctions.updateNavView((MainActivity) getActivity());
-            ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                    .newInstance(projectID, id2, isMember, true));
-        }
+        Toast.makeText(requireActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
+        NavViewFunctions.updateNavView((MainActivity) requireActivity());
+        ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                .newInstance(projectID, id2, isMember, true));
     }
 
     /** Returns to
      * @see ProjectSelectFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            projectDatabase.close();
-            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            return true;
-        }
-        return false;
+        projectDatabase.close();
+        ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        return true;
     }
 
 }

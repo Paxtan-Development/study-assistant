@@ -94,16 +94,14 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            subjectDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
+        subjectDatabase = GeneralFunctions.getSubjectDatabase(requireActivity());
 
-            // Get basic info & set title
-            if (getArguments() != null) {
-                notesSubject = getArguments().getString(ARG_SUBJECT);
-                previousOrder = getArguments().getInt(ARG_PREV);
-            }
-            checkSubjectExists(getActivity());
+        // Get basic info & set title
+        if (getArguments() != null) {
+            notesSubject = getArguments().getString(ARG_SUBJECT);
+            previousOrder = getArguments().getInt(ARG_PREV);
         }
+        checkSubjectExists(requireActivity());
         setHasOptionsMenu(true);
     }
 
@@ -111,7 +109,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     private void checkSubjectExists(Activity activity) {
         NotesSubject currentSubject = subjectDatabase.SubjectDao().search(notesSubject);
         if (currentSubject == null) {
-            Toast.makeText(getContext(), R.string.n2_error_missing_subject,
+            Toast.makeText(requireContext(), R.string.n2_error_missing_subject,
                     Toast.LENGTH_SHORT).show();
             // Return to NotesSelectFragment if not
             subjectDatabase.close();
@@ -174,12 +172,9 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
      * @see NotesSelectFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            subjectDatabase.close();
-            ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
-            return true;
-        }
-        return false;
+        subjectDatabase.close();
+        ((MainActivity) requireActivity()).displayFragment(new NotesSelectFragment());
+        return true;
     }
 
     /** Sort the notes based on the sorting format given.

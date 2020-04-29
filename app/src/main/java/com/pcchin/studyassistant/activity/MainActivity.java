@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == ActivityConstants.SELECT_PROJECT_ICON) {
-                new ImportProjectIcon(MainActivity.this).start();
+                new ImportProjectIcon(MainActivity.this, data).start();
             } else {
                 // TODO: Import media to project
             }

@@ -45,10 +45,10 @@ public class RssLicenseFragment extends Fragment implements ExtendedFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView returnScroll = new ScrollView(getActivity());
+        ScrollView returnScroll = new ScrollView(requireActivity());
 
         // Set text
-        TextView textView = new TextView(getActivity());
+        TextView textView = new TextView(requireActivity());
         textView.setTextSize(18);
         UIFunctions.setHtml(textView, FileFunctions.getTxt(inflater.getContext(),
                 "rss_license.txt"));
@@ -60,10 +60,7 @@ public class RssLicenseFragment extends Fragment implements ExtendedFragment {
      * @see AboutFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
+        return true;
     }
 }

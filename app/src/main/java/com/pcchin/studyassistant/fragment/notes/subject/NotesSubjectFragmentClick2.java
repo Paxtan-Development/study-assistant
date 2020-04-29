@@ -57,20 +57,18 @@ public class NotesSubjectFragmentClick2 {
 
     /** Renames the subject to another one. **/
     public void onRenamePressed() {
-        if (fragment.getActivity() != null) {
-            @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
-                    fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            // End icon has been set in XML file
-            if (popupView.getEditText() != null) {
-                popupView.getEditText().setText(fragment.notesSubject);
-            }
-            DialogInterface.OnShowListener nListener = dialogInterface ->
-                    setRenameDialogButton((AlertDialog) dialogInterface, popupView);
-            new AutoDismissDialog(fragment.getString(R.string.rename_subject), popupView,
-                    new String[]{fragment.getString(R.string.rename),
-                            fragment.getString(android.R.string.cancel), ""}, nListener)
-                    .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.3");
+        @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
+                fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        // End icon has been set in XML file
+        if (popupView.getEditText() != null) {
+            popupView.getEditText().setText(fragment.notesSubject);
         }
+        DialogInterface.OnShowListener nListener = dialogInterface ->
+                setRenameDialogButton((AlertDialog) dialogInterface, popupView);
+        new AutoDismissDialog(fragment.getString(R.string.rename_subject), popupView,
+                new String[]{fragment.getString(R.string.rename),
+                        fragment.getString(android.R.string.cancel), ""}, nListener)
+                .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.3");
     }
 
     /** Sets the onClickListeners for the buttons in the renaming dialog. **/
@@ -87,7 +85,7 @@ public class NotesSubjectFragmentClick2 {
                     popupView.setErrorEnabled(true);
                     popupView.setError(fragment.getString(R.string.error_subject_exists));
                 } else {
-                    moveSubject((MainActivity) fragment.getActivity(), dialogInterface, popupInputText);
+                    moveSubject((MainActivity) fragment.requireActivity(), dialogInterface, popupInputText);
                 }
             }
         });
@@ -108,7 +106,7 @@ public class NotesSubjectFragmentClick2 {
         fragment.subjectDatabase.close();
 
         // Display new subject
-        Toast.makeText(fragment.getActivity(), R.string.n2_subject_renamed,
+        Toast.makeText(fragment.requireActivity(), R.string.n2_subject_renamed,
                 Toast.LENGTH_SHORT).show();
         NavViewFunctions.updateNavView(activity);
         activity.displayFragment(NotesSubjectFragment
@@ -118,10 +116,10 @@ public class NotesSubjectFragmentClick2 {
     /** Export all the notes of the subject into a ZIP file,
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
-        if (fragment.getContext() != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                .checkSelfPermission(fragment.getContext(), Manifest.permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
+                .checkSelfPermission(fragment.requireContext(), Manifest.permission
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(fragment.getContext(), R.string
+            Toast.makeText(fragment.requireContext(), R.string
                     .error_write_permission_denied, Toast.LENGTH_SHORT).show();
         } else {
             new AutoDismissDialog(fragment.getString(R.string.n2_export_format),
@@ -143,7 +141,7 @@ public class NotesSubjectFragmentClick2 {
     public void onDeletePressed() {
         new AutoDismissDialog(fragment.getString(R.string.del), fragment.getString(R.string.n2_del_confirm),
                 new String[]{fragment.getString(R.string.del), fragment.getString(android.R.string.cancel), ""},
-                new DialogInterface.OnClickListener[]{(dialog, which) -> deleteSubject(fragment.getActivity()),
+                new DialogInterface.OnClickListener[]{(dialog, which) -> deleteSubject(fragment.requireActivity()),
                         (dialog, which) -> dialog.dismiss(), null})
                 .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.7");
     }
@@ -153,14 +151,14 @@ public class NotesSubjectFragmentClick2 {
         deletePhantomAlerts(activity);
 
         // Deletes subject from database
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(fragment.getActivity());
+        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(fragment.requireActivity());
         NotesSubject delTarget = database.SubjectDao().search(fragment.notesSubject);
         if (delTarget != null) {
             database.SubjectDao().delete(delTarget);
         }
         database.close();
         // Return to NotesSelectFragment
-        Toast.makeText(fragment.getContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
+        Toast.makeText(fragment.requireContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
         NavViewFunctions.updateNavView((MainActivity) activity);
         fragment.subjectDatabase.close();
         ((MainActivity) activity).displayFragment(new NotesSelectFragment());
@@ -173,12 +171,12 @@ public class NotesSubjectFragmentClick2 {
             if (manager != null && note.size() >= 6 && note.get(5) != null
                     && note.get(0) != null && note.get(2) != null) {
                 // Get PendingIntent for note alert
-                Intent intent = new Intent(fragment.getActivity(), NotesNotifyReceiver.class);
+                Intent intent = new Intent(fragment.requireActivity(), NotesNotifyReceiver.class);
                 intent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, note.get(0));
                 intent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, note.get(2));
                 intent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, note.get(5));
                 PendingIntent alertIntent = PendingIntent.getBroadcast(
-                        fragment.getActivity(), Integer.parseInt(note.get(5)), intent, 0);
+                        fragment.requireActivity(), Integer.parseInt(note.get(5)), intent, 0);
 
                 manager.cancel(alertIntent);
             }

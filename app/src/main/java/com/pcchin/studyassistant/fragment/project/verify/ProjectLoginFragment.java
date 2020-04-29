@@ -68,22 +68,17 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-            if (getArguments() != null) {
-                project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
-            }
-            if (project == null) {
-                // Go back to project selection
-                Toast.makeText(getActivity(), R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
-                projectDatabase.close();
-                if (getActivity() != null) {
-                    // If statement added to prevent NullPointerException
-                    ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-                }
-            } else {
-                loginProject((MainActivity) getActivity());
-            }
+        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+        if (getArguments() != null) {
+            project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
+        }
+        if (project == null) {
+            // Go back to project selection
+            Toast.makeText(requireActivity(), R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
+            projectDatabase.close();
+            ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        } else {
+            loginProject((MainActivity) requireActivity());
         }
     }
 
@@ -115,7 +110,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
 
         // Set up OnShowListener
         DialogInterface.OnShowListener passwordDialogListener = dialogInterface ->
-                setPasswordDialogListener((MainActivity) getActivity(), (AlertDialog) dialogInterface, passwordLayout);
+                setPasswordDialogListener((MainActivity) requireActivity(), (AlertDialog) dialogInterface, passwordLayout);
         AutoDismissDialog passwordDialog = new AutoDismissDialog(
                 getString(R.string.v1_project_protected), passwordLayout, passwordDialogListener);
         passwordDialog.setCancellable(false);
@@ -129,7 +124,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
             // Check if password is correct
             if (Objects.requireNonNull(passwordLayout.getEditText()).getText().toString().length() >= 8) {
                 checkProjectPass(dialogInterface,
-                        (MainActivity) getActivity(), passwordLayout);
+                        (MainActivity) requireActivity(), passwordLayout);
             } else {
                 // Display error message
                 passwordLayout.setError(getString(R.string.error_password_short));
@@ -169,15 +164,12 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         View returnScroll = inflater.inflate(R.layout.fragment_project_login, container, false);
         ((TextView) returnScroll.findViewById(R.id.v2_title)).setText(project.projectTitle);
         // Set up icon (only for portrait)
-        if (getActivity() != null) {
-            String iconPath = getActivity().getFilesDir().getAbsolutePath() + "/icons/project/"
-                    + project.projectID + ".jpg";
-            ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
-            if (project.hasIcon && new File(iconPath).exists()) {
-                projectIcon.setImageURI(Uri.fromFile(new File(iconPath)));
-            }
+        String iconPath = GeneralFunctions.getProjectIconPath(requireActivity(), project.projectID);
+        ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
+        if (project.hasIcon && new File(iconPath).exists()) {
+            projectIcon.setImageURI(Uri.fromFile(new File(iconPath)));
         }
-        new ProjectLoginFragmentView((MainActivity) getActivity(), projectDatabase, project).setLogin(returnScroll);
+        new ProjectLoginFragmentView((MainActivity) requireActivity(), projectDatabase, project).setLogin(returnScroll);
         return returnScroll;
     }
 
@@ -186,10 +178,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        return true;
     }
 }

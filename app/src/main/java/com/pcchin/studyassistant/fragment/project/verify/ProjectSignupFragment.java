@@ -63,20 +63,18 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-            if (getArguments() != null) {
-                project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
-            }
-            if (project == null) {
-                // Go back to project selection
-                Toast.makeText(getActivity(), R.string.p_error_project_not_found,
-                        Toast.LENGTH_SHORT).show();
-                projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            } else {
-                getActivity().setTitle(R.string.v1_signup);
-            }
+        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+        if (getArguments() != null) {
+            project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
+        }
+        if (project == null) {
+            // Go back to project selection
+            Toast.makeText(requireActivity(), R.string.p_error_project_not_found,
+                    Toast.LENGTH_SHORT).show();
+            projectDatabase.close();
+            ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        } else {
+            requireActivity().setTitle(R.string.v1_signup);
         }
     }
 
@@ -91,19 +89,17 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                 fullnameInput = returnView.findViewById(R.id.v1_fullname_input);
 
         // Set up listeners
-        if (getActivity() != null) {
-            returnView.findViewById(R.id.v1_return).setOnClickListener(view -> {
-                projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-            });
-            returnView.findViewById(R.id.v1_signup).setOnClickListener(view -> {
-                // Get all inputs
-                usernameInput.setErrorEnabled(false);
-                passwordInput1.setErrorEnabled(false);
-                passwordInput2.setErrorEnabled(false);
-                checkUsername1(usernameInput, passwordInput1, passwordInput2, fullnameInput);
-            });
-        }
+        returnView.findViewById(R.id.v1_return).setOnClickListener(view -> {
+            projectDatabase.close();
+            ((MainActivity) requireActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+        });
+        returnView.findViewById(R.id.v1_signup).setOnClickListener(view -> {
+            // Get all inputs
+            usernameInput.setErrorEnabled(false);
+            passwordInput1.setErrorEnabled(false);
+            passwordInput2.setErrorEnabled(false);
+            checkUsername1(usernameInput, passwordInput1, passwordInput2, fullnameInput);
+        });
         return returnView;
     }
 
@@ -149,7 +145,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
             while (projectDatabase.MemberDao().searchByID(memberID) != null) {
                 memberID = randomID.nextString();
             }
-            createMember((MainActivity) getActivity(), memberID,
+            createMember((MainActivity) requireActivity(), memberID,
                     usernameText, fullName, passwordText1);
         }
     }
@@ -181,10 +177,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+        return true;
     }
 }

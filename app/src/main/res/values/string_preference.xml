@@ -29,6 +29,7 @@
     <string name="p3_general_update_password">Update Password</string>
     <string name="p3_general_remove_password">Remove Password</string>
     <string name="p3_general_project_completed">Project Completed</string>
+    <string name="p3_general_icon_updated">Icon updated</string>
 
     <!-- For strings under the features section -->
     <string name="p3_features_status">Status Updates</string>

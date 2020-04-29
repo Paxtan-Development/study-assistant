@@ -81,14 +81,14 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getArguments() != null) {
+        if (getArguments() != null) {
             String projectID = getArguments().getString(ARG_ID);
             id2 = getArguments().getString(ARG_ID2);
             isMember = getArguments().getBoolean(ARG_IS_MEMBER);
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
+            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
-            Object[] idValidity = UIFunctions.checkIdValidity(getActivity(), projectDatabase,
+            Object[] idValidity = UIFunctions.checkIdValidity(requireActivity(), projectDatabase,
                     project, id2, isMember);
             member = (MemberData) idValidity[1];
             role = (RoleData) idValidity[2];
@@ -97,7 +97,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             if ((boolean) idValidity[0]) {
                 // Return to ProjectSelectFragment if any error is found
                 projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+                ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
             }
         }
     }
@@ -250,17 +250,14 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         if (currentPrefRoot.equals(PreferenceString.PREF_MENU_ROOT)) {
             // Returns to ProjectInfoFragment
             projectDatabase.close();
-            if (getActivity() != null) {
-                if (member == null) {
-                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, role.roleID, false, true));
-                } else {
-                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, member.memberID, true, true));
-                }
-                return true;
+            if (member == null) {
+                ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, role.roleID, false, true));
+            } else {
+                ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, member.memberID, true, true));
             }
-            return false;
+            return true;
         } else {
             // Returns to the main preferences menu
             displayPreference(PreferenceString.PREF_MENU_ROOT);
@@ -279,7 +276,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     public void onResume() {
         super.onResume();
         if (!projectDatabase.isOpen()) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
+            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
         }
     }
 }

@@ -60,6 +60,12 @@ public final class GeneralFunctions {
                 .allowMainThreadQueries().build();
     }
 
+    /** Gets the icon path of a project for a specific project ID. **/
+    @NonNull
+    public static String getProjectIconPath(@NonNull Context context, String projectID) {
+        return context.getFilesDir() + "/icons/project/" + projectID + ".jpg";
+    }
+
     /** Generates a valid String based on its type. **/
     public static String generateValidProjectString(@NonNull RandomString rand, int type,
                                                     ProjectDatabase projectDatabase) {

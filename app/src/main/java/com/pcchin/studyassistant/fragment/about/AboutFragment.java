@@ -45,9 +45,7 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name);
-        }
+        requireActivity().setTitle(R.string.app_name);
     }
 
     /** Creates the fragment. Sets the version, current year and license text. **/
@@ -66,16 +64,10 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                 getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
                 getString(R.string.m2_copyright_p2)));
 
-        returnView.findViewById(R.id.m2_library_license).setOnClickListener(view -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).displayFragment(new LicenseFragment());
-            }
-        });
-        returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).displayFragment(new RssLicenseFragment());
-            }
-        });
+        returnView.findViewById(R.id.m2_library_license).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
+        returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new RssLicenseFragment()));
         returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
@@ -98,10 +90,7 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
      * @see MainFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new MainFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new MainFragment());
+        return true;
     }
 }

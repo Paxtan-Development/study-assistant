@@ -87,21 +87,21 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getArguments() != null) {
+        if (getArguments() != null) {
             String projectID = getArguments().getString(ARG_ID), id2 = getArguments().getString(ARG_ID2);
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER),
                     updateNavView = getArguments().getBoolean(ARG_UPDATE_NAV_VIEW);
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
+            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
             // Check whether the values provided are valid and returns the required role and member
-            Object[] idValidity = UIFunctions.checkIdValidity(getActivity(), projectDatabase,
+            Object[] idValidity = UIFunctions.checkIdValidity(requireActivity(), projectDatabase,
                     project, id2, isMember);
             member = (MemberData) idValidity[1];
             role = (RoleData) idValidity[2];
             checkValidity((boolean) idValidity[0], updateNavView, isMember);
         } else {
-            // getActivity() is somehow null, returns to previous fragment.
+            // requireActivity() is somehow null, returns to previous fragment.
             onBackPressed();
         }
         setHasOptionsMenu(true);
@@ -115,10 +115,10 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         } else if (updateNavView) {
             // Set up navigation menu for members and roles respectively only if requested
             if (isMember) {
-                BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
+                BottomNavViewFunctions.updateBottomNavView((MainActivity) requireActivity(),
                         R.menu.menu_p_bottom, project, member, null);
             } else {
-                BottomNavViewFunctions.updateBottomNavView((MainActivity) getActivity(),
+                BottomNavViewFunctions.updateBottomNavView((MainActivity) requireActivity(),
                         R.menu.menu_p_bottom, project, null, role);
             }
         }
@@ -136,15 +136,13 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             // TODO: set up table
         }
 
-        if (getContext() != null) {
-            // Set up layout
-            ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
-            if (project.description.length() == 0) returnView.findViewById(R.id.p2_desc).setVisibility(View.GONE);
-            else ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
-            displayProjectIcon(returnView);
-            displayProjectStatus(returnView.findViewById(R.id.p2_status));
-            displayProjectDates(returnView);
-        }
+        // Set up layout
+        ((TextView) returnView.findViewById(R.id.p2_title)).setText(project.projectTitle);
+        if (project.description.length() == 0) returnView.findViewById(R.id.p2_desc).setVisibility(View.GONE);
+        else ((TextView) returnView.findViewById(R.id.p2_desc)).setText(project.description);
+        displayProjectIcon(returnView);
+        displayProjectStatus(returnView.findViewById(R.id.p2_status));
+        displayProjectDates(returnView);
         return returnView;
     }
 
@@ -152,8 +150,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     private void displayProjectIcon(View returnView) {
         if (project.hasIcon) {
             ((ImageView) returnView.findViewById(R.id.p2_icon)).setImageURI(Uri.fromFile(
-                    new File(requireContext().getFilesDir() + "/icons/project/"
-                            + project.projectID + ".jpg")));
+                    new File(GeneralFunctions.getProjectIconPath(requireContext(), project.projectID))));
         } else {
             // Center the title if there is no icon
             returnView.findViewById(R.id.p2_icon).setVisibility(View.GONE);
@@ -244,9 +241,9 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     /** Goes to
      * @see com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment for the member.**/
     public void onUserPressed() {
-        if (getActivity() != null && member != null) {
+        if (member != null) {
             projectDatabase.close();
-            ((MainActivity) getActivity()).displayFragment(ProjectMemberFragment
+            ((MainActivity) requireActivity()).displayFragment(ProjectMemberFragment
                     .newInstance(project.projectID, member.memberID, member.memberID, false));
         }
     }
@@ -256,9 +253,9 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
      * If the subject is not found, an alert will display asking if the user would
      * like to delete the related subject from the project. **/
     public void onNotesPressed() {
-        if (project.associatedSubject != null && getActivity() != null) {
+        if (project.associatedSubject != null) {
             // Opens subject database
-            SubjectDatabase subjDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
+            SubjectDatabase subjDatabase = GeneralFunctions.getSubjectDatabase(requireActivity());
             NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
             if (targetSubject == null) {
                 // Ask the user whether to remove the associated subject
@@ -269,17 +266,16 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                         new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
                             project.associatedSubject = null;
                             projectDatabase.ProjectDao().update(project);
-                            getActivity().invalidateOptionsMenu();
+                            requireActivity().invalidateOptionsMenu();
                         }, null, null});
                 subjDialog.setDismissListener(dialogInterface -> subjDatabase.close());
                 subjDialog.show(getParentFragmentManager(), "ProjectInfoFragment.1");
             } else {
                 subjDatabase.close();
                 projectDatabase.close();
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
-                            .newInstance(project.associatedSubject));
-                }
+                requireActivity();
+                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
+                        .newInstance(project.associatedSubject));
             }
         }
     }
@@ -287,30 +283,26 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     /** Goes to
      * @see ProjectSettingsFragment for the project. **/
     public void onSettingsPressed() {
-        if (getActivity() != null) {
-            projectDatabase.close();
-            if (member != null) {
-                ((MainActivity) getActivity()).displayFragment(ProjectSettingsFragment
-                        .newInstance(project.projectID, member.memberID, true));
-            } else {
-                ((MainActivity) getActivity()).displayFragment(ProjectSettingsFragment
-                        .newInstance(project.projectID, role.roleID, false));
-            }
+        projectDatabase.close();
+        if (member != null) {
+            ((MainActivity) requireActivity()).displayFragment(ProjectSettingsFragment
+                    .newInstance(project.projectID, member.memberID, true));
+        } else {
+            ((MainActivity) requireActivity()).displayFragment(ProjectSettingsFragment
+                    .newInstance(project.projectID, role.roleID, false));
         }
     }
 
     /** Access the media for the note at
      * @see ProjectMediaFragment . **/
     public void onMediaPressed() {
-        if (getActivity() != null) {
-            projectDatabase.close();
-            if (member != null) {
-                ((MainActivity) getActivity()).displayFragment(ProjectMediaFragment
-                        .newInstance(project.projectID, member.memberID, true));
-            } else {
-                ((MainActivity) getActivity()).displayFragment(ProjectMediaFragment
-                        .newInstance(project.projectID, role.roleID, false));
-            }
+        projectDatabase.close();
+        if (member != null) {
+            ((MainActivity) requireActivity()).displayFragment(ProjectMediaFragment
+                    .newInstance(project.projectID, member.memberID, true));
+        } else {
+            ((MainActivity) requireActivity()).displayFragment(ProjectMediaFragment
+                    .newInstance(project.projectID, role.roleID, false));
         }
     }
 
@@ -324,10 +316,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        return true;
     }
 }

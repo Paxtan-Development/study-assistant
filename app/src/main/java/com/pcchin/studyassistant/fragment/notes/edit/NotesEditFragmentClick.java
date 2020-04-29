@@ -54,7 +54,7 @@ public final class NotesEditFragmentClick {
     public NotesEditFragmentClick(@NonNull NotesEditFragment fragment) {
         this.fragment = fragment;
         this.fragmentView = fragment.getView();
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** Changes the fragment.subject that the note will be saved to. **/

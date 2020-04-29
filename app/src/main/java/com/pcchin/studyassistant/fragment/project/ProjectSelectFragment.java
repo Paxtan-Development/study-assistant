@@ -50,10 +50,8 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-            getActivity().setTitle(R.string.projects);
-        }
+        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+        requireActivity().setTitle(R.string.projects);
         setHasOptionsMenu(true);
     }
 
@@ -70,12 +68,9 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
                     .inflate(R.layout.hyperlink_btn, null);
             subjectBtn.setText(displayList.get(i).projectTitle);
             int finalI = i;
-            subjectBtn.setOnClickListener(view -> {
-                if (getActivity() != null) {
-                    ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment
-                            .newInstance(displayList.get(finalI).projectID));
-                }
-            });
+            subjectBtn.setOnClickListener(view ->
+                    ((MainActivity) requireActivity()).displayFragment(ProjectLoginFragment
+                    .newInstance(displayList.get(finalI).projectID)));
             linearView.addView(subjectBtn);
         }
         return returnView;
@@ -90,10 +85,8 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
 
     /** Creates a new project. **/
     public void onNewProjectPressed() {
-        if (getActivity() != null) {
-            projectDatabase.close();
-            ((MainActivity) getActivity()).displayFragment(new ProjectCreateFragment());
-        }
+        projectDatabase.close();
+        ((MainActivity) requireActivity()).displayFragment(new ProjectCreateFragment());
     }
 
     /** Imports an existing project file. **/
@@ -106,10 +99,7 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new MainFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new MainFragment());
+        return true;
     }
 }

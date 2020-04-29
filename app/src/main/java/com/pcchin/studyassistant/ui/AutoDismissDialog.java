@@ -210,43 +210,39 @@ public class AutoDismissDialog extends DialogFragment {
     }
 
     /** Creates the actual AlertDialog based on the given parameters.
-     * A NullPointerException is thrown if the context is null. **/
+     * A NullPointerException may be thrown through requireContext.. **/
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (getContext() != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-                    .setTitle(title);
-            if (contentType == DIALOG_CONTENT_VIEW) {
-                builder.setView(displayView);
-            } else if (contentType == DIALOG_CONTENT_MESSAGE) {
-                builder.setMessage(message);
-            } else if (contentType == DIALOG_CONTENT_LIST) {
-                builder.setItems(arrayRes, arrayListener);
-            }
-            if (autoDismiss && buttonList != null && yListeners != null
-                    && contentType != DIALOG_CONTENT_LIST) {
-                builder.setPositiveButton(buttonList[0], yListeners[0]);
-                builder.setNegativeButton(buttonList[1], yListeners[1]);
-                builder.setNeutralButton(buttonList[2], yListeners[2]);
-            } else if (buttonList != null) {
-                builder.setPositiveButton(buttonList[0], null)
-                        .setNegativeButton(buttonList[1], null)
-                        .setNeutralButton(buttonList[2], null);
-            }
-            setCancelable(cancellable);
-
-            // Sets the dialog listeners if autoDismiss is false
-            AlertDialog dialog = builder.create();
-            if (!autoDismiss) {
-                dialog.setOnShowListener(nListener);
-            }
-            if (dismissListener != null) {
-                dialog.setOnDismissListener(dismissListener);
-            }
-            return dialog;
-        } else {
-            throw new NullPointerException("Context for AutoDismissDialog is null");
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
+                .setTitle(title);
+        if (contentType == DIALOG_CONTENT_VIEW) {
+            builder.setView(displayView);
+        } else if (contentType == DIALOG_CONTENT_MESSAGE) {
+            builder.setMessage(message);
+        } else if (contentType == DIALOG_CONTENT_LIST) {
+            builder.setItems(arrayRes, arrayListener);
         }
+        if (autoDismiss && buttonList != null && yListeners != null
+                && contentType != DIALOG_CONTENT_LIST) {
+            builder.setPositiveButton(buttonList[0], yListeners[0]);
+            builder.setNegativeButton(buttonList[1], yListeners[1]);
+            builder.setNeutralButton(buttonList[2], yListeners[2]);
+        } else if (buttonList != null) {
+            builder.setPositiveButton(buttonList[0], null)
+                    .setNegativeButton(buttonList[1], null)
+                    .setNeutralButton(buttonList[2], null);
+        }
+        setCancelable(cancellable);
+
+        // Sets the dialog listeners if autoDismiss is false
+        AlertDialog dialog = builder.create();
+        if (!autoDismiss) {
+            dialog.setOnShowListener(nListener);
+        }
+        if (dismissListener != null) {
+            dialog.setOnDismissListener(dismissListener);
+        }
+        return dialog;
     }
 }

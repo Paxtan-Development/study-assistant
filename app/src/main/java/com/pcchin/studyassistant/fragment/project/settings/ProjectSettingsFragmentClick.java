@@ -21,6 +21,7 @@ import androidx.preference.Preference;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 
 import java.io.File;
@@ -35,7 +36,7 @@ final class ProjectSettingsFragmentClick {
     /** Constructor used as fragment needs to be passed on. **/
     ProjectSettingsFragmentClick(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** The tree click listeners for the root preferences. **/
@@ -47,8 +48,7 @@ final class ProjectSettingsFragmentClick {
     /** The tree click listeners for the general preferences. **/
     void generalPreferenceClick(@NonNull Preference preference) {
         if (activity != null) {
-            String iconLocation = activity.getFilesDir().toString() + "/icons/project/"
-                    + fragment.project.projectID + ".jpg";
+            String iconLocation = GeneralFunctions.getProjectIconPath(activity, fragment.project.projectID);
             switch (preference.getKey()) {
                 case PreferenceString.PREF_SET_ICON:
                 case PreferenceString.PREF_UPDATE_ICON:

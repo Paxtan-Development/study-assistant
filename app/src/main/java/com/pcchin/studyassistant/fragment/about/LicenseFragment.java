@@ -62,10 +62,7 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
      * @see AboutFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
+        return true;
     }
 }

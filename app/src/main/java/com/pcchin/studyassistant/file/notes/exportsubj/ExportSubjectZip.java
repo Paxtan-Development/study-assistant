@@ -100,9 +100,9 @@ public class ExportSubjectZip {
     /** Export the subject to a ZIP file.
      * Separated from onExportPressed() for clarity. **/
     private void exportSubjectZip(String password) {
-        if (fragment != null && fragment.getContext() != null) {
+        if (fragment != null) {
             // Generate valid paths for temp storage folder
-            String tempExportFolder = FileFunctions.generateValidFile(fragment.getContext()
+            String tempExportFolder = FileFunctions.generateValidFile(fragment.requireContext()
                     .getFilesDir().getAbsolutePath() + "/tempZip", "");
             try {
                 createZipFile(tempExportFolder, password);
@@ -110,7 +110,7 @@ public class ExportSubjectZip {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
                         "exporting a subject. Stack trace is ");
                 e.printStackTrace();
-                Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -132,7 +132,7 @@ public class ExportSubjectZip {
         } else {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
                     + " cannot be created.");
-            Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -157,7 +157,7 @@ public class ExportSubjectZip {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Temporary folder "
                     + tempExportFolder + " could not be deleted.");
         }
-        Toast.makeText(fragment.getContext(), fragment.getString(R.string.subject_exported)
+        Toast.makeText(fragment.requireContext(), fragment.getString(R.string.subject_exported)
                 + exportFilePath, Toast.LENGTH_SHORT).show();
     }
 

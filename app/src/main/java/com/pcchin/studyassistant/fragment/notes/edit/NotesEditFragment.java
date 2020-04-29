@@ -94,8 +94,8 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null && getActivity() != null) {
-            database = GeneralFunctions.getSubjectDatabase(getActivity());
+        if (getArguments() != null) {
+            database = GeneralFunctions.getSubjectDatabase(requireActivity());
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
@@ -110,7 +110,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 // Get values from newInstance
                 notesTitle = getArguments().getString(ARG_PARAM2);
             }
-            getActivity().setTitle(notesSubject);
+            requireActivity().setTitle(notesSubject);
         }
         setHasOptionsMenu(true);
     }
@@ -140,17 +140,15 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Set the minimum height of the returned view to match that of the scrollView **/
-    private void setMinHeight(View returnView) {
-        if (getActivity() != null) {
-            returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    View scrollView = returnView.findViewById(R.id.n4_scroll);
-                    ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(scrollView.getHeight());
-                }
-            });
-        }
+    private void setMinHeight(@NonNull View returnView) {
+        returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                View scrollView = returnView.findViewById(R.id.n4_scroll);
+                ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(scrollView.getHeight());
+            }
+        });
     }
 
     /** Sets the menu for the fragment **/

@@ -37,7 +37,7 @@ final class ProjectSettingsFragmentChange {
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** Detects the value change of general preferences. **/

@@ -16,7 +16,6 @@ package com.pcchin.studyassistant.fragment.notes.edit;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
@@ -27,7 +26,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
@@ -35,7 +36,6 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.text.ParseException;
@@ -84,15 +84,19 @@ public final class NotesEditFragmentClick {
                 (activity, android.R.layout.simple_spinner_item, subjTitleList);
         subjAdaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         subjListSpinner.setAdapter(subjAdaptor);
-        
-        new AutoDismissDialog(fragment.getString(R.string.n_change_subj), subjListSpinner,
-                new DialogInterface.OnClickListener[]{(dialog, which) -> {
+
+        new DefaultDialogFragment(new AlertDialog.Builder(activity)
+                .setTitle(R.string.n_change_subj)
+                .setView(subjListSpinner)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     fragment.subjModified = true;
                     fragment.targetNotesSubject = subjListSpinner.getSelectedItem().toString();
                     activity.setTitle(fragment.targetNotesSubject);
                     fragment.targetSubjContents = fragment.database.SubjectDao()
                             .search(fragment.targetNotesSubject).contents;
-                }, (dialog, which) -> dialog.dismiss(), null})
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .create())
                 .show(fragment.getParentFragmentManager(), "NotesEditFragment.1");
     }
 

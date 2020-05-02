@@ -13,7 +13,6 @@
 
 package com.pcchin.studyassistant.fragment.notes.edit;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,14 +23,15 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            database = GeneralFunctions.getSubjectDatabase(requireActivity());
+            database = DatabaseFunctions.getSubjectDatabase(requireActivity());
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
@@ -162,13 +162,13 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
      * @see MainActivity safeOnBackPressed() **/
     @Override
     public boolean onBackPressed() {
-        new AutoDismissDialog(getString(R.string.return_val), getString(R.string.n4_save_note),
-                new String[]{getString(R.string.yes), getString(R.string.no),
-                        getString(android.R.string.cancel)},
-                new DialogInterface.OnClickListener[]{
-                        (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onSavePressed(),
-                        (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed(),
-                        (dialogInterface, i) -> dialogInterface.dismiss()})
+        new DefaultDialogFragment(new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.return_val)
+                .setMessage(R.string.n4_save_note)
+                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onSavePressed())
+                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed())
+                .setNeutralButton(android.R.string.cancel, null)
+                .create())
                 .show(getParentFragmentManager(), "NotesEditFragment.2");
         return true;
     }

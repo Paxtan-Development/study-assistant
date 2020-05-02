@@ -15,18 +15,17 @@ package com.pcchin.studyassistant.file.notes.importsubj;
 
 import android.Manifest;
 import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.activity.MainActivity;
 
 /** Static functions used  in ImportSubject. **/
@@ -41,9 +40,10 @@ public final class ImportSubjectStatic {
     public static void displayImportDialog(MainActivity activity) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-            new AutoDismissDialog(activity.getString(R.string.import_from), R.array.n_import_subject_format,
-                    (dialogInterface, i) -> initFileChooser(activity, i),
-                    new String[]{"", "", ""}, new DialogInterface.OnClickListener[]{null, null, null})
+            new DefaultDialogFragment(new AlertDialog.Builder(activity)
+                    .setTitle(R.string.import_from)
+                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) -> initFileChooser(activity, i))
+                    .create())
                     .show(activity.getSupportFragmentManager(), "ImportSubject.1");
         } else {
             Toast.makeText(activity, R.string.error_read_permission_denied, Toast.LENGTH_SHORT).show();

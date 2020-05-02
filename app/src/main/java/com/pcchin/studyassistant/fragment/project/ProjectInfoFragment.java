@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.fragment.project;
 
 
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -27,9 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -41,11 +43,9 @@ import com.pcchin.studyassistant.fragment.project.member.ProjectMemberFragment;
 import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.functions.BottomNavViewFunctions;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.io.File;
 import java.util.Date;
@@ -91,7 +91,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             String projectID = getArguments().getString(ARG_ID), id2 = getArguments().getString(ARG_ID2);
             boolean isMember = getArguments().getBoolean(ARG_IS_MEMBER),
                     updateNavView = getArguments().getBoolean(ARG_UPDATE_NAV_VIEW);
-            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
             // Check whether the values provided are valid and returns the required role and member
@@ -101,7 +101,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
             role = (RoleData) idValidity[2];
             checkValidity((boolean) idValidity[0], updateNavView, isMember);
         } else {
-            // requireActivity() is somehow null, returns to previous fragment.
+            // getArguments() is somehow null, returns to previous fragment.
             onBackPressed();
         }
         setHasOptionsMenu(true);
@@ -150,7 +150,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     private void displayProjectIcon(View returnView) {
         if (project.hasIcon) {
             ((ImageView) returnView.findViewById(R.id.p2_icon)).setImageURI(Uri.fromFile(
-                    new File(GeneralFunctions.getProjectIconPath(requireContext(), project.projectID))));
+                    new File(DatabaseFunctions.getProjectIconPath(requireContext(), project.projectID))));
         } else {
             // Center the title if there is no icon
             returnView.findViewById(R.id.p2_icon).setVisibility(View.GONE);
@@ -255,27 +255,26 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
     public void onNotesPressed() {
         if (project.associatedSubject != null) {
             // Opens subject database
-            SubjectDatabase subjDatabase = GeneralFunctions.getSubjectDatabase(requireActivity());
+            SubjectDatabase subjDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
             NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
             if (targetSubject == null) {
                 // Ask the user whether to remove the associated subject
-                AutoDismissDialog subjDialog = new AutoDismissDialog(getString(R.string.p2_subject_missing),
-                        getString(R.string.p2_subject_missing_desc),
-                        new String[]{getString(android.R.string.yes),
-                        getString(android.R.string.no), ""},
-                        new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+                AlertDialog subjDialog = new AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.p2_subject_missing)
+                        .setMessage(R.string.p2_subject_missing_desc)
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                             project.associatedSubject = null;
                             projectDatabase.ProjectDao().update(project);
                             requireActivity().invalidateOptionsMenu();
-                        }, null, null});
-                subjDialog.setDismissListener(dialogInterface -> subjDatabase.close());
-                subjDialog.show(getParentFragmentManager(), "ProjectInfoFragment.1");
+                        })
+                        .setNegativeButton(android.R.string.no, null).create();
+                subjDialog.setOnDismissListener(dialogInterface -> subjDatabase.close());
+                new DefaultDialogFragment(subjDialog).show(getParentFragmentManager(), "ProjectInfoFragment.1");
             } else {
                 subjDatabase.close();
                 projectDatabase.close();
                 requireActivity();
-                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
-                        .newInstance(project.associatedSubject));
+                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(project.associatedSubject));
             }
         }
     }
@@ -318,5 +317,21 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         projectDatabase.close();
         ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
         return true;
+    }
+
+    /** Closes the database if the fragment is paused. **/
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+    }
+
+    /** Reopens the database when the fragment is resumed. **/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
+        }
     }
 }

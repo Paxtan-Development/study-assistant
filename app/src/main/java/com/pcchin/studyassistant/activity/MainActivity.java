@@ -46,13 +46,14 @@ import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
+import com.pcchin.studyassistant.fragment.project.ProjectMediaFragment;
 import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
 import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
@@ -173,10 +174,10 @@ public class MainActivity extends AppCompatActivity
     /** Updates the icon of the project specified earlier. **/
     private void updateIcon(String targetFile) {
         try {
-            String iconPath = GeneralFunctions.getProjectIconPath(MainActivity.this, projectID);
+            String iconPath = DatabaseFunctions.getProjectIconPath(MainActivity.this, projectID);
             FileFunctions.copyFile(new File(targetFile), new File(iconPath));
             new Thread(() -> {
-                ProjectDatabase database = GeneralFunctions.getProjectDatabase(MainActivity.this);
+                ProjectDatabase database = DatabaseFunctions.getProjectDatabase(MainActivity.this);
                 ProjectData project = database.ProjectDao().searchByID(projectID);
                 project.hasIcon = true;
                 database.ProjectDao().update(project);
@@ -210,10 +211,7 @@ public class MainActivity extends AppCompatActivity
     public void displayFragment(Fragment fragment) {
         // Hides bottomNavView if the project comes from a project fragment
         // and to a non-project fragment
-        if (! (fragment instanceof ProjectInfoFragment || fragment instanceof ProjectMemberListFragment
-                || fragment instanceof ProjectTaskFragment
-                || fragment instanceof ProjectRoleFragment
-                || fragment instanceof ProjectStatusFragment)) {
+        if (!fragmentHasBottomNavView(fragment)) {
             bottomNavView.setVisibility(View.GONE);
         }
 
@@ -227,6 +225,16 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.base).setVisibility(View.VISIBLE);
         currentFragment = fragment;
         hideKeyboard();
+    }
+
+    /** Checks whether a fragment has a bottom nav view. **/
+    private boolean fragmentHasBottomNavView(Fragment fragment) {
+        return fragment instanceof ProjectInfoFragment
+                || fragment instanceof ProjectMemberListFragment
+                || fragment instanceof ProjectTaskFragment
+                || fragment instanceof ProjectRoleFragment
+                || fragment instanceof ProjectStatusFragment
+                || fragment instanceof ProjectMediaFragment;
     }
 
     /** Displays the notes for the subject through a custom PageAdaptor.

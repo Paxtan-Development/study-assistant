@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
@@ -43,18 +43,18 @@ final class ProjectCreateFragmentCreate {
             if (customAdminPass1.getEditText().getText().length() > 0) {
                 // Admin with password
                 String adminSalt = saltRand.nextString();
-                adminRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+                adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                         ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                         customAdminName.getEditText().getText().toString(),
                         adminSalt, SecurityFunctions.roleHash(customAdminPass1
                         .getEditText().getText().toString(), adminSalt));
             } else {
-                adminRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+                adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                         ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                         customAdminName.getEditText().getText().toString(), saltRand.nextString(), "");
             }
         } else {
-            adminRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+            adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     "Admin", saltRand.nextString(), "");
         }
@@ -94,7 +94,7 @@ final class ProjectCreateFragmentCreate {
             memberRole = getCustomMemberRole(projectDatabase, projectID, idRand, saltRand,
                     customMemberName, customMemberPass1);
         } else {
-            memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+            memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     "Member", saltRand.nextString(), "");
         }
@@ -110,13 +110,13 @@ final class ProjectCreateFragmentCreate {
         if (Objects.requireNonNull(customMemberPass1.getEditText()).getText().length() > 0) {
             // Admin with password
             String memberSalt = saltRand.nextString();
-            memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+            memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
                     memberSalt, SecurityFunctions.roleHash(customMemberPass1
                     .getEditText().getText().toString(), memberSalt));
         } else {
-            memberRole = new RoleData(GeneralFunctions.generateValidProjectString(idRand,
+            memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
                     saltRand.nextString(), "");
@@ -134,7 +134,7 @@ final class ProjectCreateFragmentCreate {
         String memberSalt = saltRand.nextString();
         if (memberName.getEditText() != null && memberPass1.getEditText() != null) {
             if (memberPass1.getEditText().getText().length() > 0) {
-                initialMember = new MemberData(GeneralFunctions
+                initialMember = new MemberData(DatabaseFunctions
                         .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER, projectDatabase),
                         projectID, memberName.getEditText().getText().toString(), "",
                         memberSalt,
@@ -142,7 +142,7 @@ final class ProjectCreateFragmentCreate {
                                 .getText().toString(), memberSalt, projectSalt),
                         adminRoleID);
             } else {
-                initialMember = new MemberData(GeneralFunctions
+                initialMember = new MemberData(DatabaseFunctions
                         .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER, projectDatabase),
                         projectID, memberName.getEditText().getText().toString(), "",
                         memberSalt, "", adminRoleID);

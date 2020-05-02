@@ -33,7 +33,7 @@ import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
@@ -52,7 +52,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subjectDatabase = GeneralFunctions.getSubjectDatabase(requireActivity());
+        subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
         requireActivity().setTitle(R.string.notes);
         setHasOptionsMenu(true);
     }

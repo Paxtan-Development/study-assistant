@@ -42,8 +42,8 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.network.AppUpdate;
 
@@ -125,10 +125,10 @@ final class MainActivityCreate {
         if (intentUri != null) {
             String receiveFilePath = FileFunctions.getRealPathFromUri(activity, intentUri);
             // Check if file type matches the required file types
-            if (receiveFilePath.endsWith(".subject")) {
+            if (receiveFilePath != null && receiveFilePath.endsWith(".subject")) {
                 new ImportSubjectSubject(activity).importSubjectFile(receiveFilePath);
-            } else if (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
-                    || receiveFilePath.endsWith(".Zip")) {
+            } else if (receiveFilePath != null && (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
+                    || receiveFilePath.endsWith(".Zip"))) {
                 new ImportSubjectZip(activity).importZipConfirm(receiveFilePath);
             } else {
                 Toast.makeText(activity, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
@@ -157,7 +157,7 @@ final class MainActivityCreate {
 
     /** Create the default admin and member roles. **/
     private void createDefaultRoles() {
-        ProjectDatabase projectDatabase = GeneralFunctions.getProjectDatabase(activity);
+        ProjectDatabase projectDatabase = DatabaseFunctions.getProjectDatabase(activity);
         RoleData admin = projectDatabase.RoleDao().searchByID("admin");
         if (admin == null) {
             admin = new RoleData("admin", "", "Admin", "", "");

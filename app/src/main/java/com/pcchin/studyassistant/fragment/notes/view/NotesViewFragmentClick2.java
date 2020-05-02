@@ -19,7 +19,6 @@ import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.text.format.DateFormat;
@@ -27,18 +26,20 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -117,7 +118,7 @@ public class NotesViewFragmentClick2 {
         FileFunctions.checkNoteIntegrity(fragment.notesInfo);
         fragment.notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
         fragment.notesInfo.set(5, String.valueOf(requestCode));
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(activity);
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
         NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
         if (subject != null) {
             ArrayList<ArrayList<String>> updateArray = subject.contents;
@@ -164,7 +165,7 @@ public class NotesViewFragmentClick2 {
     private void updateNoteAlertValues() {
         fragment.notesInfo.set(4, null);
         fragment.notesInfo.set(5, null);
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(fragment.requireActivity());
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
         NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
         if (subject != null) {
             ArrayList<ArrayList<String>> updateArray = subject.contents;
@@ -177,10 +178,12 @@ public class NotesViewFragmentClick2 {
 
     /** Deletes the note from the subject. **/
     public void onDeletePressed() {
-        new AutoDismissDialog(fragment.getString(R.string.del), fragment.getString(R.string.n3_del_confirm),
-                new String[]{fragment.getString(R.string.del), fragment.getString(android.R.string.cancel), ""},
-                new DialogInterface.OnClickListener[]{(dialog, which) -> deleteNote(),
-                        (dialog, which) -> dialog.dismiss(), null})
+        new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                .setTitle(R.string.del)
+                .setMessage(R.string.n3_del_confirm)
+                .setPositiveButton(R.string.del, (dialog, which) -> deleteNote())
+                .setNegativeButton(android.R.string.cancel, null)
+                .create())
                 .show(fragment.getParentFragmentManager(), "NotesViewFragment.4");
     }
 
@@ -195,7 +198,7 @@ public class NotesViewFragmentClick2 {
             manager.cancel(alertIntent);
         }
 
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(fragment.requireActivity());
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
         NotesSubject currentSubject = database.SubjectDao().search(fragment.notesSubject);
         // If the note does not have a subject, fall back to NotesSelectFragment
         if (fragment.notesSubject != null) deleteNoteFromDatabase(database, currentSubject, (MainActivity) fragment.requireActivity());

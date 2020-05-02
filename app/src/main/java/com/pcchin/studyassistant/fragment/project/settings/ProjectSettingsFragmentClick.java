@@ -21,7 +21,7 @@ import androidx.preference.Preference;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 
 import java.io.File;
@@ -48,7 +48,7 @@ final class ProjectSettingsFragmentClick {
     /** The tree click listeners for the general preferences. **/
     void generalPreferenceClick(@NonNull Preference preference) {
         if (activity != null) {
-            String iconLocation = GeneralFunctions.getProjectIconPath(activity, fragment.project.projectID);
+            String iconLocation = DatabaseFunctions.getProjectIconPath(activity, fragment.project.projectID);
             switch (preference.getKey()) {
                 case PreferenceString.PREF_SET_ICON:
                 case PreferenceString.PREF_UPDATE_ICON:

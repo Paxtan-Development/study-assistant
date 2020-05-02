@@ -29,8 +29,8 @@ import com.pcchin.studyassistant.activity.MainActivity;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,
-            R.array.dtpreference_license, R.array.imagepicker_license, R.array.jsoup_license,
-            R.array.licenseview_license, R.array.zip4j_license};
+            R.array.customdialog_license, R.array.dtpreference_license, R.array.imagepicker_license,
+            R.array.jsoup_license, R.array.licenseview_license, R.array.zip4j_license};
 
     /** Default constructor. **/
     public LicenseFragment() {

@@ -30,7 +30,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
@@ -50,7 +50,7 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+        projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         requireActivity().setTitle(R.string.projects);
         setHasOptionsMenu(true);
     }
@@ -101,5 +101,21 @@ public class ProjectSelectFragment extends Fragment implements ExtendedFragment 
         projectDatabase.close();
         ((MainActivity) requireActivity()).displayFragment(new MainFragment());
         return true;
+    }
+
+    /** Closes the database if the fragment is paused. **/
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+    }
+
+    /** Reopens the database when the fragment is resumed. **/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
+        }
     }
 }

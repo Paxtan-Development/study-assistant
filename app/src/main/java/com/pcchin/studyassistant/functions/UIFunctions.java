@@ -15,7 +15,6 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
@@ -27,7 +26,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -35,8 +36,6 @@ import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
 
@@ -52,24 +51,27 @@ public final class UIFunctions {
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        popupView.setHint(activity.getString(R.string.n1_subject_title));
+
         // End icon has been set by default in XML file
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
-        DialogInterface.OnShowListener subjectListener = dialog -> {
-            popupView.setHint(activity.getString(R.string.n1_subject_title));
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                    .setOnClickListener(v -> {
-                        String inputText = "";
-                        if (popupView.getEditText() != null) inputText = popupView.getEditText().getText().toString();
-                        createSubject(dialog, popupView, activity, database, inputText);
-                    });
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> dialog.dismiss());
-        };
-        new AutoDismissDialog(activity.getString(R.string.n1_new_subject), popupView, subjectListener)
-                        .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
+                new AlertDialog.Builder(activity)
+                        .setTitle(R.string.n1_new_subject)
+                        .setView(popupView)
+                        .create());
+        dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok), v -> {
+            String inputText = "";
+            if (popupView.getEditText() != null) inputText = popupView.getEditText().getText().toString();
+            createSubject(dismissibleFragment, popupView, activity, database, inputText);
+        });
+        dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel), v ->
+                dismissibleFragment.dismiss());
+        dismissibleFragment.show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
     }
 
     /** Creates the subject if the subject title is not taken. **/
-    private static void createSubject(DialogInterface dialog, TextInputLayout popupView,
+    private static void createSubject(DismissibleDialogFragment dismissibleFragment, TextInputLayout popupView,
                                       MainActivity activity, SubjectDatabase database, @NonNull String inputText) {
         // Preliminary checks if subject name is taken or is empty
         if (inputText.replaceAll("\\s+", "").length() == 0) {
@@ -88,7 +90,7 @@ public final class UIFunctions {
             activity.safeOnBackPressed();
             activity.displayFragment(
                     NotesSubjectFragment.newInstance(inputText));
-            dialog.dismiss();
+            dismissibleFragment.dismiss();
             NavViewFunctions.updateNavView(activity);
         }
     }

@@ -34,7 +34,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.DefaultDialogPreference;
 import com.pcchin.studyassistant.preference.DefaultDialogPreferenceDialog;
@@ -55,7 +55,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
 
     // Mutually exclusive unless the project has both of those enabled
     private MemberData member;
-    private RoleData role;
+    RoleData role;
 
     /** Default constructor. **/
     public ProjectSettingsFragment() {
@@ -84,7 +84,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             String projectID = getArguments().getString(ARG_ID);
             id2 = getArguments().getString(ARG_ID2);
             isMember = getArguments().getBoolean(ARG_IS_MEMBER);
-            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
             Object[] idValidity = UIFunctions.checkIdValidity(requireActivity(), projectDatabase,
@@ -242,6 +242,11 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         displayPreference(currentPrefRoot);
     }
 
+    /** Check if a member exists within the current project. **/
+    boolean projectHasMember() {
+        return projectDatabase.MemberDao().searchByProject(project.projectID).size() > 0;
+    }
+
     /** Returns to
      * @see ProjectInfoFragment **/
     @Override
@@ -265,17 +270,19 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    /** Closes the database if the fragment is paused. **/
     @Override
     public void onPause() {
         super.onPause();
         projectDatabase.close();
     }
 
+    /** Reopens the database when the fragment is resumed. **/
     @Override
     public void onResume() {
         super.onResume();
         if (!projectDatabase.isOpen()) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         }
     }
 }

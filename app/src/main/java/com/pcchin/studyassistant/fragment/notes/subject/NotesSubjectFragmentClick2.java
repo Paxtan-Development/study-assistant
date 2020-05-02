@@ -19,7 +19,6 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -31,17 +30,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DefaultDialogFragment;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectZip;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -63,38 +63,37 @@ public class NotesSubjectFragmentClick2 {
         if (popupView.getEditText() != null) {
             popupView.getEditText().setText(fragment.notesSubject);
         }
-        DialogInterface.OnShowListener nListener = dialogInterface ->
-                setRenameDialogButton((AlertDialog) dialogInterface, popupView);
-        new AutoDismissDialog(fragment.getString(R.string.rename_subject), popupView,
-                new String[]{fragment.getString(R.string.rename),
-                        fragment.getString(android.R.string.cancel), ""}, nListener)
-                .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.3");
+
+        DismissibleDialogFragment dismissibleDialog = new DismissibleDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                .setTitle(R.string.rename_subject)
+                .setView(popupView)
+                .create());
+        dismissibleDialog.setPositiveButton(fragment.getString(R.string.rename),
+                view -> setPositiveButton(dismissibleDialog, popupView));
+        dismissibleDialog.setNegativeButton(fragment.getString(android.R.string.cancel), view -> dismissibleDialog.dismiss());
+        dismissibleDialog.show(fragment.getParentFragmentManager(), "NotesSubjectFragment.3");
     }
 
-    /** Sets the onClickListeners for the buttons in the renaming dialog. **/
-    private void setRenameDialogButton(@NonNull AlertDialog dialogInterface, TextInputLayout popupView) {
-        dialogInterface.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            if (popupView.getEditText() != null) {
-                String popupInputText = popupView.getEditText().getText().toString();
-                // Check if input is blank
-                if (popupInputText.replaceAll("\\s+", "")
-                        .length() == 0) {
-                    popupView.setErrorEnabled(true);
-                    popupView.setError(fragment.getString(R.string.n_error_subject_empty));
-                } else if (fragment.subjectDatabase.SubjectDao().search(popupInputText) != null) {
-                    popupView.setErrorEnabled(true);
-                    popupView.setError(fragment.getString(R.string.error_subject_exists));
-                } else {
-                    moveSubject((MainActivity) fragment.requireActivity(), dialogInterface, popupInputText);
-                }
+    /** Sets the positive button for the renaming dialog. **/
+    private void setPositiveButton(DismissibleDialogFragment dismissibleDialog, @NonNull TextInputLayout popupView) {
+        if (popupView.getEditText() != null) {
+            String popupInputText = popupView.getEditText().getText().toString();
+            // Check if input is blank
+            if (popupInputText.replaceAll("\\s+", "")
+                    .length() == 0) {
+                popupView.setErrorEnabled(true);
+                popupView.setError(fragment.getString(R.string.n_error_subject_empty));
+            } else if (fragment.subjectDatabase.SubjectDao().search(popupInputText) != null) {
+                popupView.setErrorEnabled(true);
+                popupView.setError(fragment.getString(R.string.error_subject_exists));
+            } else {
+                moveSubject((MainActivity) fragment.requireActivity(), dismissibleDialog, popupInputText);
             }
-        });
-        dialogInterface.getButton(DialogInterface.BUTTON_NEGATIVE)
-                .setOnClickListener(view -> dialogInterface.dismiss());
+        }
     }
 
     /** Moves the subject to another name. **/
-    private void moveSubject(MainActivity activity, @NonNull DialogInterface dialogInterface,
+    private void moveSubject(MainActivity activity, @NonNull DismissibleDialogFragment dialogInterface,
                              String popupInputText) {
         // Move subject
         dialogInterface.dismiss();
@@ -122,16 +121,18 @@ public class NotesSubjectFragmentClick2 {
             Toast.makeText(fragment.requireContext(), R.string
                     .error_write_permission_denied, Toast.LENGTH_SHORT).show();
         } else {
-            new AutoDismissDialog(fragment.getString(R.string.n2_export_format),
-                    R.array.n_import_subject_format, (dialogInterface, i) ->
-                    new Handler().post(() -> {
-                        if (i == 0) new ExportSubjectZip(fragment, fragment.subjectDatabase, 
-                                fragment.notesArray, fragment.notesSubject).askZipPassword();
-                        else new ExportSubjectSubject(fragment, fragment.notesSubject, 
-                                fragment.notesArray, fragment.subjectDatabase.SubjectDao()
-                                .search(fragment.notesSubject).sortOrder).exportSubject();
-                    }), new String[]{"", fragment.getString(android.R.string.cancel), ""},
-                    new DialogInterface.OnClickListener[]{null, null, null})
+            new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                    .setTitle(R.string.n2_export_format)
+                    .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
+                            new Handler().post(() -> {
+                                if (i == 0) new ExportSubjectZip(fragment, fragment.subjectDatabase,
+                                        fragment.notesArray, fragment.notesSubject).askZipPassword();
+                                else new ExportSubjectSubject(fragment, fragment.notesSubject,
+                                        fragment.notesArray, fragment.subjectDatabase.SubjectDao()
+                                        .search(fragment.notesSubject).sortOrder).exportSubject();
+                            }))
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create())
                     .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.4");
         }
     }
@@ -139,10 +140,12 @@ public class NotesSubjectFragmentClick2 {
     /** Deletes the current subject and returns to
      * @see NotesSelectFragment **/
     public void onDeletePressed() {
-        new AutoDismissDialog(fragment.getString(R.string.del), fragment.getString(R.string.n2_del_confirm),
-                new String[]{fragment.getString(R.string.del), fragment.getString(android.R.string.cancel), ""},
-                new DialogInterface.OnClickListener[]{(dialog, which) -> deleteSubject(fragment.requireActivity()),
-                        (dialog, which) -> dialog.dismiss(), null})
+        new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                .setTitle(R.string.del)
+                .setMessage(R.string.n2_del_confirm)
+                .setPositiveButton(R.string.del, (dialog, which) -> deleteSubject(fragment.requireActivity()))
+                .setNegativeButton(android.R.string.cancel, null)
+                .create())
                 .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.7");
     }
 
@@ -151,7 +154,7 @@ public class NotesSubjectFragmentClick2 {
         deletePhantomAlerts(activity);
 
         // Deletes subject from database
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(fragment.requireActivity());
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
         NotesSubject delTarget = database.SubjectDao().search(fragment.notesSubject);
         if (delTarget != null) {
             database.SubjectDao().delete(delTarget);

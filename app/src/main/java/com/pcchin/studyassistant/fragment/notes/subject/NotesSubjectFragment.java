@@ -32,8 +32,8 @@ import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.SortingComparators;
@@ -94,7 +94,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subjectDatabase = GeneralFunctions.getSubjectDatabase(requireActivity());
+        subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
 
         // Get basic info & set title
         if (getArguments() != null) {

@@ -62,7 +62,11 @@ final class ProjectSettingsFragmentChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
-                fragment.project.membersEnabled = (boolean) newValue;
+                if ((boolean) newValue) {
+                    checkMemberExists();
+                } else {
+                    fragment.project.membersEnabled = false;
+                }
                 break;
             case PreferenceString.PREF_ROLES:
                 fragment.project.rolesEnabled = (boolean) newValue;
@@ -77,26 +81,39 @@ final class ProjectSettingsFragmentChange {
                 fragment.project.mergeTaskStatus = (boolean) newValue;
                 break;
             case PreferenceString.PREF_STATUS_ICON:
-                switch ((String) newValue) {
-                    case "None":
-                        fragment.project.projectStatusIcon = R.string.blank;
-                        break;
-                    case "Circle":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_circle;
-                        break;
-                    case "Triangle":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_triangle;
-                        break;
-                    case "Square":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_square;
-                        break;
-                }
+                updateStatusIcon((String) newValue);
                 break;
             case PreferenceString.PREF_RELATED_SUBJECT:
                 fragment.project.associatedSubject = (String) newValue;
                 break;
         }
         fragment.updateProject();
+    }
+
+    /** Check if a member for the project already exists.
+     * If not, show a dialog to add them as a member. **/
+    private void checkMemberExists() {
+        if (!fragment.projectHasMember()) {
+            // TODO: Complete
+        }
+    }
+
+    /** Updates the status icon for the project. **/
+    private void updateStatusIcon(@NonNull String newValue) {
+        switch (newValue) {
+            case "None":
+                fragment.project.projectStatusIcon = R.string.blank;
+                break;
+            case "Circle":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_circle;
+                break;
+            case "Triangle":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_triangle;
+                break;
+            case "Square":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_square;
+                break;
+        }
     }
 
     /** Detects the value change of date preferences. **/

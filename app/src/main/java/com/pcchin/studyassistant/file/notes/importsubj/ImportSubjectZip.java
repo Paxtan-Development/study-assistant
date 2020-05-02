@@ -14,17 +14,17 @@
 package com.pcchin.studyassistant.file.notes.importsubj;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.activity.MainActivity;
 
 import net.lingala.zip4j.ZipFile;
@@ -68,15 +68,14 @@ public class ImportSubjectZip {
             }
             inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
-            // Asks for password
-            DialogInterface.OnShowListener passwordListener = dialogInterface -> {
-                setZipDialogListener(dialogInterface, inputLayout, path);
-                ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
-                        .setOnClickListener(view -> dialogInterface.dismiss());
-            };
-            new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout,
-                    passwordListener).show(activity.getSupportFragmentManager(),
-                    "ImportSubject.2");
+            // Set up dialog
+            DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(new AlertDialog.Builder(activity)
+                    .setTitle(R.string.enter_password).setView(inputLayout).create());
+            dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok),
+                    view -> setPositiveButton(dismissibleFragment, path, inputLayout));
+            dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel),
+                    view -> dismissibleFragment.dismiss());
+            dismissibleFragment.show(activity.getSupportFragmentManager(), "ImportSubject.2");
         } else {
             // Error thrown in importZipFile will be handled by the external error handler
             ZipFile inputFile = new ZipFile(path);
@@ -84,30 +83,27 @@ public class ImportSubjectZip {
         }
     }
 
-    /** Sets the dialog listener for the OK button after the user has entered their password. **/
-    private void setZipDialogListener(DialogInterface dialogInterface, TextInputLayout inputLayout,
-                                      String path) {
-        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
-                .setOnClickListener(view -> {
-                    String password = "";
-                    if (inputLayout.getEditText() != null) {
-                        password = inputLayout.getEditText().getText().toString();
-                    }
-                    if (password.length() >= 8) {
-                        try {
-                            ZipFile inputFile = new ZipFile(path, password.toCharArray());
-                            new ImportSubjectZipProcess(activity).importZipFile(inputFile);
-                            dialogInterface.dismiss();
-                        } catch (ZipException e) {
-                            inputLayout.setErrorEnabled(true);
-                            inputLayout.setError(activity.getString(R.string
-                                    .error_password_incorrect));
-                        }
-                    } else {
-                        inputLayout.setErrorEnabled(true);
-                        inputLayout.setError(activity.getString(R.string
-                                .error_password_short));
-                    }
-                });
+    /** Sets the positive button for the zip password dialog. **/
+    private void setPositiveButton(DismissibleDialogFragment dismissibleFragment, String path,
+                                   @NonNull TextInputLayout inputLayout) {
+        String password = "";
+        if (inputLayout.getEditText() != null) {
+            password = inputLayout.getEditText().getText().toString();
+        }
+        if (password.length() >= 8) {
+            try {
+                ZipFile inputFile = new ZipFile(path, password.toCharArray());
+                new ImportSubjectZipProcess(activity).importZipFile(inputFile);
+                dismissibleFragment.dismiss();
+            } catch (ZipException e) {
+                inputLayout.setErrorEnabled(true);
+                inputLayout.setError(activity.getString(R.string
+                        .error_password_incorrect));
+            }
+        } else {
+            inputLayout.setErrorEnabled(true);
+            inputLayout.setError(activity.getString(R.string
+                    .error_password_short));
+        }
     }
 }

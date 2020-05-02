@@ -34,6 +34,10 @@
     <string name="p2_subject_missing">Subject Missing</string>
     <string name="p2_subject_missing_desc">The subject required is missing. Would you like to delete the linked subject from the project?</string>
 
+    <string name="p4_info">Info</string>
+    <string name="p4_new_file">New File</string>
+    <string name="p4_duplicate">Duplicate</string>
+
     <string name="p6_project_name">Project Name</string>
     <string name="p6_enable_members">Enable Members</string>
     <string name="p6_enable_roles">Enable Roles</string>

@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.file.notes.exportsubj;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
@@ -25,12 +24,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,22 +62,26 @@ public class ExportSubjectSubject {
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         inputText.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         inputText.setHint(fragment.getString(R.string.set_blank_password));
-        DialogInterface.OnShowListener exportListener = dialogInterface -> {
-            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                // Check if password is too short, must be 8 characters in length
-                String responseText = "";
-                if (inputText.getEditText() != null) responseText = inputText.getEditText().getText().toString();
-                checkPasswordRequirement(dialogInterface, responseText, inputText);
-            });
-            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                    dialogInterface.dismiss());
-        };
-        new AutoDismissDialog(fragment.getString(R.string.n2_password_export), inputText, exportListener)
-                .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.6");
+
+        // Display the dialog
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
+                new AlertDialog.Builder(fragment.requireContext())
+                        .setTitle(R.string.n2_password_export)
+                        .setView(inputText)
+                        .create());
+        dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok), view -> {
+            // Check if password is too short, must be 8 characters in length
+            String responseText = "";
+            if (inputText.getEditText() != null) responseText = inputText.getEditText().getText().toString();
+            checkPasswordRequirement(dismissibleFragment, responseText, inputText);
+        });
+        dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel), view ->
+                dismissibleFragment.dismiss());
+        dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesSubjectFragment.6");
     }
 
     /** Check if the password set by the user fits the requirement. **/
-    private void checkPasswordRequirement(DialogInterface dialogInterface, @NonNull String responseText,
+    private void checkPasswordRequirement(DismissibleDialogFragment dialog, @NonNull String responseText,
                                           TextInputLayout inputText) {
         if (responseText.length() == 0 || responseText.length() >= 8) {
             // Set output file name
@@ -92,8 +95,8 @@ public class ExportSubjectSubject {
 
             // Check if the file can be created
             String finalOutputFileName = outputFileName;
-            dialogInterface.dismiss();
-            new Handler().post(() -> handleExportSubjectError(dialogInterface, finalOutputFileName,
+            dialog.dismiss();
+            new Handler().post(() -> handleExportSubjectError(dialog, finalOutputFileName,
                             responseText, responseText));
         } else {
             inputText.setErrorEnabled(true);
@@ -102,7 +105,7 @@ public class ExportSubjectSubject {
     }
 
     /** Handles any errors that occur while exporting the .subject file. **/
-    private void handleExportSubjectError(DialogInterface dialogInterface,
+    private void handleExportSubjectError(DismissibleDialogFragment dialog,
                                           String finalOutputFileName,
                                           String finalResponseText,
                                           String finalResponseText1) {
@@ -123,12 +126,12 @@ public class ExportSubjectSubject {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
                     + finalOutputFileName + " not found, stack trace is");
             e.printStackTrace();
-            dialogInterface.dismiss();
+            dialog.dismiss();
         } catch (IOException e) {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: An IO Exception"
                     + " occurred on file " + finalOutputFileName + ", stack trace is");
             e.printStackTrace();
-            dialogInterface.dismiss();
+            dialog.dismiss();
         }
     }
 

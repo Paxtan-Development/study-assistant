@@ -176,4 +176,14 @@ class ProjectLoginFragmentView {
             passwordInputLayout.setError(activity.getString(R.string.error_password_incorrect));
         }
     }
+
+    /** Reopens the database when the fragment is resumed. **/
+    void open(ProjectDatabase projectDatabase) {
+        this.projectDatabase = projectDatabase;
+    }
+
+    /** Closes the database before exiting the class. **/
+    void close() {
+        projectDatabase.close();
+    }
 }

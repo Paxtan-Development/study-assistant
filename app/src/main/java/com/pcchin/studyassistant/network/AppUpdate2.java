@@ -35,13 +35,14 @@ import androidx.core.content.FileProvider;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.pcchin.customdialog.DefaultDialogFragment;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,34 +101,22 @@ class AppUpdate2 {
         String downloadLink = response.getString("download");
         String releaseLink = response.getString("page");
         if (!calledFromNotif) showUpdateAvailableNotif();
-
-        // Set up dialog
-        DialogInterface.OnShowListener updateListener = dialogInterface ->
-                setUpdateDialogListeners((AlertDialog) dialogInterface, downloadLink, releaseLink);
-        new AutoDismissDialog(activity.getString(R.string.a_update_app),
-                activity.getString(R.string.a_new_version), new String[]
-                {activity.getString(android.R.string.yes),
-                        activity.getString(android.R.string.no),
-                        activity.getString(R.string.a_learn_more)}, updateListener)
-                .show(activity.getSupportFragmentManager(), "AppUpdate.1");
-    }
-
-    /** Sets the onClickListeners for the buttons for the update dialog. **/
-    private void setUpdateDialogListeners(@NonNull AlertDialog dialogInterface,
-                                          String downloadLink, String releaseLink) {
-        dialogInterface.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            dialogInterface.dismiss();
+        // Show update dialog
+        DismissibleDialogFragment updateDialog = new DismissibleDialogFragment(new AlertDialog.Builder(activity)
+                .setTitle(R.string.a_update_app).setMessage(R.string.a_new_version).create());
+        updateDialog.setPositiveButton(activity.getString(android.R.string.yes), view -> {
+            updateDialog.dismiss();
             updateViaGithub(downloadLink);
         });
-        dialogInterface.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(view -> {
+        updateDialog.setNegativeButton(activity.getString(android.R.string.no), view -> updateDialog.dismiss());
+        updateDialog.setNeutralButton(activity.getString(R.string.a_learn_more), view -> {
             // The user should be able to update after coming back from the website
             activity.safeOnBackPressed();
             Intent gitlabReleaseSite = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(releaseLink));
             activity.startActivity(gitlabReleaseSite);
         });
-        dialogInterface.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(
-                view -> dialogInterface.dismiss());
+        updateDialog.show(activity.getSupportFragmentManager(), "AppUpdate.1");
     }
 
     /** Displays a notification that an update is available. **/
@@ -180,13 +169,16 @@ class AppUpdate2 {
             queue.stop();
             continueDownload.set(false);
         };
-        AutoDismissDialog downloadDialog = new AutoDismissDialog(activity
-                .getString(R.string.a_downloading), progressBar,
-                new String[]{activity.getString(android.R.string.cancel), "", ""});
-        downloadDialog.setCancellable(false);
-        downloadDialog.setDismissListener(dismissListener);
-        downloadDialog.show(activity.getSupportFragmentManager(), "AppUpdate.2");
-        VolleyFileDownloadRequest request = getDownloadRequest(downloadDialog, queue, downloadLink, outputFileName);
+        AlertDialog downloadDialog = new AlertDialog.Builder(activity)
+                .setTitle(R.string.a_downloading)
+                .setView(progressBar)
+                .setPositiveButton(android.R.string.cancel, null)
+                .create();
+        downloadDialog.setCancelable(false);
+        downloadDialog.setOnDismissListener(dismissListener);
+        DefaultDialogFragment dialogFragment = new DefaultDialogFragment(downloadDialog);
+        dialogFragment.show(activity.getSupportFragmentManager(), "AppUpdate.2");
+        VolleyFileDownloadRequest request = getDownloadRequest(dialogFragment, queue, downloadLink, outputFileName);
         if (continueDownload.get()) {
             queue.add(request);
         }
@@ -194,8 +186,8 @@ class AppUpdate2 {
 
     /** Returns the download request for the APK file. **/
     @NonNull
-    private VolleyFileDownloadRequest getDownloadRequest(AutoDismissDialog downloadDialog,
-        RequestQueue queue, String downloadLink, String outputFileName) {
+    private VolleyFileDownloadRequest getDownloadRequest(DefaultDialogFragment downloadDialog,
+                                                         RequestQueue queue, String downloadLink, String outputFileName) {
         return new VolleyFileDownloadRequest(Request.Method.GET, downloadLink,
                 response -> tryCreateApk(downloadDialog, queue, response, outputFileName), error -> {
             downloadDialog.dismiss();
@@ -215,7 +207,7 @@ class AppUpdate2 {
     }
 
     /** The try / catch blocks for createApk. **/
-    private void tryCreateApk(AutoDismissDialog downloadDialog, RequestQueue queue,
+    private void tryCreateApk(DefaultDialogFragment downloadDialog, RequestQueue queue,
                               byte[] response, String outputFileName) {
         try {
             createApk(downloadDialog, queue, response, outputFileName);
@@ -238,7 +230,7 @@ class AppUpdate2 {
     }
 
     /** Creates the APK file in the downloads directory. **/
-    private void createApk(@NonNull AutoDismissDialog downloadDialog, @NonNull RequestQueue queue,
+    private void createApk(@NonNull DefaultDialogFragment downloadDialog, @NonNull RequestQueue queue,
                            byte[] response, String outputFileName) throws IOException {
         downloadDialog.dismiss();
         queue.stop();

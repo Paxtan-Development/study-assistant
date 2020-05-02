@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.fragment.project.verify;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -30,14 +29,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 
@@ -46,6 +45,7 @@ import java.util.Objects;
 
 public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ID = "projectID";
+    private ProjectLoginFragmentView loginFragmentView;
     private ProjectDatabase projectDatabase;
     private ProjectData project;
 
@@ -68,7 +68,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        projectDatabase = GeneralFunctions.getProjectDatabase(requireActivity());
+        projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         if (getArguments() != null) {
             project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
         }
@@ -87,7 +87,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         if (project.projectProtected || project.membersEnabled || project.rolesEnabled) {
             activity.setTitle(R.string.v2_project_login);
             if (project.projectProtected) {
-                setPasswordDialog();
+                setPasswordLayout();
             }
         } else {
             // All users will be logged in as admin if roles & members are not enabled
@@ -97,9 +97,8 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         }
     }
 
-    /** Sets up and displays the project password dialog. **/
-    private void setPasswordDialog() {
-        // Set up password input layout
+    /** Sets up and displays the layout for the project password dialog. **/
+    private void setPasswordLayout() {
         @SuppressLint("InflateParams") TextInputLayout passwordLayout =
                 (TextInputLayout) getLayoutInflater().inflate(R.layout.popup_edittext, null);
         if (passwordLayout.getEditText() != null) {
@@ -107,44 +106,39 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         }
         passwordLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         passwordLayout.setHint(getString(R.string.v1_project_protected_password));
-
-        // Set up OnShowListener
-        DialogInterface.OnShowListener passwordDialogListener = dialogInterface ->
-                setPasswordDialogListener((MainActivity) requireActivity(), (AlertDialog) dialogInterface, passwordLayout);
-        AutoDismissDialog passwordDialog = new AutoDismissDialog(
-                getString(R.string.v1_project_protected), passwordLayout, passwordDialogListener);
-        passwordDialog.setCancellable(false);
-        passwordDialog.show(getParentFragmentManager(), "ProjectLoginFragment.1");
+        setPasswordDialog(passwordLayout);
     }
 
-    /** Sets the onClickListeners for the project password dialog. **/
-    private void setPasswordDialogListener(MainActivity activity, @NonNull AlertDialog dialogInterface,
-                                           TextInputLayout passwordLayout) {
-        dialogInterface.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            // Check if password is correct
+    /** Set up and display the project password dialog based on the given layout. **/
+    private void setPasswordDialog(TextInputLayout passwordLayout) {
+        AlertDialog passwordDialog = new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.v1_project_protected).setView(passwordLayout).create();
+        passwordDialog.setCancelable(false);
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(passwordDialog);
+        dismissibleFragment.setPositiveButton(getString(android.R.string.ok), view -> {
+            // Check if password is correct, display error message if not
             if (Objects.requireNonNull(passwordLayout.getEditText()).getText().toString().length() >= 8) {
-                checkProjectPass(dialogInterface,
-                        (MainActivity) requireActivity(), passwordLayout);
+                checkProjectPass(dismissibleFragment, (MainActivity) requireActivity(), passwordLayout);
             } else {
-                // Display error message
                 passwordLayout.setError(getString(R.string.error_password_short));
             }
         });
-        dialogInterface.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view -> {
+        dismissibleFragment.setNegativeButton(getString(android.R.string.cancel), view -> {
             // Returns to ProjectSelectFragment
-            dialogInterface.dismiss();
+            dismissibleFragment.dismiss();
             projectDatabase.close();
-            activity.displayFragment(new ProjectSelectFragment());
+            ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
         });
+        dismissibleFragment.show(getParentFragmentManager(), "ProjectLoginFragment.1");
     }
 
     /** Check whether the password for the project is correct. **/
-    private void checkProjectPass(DialogInterface dialogInterface, MainActivity activity,
+    private void checkProjectPass(DismissibleDialogFragment dismissibleFragment, MainActivity activity,
                                   @NonNull TextInputLayout passwordLayout) {
         if (Objects.equals(SecurityFunctions.projectHash(Objects.requireNonNull(
                 passwordLayout.getEditText()).getText().toString(), project.salt), project.projectPass)) {
             // Password is correct
-            dialogInterface.dismiss();
+            dismissibleFragment.dismiss();
             if (!project.membersEnabled && !project.rolesEnabled) {
                 // No secondary check
                 projectDatabase.close();
@@ -164,12 +158,13 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         View returnScroll = inflater.inflate(R.layout.fragment_project_login, container, false);
         ((TextView) returnScroll.findViewById(R.id.v2_title)).setText(project.projectTitle);
         // Set up icon (only for portrait)
-        String iconPath = GeneralFunctions.getProjectIconPath(requireActivity(), project.projectID);
+        String iconPath = DatabaseFunctions.getProjectIconPath(requireActivity(), project.projectID);
         ImageView projectIcon = returnScroll.findViewById(R.id.v2_icon);
         if (project.hasIcon && new File(iconPath).exists()) {
             projectIcon.setImageURI(Uri.fromFile(new File(iconPath)));
         }
-        new ProjectLoginFragmentView((MainActivity) requireActivity(), projectDatabase, project).setLogin(returnScroll);
+        loginFragmentView = new ProjectLoginFragmentView((MainActivity) requireActivity(), projectDatabase, project);
+        loginFragmentView.setLogin(returnScroll);
         return returnScroll;
     }
 
@@ -180,5 +175,27 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
         projectDatabase.close();
         ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
         return true;
+    }
+
+    /** Closes the database if the fragment is paused. **/
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+        if (loginFragmentView != null) {
+            loginFragmentView.close();
+        }
+    }
+
+    /** Reopens the database when the fragment is resumed. **/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
+        }
+        if (loginFragmentView != null) {
+            loginFragmentView.open(projectDatabase);
+        }
     }
 }

@@ -28,7 +28,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         }
 
         // Clear data from database
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(context);
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
         NotesSubject subject = database.SubjectDao().search(subjectTitle);
         if (subject != null) {
             ArrayList<ArrayList<String>> notesList = subject.contents;

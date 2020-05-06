@@ -22,6 +22,7 @@ public final class ActivityConstants {
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
+    public static final String SHAREDPREF_SERVER_PUBLIC_PEM = "serverPublicPem";
 
     // General intent constants
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
@@ -41,6 +42,12 @@ public final class ActivityConstants {
     public static final String DATABASE_NOTES = "notesSubject";
     public static final String DATABASE_PROJECT = "projectDatabase";
     public static final String LOG_APP_NAME = "StudyAssistant";
+    public static final String EMAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+" +
+            "/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|" +
+            "\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)" +
+            "+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.)" +
+            "{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b" +
+            "\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
 
     // Permission codes
     static final int EXTERNAL_STORAGE_PERMISSION = 200;

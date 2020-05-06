@@ -26,6 +26,9 @@ import android.widget.TextView;
 
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.fragment.about.license.LicenseFragment;
+import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
+import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.activity.MainActivity;
@@ -74,9 +77,7 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
             startActivity(intent);
         });
         returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSc-VlEWcEDGsQIZCQNw14wS4opc72-DY2C5V6XrjrriKOdk8A/viewform?usp=sf_link"));
-            startActivity(intent);
+            ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment());
         });
 
         // Set license text

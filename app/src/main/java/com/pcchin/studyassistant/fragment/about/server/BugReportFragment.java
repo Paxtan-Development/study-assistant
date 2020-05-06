@@ -11,52 +11,37 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.about;
+package com.pcchin.studyassistant.fragment.about.server;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
-public class RssLicenseFragment extends Fragment implements ExtendedFragment {
+public class BugReportFragment extends Fragment implements ExtendedFragment {
+    // TODO: Complete
     /** Default constructor. **/
-    public RssLicenseFragment() {
+    public BugReportFragment() {
         // Default constructor.
     }
 
-    /** Initializes the fragment. Nothing to see here. **/
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
-    /** Creates the fragment. Sets the license text. **/
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView returnScroll = new ScrollView(requireActivity());
-
-        // Set text
-        TextView textView = new TextView(requireActivity());
-        textView.setTextSize(18);
-        UIFunctions.setHtml(textView, FileFunctions.getTxt(inflater.getContext(),
-                "rss_license.txt"));
-        returnScroll.addView(textView);
-        return returnScroll;
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_bug_report, container, false);
     }
 
-    /** Go back to
+    /** Returns to
      * @see AboutFragment **/
     @Override
     public boolean onBackPressed() {

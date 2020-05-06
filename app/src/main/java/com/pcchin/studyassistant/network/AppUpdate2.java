@@ -194,13 +194,13 @@ class AppUpdate2 {
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley file download request failed"
                     + ", response given is " + error.getMessage() + STACK_TRACE_IS);
             error.printStackTrace();
-            Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.network_error, Toast.LENGTH_SHORT).show();
         }, null){
             @NonNull
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("User-agent", AppUpdate.USER_AGENT);
+                headers.put("User-agent", NetworkConstants.USER_AGENT);
                 return headers;
             }
         };
@@ -225,7 +225,7 @@ class AppUpdate2 {
             Log.d(ActivityConstants.LOG_APP_NAME, "Error: Volley download request failed " +
                     "in middle of operation with error");
             e.printStackTrace();
-            Toast.makeText(activity, R.string.a_network_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.network_error, Toast.LENGTH_SHORT).show();
         }
     }
 

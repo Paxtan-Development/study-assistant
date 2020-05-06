@@ -14,18 +14,19 @@
 package com.pcchin.studyassistant.functions;
 
 import android.app.Activity;
-import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
-import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.database.project.ProjectDatabase;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
-import com.pcchin.studyassistant.utils.misc.RandomString;
+import com.google.gson.Gson;
+
+import java.util.Arrays;
 
 /** Functions generally used throughout the app. **/
 public final class GeneralFunctions {
@@ -41,5 +42,37 @@ public final class GeneralFunctions {
         target.getParentFragmentManager().beginTransaction()
                 .detach(target)
                 .attach(target).commit();
+    }
+
+    /** Get the connection status from the connectivity manager. **/
+    public static boolean getConnected(ConnectivityManager cm) {
+        if (Build.VERSION.SDK_INT < 23) {
+            final NetworkInfo ni = cm.getActiveNetworkInfo();
+            if (ni != null) {
+                return ni.isConnected();
+            }
+        } else {
+            final Network n = cm.getActiveNetwork();
+            if (n != null) {
+                final NetworkCapabilities nc = cm.getNetworkCapabilities(n);
+                if (nc != null) {
+                    return nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Converts the message into a JSON String with an attribute named message. **/
+    public static String getServerJson(String message) {
+        return message == null ? null: new Gson().toJson(new PlaceholderJsonClass(message));
+    }
+
+    /** Class used for conversion of a String to a class to be parsed by GSON. **/
+    static class PlaceholderJsonClass {
+        String message;
+        PlaceholderJsonClass(String message) {
+            this.message = message;
+        }
     }
 }

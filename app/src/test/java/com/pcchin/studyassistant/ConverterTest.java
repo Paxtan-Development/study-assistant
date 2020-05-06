@@ -18,6 +18,7 @@ import com.pcchin.studyassistant.functions.ConverterFunctions;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
 

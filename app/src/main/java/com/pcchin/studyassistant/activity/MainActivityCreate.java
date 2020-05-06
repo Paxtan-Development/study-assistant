@@ -114,7 +114,6 @@ final class MainActivityCreate {
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
-
         new Handler().post(this::createDefaultRoles);
         new Handler().post(this::deletePastExports);
     }

@@ -11,29 +11,27 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.about;
+package com.pcchin.studyassistant.fragment.about.license;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.pcchin.licenseview.LicenseView;
-import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.fragment.about.AboutFragment;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.ui.ExtendedFragment;
 
-public class LicenseFragment extends Fragment implements ExtendedFragment {
-    private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,
-            R.array.customdialog_license, R.array.dtpreference_license, R.array.imagepicker_license,
-            R.array.jsoup_license, R.array.licenseview_license, R.array.zip4j_license};
-
+public class RssLicenseFragment extends Fragment implements ExtendedFragment {
     /** Default constructor. **/
-    public LicenseFragment() {
+    public RssLicenseFragment() {
         // Default constructor.
     }
 
@@ -43,18 +41,19 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
         super.onCreate(savedInstanceState);
     }
 
-    /** Creates the fragment. Sets all the license texts. **/
+    /** Creates the fragment. Sets the license text. **/
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_license, container, false);
-        LicenseView licenseView = returnScroll.findViewById(R.id.m5_linear);
+        ScrollView returnScroll = new ScrollView(requireActivity());
 
-        for (int licenseArray : licenseArrays) {
-            // Updates license info & OnClickListeners
-            String[] infoArray = getResources().getStringArray(licenseArray);
-            licenseView.addLicense(infoArray);
-        }
+        // Set text
+        TextView textView = new TextView(requireActivity());
+        textView.setTextSize(18);
+        textView.setPadding(20, 20, 20, 20);
+        UIFunctions.setHtml(textView, FileFunctions.getTxt(inflater.getContext(),
+                "rss_license.txt"));
+        returnScroll.addView(textView);
         return returnScroll;
     }
 

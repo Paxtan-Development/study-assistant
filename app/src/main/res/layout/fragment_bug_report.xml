@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2020 PC Chin. All rights reserved.
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +13,11 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/m5_scroll"
+    android:id="@+id/m7"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.about.license.LicenseFragment">
+    tools:context="com.pcchin.studyassistant.fragment.about.server.BugReportFragment">
 
-    <com.pcchin.licenseview.LicenseView
-        android:id="@+id/m5_linear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="20sp"
-        android:paddingEnd="20sp"
-        android:paddingBottom="20sp">
+    <!-- TODO: Complete -->
 
-    </com.pcchin.licenseview.LicenseView>
 </ScrollView>

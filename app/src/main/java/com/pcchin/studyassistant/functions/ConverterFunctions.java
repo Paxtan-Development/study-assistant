@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public final class ConverterFunctions {
     /** The standard date storage format. **/
     public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+
+    private static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
 
     /** Converts a date to a ISO-8601 compliant string. If the date is null, "null" is returned. **/
     @TypeConverter
@@ -146,5 +149,18 @@ public final class ConverterFunctions {
                 ((original[1] & 0xff) << 16) |
                 ((original[2] & 0xff) << 8) |
                 (original[3] & 0xff);
+    }
+
+    /** Takes in a byte array
+     * @param original and convert it into a hexadecimal string.
+     * From https://stackoverflow.com/a/9855338 **/
+    static String bytesToHex(byte[] original) {
+        byte[] hexChars = new byte[original.length * 2];
+        for (int j = 0; j < original.length; j++) {
+            int v = original[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 }

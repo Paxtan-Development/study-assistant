@@ -15,10 +15,6 @@ package com.pcchin.studyassistant.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -28,9 +24,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 
 import org.json.JSONObject;
 
@@ -43,18 +39,7 @@ import java.util.Map;
  * @see MainActivity for clarity.
  * Cannot be made static as gitlabReleasesStatusCode needs to be passed on from function to function. **/
 public class AppUpdate {
-    private static final String MAIN_API = "https://api.paxtan.dev";
-    private static final String BACKUP_API = "https://api.pcchin.com";
-    private static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
-    @SuppressWarnings("ConstantConditions")
-    private static final String UPDATE_PATH = BuildConfig.BUILD_TYPE.equals("beta")
-            ? "/study-assistant/beta" : "/study-assistant/latest";
-    /* Example user agent: "Study-Assistant/1.5 (...)" */
-    @SuppressWarnings("ConstantConditions")
-    static final String USER_AGENT = System.getProperty("http.agent","")
-            .replaceAll("^.+?/\\S+", String.format("Study-Assistant/%s", BuildConfig.VERSION_NAME));
-    private static final String STACK_CASE_IS = ", stack trace is";
-
+    private static final String STACK_TRACE_IS = ", stack trace is";
     private final boolean calledFromNotif;
     private final MainActivity activity;
 
@@ -66,29 +51,10 @@ public class AppUpdate {
 
         // Check if network is connected (Updated code as old code is deprecated)
         ConnectivityManager cm = (ConnectivityManager)activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean isConnected = getConnected(cm);
+        boolean isConnected = GeneralFunctions.getConnected(cm);
 
         // Check if there is a newer version of the app
         if (isConnected && !isFromPlayStore()) checkServerUpdates();
-    }
-
-    /** Get the connection status from the connectivity manager. **/
-    private boolean getConnected(ConnectivityManager cm) {
-        if (Build.VERSION.SDK_INT < 23) {
-            final NetworkInfo ni = cm.getActiveNetworkInfo();
-            if (ni != null) {
-                return ni.isConnected();
-            }
-        } else {
-            final Network n = cm.getActiveNetwork();
-            if (n != null) {
-                final NetworkCapabilities nc = cm.getNetworkCapabilities(n);
-                if (nc != null) {
-                    return nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-                }
-            }
-        }
-        return false;
     }
 
     /** Checks if the app is downloaded from the Play Store, separated for clarity. **/
@@ -109,12 +75,12 @@ public class AppUpdate {
         RequestQueue queue = Volley.newRequestQueue(activity);
 
         // Secondary Backup Server
-        JsonObjectRequest getSecBackupReleases = getReleasesRequest(SEC_BACKUP_API, queue,
+        JsonObjectRequest getSecBackupReleases = getReleasesRequest(NetworkConstants.SEC_BACKUP_API, queue,
                 null);
         // Backup Server
-        JsonObjectRequest getBackupReleases = getReleasesRequest(BACKUP_API, queue, getSecBackupReleases);
+        JsonObjectRequest getBackupReleases = getReleasesRequest(NetworkConstants.BACKUP_API, queue, getSecBackupReleases);
         // Main Server
-        JsonObjectRequest getReleases = getReleasesRequest(MAIN_API, queue, getBackupReleases);
+        JsonObjectRequest getReleases = getReleasesRequest(NetworkConstants.MAIN_API, queue, getBackupReleases);
 
         // Send request
         queue.add(getReleases);
@@ -124,10 +90,9 @@ public class AppUpdate {
     @NonNull
     private JsonObjectRequest getReleasesRequest(String apiUrl, RequestQueue queue,
                                                  JsonObjectRequest secondaryRelease) {
-        return new JsonObjectRequest(apiUrl + UPDATE_PATH, null,
-                response -> new AppUpdate2(activity, calledFromNotif).showUpdateNotif(response, apiUrl), error -> {
+        Response.ErrorListener errorListener = error -> {
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
-                    + error.getMessage() + ":" + error.toString() + " from " + apiUrl + STACK_CASE_IS );
+                    + error.getMessage() + ":" + error.toString() + " from " + apiUrl + NetworkConstants.UPDATE_PATH + STACK_TRACE_IS);
             error.printStackTrace();
             Log.d(ActivityConstants.LOG_APP_NAME, "Attempting to connect to backup server");
             if (secondaryRelease == null) {
@@ -135,11 +100,15 @@ public class AppUpdate {
             } else {
                 queue.add(secondaryRelease);
             }
-        }) {
+        };
+
+        return new JsonObjectRequest(apiUrl + NetworkConstants.UPDATE_PATH, null, response ->
+                new AppUpdate2(activity, calledFromNotif).showUpdateNotif(response, apiUrl), errorListener)
+         {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("User-agent", USER_AGENT);
+                headers.put("User-agent", NetworkConstants.USER_AGENT);
                 return headers;
             }
 

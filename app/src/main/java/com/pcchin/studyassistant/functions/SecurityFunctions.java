@@ -13,27 +13,43 @@
 
 package com.pcchin.studyassistant.functions;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.pcchin.studyassistant.activity.ActivityConstants;
 
+import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.encodings.PKCS1Encoding;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.engines.BlowfishEngine;
+import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.bouncycastle.crypto.util.PublicKeyFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
@@ -48,7 +64,8 @@ public final class SecurityFunctions {
 
     /** Process a cipher buffer based on a specific length and
      * @return a specific output. **/
-    private static byte[] processCipherBuffer(PaddedBufferedBlockCipher cipher, byte[] original)
+    @NonNull
+    private static byte[] processCipherBuffer(@NonNull PaddedBufferedBlockCipher cipher, @NonNull byte[] original)
             throws InvalidCipherTextException, DataLengthException {
         byte[] output = new byte[cipher.getOutputSize(original.length)];
         int length1 = cipher.processBytes(original,  0, original.length, output, 0);
@@ -59,7 +76,8 @@ public final class SecurityFunctions {
     }
 
     /** Trims a byte array to a specific length, or adds to it if its not enough. **/
-    private static byte[] trimByte(byte[] original, int size) {
+    @NonNull
+    private static byte[] trimByte(@NonNull byte[] original, int size) {
         byte[] response = new byte[size];
         if (original.length > size) {
             // Trim the key to 32 bytes in length (256 bits)
@@ -77,7 +95,7 @@ public final class SecurityFunctions {
 
     /** Hashing method used in the passwords that prevent notes from being edited.
      * No need to be too secure as the contents of the notes can be easily found when exported. **/
-    public static String notesHash(String original) {
+    public static String notesHash(@NonNull String original) {
         byte[] originalByte = null;
         // 1) SHA
         try {
@@ -94,7 +112,8 @@ public final class SecurityFunctions {
     }
 
     /** Hashing method used in the passwords of projects when logging in. **/
-    public static String projectHash(String original, String salt) {
+    @NonNull
+    public static String projectHash(@NonNull String original, @NonNull String salt) {
         // 1) PBKDF2
         byte[] originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10800);
 
@@ -113,7 +132,7 @@ public final class SecurityFunctions {
     }
 
     /** Hashing method used in the passwords of roles when logging in. **/
-    public static String roleHash(String original, String salt){
+    public static String roleHash(@NonNull String original, @NonNull String salt){
         byte[] originalByte = null, hashedPassword = null;
         // 1) SHA
         try {
@@ -139,7 +158,7 @@ public final class SecurityFunctions {
     }
 
     /** Hashing method used in the passwords of members when logging in. **/
-    public static String memberHash(String original, String salt, String iv) {
+    public static String memberHash(@NonNull String original, @NonNull String salt, @NonNull String iv) {
         byte[] originalByte, ivBytes = null;
         // 1) PBKDF
         originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10000);
@@ -159,7 +178,7 @@ public final class SecurityFunctions {
     }
 
     /** Encryption method used to protect subject contents in .subject files **/
-    public static byte[] subjectEncrypt(String title, String password,
+    public static byte[] subjectEncrypt(@NonNull String title, @NonNull String password,
                                         ArrayList<ArrayList<String>> content) {
         byte[] responseByte = ConverterFunctions.doubleArrayToJson(content).getBytes();
         byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
@@ -170,12 +189,50 @@ public final class SecurityFunctions {
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<ArrayList<String>> subjectDecrypt(String title, String password,
+    public static ArrayList<ArrayList<String>> subjectDecrypt(@NonNull String title, @NonNull String password,
                                                               byte[] content) {
         byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
         content = blowfish(content, passwordByte, false);
         content = aes(content, passwordByte, title.getBytes(), false);
         return ConverterFunctions.doubleJsonToArray(new String(content));
+    }
+
+    /** Encrypts the message sent to the server through its public RSA key (PKCS1-OAEP). **/
+    public static String RSAServerEncrypt(Context context, String original) {
+        // Returns a UTF-8 String buffer
+        try (InputStream inputStream = context.getAssets().open("public.pem")) {
+            StringBuilder contentBuilder = new StringBuilder();
+            try (Scanner scanner = new Scanner(inputStream)) {
+                while (scanner.hasNext()) contentBuilder.append(scanner.next());
+            }
+            // PEM needs to be decoded to X509 for it to be accepted by the RSA Engine
+            byte[] decodedKey = Base64.decode(contentBuilder.toString(), Base64.DEFAULT);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
+            AsymmetricKeyParameter publicKey = PublicKeyFactory.createKey(keySpec.getEncoded());
+            Security.addProvider(new BouncyCastleProvider());
+            AsymmetricBlockCipher cipher = new PKCS1Encoding(new RSAEngine());
+            cipher.init(true, publicKey);
+
+            // Split into 240 bytes per encoding
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] originalBytes = original.getBytes(StandardCharsets.UTF_8);
+            int index = 0;
+            while (index < originalBytes.length) {
+                byte[] currentBytes = Arrays.copyOfRange(originalBytes, index, Math.min(index + 240, originalBytes.length));
+                outputStream.write(cipher.processBlock(currentBytes, 0, currentBytes.length));
+                index += 240;
+            }
+            // return outputStream.toString("UTF-8");
+            return ConverterFunctions.bytesToHex(outputStream.toByteArray());
+        } catch (IOException e) {
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Unable to get public server RSA Key, stack trace is");
+            e.printStackTrace();
+            return null;
+        } catch (InvalidCipherTextException e) {
+            Log.w(ActivityConstants.LOG_APP_NAME, "Cryptography Error: Unable to encrypt message using server RSA key, stack trace is");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /** AES encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.

@@ -45,6 +45,10 @@
     <string name="reenter_password">Re-enter Password</string>
     <string name="set_blank_password">Leave blank to not set a password.</string>
     <string name="return_val">Return</string>
+    <string name="optional">Optional</string>
+    <string name="submit">Submit</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
 
     <!-- String used in notifications -->
     <string name="notif_channel_notes_ID">notes</string>
@@ -78,6 +82,12 @@
     <string name="m3_data_import">Import…</string>
     <string name="m3_nav_open">Open navigation drawer</string>
     <string name="m3_nav_close">Close navigation drawer</string>
+
+    <string name="m6_title">Feature Suggestion</string>
+    <string name="m6_summary">Feature Summary</string>
+    <string name="m6_description">Feature Description</string>
+    <string name="m6_warning">Please note that all information submitted in this form wil be released publicly.</string>
+    <string name="m6_submitted">Feedback Submitted</string>
 
     <!-- Strings used in group V -->
     <string name="v1_signup">Sign Up</string>

@@ -34,9 +34,8 @@ import java.util.Objects;
 
 /** Functions specifically used to convert from one type of variable to another. **/
 public final class ConverterFunctions {
-    /** Constructor made private to simulate static class. **/
     private ConverterFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** The ISO-8601 compliant date and time format.  **/
@@ -104,7 +103,6 @@ public final class ConverterFunctions {
      * Returns null if the original array is invalid.
      * Returns an empty ArrayList if the original array is empty.
      * GSON was used for backwards compatibility and is more secure.**/
-    @TypeConverter
     @Nullable
     static ArrayList<Integer> jsonToSingleIntegerArray(String original) {
         if (isJson(original)) {

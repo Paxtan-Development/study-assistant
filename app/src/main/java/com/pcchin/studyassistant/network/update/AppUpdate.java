@@ -26,7 +26,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.NetworkFunctions;
 import com.pcchin.studyassistant.network.NetworkConstants;
 
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class AppUpdate {
 
         // Check if network is connected (Updated code as old code is deprecated)
         ConnectivityManager cm = (ConnectivityManager)activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean isConnected = GeneralFunctions.getConnected(cm);
+        boolean isConnected = NetworkFunctions.getConnected(cm);
 
         // Check if there is a newer version of the app
         if (isConnected && !isFromPlayStore()) checkServerUpdates();

@@ -44,6 +44,9 @@
     <string name="not_subject_file">The file that is selected is not a .subject file</string>
     <string name="reenter_password">Re-enter Password</string>
     <string name="set_blank_password">Leave blank to not set a password.</string>
+    <string name="submission_info_warning">Please note that all information submitted in this form wil be released publicly.</string>
+    <string name="view_previous">View Previous Submissions</string>
+    <string name="previous_submissions">Previous Submissions</string>
     <string name="return_val">Return</string>
     <string name="optional">Optional</string>
     <string name="submit">Submit</string>
@@ -87,9 +90,13 @@
     <string name="m6_title">Feature Suggestion</string>
     <string name="m6_summary">Feature Summary</string>
     <string name="m6_description">Feature Description</string>
-    <string name="m6_warning">Please note that all information submitted in this form wil be released publicly.</string>
-    <string name="m6_view_previous">View Previous Submissions</string>
-    <string name="m6_previous_submissions">Previous Submissions</string>
+
+    <string name="m7_title">Bug Report</string>
+    <string name="m7_summary">Bug Summary</string>
+    <string name="m7_description">Bug Description</string>
+    <string name="m7_steps">Steps to Reproduce the Bug</string>
+    <string name="m7_data_collection">Additional data such as the UID, device model and the app version may be collected to assist us in solving this issue.</string>
+
 
     <!-- Strings used in group V -->
     <string name="v1_signup">Sign Up</string>

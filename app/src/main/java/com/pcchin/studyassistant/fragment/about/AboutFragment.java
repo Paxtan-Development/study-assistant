@@ -30,6 +30,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.fragment.about.license.LicenseFragment;
 import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
+import com.pcchin.studyassistant.fragment.about.server.BugReportFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
@@ -61,7 +62,6 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
         View returnView = inflater.inflate(R.layout.fragment_about, container, false);
         String uid = requireActivity().getSharedPreferences(requireActivity().getPackageName(),
                 Context.MODE_PRIVATE).getString(ActivityConstants.SHAREDPREF_UID, "");
-        ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
         ((TextView) returnView.findViewById(R.id.m2_version)).setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
         ((TextView) returnView.findViewById(R.id.m2_copyright)).setText(String.format(Locale.ENGLISH, "%s%d %s",
                 getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
@@ -71,13 +71,27 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                 ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
         returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new RssLicenseFragment()));
-        returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
-            startActivity(intent);
-        });
-        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
-                ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
+        //noinspection ConstantConditions
+        if (BuildConfig.BUILD_TYPE.equals("release")) {
+            // Do not allow release variants to submit bug report and feature suggestions directly
+            returnView.findViewById(R.id.m2_uid).setVisibility(View.GONE);
+            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
+                startActivity(intent);
+            });
+            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://forms.gle/vbWKoyQpyuSPhqPCA"));
+                startActivity(intent);
+            });
+        } else {
+            ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
+            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view ->
+                    ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
+            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
+                    ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
+        }
 
         // Set license text
         UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(

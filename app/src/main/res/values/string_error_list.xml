@@ -37,8 +37,9 @@
     <string name="error_not_connected">Not connected to the internet</string>
 
     <!-- Errors used in group M. -->
-    <string name="m_error_summary_blank">Feature summary cannot not be blank.</string>
-    <string name="m_error_desc_blank">Feature description cannot be blank.</string>
+    <string name="m_error_summary_blank">Summary cannot not be blank.</string>
+    <string name="m_error_desc_blank">Description cannot be blank.</string>
+    <string name="m_error_steps_blank">Steps taken cannot be blank.</string>
 
     <!-- Errors used in group N. -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>

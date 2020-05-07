@@ -17,6 +17,12 @@
     <string name="license_apache_2">Apache License 2.0</string>
     <string name="license_mit">MIT License</string>
     <string name="license_cc_3_unported">Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</string>
+    
+    <string-array name="androiddevicenames_license">
+        <item>Android Device Names</item>
+        <item>@string/license_apache_2</item>
+        <item>Copyright © 2015 &lt;a href=&quot;https://github.com/jaredrummler&quot;&gt;Jared Rummler&lt;/a&gt;</item>
+    </string-array>
 
     <string-array name="bouncycastle_license">
         <item>BouncyCastle</item>

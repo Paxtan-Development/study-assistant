@@ -15,17 +15,26 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
@@ -38,12 +47,12 @@ import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /** Functions used for UI elements in the app. **/
 public final class UIFunctions {
-    /** Constructor made private to simulate static class. **/
     private UIFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** Shows the dialog to add a new subject to the notes list **/
@@ -155,5 +164,49 @@ public final class UIFunctions {
         }
         view.setText(output);
         view.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    /** Displays the previous feedback submissions if the device is connected to the internet. **/
+    public static void displayPreviousSubmissions(@NonNull Fragment fragment, @NonNull ArrayList<Integer> issueList, String sharedPrefValue) {
+        if (NetworkFunctions.getConnected(
+                (ConnectivityManager)fragment.requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            @SuppressLint("InflateParams") ScrollView blankScroll =
+                    (ScrollView) fragment.getLayoutInflater().inflate(R.layout.blank_list, null);
+            LinearLayout blankLinear = blankScroll.findViewById(R.id.blank_linear);
+            for (int issue : issueList) {
+                addIssue(fragment, issue, blankLinear, sharedPrefValue);
+            }
+            new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireActivity())
+                    .setTitle(R.string.previous_submissions)
+                    .setView(blankScroll)
+                    .setPositiveButton(R.string.close, null).create())
+                    .show(fragment.getParentFragmentManager(), "FeedbackFragment.1");
+        } else {
+            Toast.makeText(fragment.getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** Adds an issue to the AlertDialog, and if it does not exist,
+     * add it on to the list to be deleted. **/
+    private static void addIssue(@NonNull Fragment fragment, int issue, @NonNull LinearLayout blankLinear, String sharedPrefValue) {
+        @SuppressLint("InflateParams")
+        View currentIssue = fragment.getLayoutInflater().inflate(R.layout.m_issue, null);
+        TextView issueTitle = currentIssue.findViewById(R.id.m_issue_title);
+        issueTitle.setText(String.format(Locale.ENGLISH, "Issue #%d", issue));
+        issueTitle.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/Paxtan-Development/study-assistant/issues/" + issue));
+            fragment.startActivity(intent);
+        });
+        currentIssue.findViewById(R.id.m_issue_del).setOnClickListener(view -> {
+            DataFunctions.removeResponse(fragment.requireActivity(), sharedPrefValue, issue);
+            DefaultDialogFragment dialogFragment = (DefaultDialogFragment)
+                    fragment.getParentFragmentManager().findFragmentByTag("FeedbackFragment.1");
+            if (dialogFragment != null) {
+                dialogFragment.dismiss();
+            }
+            GeneralFunctions.reloadFragment(fragment);
+        });
+        blankLinear.addView(currentIssue);
     }
 }

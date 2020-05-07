@@ -13,40 +13,32 @@
 
 package com.pcchin.studyassistant.fragment.about.server;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.functions.DataFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.network.server.FeedbackSubmission;
+import com.pcchin.studyassistant.functions.NetworkFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
 
 public class FeedbackFragment extends Fragment implements ExtendedFragment {
@@ -73,7 +65,8 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
             returnScroll.findViewById(R.id.m6_previous).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.m6_previous_divider).setVisibility(View.GONE);
         } else {
-            returnScroll.findViewById(R.id.m6_previous).setOnClickListener(view -> displayPreviousSubmissions(issueList));
+            returnScroll.findViewById(R.id.m6_previous).setOnClickListener(view ->
+                    UIFunctions.displayPreviousSubmissions(FeedbackFragment.this, issueList, ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST));
         }
         returnScroll.findViewById(R.id.m6_return).setOnClickListener(view -> onBackPressed());
         returnScroll.findViewById(R.id.m6_submit).setOnClickListener(view -> {
@@ -87,52 +80,9 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
         return returnScroll;
     }
 
-    /** Displays the previous feedback submissions if the device is connected to the internet. **/
-    private void displayPreviousSubmissions(@NonNull ArrayList<Integer> issueList) {
-        if (GeneralFunctions.getConnected(
-                (ConnectivityManager)requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
-            @SuppressLint("InflateParams") ScrollView blankScroll =
-                    (ScrollView) getLayoutInflater().inflate(R.layout.blank_list, null);
-            LinearLayout blankLinear = blankScroll.findViewById(R.id.blank_linear);
-            for (int issue : issueList) {
-                addIssue(issue, blankLinear);
-            }
-            new DefaultDialogFragment(new AlertDialog.Builder(requireActivity())
-                    .setTitle(R.string.m6_previous_submissions)
-                    .setView(blankScroll)
-                    .setPositiveButton(R.string.close, null).create())
-                    .show(getParentFragmentManager(), "FeedbackFragment.1");
-        } else {
-            Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /** Adds an issue to the AlertDialog, and if it does not exist,
-     * add it on to the list to be deleted. **/
-    private void addIssue(int issue, @NonNull LinearLayout blankLinear) {
-        @SuppressLint("InflateParams")
-        View currentIssue = getLayoutInflater().inflate(R.layout.m_issue, null);
-        TextView issueTitle = currentIssue.findViewById(R.id.m_issue_title);
-        issueTitle.setText(String.format(Locale.ENGLISH, "Issue #%d", issue));
-        issueTitle.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://github.com/Paxtan-Development/study-assistant/issues/" + issue));
-            startActivity(intent);
-        });
-        currentIssue.findViewById(R.id.m_issue_del).setOnClickListener(view -> {
-            DataFunctions.removeResponse(requireActivity(), ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST, issue);
-            DefaultDialogFragment dialogFragment = (DefaultDialogFragment)
-                    getParentFragmentManager().findFragmentByTag("FeedbackFragment.1");
-            if (dialogFragment != null) {
-                dialogFragment.dismiss();
-            }
-            GeneralFunctions.reloadFragment(FeedbackFragment.this);
-        });
-        blankLinear.addView(currentIssue);
-    }
-
     /** Submit the feedback for the fragment. **/
     private void submitFeedback(@NonNull ScrollView returnScroll) throws JSONException {
+        Button submitButton = returnScroll.findViewById(R.id.m6_submit);
         TextInputLayout nameInput = returnScroll.findViewById(R.id.m6_name_input), emailInput = returnScroll.findViewById(R.id.m6_email_input),
             summaryInput = returnScroll.findViewById(R.id.m6_summary_input), descInput = returnScroll.findViewById(R.id.m6_description_input);
         String name = Objects.requireNonNull(nameInput.getEditText()).getText().toString(), email = Objects.requireNonNull(emailInput.getEditText()).getText().toString(),
@@ -156,7 +106,18 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
             descInput.setError(getString(R.string.m_error_desc_blank));
             hasError = true;
         }
-        if (!hasError) new FeedbackSubmission((MainActivity) getActivity()).sendFeedback(name, email, summary, desc);
+        if (!hasError) sendFeedback(name, email, summary, desc, submitButton);
+    }
+
+    /** Send the feedback request to the server. **/
+    private void sendFeedback(String name, String email, String summary, String desc, Button submitButton) throws JSONException {
+        JSONObject uploadObject = new JSONObject();
+        uploadObject.put("name", name);
+        uploadObject.put("email", email);
+        uploadObject.put("summary", summary);
+        uploadObject.put("description", desc);
+        NetworkFunctions.sendPostRequest(((MainActivity) requireActivity()), NetworkConstants.FEEDBACK_PATH,
+                uploadObject, ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST, submitButton);
     }
 
     /** Returns to

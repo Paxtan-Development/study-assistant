@@ -49,7 +49,7 @@ public final class DataFunctions {
     }
 
     /** Store the number of the created issue into the shared preferences. **/
-    public static void storeResponse(@NonNull Activity activity, String sharedPrefValue, String jsonResponse) {
+    static void storeResponse(@NonNull Activity activity, String sharedPrefValue, String jsonResponse) {
         try {
             JSONObject object = new JSONObject(jsonResponse);
             int issueNum = object.getInt("number");
@@ -69,23 +69,13 @@ public final class DataFunctions {
     }
 
     /** Removes a specific issue numbers of the created issue from the shared preferences. **/
-    public static void removeResponse(Activity activity, String sharedPrefValue,
-                                      int issueNum) {
-        ArrayList<Integer> issueNumList = new ArrayList<>();
-        issueNumList.add(issueNum);
-        removeResponse(activity, sharedPrefValue, issueNumList);
-    }
-
-    /** Removes a list of issue numbers of the created issue from the shared preferences. **/
-    private static void removeResponse(@NonNull Activity activity, String sharedPrefValue,
-                                       ArrayList<Integer> issueNumList) {
+    static void removeResponse(@NonNull Activity activity, String sharedPrefValue,
+                               int issueNum) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
         ArrayList<Integer> issueList = ConverterFunctions.jsonToSingleIntegerArray(sharedPref.getString(sharedPrefValue, ""));
         if (issueList == null) issueList = new ArrayList<>();
         // Removal by object, not by index
-        for (int issueNum: issueNumList) {
-            if (issueList.contains(issueNum)) issueList.remove((Integer) issueNum);
-        }
+        if (issueList.contains(issueNum)) issueList.remove((Integer) issueNum);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(sharedPrefValue, ConverterFunctions.singleIntArrayToJson(issueList));
         editor.apply();

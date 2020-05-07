@@ -37,9 +37,8 @@ import java.util.ArrayList;
 
 /** Functions used in managing files. **/
 public final class FileFunctions {
-    /** Constructor made private to simulate static class. **/
     private FileFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** Generates a .txt file based on a path and its contents. **/

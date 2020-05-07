@@ -60,9 +60,8 @@ public final class SecurityFunctions {
     private static final String SHA_MISSING_ERROR = "Cryptography Error: Algorithm SHA-512 " +
             "not found in MessageDigest.";
 
-    /** Constructor made private to simulate static class. **/
     private SecurityFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** Process a cipher buffer based on a specific length and

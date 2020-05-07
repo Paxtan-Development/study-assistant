@@ -19,14 +19,11 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
-
-import java.util.Arrays;
 
 /** Functions generally used throughout the app. **/
 public final class GeneralFunctions {
@@ -75,4 +72,5 @@ public final class GeneralFunctions {
             this.message = message;
         }
     }
+
 }

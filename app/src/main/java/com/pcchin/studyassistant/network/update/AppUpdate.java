@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.network;
+package com.pcchin.studyassistant.network.update;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -27,6 +27,7 @@ import com.android.volley.toolbox.Volley;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.network.NetworkConstants;
 
 import org.json.JSONObject;
 

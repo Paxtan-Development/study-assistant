@@ -72,6 +72,7 @@
     <string name="m2_copyright_p1">© 2019–</string>
     <string name="m2_copyright_p2">PC Chin</string>
     <string name="m2_version">Version: </string>
+    <string name="m2_uid">UID: </string>
     <string name="m2_libraries_used">Libraries Used</string>
     <string name="m2_rss_used">Resources Used</string>
     <string name="m2_bug_report">Bug Report</string>
@@ -87,7 +88,8 @@
     <string name="m6_summary">Feature Summary</string>
     <string name="m6_description">Feature Description</string>
     <string name="m6_warning">Please note that all information submitted in this form wil be released publicly.</string>
-    <string name="m6_submitted">Feedback Submitted</string>
+    <string name="m6_view_previous">View Previous Submissions</string>
+    <string name="m6_previous_submissions">Previous Submissions</string>
 
     <!-- Strings used in group V -->
     <string name="v1_signup">Sign Up</string>

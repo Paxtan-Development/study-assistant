@@ -27,8 +27,8 @@ public class VolleyFileDownloadRequest extends Request<byte[]> {
     private final Map<String, String> dlParams;
 
     /** Default constructor. **/
-    VolleyFileDownloadRequest(int method, String mUrl, Response.Listener<byte[]> listener,
-                              Response.ErrorListener errorListener, HashMap<String, String> params) {
+    protected VolleyFileDownloadRequest(int method, String mUrl, Response.Listener<byte[]> listener,
+                                        Response.ErrorListener errorListener, HashMap<String, String> params) {
         super(method, mUrl, errorListener);
         setShouldCache(false);
         requestResponse = listener;

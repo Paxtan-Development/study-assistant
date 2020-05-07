@@ -76,7 +76,7 @@ public final class ConverterFunctions {
     /** Converts a single layer ArrayList to a string JSON array.
      * GSON was used for backwards compatibility and is more secure. **/
     @TypeConverter
-    public static String singleArrayToJson(ArrayList<String> original) {
+    public static String singleStringArrayToJson(ArrayList<String> original) {
         return new Gson().toJson(original);
     }
 
@@ -86,9 +86,29 @@ public final class ConverterFunctions {
      * GSON was used for backwards compatibility and is more secure.**/
     @TypeConverter
     @Nullable
-    public static ArrayList<String> singleJsonToArray(String original) {
+    public static ArrayList<String> jsonToSingleStringArray(String original) {
         if (isJson(original)) {
             Type listType = new TypeToken<ArrayList<String>>() {}.getType();
+            return new Gson().fromJson(original, listType);
+        }
+        return null;
+    }
+
+    /** Converts a single layer integer ArrayList to a string JSON array.
+     * GSON was used for backwards compatibility and is more secure. **/
+    static String singleIntArrayToJson(ArrayList<Integer> original) {
+        return new Gson().toJson(original);
+    }
+
+    /** Converts an integer JSON array into a single layer ArrayList.
+     * Returns null if the original array is invalid.
+     * Returns an empty ArrayList if the original array is empty.
+     * GSON was used for backwards compatibility and is more secure.**/
+    @TypeConverter
+    @Nullable
+    static ArrayList<Integer> jsonToSingleIntegerArray(String original) {
+        if (isJson(original)) {
+            Type listType = new TypeToken<ArrayList<Integer>>() {}.getType();
             return new Gson().fromJson(original, listType);
         }
         return null;

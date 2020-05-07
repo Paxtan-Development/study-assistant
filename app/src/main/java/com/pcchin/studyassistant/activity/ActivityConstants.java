@@ -22,7 +22,9 @@ public final class ActivityConstants {
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
-    public static final String SHAREDPREF_SERVER_PUBLIC_PEM = "serverPublicPem";
+    public static final String SHAREDPREF_FEEDBACK_ISSUE_LIST = "feedbackIssueList";
+    public static final String SHAREDPREF_BUG_ISSUE_LIST = "bugIssueList";
+    public static final String SHAREDPREF_UID = "uid";
 
     // General intent constants
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";

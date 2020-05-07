@@ -45,11 +45,12 @@ import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
-import com.pcchin.studyassistant.network.AppUpdate;
+import com.pcchin.studyassistant.network.update.AppUpdate;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 /** Functions used within onCreate of
  * @see MainActivity **/
@@ -114,8 +115,17 @@ final class MainActivityCreate {
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
+        new Handler().post(this::generateUID);
         new Handler().post(this::createDefaultRoles);
         new Handler().post(this::deletePastExports);
+    }
+
+    /** Generates a unique ID for the client if one does not exist. **/
+    private void generateUID() {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        if (sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "").length() == 0) {
+            sharedPref.edit().putString(ActivityConstants.SHAREDPREF_UID, UUID.randomUUID().toString()).apply();
+        }
     }
 
     /** Checks whether the activity is opened to process files. **/

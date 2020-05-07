@@ -16,17 +16,18 @@ package com.pcchin.studyassistant.network;
 import com.pcchin.studyassistant.BuildConfig;
 
 /** Constants used in network communication. **/
-final class NetworkConstants {
-    // public static final String MAIN_API = "https://api.paxtan.dev";
-    static final String MAIN_API = "http://10.0.2.2:3000";
-    static final String BACKUP_API = "https://api.pcchin.com";
-    static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
+public final class NetworkConstants {
+    public static final String MAIN_API = "https://api.paxtan.dev";
+    // public static final String MAIN_API = "http://10.0.2.2:3000";
+    public static final String BACKUP_API = "https://api.pcchin.com";
+    public static final String SEC_BACKUP_API = "https://paxtandev.herokuapp.com";
     @SuppressWarnings("ConstantConditions")
-    static final String UPDATE_PATH = BuildConfig.BUILD_TYPE.equals("beta")
+    public static final String UPDATE_PATH = BuildConfig.BUILD_TYPE.equals("beta")
             ? "/study-assistant/beta" : "/study-assistant/latest";
-    static final String FEEDBACK_PATH = "/study-assistant/feedback";
+    public static final String FEEDBACK_PATH = "/study-assistant/feedback";
+    public static final String ISSUE_PATH = "/study-assistant/issue";
     /* Example user agent: "Study-Assistant/1.5 (...)" */
     @SuppressWarnings("ConstantConditions")
-    static final String USER_AGENT = System.getProperty("http.agent","")
+    public static final String USER_AGENT = System.getProperty("http.agent","")
             .replaceAll("^.+?/\\S+", String.format("Study-Assistant/%s", BuildConfig.VERSION_NAME));
 }

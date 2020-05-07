@@ -13,6 +13,7 @@
 
 package com.pcchin.studyassistant.fragment.about;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.fragment.about.license.LicenseFragment;
 import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
@@ -57,13 +59,11 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View returnView = inflater.inflate(R.layout.fragment_about, container, false);
-        // Set version
-        TextView textView = returnView.findViewById(R.id.m2_version);
-        textView.setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
-
-        // Set current year
-        TextView copyrightView = returnView.findViewById(R.id.m2_copyright);
-        copyrightView.setText(String.format(Locale.ENGLISH, "%s%d %s",
+        String uid = requireActivity().getSharedPreferences(requireActivity().getPackageName(),
+                Context.MODE_PRIVATE).getString(ActivityConstants.SHAREDPREF_UID, "");
+        ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
+        ((TextView) returnView.findViewById(R.id.m2_version)).setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
+        ((TextView) returnView.findViewById(R.id.m2_copyright)).setText(String.format(Locale.ENGLISH, "%s%d %s",
                 getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
                 getString(R.string.m2_copyright_p2)));
 
@@ -76,9 +76,8 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
             intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
             startActivity(intent);
         });
-        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
-            ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment());
-        });
+        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
 
         // Set license text
         UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(

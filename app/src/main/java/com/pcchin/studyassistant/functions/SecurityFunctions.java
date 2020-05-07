@@ -21,35 +21,38 @@ import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
 
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.encodings.PKCS1Encoding;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.engines.BlowfishEngine;
-import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
@@ -201,6 +204,7 @@ public final class SecurityFunctions {
     public static String RSAServerEncrypt(Context context, String original) {
         // Returns a UTF-8 String buffer
         try (InputStream inputStream = context.getAssets().open("public.pem")) {
+            // Gets the key
             StringBuilder contentBuilder = new StringBuilder();
             try (Scanner scanner = new Scanner(inputStream)) {
                 while (scanner.hasNext()) contentBuilder.append(scanner.next());
@@ -208,27 +212,31 @@ public final class SecurityFunctions {
             // PEM needs to be decoded to X509 for it to be accepted by the RSA Engine
             byte[] decodedKey = Base64.decode(contentBuilder.toString(), Base64.DEFAULT);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
-            AsymmetricKeyParameter publicKey = PublicKeyFactory.createKey(keySpec.getEncoded());
+
             Security.addProvider(new BouncyCastleProvider());
-            AsymmetricBlockCipher cipher = new PKCS1Encoding(new RSAEngine());
-            cipher.init(true, publicKey);
+            Cipher rsa = Cipher.getInstance("RSA/NONE/OAEPPadding");
+            KeyFactory.getInstance("RSA");
+            rsa.init(Cipher.ENCRYPT_MODE, KeyFactory.getInstance("RSA").generatePublic(keySpec));
 
             // Split into 240 bytes per encoding
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] originalBytes = original.getBytes(StandardCharsets.UTF_8);
             int index = 0;
             while (index < originalBytes.length) {
-                byte[] currentBytes = Arrays.copyOfRange(originalBytes, index, Math.min(index + 240, originalBytes.length));
-                outputStream.write(cipher.processBlock(currentBytes, 0, currentBytes.length));
-                index += 240;
+                byte[] currentBytes = Arrays.copyOfRange(originalBytes, index, Math.min(index + 128, originalBytes.length));
+                byte[] outputBytes = rsa.doFinal(currentBytes);
+                outputStream.write(outputBytes);
+                index += 128;
             }
+            // UTF-8 String does not work but hex string does
             // return outputStream.toString("UTF-8");
             return ConverterFunctions.bytesToHex(outputStream.toByteArray());
         } catch (IOException e) {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Unable to get public server RSA Key, stack trace is");
             e.printStackTrace();
             return null;
-        } catch (InvalidCipherTextException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException
+                | BadPaddingException | IllegalBlockSizeException | InvalidKeySpecException e) {
             Log.w(ActivityConstants.LOG_APP_NAME, "Cryptography Error: Unable to encrypt message using server RSA key, stack trace is");
             e.printStackTrace();
             return null;

@@ -23,6 +23,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 /** Test hashing/encryption functions that require context. **/
 public class ContextSecurityTest {
     private static final int TEST_COUNT = 10000;
@@ -39,8 +48,5 @@ public class ContextSecurityTest {
         String original = AndroidTestFunctions.randomString(TEST_COUNT);
         String after = SecurityFunctions.RSAServerEncrypt(instrumentationContext, original);
         Assert.assertNotNull(after);
-        String after2 = SecurityFunctions.RSAServerEncrypt(instrumentationContext, original);
-        Assert.assertNotNull(after2);
-        Assert.assertEquals(after, after2);
     }
 }

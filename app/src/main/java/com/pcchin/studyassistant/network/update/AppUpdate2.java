@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.network;
+package com.pcchin.studyassistant.network.update;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -43,6 +43,8 @@ import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.network.NetworkConstants;
+import com.pcchin.studyassistant.network.VolleyFileDownloadRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;

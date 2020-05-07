@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.network;
+package com.pcchin.studyassistant.network.server;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -28,8 +28,10 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
+import com.pcchin.studyassistant.network.NetworkConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,10 +78,8 @@ public class FeedbackSubmission {
     private StringRequest getFeedbackRequest(String apiUrl, RequestQueue queue,
                                              StringRequest secondaryRelease) {
         return new StringRequest(Request.Method.POST, apiUrl + NetworkConstants.FEEDBACK_PATH, response -> {
-            // TODO: Store response
-            Log.d(ActivityConstants.LOG_APP_NAME, "Response: " + response);
+            DataFunctions.storeResponse(activity, ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST, response);
             activity.displayFragment(new AboutFragment());
-            Toast.makeText(activity, R.string.m6_submitted, Toast.LENGTH_SHORT).show();
         }, error -> {
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
                     + error.getMessage() + ":" + error.toString() + " from " + apiUrl + NetworkConstants.FEEDBACK_PATH + ", stack trace is");
@@ -111,4 +111,5 @@ public class FeedbackSubmission {
             }
         };
     }
+
 }

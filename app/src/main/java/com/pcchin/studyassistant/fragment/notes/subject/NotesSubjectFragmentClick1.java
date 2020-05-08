@@ -98,7 +98,7 @@ public class NotesSubjectFragmentClick1 {
     /** Display the dialog for selecting a sorting method. **/
     private void displaySortDialog(Spinner sortingSpinner) {
         new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
-                .setTitle(R.string.n2_sorting_method)
+                .setTitle(R.string.sorting_method)
                 .setView(sortingSpinner)
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     // Update value in notes

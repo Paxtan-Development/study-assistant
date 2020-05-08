@@ -167,7 +167,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                     hashedPass, project.memberDefaultRole));
         }
         projectDatabase.close();
-        Toast.makeText(activity, R.string.v1_member_created, Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
         activity.displayFragment(ProjectInfoFragment.newInstance(project.projectID, memberID,
                 true, true));
     }

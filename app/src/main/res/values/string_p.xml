@@ -42,7 +42,7 @@
     <string name="p6_enable_members">Enable Members</string>
     <string name="p6_enable_roles">Enable Roles</string>
     <string name="p6_project_password">Project Password</string>
-    <string name="p6_initial_member_name">Initial Member Name</string>
+    <string name="p_initial_member_name">Initial Member Name</string>
     <string name="p6_initial_member_password">Initial Member Password</string>
     <string name="p6_custom_admin">Custom admin role</string>
     <string name="p6_custom_member">Custom member role</string>

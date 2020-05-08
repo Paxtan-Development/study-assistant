@@ -108,7 +108,8 @@ public class ProjectMediaFragment extends Fragment implements ExtendedFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_project_media, container, false);
+        // TODO: Populate view
+        return inflater.inflate(R.layout.blank_list, container, false);
     }
 
     /** Closes the database if the fragment is paused. **/

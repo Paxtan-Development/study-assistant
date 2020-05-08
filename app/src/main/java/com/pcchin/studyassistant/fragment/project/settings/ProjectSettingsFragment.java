@@ -51,7 +51,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     private String id2;
     private boolean isMember;
     private static final String ARG_ID = "projectID", ARG_ID2 = "ID2", ARG_IS_MEMBER = "isMember";
-    private ProjectDatabase projectDatabase;
+    ProjectDatabase projectDatabase;
 
     // Mutually exclusive unless the project has both of those enabled
     private MemberData member;

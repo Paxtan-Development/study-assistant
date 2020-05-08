@@ -37,6 +37,7 @@
     <string name="p3_features_status_icon">Status Icon</string>
     <string name="p3_features_displayed_home">Feature displayed on Home</string>
     <string name="p3_features_related_subject">Set related subject in Notes</string>
+    <string name="p3_missing_initial_member">No existing members found</string>
 
     <!-- For strings under the date section -->
     <string name="p3_date_expected_start_set">Set Expected Start Date</string>

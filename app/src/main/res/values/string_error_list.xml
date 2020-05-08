@@ -58,8 +58,8 @@
     <string name="p_error_role_not_found">The role selected is not found</string>
 
     <!-- Error messages in Fragment P6. -->
+    <string name="p_error_member_name_empty">Member name cannot be empty.</string>
     <string name="p6_error_project_name_empty">Project name cannot be empty.</string>
-    <string name="p6_error_member_name_empty">Member name cannot be empty.</string>
     <string name="p6_error_project_exists">Another project with the same name already exists.</string>
 
     <!-- Errors used in group V. -->

@@ -19,7 +19,6 @@
     android:layout_height="match_parent"
     tools:context="com.pcchin.studyassistant.fragment.about.server.BugReportFragment">
 
-    <!-- TODO: Complete -->
     <LinearLayout
         android:id="@+id/m7"
         android:layout_width="match_parent"

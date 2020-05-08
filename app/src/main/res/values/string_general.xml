@@ -18,6 +18,7 @@
     <string name="exit">Exit</string>
     <string name="blank" />
 
+    <string name="create">Create</string>
     <string name="create_new">Create New</string>
     <string name="data_import">Import</string>
     <string name="data_export">Export</string>
@@ -100,7 +101,7 @@
 
     <!-- Strings used in group V -->
     <string name="v1_signup">Sign Up</string>
-    <string name="v1_member_created">Member created.</string>
+    <string name="member_created">Member created</string>
     <string name="v1_project_protected">Protected Project</string>
     <string name="v1_project_protected_password">Enter the password for the project.</string>
 

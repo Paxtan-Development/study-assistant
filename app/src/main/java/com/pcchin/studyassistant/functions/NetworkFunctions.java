@@ -101,7 +101,7 @@ public final class NetworkFunctions {
         StringRequest returnRequest = new StringRequest(Request.Method.POST, fullUrl, response -> {
             submitButton.setEnabled(true);
             DataFunctions.storeResponse(activity, sharedPrefValue, response);
-            activity.displayFragment(new AboutFragment());
+            GeneralFunctions.reloadFragment(activity.currentFragment);
         }, error -> {
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
                     + error.getMessage() + ":" + error.toString() + " from " + fullUrl + ", stack trace is");

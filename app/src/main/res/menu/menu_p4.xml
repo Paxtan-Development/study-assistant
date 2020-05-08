@@ -21,6 +21,11 @@
         android:title="@string/p4_new_file"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/p4_menu_sort"
+        android:icon="@drawable/ic_sort"
+        android:title="@string/sorting_method"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/p4_menu_import"
         android:icon="@drawable/ic_menu_import"
         android:title="@string/data_import"

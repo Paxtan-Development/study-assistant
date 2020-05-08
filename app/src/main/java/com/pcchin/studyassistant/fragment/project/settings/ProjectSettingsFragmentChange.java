@@ -13,20 +13,31 @@
 
 package com.pcchin.studyassistant.fragment.project.settings;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
+import androidx.preference.SwitchPreference;
 
+import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
+import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
-import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Date;
+import java.util.Objects;
 
 /** Functions that are called when a preference is changed in
  * @see ProjectSettingsFragment **/
@@ -62,8 +73,10 @@ final class ProjectSettingsFragmentChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
+                Log.d("Testing", String.valueOf(newValue));
                 if ((boolean) newValue) {
-                    checkMemberExists();
+                    Log.d("Testing", "Called");
+                    checkMemberExists((SwitchPreference) preference);
                 } else {
                     fragment.project.membersEnabled = false;
                 }
@@ -92,9 +105,39 @@ final class ProjectSettingsFragmentChange {
 
     /** Check if a member for the project already exists.
      * If not, show a dialog to add them as a member. **/
-    private void checkMemberExists() {
-        if (!fragment.projectHasMember()) {
-            // TODO: Complete
+    private void checkMemberExists(SwitchPreference preference) {
+        if (fragment.projectHasMember()) {
+            fragment.project.membersEnabled = true;
+        } else {
+            Toast.makeText(activity, R.string.p3_missing_initial_member, Toast.LENGTH_SHORT).show();
+            @SuppressLint("InflateParams") TextInputLayout initialMemberLayout =
+                    (TextInputLayout) fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            AlertDialog newMemberDialog = new AlertDialog.Builder(activity).setTitle(R.string.p_initial_member_name)
+                    .setView(initialMemberLayout)
+                    .create();
+            DismissibleDialogFragment dialogFragment = new DismissibleDialogFragment(newMemberDialog);
+            dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> {
+                String memberName = Objects.requireNonNull(initialMemberLayout.getEditText()).getText().toString();
+                if (memberName.replaceAll("\\s+", "").length() == 0) {
+                    initialMemberLayout.setErrorEnabled(true);
+                    initialMemberLayout.setError(fragment.getString(R.string.p_error_member_name_empty));
+                } else {
+                    // Create member
+                    RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
+                    MemberData initialMember = new MemberData(DatabaseFunctions
+                            .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
+                                    fragment.projectDatabase), fragment.project.projectID,
+                            memberName, "", saltRand.nextString(), "", fragment.role.roleID);
+                    fragment.projectDatabase.MemberDao().insert(initialMember);
+                    fragment.project.membersEnabled = true;
+                    fragment.updateProject();
+                    Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
+                    fragment.displayPreference(fragment.currentPrefRoot);
+                }
+            });
+            dialogFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
+                    (view) -> dialogFragment.dismiss());
+            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectSettingsFragmentChange.1");
         }
     }
 

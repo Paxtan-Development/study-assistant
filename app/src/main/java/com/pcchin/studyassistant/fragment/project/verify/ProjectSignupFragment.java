@@ -26,16 +26,16 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.utils.misc.InputValidation;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Objects;
@@ -69,11 +69,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
             project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
         }
         if (project == null) {
-            // Go back to project selection
-            Toast.makeText(requireActivity(), R.string.p_error_project_not_found,
-                    Toast.LENGTH_SHORT).show();
-            projectDatabase.close();
-            ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+            DataFunctions.onProjectMissing((MainActivity) getActivity(), projectDatabase);
         } else {
             requireActivity().setTitle(R.string.v1_signup);
         }

@@ -17,6 +17,10 @@ import com.pcchin.studyassistant.BuildConfig;
 
 /** Constants used in network communication. **/
 public final class NetworkConstants {
+    private NetworkConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String MAIN_API = "https://api.paxtan.dev";
     // public static final String MAIN_API = "http://10.0.2.2:3000";
     public static final String BACKUP_API = "https://api.pcchin.com";

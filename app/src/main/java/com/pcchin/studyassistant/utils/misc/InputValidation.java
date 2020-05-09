@@ -46,7 +46,7 @@ public class InputValidation {
     public boolean inputIsBlank(@NonNull String inputString, TextInputLayout inputTextLayout, int errorString) {
         if (inputString.replaceAll("\\s+", "").length() == 0) {
             inputTextLayout.setErrorEnabled(true);
-            inputTextLayout.setError(context.getString(R.string.m_error_summary_blank));
+            inputTextLayout.setError(context.getString(errorString));
             return true;
         } else {
             return false;

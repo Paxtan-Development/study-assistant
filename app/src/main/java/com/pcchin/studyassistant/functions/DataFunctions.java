@@ -21,7 +21,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,5 +84,13 @@ public final class DataFunctions {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(sharedPrefValue, ConverterFunctions.singleIntArrayToJson(issueList));
         editor.apply();
+    }
+
+    /** Function that is called if the project appears to be missing. **/
+    public static void onProjectMissing(MainActivity activity, @NonNull ProjectDatabase projectDatabase) {
+        // Go back to project selection
+        Toast.makeText(activity, R.string.p_error_project_not_found, Toast.LENGTH_SHORT).show();
+        projectDatabase.close();
+        activity.displayFragment(new ProjectSelectFragment());
     }
 }

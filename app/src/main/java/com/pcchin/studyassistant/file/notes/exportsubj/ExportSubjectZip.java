@@ -63,24 +63,16 @@ public class ExportSubjectZip {
     public void askZipPassword() {
         @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
                 fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
-        if (inputLayout.getEditText() != null) {
-            inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
+        if (inputLayout.getEditText() != null) inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         inputLayout.setHint(fragment.getString(R.string.set_blank_password));
-
         // Set up the dismissible dialog
         DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
-                new AlertDialog.Builder(fragment.requireContext())
-                        .setTitle(R.string.enter_password)
-                        .setView(inputLayout)
-                        .create());
+                new AlertDialog.Builder(fragment.requireContext()).setTitle(R.string.enter_password)
+                        .setView(inputLayout).create());
         dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok), view -> {
             String inputText = "";
-            if (inputLayout.getEditText() != null) {
-                inputText = inputLayout.getEditText().getText().toString();
-            }
+            if (inputLayout.getEditText() != null) inputText = inputLayout.getEditText().getText().toString();
             if (inputText.length() == 0 || inputText.length() >= 8) {
                 exportSubjectZip(inputText);
             } else {
@@ -89,8 +81,7 @@ public class ExportSubjectZip {
             }
             dismissibleFragment.dismiss();
         });
-        dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
-                view -> dismissibleFragment.dismiss());
+        dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel), view -> dismissibleFragment.dismiss());
         dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesSubjectFragment.5");
     }
 

@@ -211,24 +211,8 @@ public final class SecurityFunctions {
             // PEM needs to be decoded to X509 for it to be accepted by the RSA Engine
             byte[] decodedKey = Base64.decode(contentBuilder.toString(), Base64.DEFAULT);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
-
-            Security.addProvider(new BouncyCastleProvider());
-            Cipher rsa = Cipher.getInstance("RSA/NONE/OAEPPadding");
-            KeyFactory.getInstance("RSA");
-            rsa.init(Cipher.ENCRYPT_MODE, KeyFactory.getInstance("RSA").generatePublic(keySpec));
-
-            // Split into 240 bytes per encoding
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] originalBytes = original.getBytes(StandardCharsets.UTF_8);
-            int index = 0;
-            while (index < originalBytes.length) {
-                byte[] currentBytes = Arrays.copyOfRange(originalBytes, index, Math.min(index + 128, originalBytes.length));
-                byte[] outputBytes = rsa.doFinal(currentBytes);
-                outputStream.write(outputBytes);
-                index += 128;
-            }
+            ByteArrayOutputStream outputStream = getRSAStream(keySpec, original);
             // UTF-8 String does not work but hex string does
-            // return outputStream.toString("UTF-8");
             return ConverterFunctions.bytesToHex(outputStream.toByteArray());
         } catch (IOException e) {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Unable to get public server RSA Key, stack trace is");
@@ -240,6 +224,28 @@ public final class SecurityFunctions {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /** Get the ByteArrayOutputStream for the RSA stream. **/
+    private static ByteArrayOutputStream getRSAStream(X509EncodedKeySpec keySpec, String original)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeySpecException,
+            BadPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+        Security.addProvider(new BouncyCastleProvider());
+        Cipher rsa = Cipher.getInstance("RSA/NONE/OAEPPadding");
+        KeyFactory.getInstance("RSA");
+        rsa.init(Cipher.ENCRYPT_MODE, KeyFactory.getInstance("RSA").generatePublic(keySpec));
+
+        // Split into 240 bytes per encoding
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] originalBytes = original.getBytes(StandardCharsets.UTF_8);
+        int index = 0;
+        while (index < originalBytes.length) {
+            byte[] currentBytes = Arrays.copyOfRange(originalBytes, index, Math.min(index + 128, originalBytes.length));
+            byte[] outputBytes = rsa.doFinal(currentBytes);
+            outputStream.write(outputBytes);
+            index += 128;
+        }
+        return outputStream;
     }
 
     /** AES encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.

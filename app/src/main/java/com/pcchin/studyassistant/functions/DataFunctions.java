@@ -36,12 +36,13 @@ public final class DataFunctions {
     }
 
     /** Gets all the issue numbers from a specific shared preference value. **/
+    @NonNull
     public static ArrayList<Integer> getAllResponses(@NonNull Activity activity, String sharedPrefValue) {
         ArrayList<Integer> returnArray = ConverterFunctions.jsonToSingleIntegerArray(
                 activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
                         .getString(sharedPrefValue, ""));
         if (returnArray == null) {
-            return null;
+            return new ArrayList<>();
         } else {
             Collections.sort(returnArray);
             return returnArray;

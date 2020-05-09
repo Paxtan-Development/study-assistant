@@ -28,13 +28,13 @@ import androidx.annotation.NonNull;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.network.NetworkConstants;
 
 import org.json.JSONObject;
@@ -102,19 +102,7 @@ public final class NetworkFunctions {
             submitButton.setEnabled(true);
             DataFunctions.storeResponse(activity, sharedPrefValue, response);
             GeneralFunctions.reloadFragment(activity.currentFragment);
-        }, error -> {
-            Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
-                    + error.getMessage() + ":" + error.toString() + " from " + fullUrl + ", stack trace is");
-            error.printStackTrace();
-            Log.d(ActivityConstants.LOG_APP_NAME, "Attempting to connect to backup server");
-            if (secondaryRelease == null) {
-                queue.stop();
-                Toast.makeText(activity, R.string.network_error, Toast.LENGTH_SHORT).show();
-                submitButton.setEnabled(true);
-            } else {
-                queue.add(secondaryRelease);
-            }
-        }) {
+        }, error -> onStringRequestError(activity, error, fullUrl, secondaryRelease, queue, submitButton)) {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
@@ -133,11 +121,26 @@ public final class NetworkFunctions {
                 return encryptedString.getBytes();
             }
         };
-        returnRequest.setRetryPolicy(new DefaultRetryPolicy(
-                20 * 1000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        returnRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         return returnRequest;
+    }
+
+    /** Function that is called when an error is returned in the String request. **/
+    private static void onStringRequestError(MainActivity activity, @NonNull VolleyError error, String fullUrl,
+                                             StringRequest secondaryRelease,
+                                             RequestQueue queue, Button submitButton) {
+        Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley returned error "
+                + error.getMessage() + ":" + error.toString() + " from " + fullUrl + ", stack trace is");
+        error.printStackTrace();
+        Log.d(ActivityConstants.LOG_APP_NAME, "Attempting to connect to backup server");
+        if (secondaryRelease == null) {
+            queue.stop();
+            Toast.makeText(activity, R.string.network_error, Toast.LENGTH_SHORT).show();
+            submitButton.setEnabled(true);
+        } else {
+            queue.add(secondaryRelease);
+        }
     }
 
     /** Converts the message into a JSON String with an attribute named message. **/

@@ -42,6 +42,7 @@ import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectZip;
 import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 import java.util.ArrayList;
@@ -79,11 +80,9 @@ public class NotesSubjectFragmentClick2 {
         if (popupView.getEditText() != null) {
             String popupInputText = popupView.getEditText().getText().toString();
             // Check if input is blank
-            if (popupInputText.replaceAll("\\s+", "")
-                    .length() == 0) {
-                popupView.setErrorEnabled(true);
-                popupView.setError(fragment.getString(R.string.n_error_subject_empty));
-            } else if (fragment.subjectDatabase.SubjectDao().search(popupInputText) != null) {
+            if (!new InputValidation(fragment.getContext()).inputIsBlank(
+                    popupInputText, popupView, R.string.n_error_subject_empty)
+                    && fragment.subjectDatabase.SubjectDao().search(popupInputText) != null) {
                 popupView.setErrorEnabled(true);
                 popupView.setError(fragment.getString(R.string.error_subject_exists));
             } else {

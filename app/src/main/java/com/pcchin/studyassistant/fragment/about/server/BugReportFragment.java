@@ -38,6 +38,7 @@ import com.pcchin.studyassistant.functions.NetworkFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +60,7 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
         ArrayList<Integer> issueList = DataFunctions.getAllResponses(requireActivity(),
                 ActivityConstants.SHAREDPREF_BUG_ISSUE_LIST);
         ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_bug_report, container, false);
-        if (issueList == null || issueList.size() == 0) {
+        if (issueList.size() == 0) {
             returnScroll.findViewById(R.id.m7_previous).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.m7_previous_divider).setVisibility(View.GONE);
         } else {
@@ -93,29 +94,12 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
         summaryInput.setErrorEnabled(false);
         descInput.setErrorEnabled(false);
         stepsInput.setErrorEnabled(false);
-        if (email.replaceAll(ActivityConstants.EMAIL_REGEX, "").length() > 0) {
-            emailInput.setErrorEnabled(true);
-            emailInput.setError(getString(R.string.error_email_incorrect));
-            hasError = true;
-        }
-        if (summary.replaceAll("\\s+", "").length() == 0) {
-            summaryInput.setErrorEnabled(true);
-            summaryInput.setError(getString(R.string.m_error_summary_blank));
-            hasError = true;
-        }
-        if (desc.replaceAll("\\s+", "").length() == 0) {
-            descInput.setErrorEnabled(true);
-            descInput.setError(getString(R.string.m_error_desc_blank));
-            hasError = true;
-        }
-        if (steps.replaceAll("\\s+", "").length() == 0) {
-            stepsInput.setErrorEnabled(true);
-            stepsInput.setError(getString(R.string.m_error_steps_blank));
-            hasError = true;
-        }
-        if (!hasError) {
-            sendBugReport(name, email, summary, desc, steps, submitButton);
-        }
+        InputValidation validator = new InputValidation(getContext());
+        if (validator.emailHasError(email, emailInput)) hasError = true;
+        if (validator.inputIsBlank(summary, summaryInput, R.string.m_error_summary_blank)) hasError = true;
+        if (validator.inputIsBlank(desc, descInput, R.string.m_error_desc_blank)) hasError = true;
+        if (validator.inputIsBlank(steps, stepsInput, R.string.m_error_steps_blank)) hasError = true;
+        if (!hasError) sendBugReport(name, email, summary, desc, steps, submitButton);
     }
 
     /** Creates the body for the bug request and sends it. **/

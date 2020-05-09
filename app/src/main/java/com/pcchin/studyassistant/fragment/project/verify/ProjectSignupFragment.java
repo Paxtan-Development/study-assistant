@@ -35,6 +35,7 @@ import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Objects;

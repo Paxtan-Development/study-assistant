@@ -261,13 +261,12 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
                 ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
                         .newInstance(project.projectID, member.memberID, true, true));
             }
-            return true;
         } else {
             // Returns to the main preferences menu
             displayPreference(PreferenceString.PREF_MENU_ROOT);
             currentPrefRoot = PreferenceString.PREF_MENU_ROOT;
-            return true;
         }
+        return true;
     }
 
     /** Closes the database if the fragment is paused. **/

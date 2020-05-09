@@ -34,6 +34,7 @@ import com.pcchin.studyassistant.functions.NetworkFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +62,7 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
         ArrayList<Integer> issueList = DataFunctions.getAllResponses(requireActivity(),
                 ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST);
         ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_about_feedback, container, false);
-        if (issueList == null || issueList.size() == 0) {
+        if (issueList.size() == 0) {
             returnScroll.findViewById(R.id.m6_previous).setVisibility(View.GONE);
             returnScroll.findViewById(R.id.m6_previous_divider).setVisibility(View.GONE);
         } else {
@@ -91,21 +92,10 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
         emailInput.setErrorEnabled(false);
         summaryInput.setErrorEnabled(false);
         descInput.setErrorEnabled(false);
-        if (email.replaceAll(ActivityConstants.EMAIL_REGEX, "").length() > 0) {
-            emailInput.setErrorEnabled(true);
-            emailInput.setError(getString(R.string.error_email_incorrect));
-            hasError = true;
-        }
-        if (summary.replaceAll("\\s+", "").length() == 0) {
-            summaryInput.setErrorEnabled(true);
-            summaryInput.setError(getString(R.string.m_error_summary_blank));
-            hasError = true;
-        }
-        if (desc.replaceAll("\\s+", "").length() == 0) {
-            descInput.setErrorEnabled(true);
-            descInput.setError(getString(R.string.m_error_desc_blank));
-            hasError = true;
-        }
+        InputValidation validator = new InputValidation(getContext());
+        if (validator.emailHasError(email, emailInput)) hasError = true;
+        if (validator.inputIsBlank(summary, summaryInput, R.string.m_error_summary_blank)) hasError = true;
+        if (validator.inputIsBlank(desc, descInput, R.string.m_error_desc_blank)) hasError = true;
         if (!hasError) sendFeedback(name, email, summary, desc, submitButton);
     }
 

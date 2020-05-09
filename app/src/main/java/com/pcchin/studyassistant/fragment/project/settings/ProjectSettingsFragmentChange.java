@@ -21,7 +21,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
-import androidx.preference.SwitchPreference;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
@@ -34,6 +33,7 @@ import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Date;
@@ -76,7 +76,7 @@ final class ProjectSettingsFragmentChange {
                 Log.d("Testing", String.valueOf(newValue));
                 if ((boolean) newValue) {
                     Log.d("Testing", "Called");
-                    checkMemberExists((SwitchPreference) preference);
+                    checkMemberExists();
                 } else {
                     fragment.project.membersEnabled = false;
                 }
@@ -105,7 +105,7 @@ final class ProjectSettingsFragmentChange {
 
     /** Check if a member for the project already exists.
      * If not, show a dialog to add them as a member. **/
-    private void checkMemberExists(SwitchPreference preference) {
+    private void checkMemberExists() {
         if (fragment.projectHasMember()) {
             fragment.project.membersEnabled = true;
         } else {
@@ -116,28 +116,29 @@ final class ProjectSettingsFragmentChange {
                     .setView(initialMemberLayout)
                     .create();
             DismissibleDialogFragment dialogFragment = new DismissibleDialogFragment(newMemberDialog);
-            dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> {
-                String memberName = Objects.requireNonNull(initialMemberLayout.getEditText()).getText().toString();
-                if (memberName.replaceAll("\\s+", "").length() == 0) {
-                    initialMemberLayout.setErrorEnabled(true);
-                    initialMemberLayout.setError(fragment.getString(R.string.p_error_member_name_empty));
-                } else {
-                    // Create member
-                    RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
-                    MemberData initialMember = new MemberData(DatabaseFunctions
-                            .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
-                                    fragment.projectDatabase), fragment.project.projectID,
-                            memberName, "", saltRand.nextString(), "", fragment.role.roleID);
-                    fragment.projectDatabase.MemberDao().insert(initialMember);
-                    fragment.project.membersEnabled = true;
-                    fragment.updateProject();
-                    Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
-                    fragment.displayPreference(fragment.currentPrefRoot);
-                }
-            });
+            dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> onNewMemberCreate(initialMemberLayout));
             dialogFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
                     (view) -> dialogFragment.dismiss());
             dialogFragment.show(fragment.getParentFragmentManager(), "ProjectSettingsFragmentChange.1");
+        }
+    }
+
+    /** Checks if the input provided is valid and if yes, create the member. **/
+    private void onNewMemberCreate(@NonNull TextInputLayout initialMemberLayout) {
+        String memberName = Objects.requireNonNull(initialMemberLayout.getEditText()).getText().toString();
+        if (!new InputValidation(activity).inputIsBlank(memberName, initialMemberLayout,
+                R.string.p_error_member_name_empty)) {
+            // Create member
+            RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
+            MemberData initialMember = new MemberData(DatabaseFunctions
+                    .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
+                            fragment.projectDatabase), fragment.project.projectID,
+                    memberName, "", saltRand.nextString(), "", fragment.role.roleID);
+            fragment.projectDatabase.MemberDao().insert(initialMember);
+            fragment.project.membersEnabled = true;
+            fragment.updateProject();
+            Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
+            fragment.displayPreference(fragment.currentPrefRoot);
         }
     }
 

@@ -121,7 +121,7 @@
                 android:id="@+id/p6_first_member_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/p6_initial_member_name"
+                android:text="@string/p_initial_member_name"
                 android:textSize="18sp" />
 
             <com.google.android.material.textfield.TextInputLayout

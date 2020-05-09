@@ -42,14 +42,15 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
-import com.pcchin.studyassistant.network.AppUpdate;
+import com.pcchin.studyassistant.network.update.AppUpdate;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 /** Functions used within onCreate of
  * @see MainActivity **/
@@ -114,9 +115,17 @@ final class MainActivityCreate {
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
-
+        new Handler().post(this::generateUID);
         new Handler().post(this::createDefaultRoles);
         new Handler().post(this::deletePastExports);
+    }
+
+    /** Generates a unique ID for the client if one does not exist. **/
+    private void generateUID() {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        if (sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "").length() == 0) {
+            sharedPref.edit().putString(ActivityConstants.SHAREDPREF_UID, UUID.randomUUID().toString()).apply();
+        }
     }
 
     /** Checks whether the activity is opened to process files. **/
@@ -125,10 +134,10 @@ final class MainActivityCreate {
         if (intentUri != null) {
             String receiveFilePath = FileFunctions.getRealPathFromUri(activity, intentUri);
             // Check if file type matches the required file types
-            if (receiveFilePath.endsWith(".subject")) {
+            if (receiveFilePath != null && receiveFilePath.endsWith(".subject")) {
                 new ImportSubjectSubject(activity).importSubjectFile(receiveFilePath);
-            } else if (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
-                    || receiveFilePath.endsWith(".Zip")) {
+            } else if (receiveFilePath != null && (receiveFilePath.endsWith(".zip") || receiveFilePath.endsWith(".ZIP")
+                    || receiveFilePath.endsWith(".Zip"))) {
                 new ImportSubjectZip(activity).importZipConfirm(receiveFilePath);
             } else {
                 Toast.makeText(activity, R.string.error_file_format_incorrect, Toast.LENGTH_SHORT).show();
@@ -157,7 +166,7 @@ final class MainActivityCreate {
 
     /** Create the default admin and member roles. **/
     private void createDefaultRoles() {
-        ProjectDatabase projectDatabase = GeneralFunctions.getProjectDatabase(activity);
+        ProjectDatabase projectDatabase = DatabaseFunctions.getProjectDatabase(activity);
         RoleData admin = projectDatabase.RoleDao().searchByID("admin");
         if (admin == null) {
             admin = new RoleData("admin", "", "Admin", "", "");

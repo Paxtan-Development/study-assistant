@@ -33,8 +33,8 @@ import androidx.fragment.app.Fragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 
@@ -76,17 +76,14 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             notesSubject = getArguments().getString(ARG_SUBJECT);
             notesOrder = getArguments().getInt(ARG_ORDER);
         }
-
-        if (getContext() != null) {
-            getNotesRequired();
-        }
+        getNotesRequired();
 
         setHasOptionsMenu(true);
     }
 
     /** Sets up the notes required and falls back to NotesSubjectFragment if an error occured. **/
     private void getNotesRequired() {
-        SubjectDatabase database = GeneralFunctions.getSubjectDatabase(getActivity());
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
         ArrayList<ArrayList<String>> allNotes = database
                 .SubjectDao().search(notesSubject).contents;
 
@@ -97,11 +94,11 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             FileFunctions.checkNoteIntegrity(notesInfo);
             isLocked = (notesInfo.get(3) != null);
             hasAlert = (notesInfo.get(4) != null);
-        } else if (getActivity() != null) {
+        } else {
             // Return to subject
-            Toast.makeText(getActivity(), R.string.n_error_corrupt,
+            Toast.makeText(requireActivity(), R.string.n_error_corrupt,
                     Toast.LENGTH_SHORT).show();
-            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
+            ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
                     .newInstance(notesSubject));
         }
         database.close();
@@ -117,19 +114,17 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
         displayFragmentData(returnView);
 
         // Set min height corresponding to screen height
-        if (getActivity() != null) {
-            getActivity().setTitle(notesSubject);
-            Point endPt = new Point();
-            getActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
-            // Height is set by Total height - bottom of last edited - navigation header height
-            ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    setMinLayoutHeight(returnView, endPt, this);
-                }
-            };
-            returnView.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
-        }
+        requireActivity().setTitle(notesSubject);
+        Point endPt = new Point();
+        requireActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
+        // Height is set by Total height - bottom of last edited - navigation header height
+        ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                setMinLayoutHeight(returnView, endPt, this);
+            }
+        };
+        returnView.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
         return returnView;
     }
 
@@ -197,11 +192,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
      * @see NotesSubjectFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment
-                    .newInstance(notesSubject, notesOrder));
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
+                .newInstance(notesSubject, notesOrder));
+        return true;
     }
 }

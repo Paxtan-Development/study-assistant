@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,9 +34,8 @@ import java.util.Objects;
 
 /** Functions specifically used to convert from one type of variable to another. **/
 public final class ConverterFunctions {
-    /** Constructor made private to simulate static class. **/
     private ConverterFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** The ISO-8601 compliant date and time format.  **/
@@ -47,6 +47,8 @@ public final class ConverterFunctions {
     /** The standard date storage format. **/
     public static final SimpleDateFormat standardDateFormat =
             new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+
+    private static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
 
     /** Converts a date to a ISO-8601 compliant string. If the date is null, "null" is returned. **/
     @TypeConverter
@@ -73,7 +75,7 @@ public final class ConverterFunctions {
     /** Converts a single layer ArrayList to a string JSON array.
      * GSON was used for backwards compatibility and is more secure. **/
     @TypeConverter
-    public static String singleArrayToJson(ArrayList<String> original) {
+    public static String singleStringArrayToJson(ArrayList<String> original) {
         return new Gson().toJson(original);
     }
 
@@ -83,9 +85,28 @@ public final class ConverterFunctions {
      * GSON was used for backwards compatibility and is more secure.**/
     @TypeConverter
     @Nullable
-    public static ArrayList<String> singleJsonToArray(String original) {
+    public static ArrayList<String> jsonToSingleStringArray(String original) {
         if (isJson(original)) {
             Type listType = new TypeToken<ArrayList<String>>() {}.getType();
+            return new Gson().fromJson(original, listType);
+        }
+        return null;
+    }
+
+    /** Converts a single layer integer ArrayList to a string JSON array.
+     * GSON was used for backwards compatibility and is more secure. **/
+    static String singleIntArrayToJson(ArrayList<Integer> original) {
+        return new Gson().toJson(original);
+    }
+
+    /** Converts an integer JSON array into a single layer ArrayList.
+     * Returns null if the original array is invalid.
+     * Returns an empty ArrayList if the original array is empty.
+     * GSON was used for backwards compatibility and is more secure.**/
+    @Nullable
+    static ArrayList<Integer> jsonToSingleIntegerArray(String original) {
+        if (isJson(original)) {
+            Type listType = new TypeToken<ArrayList<Integer>>() {}.getType();
             return new Gson().fromJson(original, listType);
         }
         return null;
@@ -146,5 +167,18 @@ public final class ConverterFunctions {
                 ((original[1] & 0xff) << 16) |
                 ((original[2] & 0xff) << 8) |
                 (original[3] & 0xff);
+    }
+
+    /** Takes in a byte array
+     * @param original and convert it into a hexadecimal string.
+     * From https://stackoverflow.com/a/9855338 **/
+    static String bytesToHex(byte[] original) {
+        byte[] hexChars = new byte[original.length * 2];
+        for (int j = 0; j < original.length; j++) {
+            int v = original[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 }

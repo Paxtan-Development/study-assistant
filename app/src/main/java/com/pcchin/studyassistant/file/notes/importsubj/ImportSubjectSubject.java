@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.file.notes.importsubj;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
@@ -24,13 +23,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -99,21 +98,20 @@ public class ImportSubjectSubject {
         }
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
 
-        DialogInterface.OnShowListener importListener = dialogInterface -> {
-            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-                Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
-                new Handler().post(() -> decryptSubject(dialogInterface, inputLayout, title, sortOrder, content));
-            });
-            ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(view ->
-                    dialogInterface.dismiss());
-        };
-        new AutoDismissDialog(activity.getString(R.string.enter_password), inputLayout, importListener)
-                .show(activity.getSupportFragmentManager(), "ImportSubject.3");
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(new AlertDialog.Builder(activity)
+                .setTitle(R.string.enter_password).setView(inputLayout).create());
+        dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok), view -> {
+            Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
+            new Handler().post(() -> decryptSubject(dismissibleFragment, inputLayout, title, sortOrder, content));
+        });
+        dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel), view ->
+                dismissibleFragment.dismiss());
+        dismissibleFragment.show(activity.getSupportFragmentManager(), "ImportSubject.3");
     }
 
     /** Decrypts and imports the subject. Done in a handler to prevent
      *  the main thread from being overloaded. **/
-    private void decryptSubject(DialogInterface dialogInterface, @NonNull TextInputLayout inputLayout,
+    private void decryptSubject(DismissibleDialogFragment dismissibleFragment, @NonNull TextInputLayout inputLayout,
                                 String title, int sortOrder, byte[] content) {
         String password = "";
         if (inputLayout.getEditText() != null) {
@@ -127,7 +125,7 @@ public class ImportSubjectSubject {
         } else {
             new ImportSubject(activity)
                     .importSubjectToDatabase(title, subjectContents, sortOrder);
-            dialogInterface.dismiss();
+            dismissibleFragment.dismiss();
         }
     }
 

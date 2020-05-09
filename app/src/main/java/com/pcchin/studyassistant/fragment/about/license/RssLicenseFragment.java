@@ -11,22 +11,22 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.about;
+package com.pcchin.studyassistant.fragment.about.license;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 public class RssLicenseFragment extends Fragment implements ExtendedFragment {
@@ -45,11 +45,12 @@ public class RssLicenseFragment extends Fragment implements ExtendedFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView returnScroll = new ScrollView(getActivity());
+        ScrollView returnScroll = new ScrollView(requireActivity());
 
         // Set text
-        TextView textView = new TextView(getActivity());
+        TextView textView = new TextView(requireActivity());
         textView.setTextSize(18);
+        textView.setPadding(20, 20, 20, 20);
         UIFunctions.setHtml(textView, FileFunctions.getTxt(inflater.getContext(),
                 "rss_license.txt"));
         returnScroll.addView(textView);
@@ -60,10 +61,7 @@ public class RssLicenseFragment extends Fragment implements ExtendedFragment {
      * @see AboutFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
+        return true;
     }
 }

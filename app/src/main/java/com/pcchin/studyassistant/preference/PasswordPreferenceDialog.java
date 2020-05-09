@@ -62,10 +62,10 @@ public final class PasswordPreferenceDialog extends PreferenceDialogFragmentComp
                         inputText2 = input2.getEditText().getText().toString();
                 boolean bothCorrect = true;
                 if (!Objects.equals(inputText1, inputText2)) {
-                    Toast.makeText(getContext(), R.string.error_password_unequal, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.error_password_unequal, Toast.LENGTH_SHORT).show();
                     bothCorrect = false;
                 } else if (inputText1.length() < 8) {
-                    Toast.makeText(getContext(), R.string.error_password_short, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.error_password_short, Toast.LENGTH_SHORT).show();
                     bothCorrect = false;
                 }
 

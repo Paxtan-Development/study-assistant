@@ -31,8 +31,8 @@ public class ConverterTest {
         ArrayList<String> compareArray;
         ArrayList<ArrayList<String>> initialArray = TestFunctions.randomArray(TEST_COUNT);
         for (ArrayList<String> currentArray: initialArray) {
-            compareArray = ConverterFunctions.singleJsonToArray(ConverterFunctions
-                    .singleArrayToJson(currentArray));
+            compareArray = ConverterFunctions.jsonToSingleStringArray(ConverterFunctions
+                    .singleStringArrayToJson(currentArray));
             Assert.assertNotNull(compareArray);
             Assert.assertEquals(currentArray.size(), compareArray.size());
             Assert.assertEquals(currentArray, compareArray);

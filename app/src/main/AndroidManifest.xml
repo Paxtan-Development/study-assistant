@@ -31,7 +31,8 @@
         android:theme="@style/DefaultTheme"
         android:resizeableActivity="true"
         android:supportsPictureInPicture="false"
-        tools:targetApi="n">
+        android:requestLegacyExternalStorage="true"
+        tools:targetApi="q">
         <receiver android:name=".utils.notes.NotesNotifyReceiver"
             android:process=":remote"/>
         <!-- Provided used to prevent FileUriExposedException -->

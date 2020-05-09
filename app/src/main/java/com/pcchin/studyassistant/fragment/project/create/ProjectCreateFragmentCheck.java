@@ -89,7 +89,7 @@ final class ProjectCreateFragmentCheck {
                     ("\\s+", "").length() == 0) {
                 // Project name is empty
                 memberName.setErrorEnabled(true);
-                memberName.setError(context.getString(R.string.p6_error_member_name_empty));
+                memberName.setError(context.getString(R.string.p_error_member_name_empty));
                 return false;
             } else if (memberName.getEditText().getText().toString()
                     .replaceAll("\\s+", "").length()
@@ -132,7 +132,7 @@ final class ProjectCreateFragmentCheck {
                     ("\\s+", "").length() == 0) {
                 // Project name is empty
                 customAdminName.setErrorEnabled(true);
-                customAdminName.setError(context.getString(R.string.p6_error_member_name_empty));
+                customAdminName.setError(context.getString(R.string.p_error_member_name_empty));
                 return false;
             }
 
@@ -168,7 +168,7 @@ final class ProjectCreateFragmentCheck {
                     ("\\s+", "").length() == 0) {
                 // Project name is empty
                 customMemberName.setErrorEnabled(true);
-                customMemberName.setError(context.getString(R.string.p6_error_member_name_empty));
+                customMemberName.setError(context.getString(R.string.p_error_member_name_empty));
                 return false;
             }
 

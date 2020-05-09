@@ -26,18 +26,19 @@ import com.pcchin.studyassistant.activity.ActivityConstants;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /** Functions used in managing files. **/
 public final class FileFunctions {
-    /** Constructor made private to simulate static class. **/
     private FileFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** Generates a .txt file based on a path and its contents. **/
@@ -121,7 +122,7 @@ public final class FileFunctions {
      * A Toast is created when it fails and it returns an empty array. **/
     @NonNull
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static byte[] getBytesFromFile(int byteAmt, FileInputStream stream) {
+    public static byte[] getBytesFromFile(int byteAmt, @NonNull FileInputStream stream) {
         byte[] returnByte = new byte[byteAmt];
         try {
             stream.read(returnByte);
@@ -135,7 +136,7 @@ public final class FileFunctions {
     }
 
     /** Returns the absolute path of a path from the given URI.
-     * If the Uri is invalid, an empty string would be returned. **/
+     * If the Uri is invalid or no such file exists, it would return null. **/
     public static String getRealPathFromUri(Context context, Uri uri){
         Cursor cursor = null;
         try {
@@ -147,13 +148,13 @@ public final class FileFunctions {
                 cursor.moveToFirst();
                 return cursor.getString(column_index);
             } else {
-                return "";
+                return null;
             }
         } catch (Exception e) {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Uri" + uri.toString() + "could not be "
                 + "parsed as a path. Stack trace is");
             e.printStackTrace();
-            return "";
+            return null;
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -161,4 +162,16 @@ public final class FileFunctions {
         }
     }
 
+    /** Copies the file from a source to its destination. **/
+    public static void copyFile(File source, File destination) throws IOException {
+        try (InputStream input = new FileInputStream(source);
+                OutputStream output = new FileOutputStream(destination)) {
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = input.read(buf)) > 0) {
+                output.write(buf, 0, len);
+            }
+        }
+    }
 }

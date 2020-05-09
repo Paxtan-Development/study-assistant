@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Copyright 2020 PC Chin. All rights reserved.
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 <resources>
     <!-- Short error messages shown to the user. -->
     <string name="file_error">File Error</string>
-    <string name="a_network_error">Network Error</string>
+    <string name="network_error">Network Error</string>
 
     <!-- String used in general errors. -->
     <string name="error_password_incorrect">The password that is entered is incorrect.</string>
@@ -33,6 +33,13 @@
     <string name="error_file_manager_not_found">A file manager could not be found on the device.</string>
     <string name="error_file_format_incorrect">The file selected could not be imported into the app.</string>
     <string name="error_password_unequal">Both passwords are not the same.</string>
+    <string name="error_email_incorrect">The email address does not appear to be valid.</string>
+    <string name="error_not_connected">Not connected to the internet</string>
+
+    <!-- Errors used in group M. -->
+    <string name="m_error_summary_blank">Summary cannot not be blank.</string>
+    <string name="m_error_desc_blank">Description cannot be blank.</string>
+    <string name="m_error_steps_blank">Steps taken cannot be blank.</string>
 
     <!-- Errors used in group N. -->
     <string name="n_error_corrupt">The notes in this subject may be missing</string>
@@ -51,8 +58,8 @@
     <string name="p_error_role_not_found">The role selected is not found</string>
 
     <!-- Error messages in Fragment P6. -->
+    <string name="p_error_member_name_empty">Member name cannot be empty.</string>
     <string name="p6_error_project_name_empty">Project name cannot be empty.</string>
-    <string name="p6_error_member_name_empty">Member name cannot be empty.</string>
     <string name="p6_error_project_exists">Another project with the same name already exists.</string>
 
     <!-- Errors used in group V. -->

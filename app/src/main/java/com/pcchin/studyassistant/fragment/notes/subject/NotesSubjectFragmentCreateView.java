@@ -50,7 +50,7 @@ class NotesSubjectFragmentCreateView {
 
         // Check if stored data may be corrupt
         if (fragment.notesArray == null) {
-            Toast.makeText(fragment.getContext(), R.string.n_error_corrupt, Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragment.requireContext(), R.string.n_error_corrupt, Toast.LENGTH_SHORT).show();
             fragment.notesArray = new ArrayList<>();
         }
 
@@ -58,7 +58,7 @@ class NotesSubjectFragmentCreateView {
         boolean anyCorrupt = checkNoteCorrupt(returnScroll, returnView);
 
         if (anyCorrupt) {
-            Toast.makeText(fragment.getContext(), R.string.n2_error_some_corrupt, Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragment.requireContext(), R.string.n2_error_some_corrupt, Toast.LENGTH_SHORT).show();
         }
         return returnScroll;
     }
@@ -111,11 +111,9 @@ class NotesSubjectFragmentCreateView {
     private void initMiniNoteListener(@NonNull LinearLayout miniNote, @NonNull LinearLayout returnView, final int i) {
         // Set on click listener
         View.OnClickListener displayNoteListener = v -> {
-            if (fragment.getActivity() != null) {
-                fragment.subjectDatabase.close();
-                ((MainActivity) fragment.getActivity()).displayNotes(fragment.notesSubject, fragment.notesArray.size());
-                ((MainActivity) fragment.getActivity()).pager.setCurrentItem(i, false);
-            }
+            fragment.subjectDatabase.close();
+            ((MainActivity) fragment.requireActivity()).displayNotes(fragment.notesSubject, fragment.notesArray.size());
+            ((MainActivity) fragment.requireActivity()).pager.setCurrentItem(i, false);
         };
 
         miniNote.setOnClickListener(displayNoteListener);

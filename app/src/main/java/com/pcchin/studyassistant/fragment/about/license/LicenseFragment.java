@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.pcchin.studyassistant.fragment.about;
+package com.pcchin.studyassistant.fragment.about.license;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,13 +24,15 @@ import androidx.fragment.app.Fragment;
 
 import com.pcchin.licenseview.LicenseView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
-    private static final int[] licenseArrays = new int[]{R.array.bouncycastle_license,
-            R.array.dtpreference_license, R.array.jsoup_license,
-            R.array.licenseview_license, R.array.zip4j_license};
+    private static final int[] licenseArrays = new int[]{
+            R.array.androiddevicenames_license,R.array.bouncycastle_license,
+            R.array.customdialog_license, R.array.dtpreference_license, R.array.imagepicker_license,
+            R.array.jsoup_license, R.array.licenseview_license, R.array.zip4j_license};
 
     /** Default constructor. **/
     public LicenseFragment() {
@@ -62,10 +64,7 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
      * @see AboutFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
+        return true;
     }
 }

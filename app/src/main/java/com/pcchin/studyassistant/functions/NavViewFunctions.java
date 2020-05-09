@@ -58,7 +58,7 @@ public final class NavViewFunctions {
     /** Adds the subject menu to the nav view. **/
     private static void addSubjectMenu(@NonNull Menu currentMenu, MainActivity activity) {
         // Subject menu
-        final SubjectDatabase subjectDatabase = GeneralFunctions.getSubjectDatabase(activity);
+        final SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(activity);
         SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);
         addSubjects(subjMenu, activity, subjectDatabase);
 
@@ -100,7 +100,7 @@ public final class NavViewFunctions {
     private static void addProjectMenu(@NonNull Menu currentMenu, MainActivity activity) {
         // Add projects
         SubMenu projMenu = currentMenu.addSubMenu(R.string.projects);
-        ProjectDatabase projectDatabase = GeneralFunctions.getProjectDatabase(activity);
+        ProjectDatabase projectDatabase = DatabaseFunctions.getProjectDatabase(activity);
         addProjects(projMenu, activity, projectDatabase);
 
         // Add New Project Button

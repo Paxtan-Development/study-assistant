@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.file.notes.exportsubj;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,13 +23,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -64,45 +63,34 @@ public class ExportSubjectZip {
     public void askZipPassword() {
         @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout)
                 fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
-        if (inputLayout.getEditText() != null) {
-            inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
+        if (inputLayout.getEditText() != null) inputLayout.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         inputLayout.setHint(fragment.getString(R.string.set_blank_password));
-
-        DialogInterface.OnShowListener passwordListener =
-                dialogInterface -> setPositiveBtn(dialogInterface, inputLayout);
-        new AutoDismissDialog(fragment.getString(R.string.enter_password), inputLayout, passwordListener)
-                .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.5");
-    }
-
-    /** Sets the positive button on the zip password dialog. **/
-    private void setPositiveBtn(DialogInterface dialogInterface, TextInputLayout inputLayout) {
-        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE)
-                .setOnClickListener(view -> {
-                    String inputText = "";
-                    if (inputLayout.getEditText() != null) {
-                        inputText = inputLayout.getEditText().getText().toString();
-                    }
-                    if (inputText.length() == 0 || inputText.length() >= 8) {
-                        exportSubjectZip(inputText);
-                    } else {
-                        inputLayout.setErrorEnabled(true);
-                        inputLayout.setError(fragment.getString(R.string.error_password_short));
-                    }
-                    dialogInterface.dismiss();
-                });
-        ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE)
-                .setOnClickListener(view -> dialogInterface.dismiss());
+        // Set up the dismissible dialog
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
+                new AlertDialog.Builder(fragment.requireContext()).setTitle(R.string.enter_password)
+                        .setView(inputLayout).create());
+        dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok), view -> {
+            String inputText = "";
+            if (inputLayout.getEditText() != null) inputText = inputLayout.getEditText().getText().toString();
+            if (inputText.length() == 0 || inputText.length() >= 8) {
+                exportSubjectZip(inputText);
+            } else {
+                inputLayout.setErrorEnabled(true);
+                inputLayout.setError(fragment.getString(R.string.error_password_short));
+            }
+            dismissibleFragment.dismiss();
+        });
+        dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel), view -> dismissibleFragment.dismiss());
+        dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesSubjectFragment.5");
     }
 
     /** Export the subject to a ZIP file.
      * Separated from onExportPressed() for clarity. **/
     private void exportSubjectZip(String password) {
-        if (fragment != null && fragment.getContext() != null) {
+        if (fragment != null) {
             // Generate valid paths for temp storage folder
-            String tempExportFolder = FileFunctions.generateValidFile(fragment.getContext()
+            String tempExportFolder = FileFunctions.generateValidFile(fragment.requireContext()
                     .getFilesDir().getAbsolutePath() + "/tempZip", "");
             try {
                 createZipFile(tempExportFolder, password);
@@ -110,7 +98,7 @@ public class ExportSubjectZip {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
                         "exporting a subject. Stack trace is ");
                 e.printStackTrace();
-                Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -132,7 +120,7 @@ public class ExportSubjectZip {
         } else {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
                     + " cannot be created.");
-            Toast.makeText(fragment.getContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -157,7 +145,7 @@ public class ExportSubjectZip {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Temporary folder "
                     + tempExportFolder + " could not be deleted.");
         }
-        Toast.makeText(fragment.getContext(), fragment.getString(R.string.subject_exported)
+        Toast.makeText(fragment.requireContext(), fragment.getString(R.string.subject_exported)
                 + exportFilePath, Toast.LENGTH_SHORT).show();
     }
 

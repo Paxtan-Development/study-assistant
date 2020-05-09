@@ -33,7 +33,7 @@ import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
@@ -52,10 +52,8 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            subjectDatabase = GeneralFunctions.getSubjectDatabase(getActivity());
-            getActivity().setTitle(R.string.notes);
-        }
+        subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
+        requireActivity().setTitle(R.string.notes);
         setHasOptionsMenu(true);
     }
 
@@ -75,12 +73,10 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
             final int finalI = i;
             subjectBtn.setOnClickListener(v -> {
                 // Go to notesSubjectFragment
-                if (getActivity() != null) {
-                    subjectDatabase.close();
-                    ((MainActivity) getActivity()).displayFragment(NotesSubjectFragment.newInstance(
-                            subjectList.get(finalI).title
-                    ));
-                }
+                subjectDatabase.close();
+                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(
+                        subjectList.get(finalI).title
+                ));
             });
             ((LinearLayout) returnView.findViewById(R.id.blank_linear)).addView(subjectBtn, i);
         }
@@ -96,14 +92,12 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
 
     /** Creates a new subject. **/
     public void onNewSubjectPressed() {
-        if (getActivity() != null) {
-            UIFunctions.showNewSubject(((MainActivity) getActivity()), subjectDatabase);
-        }
+        UIFunctions.showNewSubject(((MainActivity) requireActivity()), subjectDatabase);
     }
 
     /** Imports an existing zip/.subject file. **/
     public void onImportPressed() {
-        new Handler().post(() -> ImportSubjectStatic.displayImportDialog((MainActivity) getActivity()));
+        new Handler().post(() -> ImportSubjectStatic.displayImportDialog((MainActivity) requireActivity()));
     }
 
     /** Returns to
@@ -111,10 +105,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     @Override
     public boolean onBackPressed() {
         subjectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(new MainFragment());
-            return true;
-        }
-        return false;
+        ((MainActivity) requireActivity()).displayFragment(new MainFragment());
+        return true;
     }
 }

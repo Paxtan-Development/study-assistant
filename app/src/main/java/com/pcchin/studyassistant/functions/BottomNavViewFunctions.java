@@ -47,7 +47,7 @@ public final class BottomNavViewFunctions {
         activity.bottomNavView.getMenu().clear();
         activity.bottomNavView.inflateMenu(res);
         Menu navViewMenu = activity.bottomNavView.getMenu();
-        ProjectDatabase database = GeneralFunctions.getProjectDatabase(activity);
+        ProjectDatabase database = DatabaseFunctions.getProjectDatabase(activity);
 
         // Bottom nav view
         if (res == R.menu.menu_p_bottom) {

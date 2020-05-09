@@ -43,9 +43,7 @@ public class MainFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            getActivity().setTitle(R.string.app_name);
-        }
+        requireActivity().setTitle(R.string.app_name);
     }
 
     /** Creates the fragment and sets up the listener for the buttons. **/
@@ -54,39 +52,25 @@ public class MainFragment extends Fragment implements ExtendedFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment and set up listeners
         View returnView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        returnView.findViewById(R.id.m1_notes).setOnClickListener(v -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).displayFragment(new NotesSelectFragment());
-            }
-        });
-
-        returnView.findViewById(R.id.m1_projects).setOnClickListener(v -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            }
-        });
-
-        returnView.findViewById(R.id.m1_about).setOnClickListener(v -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).displayFragment(new AboutFragment());
-            }
-        });
+        returnView.findViewById(R.id.m1_notes).setOnClickListener(v ->
+                ((MainActivity) requireActivity()).displayFragment(new NotesSelectFragment()));
+        returnView.findViewById(R.id.m1_projects).setOnClickListener(v ->
+                ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment()));
+        returnView.findViewById(R.id.m1_about).setOnClickListener(v ->
+                ((MainActivity) requireActivity()).displayFragment(new AboutFragment()));
         return returnView;
     }
 
     /** Display the exit dialog when the 'Back' button is pressed. **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            // Press back to exit
-            if (doubleBackToExitPressedOnce) {
-                GeneralFunctions.exitApp(getActivity());
-            } else {
-                this.doubleBackToExitPressedOnce = true;
-                Toast.makeText(getContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();
-                new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 1500);
-            }
+        // Press back to exit
+        if (doubleBackToExitPressedOnce) {
+            GeneralFunctions.exitApp(requireActivity());
+        } else {
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 1500);
         }
         return true;
     }

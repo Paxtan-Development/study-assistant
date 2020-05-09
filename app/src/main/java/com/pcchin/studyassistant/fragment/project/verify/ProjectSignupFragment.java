@@ -26,15 +26,16 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DataFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Objects;
@@ -63,20 +64,14 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-            if (getArguments() != null) {
-                project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
-            }
-            if (project == null) {
-                // Go back to project selection
-                Toast.makeText(getActivity(), R.string.p_error_project_not_found,
-                        Toast.LENGTH_SHORT).show();
-                projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            } else {
-                getActivity().setTitle(R.string.v1_signup);
-            }
+        projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
+        if (getArguments() != null) {
+            project = projectDatabase.ProjectDao().searchByID(getArguments().getString(ARG_ID));
+        }
+        if (project == null) {
+            DataFunctions.onProjectMissing((MainActivity) getActivity(), projectDatabase);
+        } else {
+            requireActivity().setTitle(R.string.v1_signup);
         }
     }
 
@@ -91,19 +86,17 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                 fullnameInput = returnView.findViewById(R.id.v1_fullname_input);
 
         // Set up listeners
-        if (getActivity() != null) {
-            returnView.findViewById(R.id.v1_return).setOnClickListener(view -> {
-                projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-            });
-            returnView.findViewById(R.id.v1_signup).setOnClickListener(view -> {
-                // Get all inputs
-                usernameInput.setErrorEnabled(false);
-                passwordInput1.setErrorEnabled(false);
-                passwordInput2.setErrorEnabled(false);
-                checkUsername1(usernameInput, passwordInput1, passwordInput2, fullnameInput);
-            });
-        }
+        returnView.findViewById(R.id.v1_return).setOnClickListener(view -> {
+            projectDatabase.close();
+            ((MainActivity) requireActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+        });
+        returnView.findViewById(R.id.v1_signup).setOnClickListener(view -> {
+            // Get all inputs
+            usernameInput.setErrorEnabled(false);
+            passwordInput1.setErrorEnabled(false);
+            passwordInput2.setErrorEnabled(false);
+            checkUsername1(usernameInput, passwordInput1, passwordInput2, fullnameInput);
+        });
         return returnView;
     }
 
@@ -149,7 +142,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
             while (projectDatabase.MemberDao().searchByID(memberID) != null) {
                 memberID = randomID.nextString();
             }
-            createMember((MainActivity) getActivity(), memberID,
+            createMember((MainActivity) requireActivity(), memberID,
                     usernameText, fullName, passwordText1);
         }
     }
@@ -171,7 +164,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                     hashedPass, project.memberDefaultRole));
         }
         projectDatabase.close();
-        Toast.makeText(activity, R.string.v1_member_created, Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
         activity.displayFragment(ProjectInfoFragment.newInstance(project.projectID, memberID,
                 true, true));
     }
@@ -181,10 +174,23 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
     @Override
     public boolean onBackPressed() {
         projectDatabase.close();
-        if (getActivity() != null) {
-            ((MainActivity) getActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
-            return true;
+        ((MainActivity) requireActivity()).displayFragment(ProjectLoginFragment.newInstance(project.projectID));
+        return true;
+    }
+
+    /** Closes the database if the fragment is paused. **/
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+    }
+
+    /** Reopens the database when the fragment is resumed. **/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         }
-        return false;
     }
 }

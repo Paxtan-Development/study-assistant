@@ -13,20 +13,31 @@
 
 package com.pcchin.studyassistant.fragment.project.settings;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
+import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
-import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.utils.misc.InputValidation;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Date;
+import java.util.Objects;
 
 /** Functions that are called when a preference is changed in
  * @see ProjectSettingsFragment **/
@@ -37,7 +48,7 @@ final class ProjectSettingsFragmentChange {
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** Detects the value change of general preferences. **/
@@ -62,7 +73,13 @@ final class ProjectSettingsFragmentChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
-                fragment.project.membersEnabled = (boolean) newValue;
+                Log.d("Testing", String.valueOf(newValue));
+                if ((boolean) newValue) {
+                    Log.d("Testing", "Called");
+                    checkMemberExists();
+                } else {
+                    fragment.project.membersEnabled = false;
+                }
                 break;
             case PreferenceString.PREF_ROLES:
                 fragment.project.rolesEnabled = (boolean) newValue;
@@ -77,26 +94,70 @@ final class ProjectSettingsFragmentChange {
                 fragment.project.mergeTaskStatus = (boolean) newValue;
                 break;
             case PreferenceString.PREF_STATUS_ICON:
-                switch ((String) newValue) {
-                    case "None":
-                        fragment.project.projectStatusIcon = R.string.blank;
-                        break;
-                    case "Circle":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_circle;
-                        break;
-                    case "Triangle":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_triangle;
-                        break;
-                    case "Square":
-                        fragment.project.projectStatusIcon = R.drawable.status_ic_square;
-                        break;
-                }
+                updateStatusIcon((String) newValue);
                 break;
             case PreferenceString.PREF_RELATED_SUBJECT:
                 fragment.project.associatedSubject = (String) newValue;
                 break;
         }
         fragment.updateProject();
+    }
+
+    /** Check if a member for the project already exists.
+     * If not, show a dialog to add them as a member. **/
+    private void checkMemberExists() {
+        if (fragment.projectHasMember()) {
+            fragment.project.membersEnabled = true;
+        } else {
+            Toast.makeText(activity, R.string.p3_missing_initial_member, Toast.LENGTH_SHORT).show();
+            @SuppressLint("InflateParams") TextInputLayout initialMemberLayout =
+                    (TextInputLayout) fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
+            AlertDialog newMemberDialog = new AlertDialog.Builder(activity).setTitle(R.string.p_initial_member_name)
+                    .setView(initialMemberLayout)
+                    .create();
+            DismissibleDialogFragment dialogFragment = new DismissibleDialogFragment(newMemberDialog);
+            dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> onNewMemberCreate(initialMemberLayout));
+            dialogFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
+                    (view) -> dialogFragment.dismiss());
+            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectSettingsFragmentChange.1");
+        }
+    }
+
+    /** Checks if the input provided is valid and if yes, create the member. **/
+    private void onNewMemberCreate(@NonNull TextInputLayout initialMemberLayout) {
+        String memberName = Objects.requireNonNull(initialMemberLayout.getEditText()).getText().toString();
+        if (!new InputValidation(activity).inputIsBlank(memberName, initialMemberLayout,
+                R.string.p_error_member_name_empty)) {
+            // Create member
+            RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
+            MemberData initialMember = new MemberData(DatabaseFunctions
+                    .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
+                            fragment.projectDatabase), fragment.project.projectID,
+                    memberName, "", saltRand.nextString(), "", fragment.role.roleID);
+            fragment.projectDatabase.MemberDao().insert(initialMember);
+            fragment.project.membersEnabled = true;
+            fragment.updateProject();
+            Toast.makeText(activity, R.string.member_created, Toast.LENGTH_SHORT).show();
+            fragment.displayPreference(fragment.currentPrefRoot);
+        }
+    }
+
+    /** Updates the status icon for the project. **/
+    private void updateStatusIcon(@NonNull String newValue) {
+        switch (newValue) {
+            case "None":
+                fragment.project.projectStatusIcon = R.string.blank;
+                break;
+            case "Circle":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_circle;
+                break;
+            case "Triangle":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_triangle;
+                break;
+            case "Square":
+                fragment.project.projectStatusIcon = R.drawable.status_ic_square;
+                break;
+        }
     }
 
     /** Detects the value change of date preferences. **/

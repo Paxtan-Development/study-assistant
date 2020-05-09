@@ -17,6 +17,12 @@
     <string name="license_apache_2">Apache License 2.0</string>
     <string name="license_mit">MIT License</string>
     <string name="license_cc_3_unported">Creative Commons - Attribution 3.0 Unported (CC BY 3.0)</string>
+    
+    <string-array name="androiddevicenames_license">
+        <item>Android Device Names</item>
+        <item>@string/license_apache_2</item>
+        <item>Copyright © 2015 &lt;a href=&quot;https://github.com/jaredrummler&quot;&gt;Jared Rummler&lt;/a&gt;</item>
+    </string-array>
 
     <string-array name="bouncycastle_license">
         <item>BouncyCastle</item>
@@ -25,10 +31,24 @@
             bouncycastle.org&quot;&gt;http://www.bouncycastle.org&lt;/a&gt;)</item>
     </string-array>
 
+    <string-array name="customdialog_license">
+        <item>CustomDialog</item>
+        <item>@string/license_apache_2</item>
+        <item>Copyright © 2020 &lt;a href=&quot;https://github.com/pc-chin&quot;&gt;PC Chin&lt;/a&gt;</item>
+    </string-array>
+
     <string-array name="dtpreference_license">
         <item>dtpreference</item>
         <item>@string/license_apache_2</item>
         <item>Copyright © 2020 &lt;a href=&quot;https://github.com/pc-chin&quot;&gt;PC Chin&lt;/a&gt;</item>
+    </string-array>
+
+    <!-- The license for the image picker library does not uses his own name,
+        but the repo can be found at https://github.com/Dhaval2404/ImagePicker -->
+    <string-array name="imagepicker_license">
+        <item>Image Picker</item>
+        <item>@string/license_apache_2</item>
+        <item>Copyright 2019, &lt;a href=&quot;https://source.android.com/&quot;&gt;The Android Open Source Project&lt;/a&gt;</item>
     </string-array>
 
     <string-array name="jsoup_license">

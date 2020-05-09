@@ -12,9 +12,17 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/p4"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragment.project.ProjectMediaFragment" />
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid
+        android:color="@android:color/holo_green_light"/>
+
+    <size
+        android:width="24dp"
+        android:height="24dp"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/holo_green_dark"/>
+</shape>

@@ -1,3 +1,10 @@
+# Public key files
+app/src/main/assets/public.pem
+
+# Testing only files
+src/test/resources/
+src/androidTest/resources/
+
 # Built application files
 *.apk
 *.aar

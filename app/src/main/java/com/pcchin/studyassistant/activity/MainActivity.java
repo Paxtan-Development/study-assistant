@@ -13,14 +13,13 @@
 
 package com.pcchin.studyassistant.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,30 +31,39 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.project.ProjectDatabase;
+import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
-import com.pcchin.studyassistant.file.project.ImportProjectIcon;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
-import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
-import com.pcchin.studyassistant.fragment.project.member.ProjectMemberListFragment;
-import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
-import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
-import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
+import com.pcchin.studyassistant.fragment.project.settings.ProjectSettingsFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
+import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
     public ViewPager pager;
     public Fragment currentFragment;
+
+    // Values that are only used when processing the ID
+    private String projectID;
+    private String id2;
+    private boolean isMember;
 
     /** Initializes activity. Sets up toolbar and drawer.  **/
     @Override
@@ -97,6 +105,7 @@ public class MainActivity extends AppCompatActivity
             // the onBackPressed, hence its a special case
             ((NotesViewFragment) currentFragment).onBackPressed();
         } else {
+            closeDrawer();
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
             if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
                 super.onBackPressed();
@@ -119,28 +128,77 @@ public class MainActivity extends AppCompatActivity
     /** External intent is returned here from picking a file from the following:
      * @see ImportSubjectZip
      * @see ImportSubjectSubject
-     * @see ImportProjectIcon
      * The file would be sent back to a new ImportSubject to be imported. **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data.getData() != null) {
             String targetFile = FileFunctions.getRealPathFromUri(MainActivity.this, data.getData());
-            if (requestCode == ActivityConstants.SELECT_ZIP_FILE) {
-                // Sample URI:
-                // content://com.coloros.filemanager.../documents/raw:/storage/emulated/0/file.ext
-                new ImportSubjectZip(MainActivity.this).importZipConfirm(targetFile);
-            } else if (requestCode == ActivityConstants.SELECT_SUBJECT_FILE) {
-                if (targetFile.endsWith(".subject")) {
-                    new ImportSubjectSubject(MainActivity.this).importSubjectFile(targetFile);
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
-                }
-            } else if (requestCode == ActivityConstants.SELECT_PROJECT_ICON) {
-                new ImportProjectIcon(MainActivity.this).start();
-            } else {
-                // TODO: Import media to project
+            boolean imagePicked = false;
+            if (targetFile == null) {
+                targetFile = ImagePicker.Companion.getFilePath(data);
+                imagePicked = true;
             }
+            processFileRequest(requestCode, targetFile, imagePicked);
+        }
+    }
+
+    /** Process the file request received. **/
+    private void processFileRequest(int requestCode, String targetFile, boolean imagePicked) {
+        if (requestCode == ActivityConstants.SELECT_ZIP_FILE) {
+            // Select zip file
+            new ImportSubjectZip(MainActivity.this).importZipConfirm(targetFile);
+        } else if (requestCode == ActivityConstants.SELECT_SUBJECT_FILE) {
+            // Select .subject file
+            if (targetFile != null && targetFile.endsWith(".subject")) {
+                new ImportSubjectSubject(MainActivity.this).importSubjectFile(targetFile);
+            } else {
+                Toast.makeText(MainActivity.this, R.string.not_subject_file, Toast.LENGTH_SHORT).show();
+            }
+        } else if (imagePicked && targetFile != null) {
+            updateIcon(targetFile);
+        } else if (targetFile != null) {
+            // TODO: Import media to project
+        } else {
+            // File could not be processed.
+            Toast.makeText(MainActivity.this, R.string.file_error, Toast.LENGTH_SHORT).show();
+            Log.e(ActivityConstants.LOG_APP_NAME,
+                    String.format("File Error: The intent received with request code %s is unable to be processed", requestCode));
+        }
+    }
+
+    /** Updates the icon of the project specified earlier. **/
+    private void updateIcon(String targetFile) {
+        try {
+            String iconPath = DatabaseFunctions.getProjectIconPath(MainActivity.this, projectID);
+            FileFunctions.copyFile(new File(targetFile), new File(iconPath));
+            new Thread(() -> {
+                ProjectDatabase database = DatabaseFunctions.getProjectDatabase(MainActivity.this);
+                ProjectData project = database.ProjectDao().searchByID(projectID);
+                project.hasIcon = true;
+                database.ProjectDao().update(project);
+                runOnUiThread(this::startProjectSettings);
+            }).start();
+            Toast.makeText(MainActivity.this, R.string.p3_general_icon_updated, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, R.string.file_error, Toast.LENGTH_SHORT).show();
+            Log.e(ActivityConstants.LOG_APP_NAME, String.format("File Error: Unable to be update " +
+                    "the icon of project ID %s from targetFile %s", projectID, targetFile));
+            e.printStackTrace();
+        }
+    }
+
+    /** Go to the settings page if it is not at the settings for the imported project. **/
+    private void startProjectSettings() {
+        if (currentFragment instanceof ProjectSettingsFragment
+                && Objects.equals(((ProjectSettingsFragment) currentFragment)
+                .project.projectID, projectID)) {
+            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
+        } else {
+            // Start the settings page for that project
+            safeOnBackPressed();
+            displayFragment(ProjectSettingsFragment.newInstance(projectID, id2, isMember));
+            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
         }
     }
 
@@ -149,10 +207,7 @@ public class MainActivity extends AppCompatActivity
     public void displayFragment(Fragment fragment) {
         // Hides bottomNavView if the project comes from a project fragment
         // and to a non-project fragment
-        if (! (fragment instanceof ProjectInfoFragment || fragment instanceof ProjectMemberListFragment
-                || fragment instanceof ProjectTaskFragment
-                || fragment instanceof ProjectRoleFragment
-                || fragment instanceof ProjectStatusFragment)) {
+        if (!MainActivityFunctions.fragmentHasBottomNavView(fragment)) {
             bottomNavView.setVisibility(View.GONE);
         }
 
@@ -165,7 +220,7 @@ public class MainActivity extends AppCompatActivity
         pager.setVisibility(View.GONE);
         findViewById(R.id.base).setVisibility(View.VISIBLE);
         currentFragment = fragment;
-        hideKeyboard();
+        new MainActivityFunctions(MainActivity.this).hideKeyboard();
     }
 
     /** Displays the notes for the subject through a custom PageAdaptor.
@@ -177,64 +232,19 @@ public class MainActivity extends AppCompatActivity
             // This is to remove the menu from the bottom container and prevent double onBackPressed
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
-        FragmentStatePagerAdapter baseAdapter = getNoteAdapter(subject, size);
+        FragmentStatePagerAdapter baseAdapter = new MainActivityFunctions(MainActivity.this).getNoteAdapter(subject, size);
         // Updates currentFragment to the current item
-        ViewPager.OnPageChangeListener baseAdapterPageChanger = getNoteAdapterPageChanger(baseAdapter);
+        ViewPager.OnPageChangeListener baseAdapterPageChanger = new MainActivityFunctions(MainActivity.this).getNoteAdapterPageChanger(baseAdapter);
         pager.setAdapter(baseAdapter);
         pager.addOnPageChangeListener(baseAdapterPageChanger);
-        fadeToNote();
+        new MainActivityFunctions(MainActivity.this).fadeToNote();
     }
 
-    /** Gets the pager adapter for the notes. **/
-    @NonNull
-    private FragmentStatePagerAdapter getNoteAdapter(String subject, int size) {
-        return new FragmentStatePagerAdapter(getSupportFragmentManager(),
-                FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-            @NonNull
-            @Override
-            // getItem does not correspond to the current item selected, DO NOT USE IT AS SUCH
-            public Fragment getItem(int position) {
-                // Used to be an issue where NotesViewFragment would crash as menu is null,
-                // but it seems to had resolved itself
-                return NotesViewFragment.newInstance(subject, position);
-            }
-
-            @Override
-            public int getCount() {
-                return size;
-            }
-        };
-    }
-
-    /** Returns the page change listener for the note adapter. **/
-    @NonNull
-    private ViewPager.OnPageChangeListener getNoteAdapterPageChanger(FragmentStatePagerAdapter baseAdapter) {
-        return new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Not needed
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                // instantiateItem used instead of getItem as getItem returns a new instance of
-                // a fragment instead of an existing one
-                currentFragment = (Fragment) baseAdapter.instantiateItem(findViewById(R.id.base), position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // Not needed
-            }
-        };
-    }
-
-    /** Fades out to another note to increase smoothness. **/
-    private void fadeToNote() {
-        findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout));
-        findViewById(R.id.base).setVisibility(View.GONE);
-        pager.setVisibility(View.VISIBLE);
-        hideKeyboard();
+    /** Set the info of the project based on the given project info. **/
+    public void setProjectInfo(String projectID, String id2, boolean isMember) {
+        this.projectID = projectID;
+        this.id2 = id2;
+        this.isMember = isMember;
     }
 
     /** Closes the navigation drawer. **/
@@ -242,21 +252,6 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-    }
-
-    /** Hides the soft input keyboard, separated for clarity. **/
-    private void hideKeyboard() {
-        // Hide keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(MainActivity.this);
-        }
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 

@@ -13,7 +13,6 @@
 
 package com.pcchin.studyassistant.fragment.notes.edit;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,14 +23,15 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.util.ArrayList;
@@ -94,8 +94,8 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null && getActivity() != null) {
-            database = GeneralFunctions.getSubjectDatabase(getActivity());
+        if (getArguments() != null) {
+            database = DatabaseFunctions.getSubjectDatabase(requireActivity());
             // Get values from newInstance
             notesSubject = getArguments().getString(ARG_PARAM1);
             subject = database.SubjectDao().search(notesSubject);
@@ -110,7 +110,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 // Get values from newInstance
                 notesTitle = getArguments().getString(ARG_PARAM2);
             }
-            getActivity().setTitle(notesSubject);
+            requireActivity().setTitle(notesSubject);
         }
         setHasOptionsMenu(true);
     }
@@ -140,17 +140,15 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Set the minimum height of the returned view to match that of the scrollView **/
-    private void setMinHeight(View returnView) {
-        if (getActivity() != null) {
-            returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    View scrollView = returnView.findViewById(R.id.n4_scroll);
-                    ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(scrollView.getHeight());
-                }
-            });
-        }
+    private void setMinHeight(@NonNull View returnView) {
+        returnView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                returnView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                View scrollView = returnView.findViewById(R.id.n4_scroll);
+                ((EditText) returnView.findViewById(R.id.n4_edit)).setMinHeight(scrollView.getHeight());
+            }
+        });
     }
 
     /** Sets the menu for the fragment **/
@@ -164,13 +162,13 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
      * @see MainActivity safeOnBackPressed() **/
     @Override
     public boolean onBackPressed() {
-        new AutoDismissDialog(getString(R.string.return_val), getString(R.string.n4_save_note),
-                new String[]{getString(R.string.yes), getString(R.string.no),
-                        getString(android.R.string.cancel)},
-                new DialogInterface.OnClickListener[]{
-                        (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onSavePressed(),
-                        (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed(),
-                        (dialogInterface, i) -> dialogInterface.dismiss()})
+        new DefaultDialogFragment(new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.return_val)
+                .setMessage(R.string.n4_save_note)
+                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onSavePressed())
+                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed())
+                .setNeutralButton(android.R.string.cancel, null)
+                .create())
                 .show(getParentFragmentManager(), "NotesEditFragment.2");
         return true;
     }

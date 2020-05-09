@@ -23,7 +23,7 @@ import androidx.preference.SwitchPreference;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 
 import java.util.Date;
@@ -39,7 +39,7 @@ final class ProjectSettingsFragmentCustomize {
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentCustomize(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.requireActivity();
     }
 
     /** Customize the general preferences. **/
@@ -66,7 +66,7 @@ final class ProjectSettingsFragmentCustomize {
         ((SwitchPreference) Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_MERGE_TASK_STATUS))).setChecked(fragment.project.mergeTaskStatus);
         // Handler for setting related subject as database access is needed
         new Handler().postDelayed(() -> {
-            SubjectDatabase database = GeneralFunctions.getSubjectDatabase(activity);
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
             List<NotesSubject> subjectList = database.SubjectDao().getAll();
             CharSequence[] subjectNameList = new CharSequence[subjectList.size()];
             for (int i = 0; i < subjectList.size(); i++) {
@@ -109,6 +109,10 @@ final class ProjectSettingsFragmentCustomize {
             ((Preference) Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_REMOVE_PW))).setVisible(false);
         } else {
             ((Preference) Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_SET_PW))).setVisible(false);
+        }
+        // The role for the member would be set to fragment.role so there is no other check for members
+        if (fragment.role == null || !fragment.role.canDeleteProject) {
+            ((Preference) Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_DELETE_PROJECT))).setVisible(false);
         }
     }
 }

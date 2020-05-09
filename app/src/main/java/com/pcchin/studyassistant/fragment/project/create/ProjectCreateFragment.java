@@ -32,7 +32,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
@@ -59,11 +59,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
-        } else {
-            onBackPressed();
-        }
+        projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
     }
 
     /** Sets up the layout for the fragment. **/
@@ -82,7 +78,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         // Creates project if conditions are met
         returnView.findViewById(R.id.p6_create).setOnClickListener(view -> {
             boolean allInputCorrect = true;
-            ProjectCreateFragmentCheck check = new ProjectCreateFragmentCheck(getContext());
+            ProjectCreateFragmentCheck check = new ProjectCreateFragmentCheck(requireContext());
 
             // Check for all requirements
             TextInputLayout projectName = returnView.findViewById(R.id.p6_name_input),
@@ -111,7 +107,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 // Creates admin role
                 RandomString idRand = new RandomString(48),
                         saltRand = new RandomString(40);
-                String projectID = GeneralFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
+                String projectID = DatabaseFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
                         projectDatabase);
                 RoleData adminRole = ProjectCreateFragmentCreate.createAdminRole(customAdmin, idRand,
                             saltRand, projectID, customAdminName, customAdminPass1, projectDatabase),
@@ -120,7 +116,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 projectDatabase.RoleDao().insert(adminRole);
                 projectDatabase.RoleDao().insert(memberRole);
 
-                String projectSalt = GeneralFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
+                String projectSalt = DatabaseFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
                         projectDatabase), projectPass;
                 if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                     projectPass = "";
@@ -186,24 +182,35 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
     /** Go to the project info fragment. **/
     private void startProjectInfo(String projectID, String id2, boolean isMember) {
         // Go to project info
-        Toast.makeText(getActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
-        if (getActivity() != null) {
-            NavViewFunctions.updateNavView((MainActivity) getActivity());
-            ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                    .newInstance(projectID, id2, isMember, true));
-        }
+        Toast.makeText(requireActivity(), R.string.p6_project_created, Toast.LENGTH_SHORT).show();
+        NavViewFunctions.updateNavView((MainActivity) requireActivity());
+        ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                .newInstance(projectID, id2, isMember, true));
     }
 
     /** Returns to
      * @see ProjectSelectFragment **/
     @Override
     public boolean onBackPressed() {
-        if (getActivity() != null) {
-            projectDatabase.close();
-            ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
-            return true;
+        projectDatabase.close();
+        ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
+        return true;
+    }
+
+    /** Closes the database if the fragment is paused. **/
+    @Override
+    public void onPause() {
+        super.onPause();
+        projectDatabase.close();
+    }
+
+    /** Reopens the database when the fragment is resumed. **/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!projectDatabase.isOpen()) {
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         }
-        return false;
     }
 
 }

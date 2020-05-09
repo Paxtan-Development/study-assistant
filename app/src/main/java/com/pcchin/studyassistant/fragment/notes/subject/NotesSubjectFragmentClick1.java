@@ -14,19 +14,19 @@
 package com.pcchin.studyassistant.fragment.notes.subject;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DefaultDialogFragment;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.notes.NotesSortAdaptor;
 
 /** 1st class for the functions for the onClickListeners in the fragment. **/
@@ -40,24 +40,23 @@ public class NotesSubjectFragmentClick1 {
 
     /** Creates a new note with a given title. **/
     public void onNewNotePressed() {
-        if (fragment.getActivity() != null) {
-            @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
-                    fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
-            // End icon has been set in XML file
-            DialogInterface.OnShowListener nListener = dialog -> {
-                popupView.setHint(fragment.getString(R.string.title));
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setOnClickListener(v -> createNewNote(dialog, popupView));
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE)
-                        .setOnClickListener(v -> dialog.dismiss());
-            };
-            new AutoDismissDialog(fragment.getString(R.string.n2_new_note), popupView, nListener)
-                    .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.1");
-        }
+        @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout)
+                fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        popupView.setHint(fragment.getString(R.string.title));
+        // End icon has been set in XML file
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                .setTitle(R.string.n2_new_note)
+                .setView(popupView)
+                .create());
+        dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok),
+                v -> createNewNote(dismissibleFragment, popupView));
+        dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
+                v -> dismissibleFragment.dismiss());
+        dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesSubjectFragment.1");
     }
 
     /** Creates a new note based on the given title. **/
-    private void createNewNote(DialogInterface dialog, @NonNull TextInputLayout popupView) {
+    private void createNewNote(DismissibleDialogFragment dismissibleFragment, @NonNull TextInputLayout popupView) {
         String popupInputText = "";
         if (popupView.getEditText() != null) {
             popupInputText = popupView.getEditText().getText().toString();
@@ -68,40 +67,40 @@ public class NotesSubjectFragmentClick1 {
                 .length() == 0) {
             popupView.setErrorEnabled(true);
             popupView.setError(fragment.getString(R.string.n2_error_note_title_empty));
-        } else if (fragment.getActivity() != null){
+        } else {
             // Edit new note
-            dialog.dismiss();
+            dismissibleFragment.dismiss();
             fragment.subjectDatabase.close();
-            ((MainActivity) fragment.getActivity()).displayFragment
+            ((MainActivity) fragment.requireActivity()).displayFragment
                     (NotesEditFragment.newInstance(fragment.notesSubject, popupInputText));
         }
     }
 
     /** Change the method which the notes are sorted. **/
     public void onSortPressed() {
-        if (fragment.getContext() != null) {
-            @SuppressLint("InflateParams") final Spinner sortingSpinner = (Spinner) fragment.getLayoutInflater().inflate
-                    (R.layout.n2_sorting_spinner, null);
+        @SuppressLint("InflateParams") final Spinner sortingSpinner = (Spinner) fragment.getLayoutInflater().inflate
+                (R.layout.n2_sorting_spinner, null);
 
-            // Get current order
-            sortingSpinner.setAdapter(new NotesSortAdaptor(fragment.getContext(),
-                    NotesSubjectFragment.sortingTitles, NotesSubjectFragment.sortingImgs));
-            NotesSubject subject = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
-            int currentOrder = subject.sortOrder;
-            for (int i = 0; i < NotesSubjectFragment.sortingList.length; i++) {
-                // Sort spinner to current order
-                if (NotesSubjectFragment.sortingList[i] == currentOrder) {
-                    sortingSpinner.setSelection(i);
-                }
+        // Get current order
+        sortingSpinner.setAdapter(new NotesSortAdaptor(fragment.requireContext(),
+                NotesSubjectFragment.sortingTitles, NotesSubjectFragment.sortingImgs));
+        NotesSubject subject = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
+        int currentOrder = subject.sortOrder;
+        for (int i = 0; i < NotesSubjectFragment.sortingList.length; i++) {
+            // Sort spinner to current order
+            if (NotesSubjectFragment.sortingList[i] == currentOrder) {
+                sortingSpinner.setSelection(i);
             }
-            displaySortDialog(sortingSpinner);
         }
+        displaySortDialog(sortingSpinner);
     }
 
     /** Display the dialog for selecting a sorting method. **/
     private void displaySortDialog(Spinner sortingSpinner) {
-        new AutoDismissDialog(fragment.getString(R.string.n2_sorting_method), sortingSpinner,
-                new DialogInterface.OnClickListener[]{(dialogInterface, i) -> {
+        new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
+                .setTitle(R.string.sorting_method)
+                .setView(sortingSpinner)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     // Update value in notes
                     NotesSubject subject1 = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
                     subject1.sortOrder = NotesSubjectFragment.sortingList[sortingSpinner.getSelectedItemPosition()];
@@ -109,7 +108,9 @@ public class NotesSubjectFragmentClick1 {
                     dialogInterface.dismiss();
                     fragment.sortNotes(subject1);
                     GeneralFunctions.reloadFragment(fragment);
-                }, (dialogInterface, i) -> dialogInterface.dismiss(), null})
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .create())
                 .show(fragment.getParentFragmentManager(), "NotesSubjectFragment.2");
     }
 }

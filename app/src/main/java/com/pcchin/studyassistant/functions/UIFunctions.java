@@ -15,19 +15,29 @@ package com.pcchin.studyassistant.functions;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.pcchin.customdialog.DefaultDialogFragment;
+import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -35,16 +45,14 @@ import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
-import com.pcchin.studyassistant.ui.AutoDismissDialog;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /** Functions used for UI elements in the app. **/
 public final class UIFunctions {
-    /** Constructor made private to simulate static class. **/
     private UIFunctions() {
-        // Constructor made private to simulate static class.
+        throw new IllegalStateException("Utility class");
     }
 
     /** Shows the dialog to add a new subject to the notes list **/
@@ -52,24 +60,27 @@ public final class UIFunctions {
                                final SubjectDatabase database) {
         @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
+        popupView.setHint(activity.getString(R.string.n1_subject_title));
+
         // End icon has been set by default in XML file
         // OnClickListeners implemented separately to prevent dialog from being dismissed after button click
-        DialogInterface.OnShowListener subjectListener = dialog -> {
-            popupView.setHint(activity.getString(R.string.n1_subject_title));
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                    .setOnClickListener(v -> {
-                        String inputText = "";
-                        if (popupView.getEditText() != null) inputText = popupView.getEditText().getText().toString();
-                        createSubject(dialog, popupView, activity, database, inputText);
-                    });
-            ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> dialog.dismiss());
-        };
-        new AutoDismissDialog(activity.getString(R.string.n1_new_subject), popupView, subjectListener)
-                        .show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
+                new AlertDialog.Builder(activity)
+                        .setTitle(R.string.n1_new_subject)
+                        .setView(popupView)
+                        .create());
+        dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok), v -> {
+            String inputText = "";
+            if (popupView.getEditText() != null) inputText = popupView.getEditText().getText().toString();
+            createSubject(dismissibleFragment, popupView, activity, database, inputText);
+        });
+        dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel), v ->
+                dismissibleFragment.dismiss());
+        dismissibleFragment.show(activity.getSupportFragmentManager(), "GeneralFunctions.1");
     }
 
     /** Creates the subject if the subject title is not taken. **/
-    private static void createSubject(DialogInterface dialog, TextInputLayout popupView,
+    private static void createSubject(DismissibleDialogFragment dismissibleFragment, TextInputLayout popupView,
                                       MainActivity activity, SubjectDatabase database, @NonNull String inputText) {
         // Preliminary checks if subject name is taken or is empty
         if (inputText.replaceAll("\\s+", "").length() == 0) {
@@ -88,7 +99,7 @@ public final class UIFunctions {
             activity.safeOnBackPressed();
             activity.displayFragment(
                     NotesSubjectFragment.newInstance(inputText));
-            dialog.dismiss();
+            dismissibleFragment.dismiss();
             NavViewFunctions.updateNavView(activity);
         }
     }
@@ -153,5 +164,49 @@ public final class UIFunctions {
         }
         view.setText(output);
         view.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    /** Displays the previous feedback submissions if the device is connected to the internet. **/
+    public static void displayPreviousSubmissions(@NonNull Fragment fragment, @NonNull ArrayList<Integer> issueList, String sharedPrefValue) {
+        if (NetworkFunctions.getConnected(
+                (ConnectivityManager)fragment.requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            @SuppressLint("InflateParams") ScrollView blankScroll =
+                    (ScrollView) fragment.getLayoutInflater().inflate(R.layout.blank_list, null);
+            LinearLayout blankLinear = blankScroll.findViewById(R.id.blank_linear);
+            for (int issue : issueList) {
+                addIssue(fragment, issue, blankLinear, sharedPrefValue);
+            }
+            new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireActivity())
+                    .setTitle(R.string.previous_submissions)
+                    .setView(blankScroll)
+                    .setPositiveButton(R.string.close, null).create())
+                    .show(fragment.getParentFragmentManager(), "FeedbackFragment.1");
+        } else {
+            Toast.makeText(fragment.getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** Adds an issue to the AlertDialog, and if it does not exist,
+     * add it on to the list to be deleted. **/
+    private static void addIssue(@NonNull Fragment fragment, int issue, @NonNull LinearLayout blankLinear, String sharedPrefValue) {
+        @SuppressLint("InflateParams")
+        View currentIssue = fragment.getLayoutInflater().inflate(R.layout.m_issue, null);
+        TextView issueTitle = currentIssue.findViewById(R.id.m_issue_title);
+        issueTitle.setText(String.format(Locale.ENGLISH, "Issue #%d", issue));
+        issueTitle.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/Paxtan-Development/study-assistant/issues/" + issue));
+            fragment.startActivity(intent);
+        });
+        currentIssue.findViewById(R.id.m_issue_del).setOnClickListener(view -> {
+            DataFunctions.removeResponse(fragment.requireActivity(), sharedPrefValue, issue);
+            DefaultDialogFragment dialogFragment = (DefaultDialogFragment)
+                    fragment.getParentFragmentManager().findFragmentByTag("FeedbackFragment.1");
+            if (dialogFragment != null) {
+                dialogFragment.dismiss();
+            }
+            GeneralFunctions.reloadFragment(fragment);
+        });
+        blankLinear.addView(currentIssue);
     }
 }

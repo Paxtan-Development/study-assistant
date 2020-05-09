@@ -17,6 +17,9 @@ If you wish to compile in a version other than debug, you would need to set up t
 - `keystoreAlias`: The alias for your keystore.
 - `keystorePass`: The password to access your keystore.
 
+You would also need to set up the public key to access the server in a PKCS8 PEM format (2048 bits) under `app/src/main/assets/public.pem` without its headers.
+A corresponding private key should be available on the server as seen [here](https://github.com/Paxtan-Development/api) with PKCS8 PEM format as well.
+
 ## Contribution
 Any contribution is welcome, feel free to add any issues or pull requests to the repository.
 

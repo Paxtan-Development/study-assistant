@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.fragment.project.settings;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -25,9 +24,9 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.pcchin.dtpreference.DatePreference;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
@@ -35,7 +34,7 @@ import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.DefaultDialogPreference;
 import com.pcchin.studyassistant.preference.DefaultDialogPreferenceDialog;
@@ -52,11 +51,11 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     private String id2;
     private boolean isMember;
     private static final String ARG_ID = "projectID", ARG_ID2 = "ID2", ARG_IS_MEMBER = "isMember";
-    private ProjectDatabase projectDatabase;
+    ProjectDatabase projectDatabase;
 
     // Mutually exclusive unless the project has both of those enabled
     private MemberData member;
-    private RoleData role;
+    RoleData role;
 
     /** Default constructor. **/
     public ProjectSettingsFragment() {
@@ -81,14 +80,14 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getArguments() != null) {
+        if (getArguments() != null) {
             String projectID = getArguments().getString(ARG_ID);
             id2 = getArguments().getString(ARG_ID2);
             isMember = getArguments().getBoolean(ARG_IS_MEMBER);
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
             project = projectDatabase.ProjectDao().searchByID(projectID);
 
-            Object[] idValidity = UIFunctions.checkIdValidity(getActivity(), projectDatabase,
+            Object[] idValidity = UIFunctions.checkIdValidity(requireActivity(), projectDatabase,
                     project, id2, isMember);
             member = (MemberData) idValidity[1];
             role = (RoleData) idValidity[2];
@@ -97,7 +96,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
             if ((boolean) idValidity[0]) {
                 // Return to ProjectSelectFragment if any error is found
                 projectDatabase.close();
-                ((MainActivity) getActivity()).displayFragment(new ProjectSelectFragment());
+                ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment());
             }
         }
     }
@@ -134,20 +133,20 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         return false;
     }
 
-    /** Starts the intent to pick an icon. **/
-    void startPickIconIntent() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(ActivityConstants.INTENT_PROJECT_ID, project.projectID);
-        intent.putExtra(ActivityConstants.INTENT_IS_MEMBER, isMember);
-        intent.putExtra(ActivityConstants.INTENT_ID2, id2);
-        startActivityForResult(intent, ActivityConstants.SELECT_PROJECT_ICON);
+    /** Starts the image picker to pick an icon. **/
+    void startIconPicker() {
+        // Activity is used here instead of the fragment as the inline data handling requires a FragmentActivity
+        ImagePicker.Companion.with(requireActivity())
+                .cropSquare()
+                .compress(1024)
+                .start();
+        ((MainActivity) requireActivity()).setProjectInfo(project.projectID, id2, isMember);
     }
 
     /** Delegates the show/hide of preferences to their own functions within
      * @see ProjectSettingsFragmentCustomize
      * No need to customize PREF_ROOT as there is nothing to customize. **/
-    void displayPreference(@NonNull String key) {
+    public void displayPreference(@NonNull String key) {
         ProjectSettingsFragmentCustomize customize = new ProjectSettingsFragmentCustomize(ProjectSettingsFragment.this);
         switch (key) {
             case PreferenceString.PREF_MENU_ROOT:
@@ -243,6 +242,11 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         displayPreference(currentPrefRoot);
     }
 
+    /** Check if a member exists within the current project. **/
+    boolean projectHasMember() {
+        return projectDatabase.MemberDao().searchByProject(project.projectID).size() > 0;
+    }
+
     /** Returns to
      * @see ProjectInfoFragment **/
     @Override
@@ -250,36 +254,34 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         if (currentPrefRoot.equals(PreferenceString.PREF_MENU_ROOT)) {
             // Returns to ProjectInfoFragment
             projectDatabase.close();
-            if (getActivity() != null) {
-                if (member == null) {
-                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, role.roleID, false, true));
-                } else {
-                    ((MainActivity) getActivity()).displayFragment(ProjectInfoFragment
-                            .newInstance(project.projectID, member.memberID, true, true));
-                }
-                return true;
+            if (member == null) {
+                ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, role.roleID, false, true));
+            } else {
+                ((MainActivity) requireActivity()).displayFragment(ProjectInfoFragment
+                        .newInstance(project.projectID, member.memberID, true, true));
             }
-            return false;
         } else {
             // Returns to the main preferences menu
             displayPreference(PreferenceString.PREF_MENU_ROOT);
             currentPrefRoot = PreferenceString.PREF_MENU_ROOT;
-            return true;
         }
+        return true;
     }
 
+    /** Closes the database if the fragment is paused. **/
     @Override
     public void onPause() {
         super.onPause();
         projectDatabase.close();
     }
 
+    /** Reopens the database when the fragment is resumed. **/
     @Override
     public void onResume() {
         super.onResume();
         if (!projectDatabase.isOpen()) {
-            projectDatabase = GeneralFunctions.getProjectDatabase(getActivity());
+            projectDatabase = DatabaseFunctions.getProjectDatabase(requireActivity());
         }
     }
 }

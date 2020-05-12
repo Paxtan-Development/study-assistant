@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.zip.InflaterInputStream;
 
 /** Functions for importing a subject from a .subject file. Yes, that's why it has this name. **/
 public class ImportSubjectSubject {
@@ -51,8 +52,9 @@ public class ImportSubjectSubject {
         // Check if file exists
         File targetFile = new File(path);
         if (targetFile.exists() && targetFile.isFile()) {
-            try (FileInputStream inputStream = new FileInputStream(targetFile)) {
-                processSubjectFile(inputStream, path);
+            try (FileInputStream inputStream = new FileInputStream(targetFile);
+                 InflaterInputStream inflatedStream = new InflaterInputStream(inputStream)) {
+                processSubjectFile(inflatedStream, path);
             } catch (IOException e) {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + path + " could not be read"
                         + " by FileInputStream. Stack trace is");
@@ -67,8 +69,7 @@ public class ImportSubjectSubject {
     }
 
     /** Processes the .subject file. **/
-    private void processSubjectFile(@NonNull FileInputStream inputStream, String path) throws IOException {
-        int fileSize = (int) inputStream.getChannel().size();
+    private void processSubjectFile(@NonNull InflaterInputStream inputStream, String path) throws IOException {
         // Length of title is first 4 bytes, title follows next
         int titleLength = ConverterFunctions.bytesToInt(FileFunctions.getBytesFromFile(4, inputStream));
         String title = new String(FileFunctions.getBytesFromFile(titleLength, inputStream));
@@ -77,7 +78,7 @@ public class ImportSubjectSubject {
         // Then whether the byte containing whether the subject is encrypted is returned
         byte subjectEncrypted = FileFunctions.getBytesFromFile(1, inputStream)[0];
         // Then the content of the subject is returned
-        byte[] content = FileFunctions.getBytesFromFile(fileSize - titleLength - 8 - 1, inputStream);
+        byte[] content = FileFunctions.getRemainingBytesFromFile(inputStream);
         inputStream.close();
 
         if (subjectEncrypted == 1) {

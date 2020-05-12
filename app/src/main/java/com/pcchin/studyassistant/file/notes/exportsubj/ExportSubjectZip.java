@@ -28,7 +28,6 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 
 import net.lingala.zip4j.ZipFile;
@@ -91,7 +90,7 @@ public class ExportSubjectZip {
         if (fragment != null) {
             // Generate valid paths for temp storage folder
             String tempExportFolder = FileFunctions.generateValidFile(fragment.requireContext()
-                    .getFilesDir().getAbsolutePath() + "/tempZip", "");
+                    .getFilesDir().getAbsolutePath() + "/temp/tempZip", "");
             try {
                 createZipFile(tempExportFolder, password);
             } catch (ZipException e) {
@@ -107,7 +106,7 @@ public class ExportSubjectZip {
     private void createZipFile(String tempExportFolder, @NonNull String password) throws ZipException {
         // Creates ZIP file
         String exportFilePath = FileFunctions.generateValidFile(
-                NotesSubjectFragment.DOWNLOAD_FOLDER + notesSubject, ".zip");
+                FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject, ".zip");
         ZipFile exportFile;
         if (password.length() >= 8) {
             exportFile = new ZipFile(exportFilePath, password.toCharArray());

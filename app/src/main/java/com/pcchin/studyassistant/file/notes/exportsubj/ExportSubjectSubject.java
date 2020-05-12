@@ -27,8 +27,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 
 import java.io.File;
@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.zip.DeflaterOutputStream;
 
 /** Functions that export the subject as a .subject file. **/
 public class ExportSubjectSubject {
@@ -85,11 +86,11 @@ public class ExportSubjectSubject {
                                           TextInputLayout inputText) {
         if (responseText.length() == 0 || responseText.length() >= 8) {
             // Set output file name
-            String outputFileName = NotesSubjectFragment.DOWNLOAD_FOLDER + notesSubject
+            String outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject
                     + ".subject";
             int count = 0;
             while (new File(outputFileName).exists()) {
-                outputFileName = NotesSubjectFragment.DOWNLOAD_FOLDER + notesSubject
+                outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject
                         + "(" + count + ").subject";
             }
 
@@ -113,23 +114,21 @@ public class ExportSubjectSubject {
             // Get permission to read and write files
             File outputFile = new File(finalOutputFileName);
             if (outputFile.createNewFile()) {
-                try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-                    exportSubjectFile(finalOutputFileName, finalResponseText, finalResponseText1, outputStream);
+                try (FileOutputStream outputStream = new FileOutputStream(outputFile);
+                     DeflaterOutputStream deflatedStream = new DeflaterOutputStream(outputStream)) {
+                    exportSubjectFile(finalOutputFileName, finalResponseText, finalResponseText1, deflatedStream);
                 }
             } else {
-                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
-                        + finalOutputFileName + " cannot be created.");
+                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + finalOutputFileName + " cannot be created.");
                 Toast.makeText(fragment.requireContext(), R.string.n2_error_file_not_created,
                         Toast.LENGTH_SHORT).show();
             }
         } catch (FileNotFoundException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File "
-                    + finalOutputFileName + " not found, stack trace is");
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + finalOutputFileName + " not found, stack trace is");
             e.printStackTrace();
             dialog.dismiss();
         } catch (IOException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: An IO Exception"
-                    + " occurred on file " + finalOutputFileName + ", stack trace is");
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: An IO Exception" + " occurred on file " + finalOutputFileName + ", stack trace is");
             e.printStackTrace();
             dialog.dismiss();
         }
@@ -138,25 +137,25 @@ public class ExportSubjectSubject {
     /** Creates and export the .subject file. **/
     private void exportSubjectFile(String finalOutputFileName, String finalResponseText,
                                    @NonNull String finalResponseText1,
-                                   @NonNull FileOutputStream outputStream)
+                                   @NonNull DeflaterOutputStream deflatedOutput)
             throws IOException {
         Toast.makeText(fragment.requireContext(), R.string.n2_exporting_subject, Toast.LENGTH_SHORT).show();
         // Export the file
         // The length of the title is exported first, followed by the title.
         // Then, the subject's sort order is listed and the encrypted contents are stored.
-        outputStream.write(ConverterFunctions.intToBytes(notesSubject.getBytes().length));
-        outputStream.write(notesSubject.getBytes());
-        outputStream.write(ConverterFunctions.intToBytes(sortOrder));
+        // All the contents in the file are then compressed before exported
+        deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.getBytes().length));
+        deflatedOutput.write(notesSubject.getBytes());
+        deflatedOutput.write(ConverterFunctions.intToBytes(sortOrder));
         if (finalResponseText1.length() >= 8) {
-            outputStream.write(1);
-            outputStream.write(SecurityFunctions.subjectEncrypt(notesSubject, finalResponseText, notesArray));
+            deflatedOutput.write(1);
+            deflatedOutput.write(SecurityFunctions.subjectEncrypt(notesSubject, finalResponseText, notesArray));
         } else {
-            outputStream.write(0);
-            outputStream.write(ConverterFunctions.doubleArrayToJson(notesArray).getBytes());
+            deflatedOutput.write(0);
+            deflatedOutput.write(ConverterFunctions.doubleArrayToJson(notesArray).getBytes());
         }
-        outputStream.flush();
-        outputStream.close();
-        Toast.makeText(fragment.requireContext(), fragment.getString(R.string.subject_exported)
-                        + finalOutputFileName, Toast.LENGTH_SHORT).show();
+        deflatedOutput.flush();
+        deflatedOutput.close();
+        Toast.makeText(fragment.requireContext(), fragment.getString(R.string.subject_exported) + finalOutputFileName, Toast.LENGTH_SHORT).show();
     }
 }

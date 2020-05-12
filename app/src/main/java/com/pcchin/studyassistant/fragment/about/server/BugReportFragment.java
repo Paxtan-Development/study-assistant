@@ -14,6 +14,7 @@
 package com.pcchin.studyassistant.fragment.about.server;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -110,7 +111,7 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
         uploadObject.put("uid", requireActivity().getSharedPreferences(
                 requireActivity().getPackageName(), Context.MODE_PRIVATE)
                 .getString(ActivityConstants.SHAREDPREF_UID, ""));
-        uploadObject.put("device", DeviceName.getDeviceName());
+        uploadObject.put("device", DeviceName.getDeviceName() + "(" + Build.MODEL + ")");
         uploadObject.put("version", BuildConfig.VERSION_NAME);
         uploadObject.put("summary", summary);
         uploadObject.put("description", desc);

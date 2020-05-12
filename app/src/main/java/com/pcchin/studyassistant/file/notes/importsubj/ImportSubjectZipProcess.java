@@ -51,7 +51,7 @@ class ImportSubjectZipProcess {
      * separated from importZipConfirm(String path) for clarity.  **/
     void importZipFile(@NonNull ZipFile inputFile) throws ZipException {
         String tempInputDirPath = FileFunctions.generateValidFile(
-                "/storage/emulated/0/Download/.tempZip", "");
+                FileFunctions.getDownloadDir(activity) + ".tempZip", "");
         try {
             inputFile.extractAll(tempInputDirPath);
         } catch (ZipException e) {

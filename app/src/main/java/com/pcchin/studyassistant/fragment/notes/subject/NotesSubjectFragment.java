@@ -15,6 +15,7 @@ package com.pcchin.studyassistant.fragment.notes.subject;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,7 +48,6 @@ import java.util.Date;
 public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_SUBJECT = "noteSubject",
             ARG_PREV = "previousOrder";
-    public static final String DOWNLOAD_FOLDER = "/storage/emulated/0/Download/";
 
     static final int[] sortingList = new int[]{NotesSubject.SORT_ALPHABETICAL_ASC,
         NotesSubject.SORT_ALPHABETICAL_DES, NotesSubject.SORT_DATE_ASC, NotesSubject.SORT_DATE_DES};

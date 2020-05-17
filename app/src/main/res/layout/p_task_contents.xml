@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Copyright 2020 PC Chin. All rights reserved.
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -14,12 +14,12 @@
 
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/p4_mini"
+    android:id="@+id/p_task"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <EditText
-        android:id="@+id/p4_mini_no"
+        android:id="@+id/p_task_no"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.1"
@@ -31,7 +31,7 @@
         tools:ignore="Autofill" />
 
     <EditText
-        android:id="@+id/p4_mini_member"
+        android:id="@+id/p_task_member"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.2"
@@ -43,7 +43,7 @@
         tools:ignore="Autofill" />
 
     <EditText
-        android:id="@+id/p4_mini_desc"
+        android:id="@+id/p_task_desc"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
@@ -55,7 +55,7 @@
         tools:ignore="Autofill" />
 
     <EditText
-        android:id="@+id/p4_mini_progress"
+        android:id="@+id/p_task_progress"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.2"

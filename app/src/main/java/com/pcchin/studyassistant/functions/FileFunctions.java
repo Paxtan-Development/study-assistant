@@ -192,14 +192,21 @@ public final class FileFunctions {
         }
     }
 
-    /** Copies the file from a given InputStream to its destination. **/
+    /** Copies the file from a given InputStream to its destination.
+     * This process would fail with an IOException if the size of the byte array reaches 100MB.
+     * This is to prevent the user from importing an extremely large file which may crash the app. **/
     private static void copyFile(@NonNull InputStream input, File destination) throws IOException {
         try (OutputStream output = new FileOutputStream(destination)) {
+            long totalLength = 0;
             // Transfer bytes from in to out
             byte[] buf = new byte[1024];
             int len;
             while ((len = input.read(buf)) > 0) {
                 output.write(buf, 0, len);
+                totalLength += len;
+                if (totalLength > (100 * 1000 * 1000)) {
+                    throw new IOException("Input size exceeds 100MB");
+                }
             }
         }
     }

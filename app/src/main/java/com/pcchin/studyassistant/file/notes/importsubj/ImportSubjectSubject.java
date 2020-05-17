@@ -55,7 +55,7 @@ public class ImportSubjectSubject {
             try (FileInputStream inputStream = new FileInputStream(targetFile);
                  InflaterInputStream inflatedStream = new InflaterInputStream(inputStream)) {
                 processSubjectFile(inflatedStream, path);
-            } catch (IOException e) {
+            } catch (IOException | ArrayIndexOutOfBoundsException e) {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + path + " could not be read"
                         + " by FileInputStream. Stack trace is");
                 Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
@@ -69,7 +69,7 @@ public class ImportSubjectSubject {
     }
 
     /** Processes the .subject file. **/
-    private void processSubjectFile(@NonNull InflaterInputStream inputStream, String path) throws IOException {
+    private void processSubjectFile(@NonNull InflaterInputStream inputStream, String path) throws IOException, IndexOutOfBoundsException {
         // Length of title is first 4 bytes, title follows next
         int titleLength = ConverterFunctions.bytesToInt(FileFunctions.getBytesFromFile(4, inputStream));
         String title = new String(FileFunctions.getBytesFromFile(titleLength, inputStream));

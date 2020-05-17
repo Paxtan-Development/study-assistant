@@ -87,9 +87,6 @@ android {
         exclude 'META-INF/main.kotlin_module'
     }
     buildToolsVersion = '29.0.2'
-    dexOptions {
-        if (!(boolean) keystoreProperties.getProperty('isLocal')) javaMaxHeapSize "6g"
-    }
 }
 
 dependencies {

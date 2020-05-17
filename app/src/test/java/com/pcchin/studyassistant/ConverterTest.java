@@ -23,7 +23,16 @@ import java.util.Random;
 
 /** Test the converters and whether they are working. **/
 public class ConverterTest {
-    private static final int TEST_COUNT = 5000;
+    private static int TEST_COUNT;
+
+    /** Default constructor. **/
+    public ConverterTest() {
+        if (BuildConfig.IS_LOCAL) {
+            TEST_COUNT = 5000;
+        } else {
+            TEST_COUNT = 1000;
+        }
+    }
 
     /** Test JSON to a single layer ArrayList and vice versa. **/
     @Test

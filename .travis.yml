@@ -1,3 +1,12 @@
-language: java
+language: android
+dist: trusty
 jdk: openjdk8
+android:
+  components:
+    - tools
+    - platform-tools
+    # The BuildTools version used by your project
+    - build-tools-29.0.2
+    # The SDK version used to compile your project
+    - android-29
 script: ./gradlew testDebugUnitTest

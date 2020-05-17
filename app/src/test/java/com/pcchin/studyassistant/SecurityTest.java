@@ -27,9 +27,9 @@ public class SecurityTest {
     /** Default constructor. **/
     public SecurityTest() {
         if (BuildConfig.IS_LOCAL) {
-            TEST_COUNT = 10000;
+            TEST_COUNT = 8000;
         } else {
-            TEST_COUNT = 1000;
+            TEST_COUNT = 500;
         }
     }
 

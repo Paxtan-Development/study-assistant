@@ -18,8 +18,10 @@ def keystoreProperties = new Properties()
 try {
     def keystorePropertiesFile = rootProject.file('keystore.properties')
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    keystoreProperties.put('isLocal', 'true')
 } catch (Exception ignored) {
     keystoreProperties.put('keystoreDir', '/')
+    keystoreProperties.put('isLocal', 'false')
 }
 
 android {
@@ -48,7 +50,7 @@ android {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
-        buildConfigField "boolean", "IS_LOCAL", "${(boolean) (keystoreProperties['keystoreDir'].toString() == '/')}"
+        buildConfigField "boolean", "IS_LOCAL", "${(boolean) keystoreProperties.getProperty('isLocal')}"
         resValue "string", "app_name", "Study Assistant"
     }
     buildTypes {

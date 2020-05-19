@@ -3,7 +3,7 @@ kind: pipeline
 name: sa-ci-test
 
 steps:
-  - name: java-test
+  - name: java-pr-test
     image: nextcloudci/android:android-49
     # Keystore properties not included in order to trigger isLocal = false automatically
     # Can only test with debug as other build configs require a keystore
@@ -12,88 +12,23 @@ steps:
       _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
       - ./gradlew testDebugUnitTest
+    when:
+      branch: master
+      event: pull_request
+
+  - name: java-push-test
+    image: nextcloudci/android:android-49
+    # Keystore properties not included in order to trigger isLocal = false automatically
+    # Can only test with debug as other build configs require a keystore
+    environment:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
+      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
+    commands:
+      - ./gradlew testDebugUnitTest
+    when:
+      event: push
 
 trigger:
   event:
     - pull_request
-
----
-kind: pipeline
-name: sa-ci-build-release
-
-steps:
-  - name: build-release
-    image: nextcloudci/android:android-54
-    volumes:
-      - name: artifacts
-        path: /artifacts
-    environment:
-      KEYSTORE_CONTENTS:
-        from_secret: KEYSTORE_CONTENTS
-      KEYSTORE_ALIAS:
-        from_secret: KEYSTORE_ALIAS
-      KEYSTORE_PASS:
-        from_secret: KEYSTORE_PASS
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
-      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
-    commands:
-      # Check if push commit title matches regex
-      - GIT_TITLE=$(git log -1 --pretty=%s)
-      - echo "Title is `$GIT_TITLE`"
-      - GIT_BODY=$(git log -1 --pretty=%b)
-      - echo "Body is `$GIT_BODY`"
-      - if [ "`(echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+$'`" -eq "1" ];
-        then echo "Release build config detected" && export IS_RELEASE=1;
-        elif [ "`(echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$'`" -eq "1" ];
-        then echo "Beta build config detected" && export IS_RELEASE=0;
-        else echo "Push commit title does not match regex" && exit 1; fi;
-      # Create keystore file (KEYSTORE_CONTENTS should be a hex string encoded with `hexdump -v -e '1/1 "%02x"' "$1"`)
-      # This method cannot be used for files over 32KB due to https://unix.stackexchange.com/a/352570
-      - echo $KEYSTORE_CONTENTS | sed 's/\([0-9A-F]\{2\}\)/\\\\\\x\1/gI' | xargs printf > keystore.jks
-      # Create keystore.properties file
-      - touch keystore.properties
-      - echo "keystoreDir=$PWD/keystore.jks\n" >> keystore.properties
-      - echo "keystoreAlias=$KEYSTORE_ALIAS\n" >> keystore.properties
-      - echo "keystorePass=$KEYSTORE_PASS\n" >> keystore.properties
-      # Create APK
-      # Upload to GitHub on second step
-      - if [ "`echo $IS_RELEASE`" -eq "1" ];
-        then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /artifacts/com.pcchin.studyassistant.apk;
-        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk; fi;
-      - echo "$GIT_TITLE" > /artifacts/title.txt
-      - echo "$GIT_BODY" > /artifacts/body.txt
-
-  - name: create-tag
-    image: quintoandar/drone-github-tag
-    # Manually set version
-    settings:
-      api_key:
-        from_secret: GITHUB_TOKEN
-      version: v2.0.0.1-b
-
-  - name: publish
-    image: plugins/github-release
-    volumes:
-      - name: artifacts
-        path: /artifacts
-    settings:
-      api_key:
-        from_secret: GITHUB_TOKEN
-      files: /artifacts/com.pcchin.studyassistant.apk
-      prerelease: true # Checks if the attributes are correct before releasing it
-      checksum:
-        - md5
-        - sha1
-      title: /artifacts/title.txt
-      note: /artifacts/body.txt
-
-volumes:
-  - name: artifacts
-    host:
-      path: /tmp/sa-runner
-
-trigger:
-  event:
     - push
-  branch:
-    - master

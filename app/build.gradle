@@ -17,8 +17,9 @@ apply plugin: 'com.android.application'
 def keystoreProperties = new Properties()
 try {
     def keystorePropertiesFile = rootProject.file('keystore.properties')
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    // Put isLocal first so that it can be overwritten later within keystore.properties itself (If needed)
     keystoreProperties.put('isLocal', 'true')
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ignored) {
     keystoreProperties.put('keystoreDir', '/')
     keystoreProperties.put('isLocal', 'false')
@@ -38,8 +39,8 @@ android {
         applicationId "com.pcchin.studyassistant"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 14
-        versionName "2.0.0.0"
+        versionCode 15
+        versionName "2.0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables {

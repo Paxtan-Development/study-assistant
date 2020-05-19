@@ -1,0 +1,82 @@
+---
+kind: pipeline
+name: sa-ci-test
+
+steps:
+  - name: java-test
+    image: nextcloudci/android:android-49
+    # Keystore properties not included in order to trigger isLocal = false automatically
+    # Can only test with debug as other build configs require a keystore
+    commands:
+      - ./gradlew testDebugUnitTest
+
+trigger:
+  event:
+    - pull_request
+
+---
+kind: pipeline
+name: sa-ci-build-release
+
+steps:
+  - name: build-release
+    image: nextcloudci/android:android-49
+    volumes:
+      - name: artifacts
+      - path: /root/artifacts
+    environment:
+      KEYSTORE_CONTENTS:
+        from_secret: KEYSTORE_CONTENTS
+      KEYSTORE_ALIAS:
+        from_secret: KEYSTORE_ALIAS
+      KEYSTORE_PASS:
+        from_secret: KEYSTORE_PASS
+    commands:
+      # Check if push commit title matches regex
+      - GIT_TITLE=$(git log -1 --pretty=%s)
+      - GIT_BODY=$(git log -1 --pretty=%b)
+      - if [[ $((echo $GIT_TITLE) | grep -Ei 'Release\ [0-9]+\.[0-9]+\.[0-9]+$' | wc -l) -eq "1" ]];
+        then echo "Release build config detected" && IS_RELEASE=1;
+        elif [[ $((echo $GIT_TITLE) | grep -Ei 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$' | wc -l) -eq "1" ]];
+        then echo "Beta build config detected" && IS_RELEASE=0;
+        else echo "Push commit title does not match regex" && exit 1; fi
+      # Create keystore file
+      - echo "$KEYSTORE_CONTENTS" > keystore.jks
+      # Create keystore.properties file
+      - touch keystore.properties
+      - echo "keystoreDir=$PWD/keystore.jks\n" >> keystore.properties
+      - echo "keystoreAlias=$KEYSTORE_ALIAS\n" >> keystore.properties
+      - echo "keystorePass=$KEYSTORE_PASS\n" >> keystore.properties
+      # Create APK
+      # Upload to GitHub on second step
+      - if [[ $IS_RELEASE -eq "1" ]];
+        then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /root/artifacts/com.pcchin.studyassistant.apk;
+        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /root/artifacts/com.pcchin.studyassistant.apk;
+      - echo "$GIT_TITLE" > /root/artifacts/title.txt
+      - echo "$GIT_BODY" > /root/artifacts/body.txt
+
+  - name: publish
+    image: plugins/github-release
+    volumes:
+      - name: artifacts
+      - path: /root/artifacts
+    settings:
+      api_key:
+        from_secret: GITHUB_TOKEN
+      files: /root/artifacts/com.pcchin.studyassistant.apk
+      prerelease: true # Checks if the attributes are correct before releasing it
+      checksum:
+        - md5
+        - sha1
+      title: /root/artifacts/title.txt
+      note: /root/artifacts/body.txt
+
+volumes:
+  - name: artifacts
+    temp: {}
+
+trigger:
+  event:
+    - push
+  branch:
+    - master

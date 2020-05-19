@@ -26,7 +26,7 @@ steps:
     image: nextcloudci/android:android-49
     volumes:
       - name: artifacts
-      - path: /root/artifacts
+      - path: /artifacts
     environment:
       KEYSTORE_CONTENTS:
         from_secret: KEYSTORE_CONTENTS
@@ -55,26 +55,26 @@ steps:
       # Create APK
       # Upload to GitHub on second step
       - if [[ $IS_RELEASE -eq "1" ]];
-        then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /root/artifacts/com.pcchin.studyassistant.apk;
-        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /root/artifacts/com.pcchin.studyassistant.apk;
-      - echo "$GIT_TITLE" > /root/artifacts/title.txt
-      - echo "$GIT_BODY" > /root/artifacts/body.txt
+        then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /artifacts/com.pcchin.studyassistant.apk;
+        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk;
+      - echo "$GIT_TITLE" > /artifacts/title.txt
+      - echo "$GIT_BODY" > /artifacts/body.txt
 
   - name: publish
     image: plugins/github-release
     volumes:
       - name: artifacts
-      - path: /root/artifacts
+      - path: /artifacts
     settings:
       api_key:
         from_secret: GITHUB_TOKEN
-      files: /root/artifacts/com.pcchin.studyassistant.apk
+      files: /artifacts/com.pcchin.studyassistant.apk
       prerelease: true # Checks if the attributes are correct before releasing it
       checksum:
         - md5
         - sha1
-      title: /root/artifacts/title.txt
-      note: /root/artifacts/body.txt
+      title: /artifacts/title.txt
+      note: /artifacts/body.txt
 
 volumes:
   - name: artifacts

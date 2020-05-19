@@ -39,8 +39,6 @@ steps:
     commands:
       # Get device info
       - uname -a
-      # Install xxd (Part of vim) as it is not installed by default
-      - apt-get install -y vim-common
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)
       - echo "Title is `$GIT_TITLE`"
@@ -51,8 +49,8 @@ steps:
         elif [ "`(echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$'`" -eq "1" ];
         then echo "Beta build config detected" && export IS_RELEASE=0;
         else echo "Push commit title does not match regex" && exit 1; fi;
-      # Create keystore file (KEYSTORE_CONTENTS should be the jks file transformed using xxd)
-      - echo $KEYSTORE_CONTENTS | xxd -r > keystore.jks
+      # Create keystore file (KEYSTORE_CONTENTS should be the binary file itself inserted through the CLI)
+      - echo $KEYSTORE_CONTENTS > keystore.jks
       # Create keystore.properties file
       - touch keystore.properties
       - echo "keystoreDir=$PWD/keystore.jks\n" >> keystore.properties

@@ -7,6 +7,9 @@ steps:
     image: nextcloudci/android:android-49
     # Keystore properties not included in order to trigger isLocal = false automatically
     # Can only test with debug as other build configs require a keystore
+    environment:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
+      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
       - ./gradlew testDebugUnitTest
 
@@ -31,6 +34,8 @@ steps:
         from_secret: KEYSTORE_ALIAS
       KEYSTORE_PASS:
         from_secret: KEYSTORE_PASS
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
+      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)

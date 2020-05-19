@@ -16,7 +16,6 @@ steps:
 trigger:
   event:
     - pull_request
-    - push
 
 ---
 kind: pipeline
@@ -40,12 +39,15 @@ steps:
     commands:
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)
+      - echo "Title is ${GIT_TITLE}"
       - GIT_BODY=$(git log -1 --pretty=%b)
-      - if $( (echo "$GIT_TITLE") | grep -cEi 'Release [0-9]+\.[0-9]+\.[0-9]+$') -eq "1";
+      - echo "Body is ${GIT_BODY}"
+      - eval 'GIT_TITLE=$(git log -1 --pretty=%s);
+        if [[ $( (echo "$GIT_TITLE") | grep -cEi '\''Release\ [0-9]+\.[0-9]+\.[0-9]+$'\'') -eq "1" ]];
         then echo "Release build config detected" && export IS_RELEASE=1;
-        elif $( (echo "$GIT_TITLE") | grep -cEi 'Release [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$') -eq "1";
+        elif [[ $( (echo "$GIT_TITLE") | grep -cEi '\''Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$'\'') -eq "1" ]];
         then echo "Beta build config detected" && export IS_RELEASE=0;
-        else echo "Push commit title does not match regex" && exit 1; fi
+        else echo "Push commit title does not match regex" && exit 1; fi'
       # Create keystore file
       - echo "$KEYSTORE_CONTENTS" > keystore.jks
       # Create keystore.properties file

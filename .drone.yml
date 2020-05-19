@@ -37,8 +37,6 @@ steps:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
       _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
-      # Get device info
-      - uname -a
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)
       - echo "Title is `$GIT_TITLE`"
@@ -59,7 +57,7 @@ steps:
       - echo "keystorePass=$KEYSTORE_PASS\n" >> keystore.properties
       # Create APK
       # Upload to GitHub on second step
-      - if [ "`$IS_RELEASE`" -eq "1" ];
+      - if [ "`echo $IS_RELEASE`" -eq "1" ];
         then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /artifacts/com.pcchin.studyassistant.apk;
         else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk; fi;
       - echo "$GIT_TITLE" > /artifacts/title.txt
@@ -69,6 +67,8 @@ steps:
     image: quintoandar/drone-github-tag
     # Manually set version
     settings:
+      api_key:
+        from_secret: GITHUB_TOKEN
       version: v2.0.0.1-b
 
   - name: publish

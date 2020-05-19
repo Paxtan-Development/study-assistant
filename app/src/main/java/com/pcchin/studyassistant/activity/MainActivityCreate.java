@@ -41,6 +41,7 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
+import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
@@ -75,7 +76,23 @@ final class MainActivityCreate {
             String targetSubject = activity.getIntent().getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
             activity.displayFragment(NotesSubjectFragment.newInstance(targetSubject));
         }
+        initFragmentView();
         setNavigation();
+    }
+
+    /** Display and hides the relevant views used by the current activity. **/
+    private void initFragmentView() {
+        if (activity.currentFragment == null || !(activity.currentFragment instanceof NotesViewFragment)) {
+            activity.findViewById(R.id.base_pager).setVisibility(View.GONE);
+        } else {
+            NotesViewFragment currentNote = ((NotesViewFragment) activity.currentFragment);
+            activity.findViewById(R.id.base).setVisibility(View.GONE);
+            activity.displayNotes(currentNote.notesSubject, currentNote.notesOrder);
+        }
+
+        if (!MainActivityFunctions.fragmentHasBottomNavView(activity.currentFragment)) {
+            activity.findViewById(R.id.bottom_nav).setVisibility(View.GONE);
+        }
     }
 
     /** Set up info for the activity. **/

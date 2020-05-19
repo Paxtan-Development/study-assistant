@@ -73,7 +73,6 @@ final class ProjectSettingsFragmentChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
-                Log.d("Testing", String.valueOf(newValue));
                 if ((boolean) newValue) {
                     Log.d("Testing", "Called");
                     checkMemberExists();

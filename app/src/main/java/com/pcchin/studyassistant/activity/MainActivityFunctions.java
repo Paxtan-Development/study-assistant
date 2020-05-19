@@ -42,6 +42,7 @@ final class MainActivityFunctions {
     }
 
     /** Checks whether a fragment has a bottom nav view. **/
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean fragmentHasBottomNavView(Fragment fragment) {
         return fragment instanceof ProjectInfoFragment
                 || fragment instanceof ProjectMemberListFragment
@@ -86,6 +87,7 @@ final class MainActivityFunctions {
                 // instantiateItem used instead of getItem as getItem returns a new instance of
                 // a fragment instead of an existing one
                 activity.currentFragment = (Fragment) baseAdapter.instantiateItem(activity.findViewById(R.id.base), position);
+                activity.invalidateOptionsMenu();
             }
 
             @Override

@@ -45,8 +45,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_ORDER = "noteOrder";
 
     ArrayList<String> notesInfo;
-    String notesSubject;
-    int notesOrder;
+    public String notesSubject;
+    public int notesOrder;
     boolean isLocked;
     boolean hasAlert;
 

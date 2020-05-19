@@ -162,7 +162,7 @@ public final class ConverterFunctions {
 
     /** Takes in a byte array
      * @param original and convert it to an integer. **/
-    public static int bytesToInt(byte[] original) {
+    public static int bytesToInt(byte[] original) throws IndexOutOfBoundsException {
         return ((original[0] & 0xff) << 24) |
                 ((original[1] & 0xff) << 16) |
                 ((original[2] & 0xff) << 8) |

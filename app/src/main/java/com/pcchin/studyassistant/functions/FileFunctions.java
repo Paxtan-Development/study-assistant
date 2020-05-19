@@ -16,7 +16,8 @@ package com.pcchin.studyassistant.functions;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.os.Environment;
+import android.provider.OpenableColumns;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import androidx.annotation.NonNull;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -87,6 +89,15 @@ public final class FileFunctions {
         return dir.delete();
     }
 
+    /** Get the download directory of the project. **/
+    public static String getDownloadDir(@NonNull Context context) {
+        File downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        if (downloadDirFile == null) {
+            downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        }
+        return downloadDirFile == null ? "/storage/emulated/0/" : downloadDirFile.getAbsolutePath() + "/";
+    }
+
     /** @return a string of text from specific text files in the assets folder **/
     @SuppressWarnings("SameParameterValue")
     @NonNull
@@ -122,7 +133,7 @@ public final class FileFunctions {
      * A Toast is created when it fails and it returns an empty array. **/
     @NonNull
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static byte[] getBytesFromFile(int byteAmt, @NonNull FileInputStream stream) {
+    public static byte[] getBytesFromFile(int byteAmt, @NonNull InputStream stream) {
         byte[] returnByte = new byte[byteAmt];
         try {
             stream.read(returnByte);
@@ -135,43 +146,89 @@ public final class FileFunctions {
         }
     }
 
-    /** Returns the absolute path of a path from the given URI.
-     * If the Uri is invalid or no such file exists, it would return null. **/
-    public static String getRealPathFromUri(Context context, Uri uri){
-        Cursor cursor = null;
+    /** Gets all the remaining bytes of data from a file.
+     * A Toast is created when it fails and it returns an empty array. **/
+    @NonNull
+    public static byte[] getRemainingBytesFromFile(@NonNull InputStream stream) {
         try {
-            // MediaStore.Images.Media.DATA is deprecated but no viable alternatives are found yet
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(uri, proj, null, null, null);
-            if (cursor != null) {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(column_index);
-            } else {
-                return null;
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            while(stream.available() != 0){
+                buffer.write(stream.read());
             }
-        } catch (Exception e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Uri" + uri.toString() + "could not be "
-                + "parsed as a path. Stack trace is");
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Remaining bytes of input stream of file "
+                    + stream + " not able to be read. Stack trace is");
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
+    /** Returns the absolute path of a path from the given URI.
+     * If the Uri is invalid or no such file exists, it would return null.
+     * This is done through copying the file to the temp directory and return the temp file. **/
+    public static String getRealPathFromUri(Context context, Uri uri) {
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) {
+                return null;
+            } else {
+                String outputFile = generateValidFile(context.getFilesDir().getAbsolutePath()
+                        + "/temp/importedFile ", getFileNameFromUri(context, uri));
+                copyFile(inputStream, new File(outputFile));
+                return outputFile;
+            }
+        } catch (IOException e) {
+            Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Could not read from URI "
+                    + uri.toString() + ". Stack trace is");
             e.printStackTrace();
             return null;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
     /** Copies the file from a source to its destination. **/
     public static void copyFile(File source, File destination) throws IOException {
-        try (InputStream input = new FileInputStream(source);
-                OutputStream output = new FileOutputStream(destination)) {
+        try (InputStream input = new FileInputStream(source)) {
+            copyFile(input, destination);
+        }
+    }
+
+    /** Copies the file from a given InputStream to its destination.
+     * This process would fail with an IOException if the size of the byte array reaches 100MB.
+     * This is to prevent the user from importing an extremely large file which may crash the app. **/
+    private static void copyFile(@NonNull InputStream input, File destination) throws IOException {
+        try (OutputStream output = new FileOutputStream(destination)) {
+            long totalLength = 0;
             // Transfer bytes from in to out
             byte[] buf = new byte[1024];
             int len;
             while ((len = input.read(buf)) > 0) {
                 output.write(buf, 0, len);
+                totalLength += len;
+                if (totalLength > (100 * 1000 * 1000)) {
+                    throw new IOException("Input size exceeds 100MB");
+                }
             }
         }
+    }
+
+    /** Gets the file name from a specified URI.
+     * Answer from https://stackoverflow.com/a/25005243 **/
+    private static String getFileNameFromUri(Context context, @NonNull Uri uri) {
+        String result = null;
+        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            }
+        }
+        if (result == null && uri.getPath() != null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 }

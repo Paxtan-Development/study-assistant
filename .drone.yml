@@ -49,8 +49,9 @@ steps:
         elif [ "`(echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$'`" -eq "1" ];
         then echo "Beta build config detected" && export IS_RELEASE=0;
         else echo "Push commit title does not match regex" && exit 1; fi;
-      # Create keystore file (KEYSTORE_CONTENTS should be the binary file itself inserted through the CLI)
-      - echo $KEYSTORE_CONTENTS > keystore.jks
+      # Create keystore file (KEYSTORE_CONTENTS should be a hex string encoded with `hexdump -v -e '1/1 "%02x"' "$1"`)
+      # This method cannot be used for files over 32KB due to https://unix.stackexchange.com/a/352570
+      - echo $KEYSTORE_CONTENTS | sed 's/\([0-9A-F]\{2\}\)/\\\\\\x\1/gI' | xargs printf > keystore.jks
       # Create keystore.properties file
       - touch keystore.properties
       - echo "keystoreDir=$PWD/keystore.jks\n" >> keystore.properties
@@ -58,11 +59,17 @@ steps:
       - echo "keystorePass=$KEYSTORE_PASS\n" >> keystore.properties
       # Create APK
       # Upload to GitHub on second step
-      - if [[ $IS_RELEASE -eq "1" ]];
+      - if [ "`$IS_RELEASE`" -eq "1" ];
         then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /artifacts/com.pcchin.studyassistant.apk;
         else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk; fi;
       - echo "$GIT_TITLE" > /artifacts/title.txt
       - echo "$GIT_BODY" > /artifacts/body.txt
+
+  - name: create-tag
+    image: quintoandar/drone-github-tag
+    # Manually set version
+    settings:
+      version: v2.0.0.1-b
 
   - name: publish
     image: plugins/github-release

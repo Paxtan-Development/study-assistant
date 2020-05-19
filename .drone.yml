@@ -26,7 +26,7 @@ steps:
     image: nextcloudci/android:android-49
     volumes:
       - name: artifacts
-      - path: /artifacts
+        path: /artifacts
     environment:
       KEYSTORE_CONTENTS:
         from_secret: KEYSTORE_CONTENTS
@@ -64,7 +64,7 @@ steps:
     image: plugins/github-release
     volumes:
       - name: artifacts
-      - path: /artifacts
+        path: /artifacts
     settings:
       api_key:
         from_secret: GITHUB_TOKEN

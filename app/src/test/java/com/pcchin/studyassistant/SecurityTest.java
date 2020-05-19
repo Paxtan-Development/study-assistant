@@ -29,7 +29,7 @@ public class SecurityTest {
         if (BuildConfig.IS_LOCAL) {
             TEST_COUNT = 8000;
         } else {
-            TEST_COUNT = 100;
+            TEST_COUNT = 500;
         }
     }
 

@@ -23,7 +23,7 @@ name: sa-ci-build-release
 
 steps:
   - name: build-release
-    image: nextcloudci/android:android-49
+    image: nextcloudci/android:android-54
     volumes:
       - name: artifacts
         path: /artifacts
@@ -37,8 +37,8 @@ steps:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
       _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
-      # Install xxd as it is not installed by default
-      - apt-get install -y xxd
+      # Install xxd (Part of vim) as it is not installed by default
+      - apt-get install -y vim-common
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)
       - echo "Title is `$GIT_TITLE`"

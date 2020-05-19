@@ -40,10 +40,10 @@ steps:
       # Check if push commit title matches regex
       - GIT_TITLE=$(git log -1 --pretty=%s)
       - GIT_BODY=$(git log -1 --pretty=%b)
-      - if [[ $((echo $GIT_TITLE) | grep -Ei 'Release\ [0-9]+\.[0-9]+\.[0-9]+$' | wc -l) -eq "1" ]];
-        then echo "Release build config detected" && IS_RELEASE=1;
-        elif [[ $((echo $GIT_TITLE) | grep -Ei 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$' | wc -l) -eq "1" ]];
-        then echo "Beta build config detected" && IS_RELEASE=0;
+      - if [[ $( (echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+$') -eq "1" ]];
+        then echo "Release build config detected" && export IS_RELEASE=1;
+        elif [[ $( (echo "$GIT_TITLE") | grep -cEi 'Release\ [0-9]+\.[0-9]+\.[0-9]+\.[0-9]-b$') -eq "1" ]];
+        then echo "Beta build config detected" && export IS_RELEASE=0;
         else echo "Push commit title does not match regex" && exit 1; fi
       # Create keystore file
       - echo "$KEYSTORE_CONTENTS" > keystore.jks

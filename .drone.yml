@@ -60,7 +60,7 @@ steps:
       # Upload to GitHub on second step
       - if [[ $IS_RELEASE -eq "1" ]];
         then ./gradlew assembleRelease && mv ./app/build/outputs/apk/release/app-release.apk /artifacts/com.pcchin.studyassistant.apk;
-        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk;
+        else ./gradlew assembleBeta && mv ./app/build/outputs/apk/beta/app-beta.apk /artifacts/com.pcchin.studyassistant.apk; fi;
       - echo "$GIT_TITLE" > /artifacts/title.txt
       - echo "$GIT_BODY" > /artifacts/body.txt
 

@@ -100,15 +100,17 @@ public class MainActivity extends AppCompatActivity
     /** Delegates each onBackPressed to each Fragment **/
     @Override
     public void onBackPressed() {
-        if (currentFragment instanceof NotesViewFragment) {
-            // As NotesViewFragment is inside a PagerAdapter, it does not intercept
-            // the onBackPressed, hence its a special case
-            ((NotesViewFragment) currentFragment).onBackPressed();
-        } else {
-            closeDrawer();
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
-            if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
-                super.onBackPressed();
+        if (!closeDrawer()) {
+            if (currentFragment instanceof NotesViewFragment) {
+                // As NotesViewFragment is inside a PagerAdapter, it does not intercept
+                // the onBackPressed, hence its a special case
+                ((NotesViewFragment) currentFragment).onBackPressed();
+            } else {
+                closeDrawer();
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.base);
+                if (!(fragment instanceof ExtendedFragment) || !((ExtendedFragment) fragment).onBackPressed()) {
+                    super.onBackPressed();
+                }
             }
         }
     }
@@ -247,12 +249,15 @@ public class MainActivity extends AppCompatActivity
         this.isMember = isMember;
     }
 
-    /** Closes the navigation drawer. **/
-    public void closeDrawer() {
+    /** Closes the navigation drawer.
+     * Returns whether the drawer is closed. **/
+    public boolean closeDrawer() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+            return true;
         }
+        return false;
     }
 
     /** Triggers the onBackPressed for key fragments (eg. when files are not saved)

@@ -32,21 +32,6 @@ final class AndroidTestFunctions {
         throw new IllegalStateException("Utility class");
     }
 
-    /** Returns the notes after it has been migrated. **/
-    @NonNull
-    static SubjectDatabase getNotesDatabaseAftMigration(@NonNull MigrationTestHelper migrationTestHelper,
-                                                        String databaseName,
-                                                        Migration... migrations) {
-        SubjectDatabase roomDatabase = Room
-                .databaseBuilder(InstrumentationRegistry.getInstrumentation().getContext(),
-                        SubjectDatabase.class, databaseName)
-                .addMigrations(migrations)
-                .allowMainThreadQueries().build();
-        migrationTestHelper.closeWhenFinished(roomDatabase);
-        return roomDatabase;
-
-    }
-
     /** Generate a string with random characters.
      * Some characters have been sanitized to prevent accidental SQL injections.
      * @param count defines the max number of characters in the string. **/
@@ -56,21 +41,5 @@ final class AndroidTestFunctions {
                 .replace(",", "\\,").replace(")", "\\)")
                 .replace(";", "\\;").replace("(", "\\(")
                 .replace("-", "\\-");
-    }
-
-    /** Generate an ArrayList with random values.
-     * @param count defines the max number of children in the array. **/
-    @NonNull
-    static ArrayList<ArrayList<String>> randomArray(int count) {
-        Random rand = new Random();
-        ArrayList<ArrayList<String>> returnList = new ArrayList<>();
-        for (int i = 0; i < rand.nextInt(count); i++) {
-            ArrayList<String> temp = new ArrayList<>();
-            for (int j = 0; j < rand.nextInt(count); j++) {
-                temp.add(randomString(count));
-            }
-            returnList.add(temp);
-        }
-        return returnList;
     }
 }

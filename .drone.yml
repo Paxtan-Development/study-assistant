@@ -13,6 +13,9 @@ steps:
     commands:
       - ./gradlew testDebugUnitTest
     when:
+      branch:
+        include:
+          - master
       event: push
 
 trigger:

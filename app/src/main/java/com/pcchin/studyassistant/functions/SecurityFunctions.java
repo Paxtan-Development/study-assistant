@@ -56,6 +56,7 @@ import javax.crypto.NoSuchPaddingException;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
+    // TODO: Refactor entire class
     private static final String SHA_512 = "SHA-512";
     private static final String SHA_MISSING_ERROR = "Cryptography Error: Algorithm SHA-512 " +
             "not found in MessageDigest.";

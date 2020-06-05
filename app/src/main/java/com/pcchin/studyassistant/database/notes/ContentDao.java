@@ -22,28 +22,28 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface SubjectDao {
-    /** Search for a subject based on its title. **/
-    @Query("SELECT * FROM notesSubject WHERE title = :title")
-    NotesSubject search(String title);
+public interface ContentDao {
+    /** Search for a note based on its ID. **/
+    @Query("SELECT * FROM notesContent WHERE _noteId = :id")
+    NotesContent search(int id);
 
-    /** Get all of the subjects. **/
-    @Query("SELECT * FROM notesSubject ORDER BY title ASC")
-    List<NotesSubject> getAll();
+    /** Get all of the notes for a specific subject. **/
+    @Query("SELECT * FROM notesContent WHERE subjectId = :subjectId")
+    List<NotesContent> searchBySubject(int subjectId);
 
-    /** Get all of the IDs for all subjects. **/
-    @Query("SELECT _subjectId from notesSubject")
-    List<Integer> getAllSubjectId();
+    /** Get all of the IDs for all notes. **/
+    @Query("SELECT _noteId from notesContent")
+    List<Integer> getAllNoteId();
 
     /** Adds a new subject into the notes. **/
     @Insert
-    void insert(NotesSubject subject);
+    void insert(NotesContent note);
 
     /** Updates an existing subject. **/
     @Update
-    void update(NotesSubject subject);
+    void update(NotesContent note);
 
     /** Deletes an existing subject. **/
     @Delete
-    void delete(NotesSubject subject);
+    void delete(NotesContent note);
 }

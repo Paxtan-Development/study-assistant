@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Room;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
@@ -35,8 +34,9 @@ public final class DatabaseFunctions {
     @NonNull
     public static SubjectDatabase getSubjectDatabase(Context context) {
         return Room.databaseBuilder(context, SubjectDatabase.class,
-                ActivityConstants.DATABASE_NOTES).allowMainThreadQueries()
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+                ActivityConstants.DATABASE_NOTES)
+                .fallbackToDestructiveMigrationFrom(1)
+                .allowMainThreadQueries().build();
     }
 
     /** Returns the project database. **/

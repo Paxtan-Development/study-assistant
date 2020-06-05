@@ -21,6 +21,7 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -39,7 +40,7 @@ import java.util.Random;
 public class NotesNotifyReceiver extends BroadcastReceiver {
     /** Displays a notification with the message of the note as the title. **/
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, @NonNull Intent intent) {
         // Show notification
         String title = intent.getStringExtra(ActivityConstants.INTENT_VALUE_TITLE);
         String message = intent.getStringExtra(ActivityConstants.INTENT_VALUE_MESSAGE);

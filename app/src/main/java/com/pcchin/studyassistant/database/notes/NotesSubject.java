@@ -37,14 +37,19 @@ public class NotesSubject {
     @Ignore
     public static final int SORT_DATE_DES = 4;
 
-    /** The title of the subject. Serves as a unique key. **/
-    @SuppressWarnings("NullableProblems")
+    /** The ID for the subject, serves as an unique key.
+     * Integer used instead of int as it would not be able to annotate NonNull otherwise. **/
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name = "_title")
+    @ColumnInfo(name = "_subjectId")
+    public Integer subjectId;
+
+    /** The title of the subject. **/
     public String title;
 
-    /** The contents of the subject. Contains the values of the notes. **/
+    /** The contents of the subject. Contains the values of the notes.
+     * WARNING: This variable is outdated and will be replaced in future beta releases. **/
+    // TODO: Remove variable
     public ArrayList<ArrayList<String>> contents;
 
     /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
@@ -54,10 +59,13 @@ public class NotesSubject {
     @Ignore
     NotesSubject() {
         // Default constructor.
+        this.subjectId = 0;
     }
 
-    /** Constructor used in the current version. **/
+    /** Constructor used to create the subject. **/
     public NotesSubject(@NonNull String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
+        // TODO: Change constructor to add ID
+        this.subjectId = 0;
         this.title = title;
         this.contents = contents;
         this.sortOrder = sortOrder;

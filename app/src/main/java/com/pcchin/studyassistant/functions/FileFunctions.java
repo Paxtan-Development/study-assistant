@@ -220,4 +220,15 @@ public final class FileFunctions {
         }
         return result;
     }
+
+    /** Gets the name of the file without its trailing extension.
+     * The file name is first reversed, then the first value of the array split by . is taken,
+     * then the string is reversed back. **/
+    @NonNull
+    public static String getFileName(String fileName) {
+        return new StringBuilder(new StringBuilder(fileName)
+                .reverse().toString()
+                .split("\\.", 2)[0])
+                .reverse().toString();
+    }
 }

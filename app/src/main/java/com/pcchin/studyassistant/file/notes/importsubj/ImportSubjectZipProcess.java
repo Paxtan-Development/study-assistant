@@ -20,27 +20,43 @@ import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.zip.InflaterInputStream;
 
 /** Continuation of ImportSubjectZip, functions which actually import and process the ZIP file,
- * separated for clarity. **/
+ * separated for clarity. The ZIP file provided in this class either has a given password
+ * or does not have a password. **/
 class ImportSubjectZipProcess {
     private final MainActivity activity;
-    private String title;
-    private int listOrder;
+    private ArrayList<File> txtFileList;
+
+    // HashMaps for processing .subj files
+    // The key is the file name of the corresponding txt file
+    private HashMap<String, String> titleHashMap = new HashMap<>();
+    private HashMap<String, Date> lastEditedHashMap = new HashMap<>();
+    private HashMap<String, String> saltHashMap = new HashMap<>();
+    private HashMap<String, String> lockedPassHashMap = new HashMap<>();
+    private HashMap<String, Date> alertDateHashMap = new HashMap<>();
+    private HashMap<String, Integer> alertCodeHashMap = new HashMap<>();
 
     /** The constructor for the class as activity needs to be passed on. **/
     ImportSubjectZipProcess(MainActivity activity) {
@@ -64,7 +80,7 @@ class ImportSubjectZipProcess {
         Toast.makeText(activity, R.string.importing_subject, Toast.LENGTH_SHORT).show();
         File tempInputDir = new File(tempInputDirPath);
         if (tempInputDir.exists() && tempInputDir.isDirectory()) {
-            getZipFiles(inputFile, tempInputDir);
+            getZipFiles(FileFunctions.getFileName(inputFile.getFile().getName()), tempInputDir);
         } else {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Folder "+ tempInputDirPath
                     + " is not found");
@@ -73,146 +89,120 @@ class ImportSubjectZipProcess {
     }
 
     /** Gets the .subj and .txt files stored in the ZIP file and process them. **/
-    private void getZipFiles(ZipFile inputFile, @NonNull File tempInputDir) {
+    private void getZipFiles(String fileName, @NonNull File tempInputDir) {
         File[] fileList = tempInputDir.listFiles();
-        title = "";
-        listOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
-        ArrayList<ArrayList<String>> content = new ArrayList<>();
-        processFileList(fileList, tempInputDir, content);
-
-        // Delete temp directory
-        FileFunctions.deleteDir(tempInputDir);
-        if (title.length() > 0) {
-            new ImportSubject(activity).importSubjectToDatabase(title, content, listOrder);
-        } else {
-            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Title of subject in ZIP file "
-                    + inputFile.getFile().getAbsolutePath() + " invalid.");
-            Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /** Gets all the files then process them. **/
-    private void processFileList(File[] fileList, File tempInputDir,
-                                 ArrayList<ArrayList<String>> content) {
-        // Get notes from .subj file, then from .txt files
         if (fileList != null) {
-            // Get notes info from .subj file
-            // First 2 strings are title and sort order.
-            // Then the notes are stored in groups of 4:
-            // 1) Relative path, 2) Title, 3) Notes lock, 4) Alert Date and Time, 5) Alert Code
-            ArrayList<String> subjInfo = new ArrayList<>();
-            ArrayList<ArrayList<String>> notesInfo = new ArrayList<>();
-            populateNoteArray(fileList, subjInfo);
-            initNote(fileList, subjInfo, notesInfo, content);
-        } else {
-            title = tempInputDir.getName();
-        }
-    }
-
-    /** Initializes each note. **/
-    private void initNote(File[] fileList, @NonNull ArrayList<String> subjInfo,
-                          ArrayList<ArrayList<String>> notesInfo, ArrayList<ArrayList<String>> content) {
-        if (subjInfo.size() >= 2) {
-            title = subjInfo.get(0);
-            listOrder = Integer.parseInt(subjInfo.get(1));
-        }
-        for (int i = 3; i < subjInfo.size(); i+=5) {
-            ArrayList<String> currentNoteInfo = new ArrayList<>();
-            // Add notes info to notesInfo
-            for (int j = 0; j < 5; j++) {
-                if (i + j < subjInfo.size()) currentNoteInfo.add(subjInfo.get(i + j));
-                else currentNoteInfo.add(null);
-            }
-            notesInfo.add(currentNoteInfo);
-        }
-
-        // Get notes content from each note
-        for (File file : fileList) {
-            try {
-                processFile(file, notesInfo, content);
-            } catch (FileNotFoundException e) {
-                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: ");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /** Process each file available in the ZIP archive. **/
-    private void processFile(@NonNull File file, ArrayList<ArrayList<String>> notesInfo,
-                             ArrayList<ArrayList<String>> content) throws FileNotFoundException {
-        String fileName = file.getName();
-        if (fileName.endsWith(".txt")) {
-            // Get text contents from file
-            StringBuilder fileContents = new StringBuilder();
-            // Try-by-resources
-            try (Scanner currentFileScanner = new Scanner(file)) {
-                while (currentFileScanner.hasNext()) {
-                    fileContents.append(currentFileScanner.next()).append("\n");
+            txtFileList = new ArrayList<>();
+            File subjFile = null;
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+            database.close();
+            // Populate subjFile and txtFileList
+            for (File file : fileList) {
+                if (file.getName().endsWith(".subj")) {
+                    subjFile = file;
+                } else if (file.getName().endsWith(".txt")) {
+                    txtFileList.add(file);
                 }
             }
-
-            // Check if any notes match the info stored in the subject
-            if (!checkNoteAdded(notesInfo, fileName,fileContents, content))
-                addTempArray(fileName, fileContents, content);
-        }
-    }
-
-    /** Adds the content of the file to the note via a temp array. **/
-    private void addTempArray(@NonNull String fileName, @NonNull StringBuilder fileContents,
-                              ArrayList<ArrayList<String>> content) {
-        // Note is not mentioned in the .subj file, needs to be added manually
-        ArrayList<String> tempArray = new ArrayList<>();
-        // Removes the .txt extension
-        tempArray.add(fileName.replace(fileName.substring(fileName.length() - 4),
-                ""));
-        tempArray.add(ConverterFunctions.standardDateTimeFormat.format(new Date()));
-        tempArray.add(fileContents.toString());
-
-        // For lock, alert time & request code respectively
-        for (int i = 0; i < 3; i++) {
-            tempArray.add(null);
-        }
-
-        content.add(tempArray);
-    }
-
-    /** Check whether a note with the specified title exists, and if yes, add it to the database. **/
-    private boolean checkNoteAdded(@NonNull ArrayList<ArrayList<String>> notesInfo, String fileName,
-                                   StringBuilder fileContents, ArrayList<ArrayList<String>> content) {
-        for (int i = 0; i < notesInfo.size(); i++) {
-            if (Objects.equals(notesInfo.get(i).get(0), fileName)) {
-                // Add note info to ArrayList
-                ArrayList<String> currentNote = new ArrayList<>();
-                currentNote.add(notesInfo.get(i).get(1));
-                currentNote.add(ConverterFunctions.standardDateTimeFormat
-                        .format(new Date()));
-                currentNote.add(fileContents.toString());
-
-                // Add other attributes from .subj file
-                for (int att = 2; att <= 4; att++) {
-                    currentNote.add(notesInfo.get(i).get(att));
-                }
-
-                content.add(currentNote);
-                return true;
+            // Pass on to respective processing functions
+            if (subjFile == null) {
+                importZipWithoutSubj(subjectId, fileName);
+            } else {
+                importZipWithSubj(subjectId, fileName, subjFile);
             }
         }
-        return false;
     }
 
-    /** Populates all the notes into the ArrayList. **/
-    private void populateNoteArray(@NonNull File[] fileList, ArrayList<String> subjInfo) {
-        for (File file: fileList) {
-            if (file.getAbsolutePath().endsWith(".subj")) {
-                try (Scanner scanner = new Scanner(file)) {
-                    while (scanner.hasNext()) subjInfo.add(scanner.next());
-                } catch (FileNotFoundException e) {
-                    Log.e(ActivityConstants.LOG_APP_NAME, "File Error: " + file.getAbsolutePath()
-                            + " not found despite contained in file list of parent folder. " +
-                            "Stack trace is");
-                    e.printStackTrace();
-                }
+    /** Imports from a ZIP without a subj file.
+     * The names of each note is assumed to be the title of the note,
+     * and the title of the subject is assumed to be the file name of the subject. **/
+    private void importZipWithoutSubj(int subjectId, String subjectTitle) {
+        Random rand = new Random();
+        RandomString randString = new RandomString(40);
+        NotesSubject subject = new NotesSubject(subjectId, subjectTitle, NotesSubject.SORT_ALPHABETICAL_ASC);
+        ArrayList<NotesContent> notesList = new ArrayList<>();
+        // Get notesIdList from database
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+        List<Integer> notesIdList = database.ContentDao().getAllNoteId();
+        database.close();
+        for (File txtFile: txtFileList) {
+            NotesContent currentNote = generateNoteWithoutSubj(rand, randString, subjectId, notesIdList, txtFile);
+            notesList.add(currentNote);
+        }
+        new ImportSubject(activity).importSubjectToDatabase(subject, notesList);
+    }
+
+    /** Generates a note if the .subj file is not present,
+     * or if the note is not present within the .subj file itself. **/
+    @NonNull
+    private NotesContent generateNoteWithoutSubj (@NonNull Random rand, RandomString randString,
+                                                  int subjectId, @NonNull List<Integer> notesIdList,
+                                                  File inputFile) {
+        // Generate a valid noteId and add it to the list
+        int noteId = rand.nextInt();
+        while (notesIdList.contains(noteId)) noteId = rand.nextInt();
+        notesIdList.add(noteId);
+        // Reads the contents file and creates the file
+        String fileName = FileFunctions.getFileName(inputFile.getName()),
+                fileContents = getFileContents(inputFile);
+        return new NotesContent(noteId, subjectId, fileName, fileContents,
+                new Date(), randString.nextString());
+    }
+
+    /** Gets the contents of a text file and stores it as a String.
+     * If the contents of the file is invalid, an empty String would be returned. **/
+    @NonNull
+    private String getFileContents(File inputFile) {
+        StringBuilder fileContents = new StringBuilder();
+        try (Scanner fileScanner = new Scanner(inputFile)) {
+            while (fileScanner.hasNext()) {
+                fileContents.append(fileScanner.next()).append("\n");
             }
+            return fileContents.toString();
+        } catch (IOException e) {
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: A txt file exported from " +
+                    "a ZIP file could not be imported. The error is");
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /** Imports from a ZIP with a subj file.
+     * If the format provided in the subj file is incorrect, it will fallback to
+     * importZipWithoutSubj with fileName as the subject title. **/
+    private void importZipWithSubj(int subjectId, String fileName, File subjFile) {
+        // TODO: Complete
+        // Reads the subj file and maps it to a couple of HashMaps
+        try (FileInputStream infoStream = new FileInputStream(subjFile);
+             InflaterInputStream inflatedInfoStream = new InflaterInputStream(infoStream);
+             Scanner infoFileScanner = new Scanner(inflatedInfoStream)) {
+            // First line is title while second line is sort order
+            NotesSubject currentSubject = new NotesSubject(subjectId, infoFileScanner.nextLine(),
+                    Integer.parseInt(infoFileScanner.nextLine()));
+            parseSubjFile(infoFileScanner, currentSubject);
+        } catch (IOException | NumberFormatException e) {
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: An error occurred while " +
+                    "attempting to parse a .subj file, falling back to importZipWithoutSubj, error is");
+            e.printStackTrace();
+            importZipWithoutSubj(subjectId, fileName);
+        }
+    }
+
+    /** Parses the .subj file in a ZIP file and stores the values to the database.
+     * The line order in the subj file should be as follows:
+     * 1. path of the txt file
+     * 2. title of note
+     * 3. The last edited date of the note, in ISO format
+     * 4. The salt of the note
+     * 5. The locked pass of the note (If any)
+     * 6. **/
+    private void parseSubjFile(@NonNull Scanner infoFileScanner, NotesSubject currentSubject)
+            throws NumberFormatException {
+        int index = 0;
+        while (infoFileScanner.hasNext()) {
+            String currentLine = infoFileScanner.nextLine();
+            // TODO: Complete
         }
     }
 }

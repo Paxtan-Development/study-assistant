@@ -143,7 +143,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        if (note.lockedPass == null) {
+        if (note.lockedPass.length() == 0) {
             inflater.inflate(R.menu.menu_n3_unlocked, menu);
         } else {
             inflater.inflate(R.menu.menu_n3_locked, menu);

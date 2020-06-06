@@ -98,7 +98,7 @@ class NotesSubjectFragmentCreateView {
     /** Initializes the mini icons for the note. **/
     private void initNoteIcons(LinearLayout miniNote, @NonNull NotesContent note) {
         // Check if note is locked
-        if (note.lockedPass == null) {
+        if (note.lockedPass.length() == 0) {
             miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.GONE);
         } else {
             miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.VISIBLE);

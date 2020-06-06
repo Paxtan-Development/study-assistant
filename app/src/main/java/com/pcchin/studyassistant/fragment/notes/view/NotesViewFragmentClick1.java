@@ -109,7 +109,7 @@ public class NotesViewFragmentClick1 {
         if (inputText.length() == 0) {
             fragment.note.lockedPass = "";
         } else {
-            fragment.note.lockedPass = SecurityFunctions.notesHash(inputText);
+            fragment.note.lockedPass = SecurityFunctions.passwordHash(fragment.note.lockedSalt, inputText);
         }
         database.ContentDao().update(fragment.note);
         Toast.makeText(fragment.requireContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
@@ -121,7 +121,7 @@ public class NotesViewFragmentClick1 {
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        if (fragment.note.lockedPass != null && !fragment.note.lockedPass.equals("")) {
+        if (!fragment.note.lockedPass.equals("")) {
             setUnlockDialogLayout(database);
         } else {
             removeLock(database);
@@ -171,7 +171,7 @@ public class NotesViewFragmentClick1 {
 
     /** Removes the lock for the note and refreshes the menu.  **/
     private void removeLock(@NonNull SubjectDatabase database) {
-        fragment.note.lockedPass = null;
+        fragment.note.lockedPass = "";
         database.ContentDao().update(fragment.note);
         database.close();
         Toast.makeText(fragment.requireActivity(), R.string.n3_note_unlocked, Toast.LENGTH_SHORT).show();

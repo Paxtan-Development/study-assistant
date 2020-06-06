@@ -14,14 +14,10 @@
 package com.pcchin.studyassistant.utils.misc;
 
 import com.pcchin.studyassistant.database.notes.NotesContent;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 
 /** Comparators used to sort special classes/cases **/
 public class SortingComparators {

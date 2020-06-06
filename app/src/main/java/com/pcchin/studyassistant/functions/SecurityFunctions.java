@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import org.bouncycastle.crypto.DataLengthException;
@@ -46,7 +47,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -101,23 +101,23 @@ public final class SecurityFunctions {
     }
 
     /** Encryption method used to protect subject contents in .subject files. **/
-    public static byte[] subjectEncrypt(@NonNull String title, @NonNull String password,
+    public static byte[] subjectEncrypt(@NonNull String password, byte[] salt,
                                         List<NotesContent> content) {
         byte[] responseByte = ConverterFunctions.notesListToString(content).getBytes();
-        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
-        responseByte = aes(responseByte, passwordByte, title.getBytes(), true);
+        byte[] passwordByte = pbkdf2(password.getBytes(), salt, 11000);
+        responseByte = aes(responseByte, passwordByte, salt, true);
         responseByte = blowfish(responseByte, passwordByte, true);
         return responseByte;
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<NotesContent> subjectDecrypt(SubjectDatabase database, int subjectId,
-                                                              @NonNull String title, @NonNull String password,
-                                                              byte[] content) {
-        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
+    public static List<NotesContent> subjectDecrypt(SubjectDatabase database, @NonNull NotesSubject subject,
+                                                    byte[] salt, @NonNull String password,
+                                                    byte[] content) {
+        byte[] passwordByte = pbkdf2(password.getBytes(), salt, 11000);
         content = blowfish(content, passwordByte, false);
-        content = aes(content, passwordByte, title.getBytes(), false);
-        return ConverterFunctions.stringToNotesList(database, subjectId, new String(content));
+        content = aes(content, passwordByte, salt, false);
+        return ConverterFunctions.stringToNotesList(database, subject.subjectId, new String(content));
     }
 
     /** Encrypts the message sent to the server through its public RSA key (PKCS1-OAEP). **/

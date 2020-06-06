@@ -36,7 +36,9 @@ import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class NotesEditFragment extends Fragment implements ExtendedFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -106,8 +108,8 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 // Get values from newInstance and creates a note without inserting into database
                 String notesTitle = getArguments().getString(ARG_PARAM2);
                 currentNote = new NotesContent(DatabaseFunctions.generateValidId(database,
-                        DatabaseFunctions.ID_TYPE.NOTE), subjectId, notesTitle,
-                        "", null, new RandomString(40).nextString());
+                        DatabaseFunctions.ID_TYPE.NOTE), subjectId, Objects.requireNonNull(notesTitle),
+                        "", new Date(), new RandomString(40).nextString());
             }
             requireActivity().setTitle(subject.title);
         }

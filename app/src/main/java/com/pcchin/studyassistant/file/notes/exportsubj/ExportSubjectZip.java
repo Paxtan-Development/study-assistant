@@ -155,8 +155,9 @@ public class ExportSubjectZip {
                 tempExportFolder + notesSubject.title, ".subj");
         try (FileOutputStream infoTempStream = new FileOutputStream(infoTempOutputPath);
              DeflaterOutputStream deflatedInfoTemp = new DeflaterOutputStream(infoTempStream)) {
-            deflatedInfoTemp.write((notesSubject.title + "\n" + notesSubject.sortOrder + "\n").getBytes());
-            exportNote(tempExportFolder, exportFilesList, deflatedInfoTemp);
+            StringBuilder infoStringBuilder = new StringBuilder(notesSubject.title + "\n" + notesSubject.sortOrder + "\n");
+            exportNote(infoStringBuilder, tempExportFolder, exportFilesList);
+            deflatedInfoTemp.write(infoStringBuilder.toString().getBytes());
             deflatedInfoTemp.flush();
             deflatedInfoTemp.close();
 
@@ -170,9 +171,8 @@ public class ExportSubjectZip {
     }
 
     /** Export a note to a txt file and add its info to the .subj file. **/
-    private void exportNote(String tempExportFolder,
-                            ArrayList<File> exportFilesList,
-                            DeflaterOutputStream infoTempOutput) throws IOException {
+    private void exportNote(StringBuilder infoStringBuilder, String tempExportFolder,
+                            ArrayList<File> exportFilesList) {
         for (int i = 0; i < notesList.size(); i++) {
             NotesContent currentNote = notesList.get(i);
             // Export the note to the output folder
@@ -185,13 +185,26 @@ public class ExportSubjectZip {
             // Record info about the note to the .subj file
             // The format is in:
             // title, lastEdited, salt, lockedPass, alertDate, alertCode
-            // The content is already in the txt files and
-            infoTempOutput.write((new File(currentPath).getName()
-                    + "\n" + currentNote.noteTitle + "\n"
-                    + ConverterFunctions.isoDateTimeFormat.format(currentNote.lastEdited) + "\n"
-                    + currentNote.lockedSalt + "\n" + currentNote.lockedPass + "\n"
-                    + ConverterFunctions.isoDateTimeFormat.format(currentNote.alertDate) + "\n"
-                    + currentNote.alertCode + "\n").getBytes());
+            // The content is already in the txt files
+            infoStringBuilder.append(new File(currentPath).getName()).append("\n")
+                    .append(currentNote.noteTitle).append("\n")
+                    .append(ConverterFunctions.isoDateTimeFormat.format(currentNote.lastEdited))
+                    .append("\n").append(currentNote.lockedSalt).append("\n");
+            appendNullableFields(infoStringBuilder, currentNote);
+        }
+    }
+
+    /** Converts null to NULL for fields that may be null. **/
+    private void appendNullableFields(StringBuilder infoStringBuilder, @NonNull NotesContent currentNote) {
+        if (currentNote.alertDate == null) {
+            infoStringBuilder.append("NULL\n");
+        } else {
+            infoStringBuilder.append(ConverterFunctions.isoDateTimeFormat.format(currentNote.alertDate));
+        }
+        if (currentNote.alertCode == null) {
+            infoStringBuilder.append("NULL\n");
+        } else {
+            infoStringBuilder.append("\n").append(currentNote.alertCode).append("\n");
         }
     }
 }

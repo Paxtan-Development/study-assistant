@@ -25,13 +25,13 @@ import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 /** Functions used to import subjects from .subject files and ZIP files.
  * Cannot be made static as MainActivity activity needs to be separated for clarity. **/
@@ -47,28 +47,26 @@ class ImportSubject {
 
     /** Import a NotesSubject into the notes.
      * Duplicating titles for subject are checked within the function. **/
-    void importSubjectToDatabase(@NonNull String title, ArrayList<ArrayList<String>> contents,
-                                         int sortOrder) {
-        if (title.length() > 0) {
-            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-            // Import to notes
-            if (database.SubjectDao().searchByTitle(title) != null) {
-                showConflictDialog(title, contents, sortOrder);
-            } else {
-                database.SubjectDao().insert(new NotesSubject(title, contents, sortOrder));
-                Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
-                activity.safeOnBackPressed();
-                activity.displayFragment(NotesSubjectFragment.newInstance(title));
+    void importSubjectToDatabase(@NonNull NotesSubject subject, List<NotesContent> notesList) {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+        NotesSubject conflictSubject = database.SubjectDao().searchByTitle(subject.title);
+        if (conflictSubject != null) {
+            database.close();
+            showConflictDialog(subject, conflictSubject, notesList);
+        } else {
+            database.SubjectDao().insert(subject);
+            for (NotesContent note: notesList) {
+                database.ContentDao().insert(note);
             }
             database.close();
-        } else {
-            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Title of subject in ZIP file  invalid.");
-            Toast.makeText(activity, R.string.error_subject_title_invalid, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
+            activity.safeOnBackPressed();
+            activity.displayFragment(NotesSubjectFragment.newInstance(subject.subjectId));
         }
     }
 
     /** Show the subject conflict dialog. **/
-    private void showConflictDialog(String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
+    private void showConflictDialog(NotesSubject subject, NotesSubject conflictSubject, List<NotesContent> notesList) {
         DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(
                 new AlertDialog.Builder(activity)
                         .setTitle(R.string.subject_conflict)
@@ -76,11 +74,11 @@ class ImportSubject {
                         .create());
         dismissibleFragment.setPositiveButton(activity.getString(R.string.merge), view -> {
             dismissibleFragment.dismiss();
-            mergeSubjects(title, contents);
+            mergeSubjects(conflictSubject, notesList);
         });
         dismissibleFragment.setNegativeButton(activity.getString(R.string.rename), view -> {
             dismissibleFragment.dismiss();
-            showRenameDialog(title, contents, sortOrder);
+            showRenameDialog(subject, notesList);
         });
         dismissibleFragment.setNeutralButton(activity.getString(android.R.string.cancel),
                 view -> dismissibleFragment.dismiss());
@@ -88,45 +86,45 @@ class ImportSubject {
     }
 
     /** Display the renaming dialog for the conflicted subject.
-     * Separated from importSubjectToDatabase(String title,
-     * ArrayList<ArrayList<String>> contents, int sortOrder) for clarity. **/
-    private void showRenameDialog(String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
+     * Separated from importSubjectToDatabase for clarity. **/
+    private void showRenameDialog(NotesSubject subject, List<NotesContent> notesList) {
         @SuppressLint("InflateParams") TextInputLayout inputLayout = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
-        if (inputLayout.getEditText() != null) inputLayout.getEditText().setText(title);
+        if (inputLayout.getEditText() != null) inputLayout.getEditText().setText(subject.title);
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
 
         AlertDialog renameDialog = new AlertDialog.Builder(activity)
                 .setTitle(R.string.rename_subject)
                 .setView(inputLayout)
                 .create();
-        renameDialog.setOnDismissListener(dialogInterface -> database.close());
-        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment();
+        DismissibleDialogFragment dismissibleFragment = new DismissibleDialogFragment(renameDialog);
         dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok),
-                view -> setPositiveButton(database, dismissibleFragment, inputLayout, contents, sortOrder));
+                view -> setPositiveButton(subject, notesList, dismissibleFragment, inputLayout));
         dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel),
                 view -> dismissibleFragment.dismiss());
         dismissibleFragment.show(activity.getSupportFragmentManager(), "ImportSubject.5");
     }
 
     /** Sets the positive button for the renaming dialog. **/
-    private void setPositiveButton(SubjectDatabase database, DismissibleDialogFragment dismissibleFragment,
-                                   @NonNull TextInputLayout inputLayout, ArrayList<ArrayList<String>> contents, int sortOrder) {
+    private void setPositiveButton(NotesSubject subject, List<NotesContent> notesList,
+                                   DismissibleDialogFragment dismissibleFragment,
+                                   @NonNull TextInputLayout inputLayout) {
         String inputText = "";
         if (inputLayout.getEditText() != null) {
             inputText = inputLayout.getEditText().getText().toString();
         }
-        if (inputText.length() > 0 && database.SubjectDao().searchByTitle(inputText) == null) {
-            // Import subject into notes
-            database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
-            dismissibleFragment.dismiss();
-            Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
-            activity.safeOnBackPressed();
-            activity.displayFragment(NotesSubjectFragment.newInstance(inputText));
-        } else if (inputText.length() > 0) {
-            inputLayout.setErrorEnabled(true);
-            inputLayout.setError(activity.getString(R.string.error_subject_exists));
+        if (inputText.length() > 0) {
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+            if (database.SubjectDao().searchByTitle(inputText) == null) {
+                // Import subject into notes
+                subject.title = inputText;
+                dismissibleFragment.dismiss();
+                importSubjectToDatabase(subject, notesList);
+            } else {
+                inputLayout.setErrorEnabled(true);
+                inputLayout.setError(activity.getString(R.string.error_subject_exists));
+            }
+            database.close();
         } else {
             Log.w(ActivityConstants.LOG_APP_NAME, "TextInputLayout Error: getEditText() for " +
                     "AlertDialog in ImportSubject.showRenameDialog not found.");
@@ -134,40 +132,19 @@ class ImportSubject {
     }
 
     /** Merge two conflicted subjects with the same name.
-     * Notes that are exactly the same will not be re-imported,
-     * sort order will inherit the original subject stored on the notes. **/
-    private void mergeSubjects(String title, ArrayList<ArrayList<String>> newContent) {
+     * Sort order will inherit the original subject stored on the notes. **/
+    private void mergeSubjects(NotesSubject conflictSubject, @NonNull List<NotesContent> notesList) {
+        // The conflictSubject (The one that is already in the database) will be used as the base
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        NotesSubject editSubject = database.SubjectDao().searchByTitle(title);
-        ArrayList<ArrayList<String>> oldContents = editSubject.contents;
-
-        // Compare and add notes if necessary
-        int oldContentsSize = oldContents.size();
-        if (newContent != null && newContent.size() > 0) {
-            for (ArrayList<String> note: newContent) {
-                // Compare each note to the former notes in the old content
-                boolean notePresent = false;
-                // A for loop is used to prevent the new notes from being compared to
-                for (int i = 0; i < oldContentsSize; i++) {
-                    if (Objects.equals(note, oldContents.get(i))) {
-                        notePresent = true;
-                        break;
-                    }
-                }
-
-                if (!notePresent) {
-                    // Add note to oldContents
-                    oldContents.add(note);
-                }
-            }
+        // Change the subjectId for notesList and store it into the database
+        for (NotesContent note: notesList) {
+            note.subjectId = conflictSubject.subjectId;
+            database.ContentDao().insert(note);
         }
-
-        editSubject.contents = oldContents;
-        database.SubjectDao().update(editSubject);
         database.close();
         // Go to the fragment
         Toast.makeText(activity, R.string.subject_imported, Toast.LENGTH_SHORT).show();
         activity.safeOnBackPressed();
-        activity.displayFragment(NotesSubjectFragment.newInstance(title));
+        activity.displayFragment(NotesSubjectFragment.newInstance(conflictSubject.subjectId));
     }
 }

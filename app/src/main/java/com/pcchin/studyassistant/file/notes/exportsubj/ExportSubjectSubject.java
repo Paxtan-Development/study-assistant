@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.zip.DeflaterOutputStream;
 
 /** Functions that export the subject as a .subject file. **/
@@ -149,7 +150,10 @@ public class ExportSubjectSubject {
         deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.sortOrder));
         if (finalResponseText1.length() >= 8) {
             deflatedOutput.write(1);
-            deflatedOutput.write(SecurityFunctions.subjectEncrypt(notesSubject.title, finalResponseText, notesList));
+            // Create 32 bytes of salt
+            byte[] salt = new byte[32];
+            new Random().nextBytes(salt);
+            deflatedOutput.write(SecurityFunctions.subjectEncrypt(finalResponseText, salt, notesList));
         } else {
             deflatedOutput.write(0);
             deflatedOutput.write(ConverterFunctions.notesListToString(notesList).getBytes());

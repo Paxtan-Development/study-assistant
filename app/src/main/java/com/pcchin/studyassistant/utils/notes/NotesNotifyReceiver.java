@@ -48,10 +48,10 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
         NotesContent note = database.ContentDao().search(noteId);
         if (note != null) {
-            if (note.noteTitle != null && note.noteTitle.length() != 0) {
+            if (note.noteTitle.length() != 0) {
                 title = note.noteTitle;
             }
-            if (note.noteContent != null && note.noteContent.length() != 0) {
+            if (note.noteContent.length() != 0) {
                 message = note.noteContent;
             }
             if (note.alertCode != null) {

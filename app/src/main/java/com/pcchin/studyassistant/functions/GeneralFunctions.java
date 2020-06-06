@@ -37,5 +37,4 @@ public final class GeneralFunctions {
                 .detach(target)
                 .attach(target).commit();
     }
-
 }

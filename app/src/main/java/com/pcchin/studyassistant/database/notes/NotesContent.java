@@ -35,18 +35,23 @@ public class NotesContent {
     public int subjectId;
 
     /** The title for the note. **/
+    @NonNull
     public String noteTitle;
 
     /** The content for the note. **/
+    @NonNull
     public String noteContent;
 
     /** The date that the note was last edited. **/
+    @NonNull
     public Date lastEdited;
 
     /** The salt used to hash the password used for locking the note. **/
+    @NonNull
     public String lockedSalt;
 
     /** The hashed password used to lock the note. **/
+    @NonNull
     public String lockedPass;
 
     /** The date and time that the alert on the note would be run. **/
@@ -61,25 +66,31 @@ public class NotesContent {
     NotesContent() {
         // Default constructor.
         this.noteId = 0;
+        this.subjectId = 0;
+        this.noteTitle = "";
+        this.noteContent = "";
+        this.lastEdited = new Date();
+        this.lockedSalt = "";
+        this.lockedPass = "";
     }
 
     /** Constructor used to create the note. **/
-    public NotesContent(int noteId, int subjectId, String noteTitle, String noteContent,
-                        Date lastEdited, String lockedSalt) {
+    public NotesContent(int noteId, int subjectId, @NonNull String noteTitle, @NonNull String noteContent,
+                        @NonNull Date lastEdited, @NonNull String lockedSalt) {
         this.noteId = noteId;
         this.subjectId = subjectId;
         this.noteTitle = noteTitle;
         this.noteContent = noteContent;
         this.lastEdited = lastEdited;
         this.lockedSalt = lockedSalt;
-        this.lockedPass = null;
+        this.lockedPass = "";
         this.alertDate = null;
         this.alertCode = null;
     }
 
     /** Constructor used to create the note. Used when importing a new note. **/
-    public NotesContent(int noteId, int subjectId, String noteTitle, String noteContent,
-                        Date lastEdited, String lockedSalt, String lockedPass,
+    public NotesContent(int noteId, int subjectId, @NonNull String noteTitle, @NonNull String noteContent,
+                        @NonNull Date lastEdited, @NonNull String lockedSalt, @NonNull String lockedPass,
                         Date alertDate, Integer alertCode) {
         this.noteId = noteId;
         this.subjectId = subjectId;

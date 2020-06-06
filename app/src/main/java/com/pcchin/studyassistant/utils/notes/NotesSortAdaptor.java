@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
 import com.pcchin.studyassistant.R;
 
 /** An adaptor used to sort notes in each subject. **/
-public class NotesSortAdaptor extends ArrayAdapter {
+public class NotesSortAdaptor extends ArrayAdapter<String> {
     private final int[] titles;
     private final int[] images;
     private final Context context;

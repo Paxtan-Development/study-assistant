@@ -29,33 +29,30 @@ import androidx.fragment.app.Fragment;
 import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class NotesEditFragment extends Fragment implements ExtendedFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1",
-            ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "param1", ARG_PARAM2 = "param2";
 
     SubjectDatabase database;
     NotesSubject subject;
-    ArrayList<ArrayList<String>> subjContents;
+    List<NotesContent> noteList;
 
     boolean hasParent;
-    String notesSubject;
-    private String notesTitle;
+    int subjectId;
 
-    // Used only if hasParent
-    int notesOrder;
-
+    NotesContent currentNote;
     boolean subjModified = false;
     // Used only if subjModified
-    String targetNotesSubject;
-    ArrayList<ArrayList<String>> targetSubjContents;
+    int targetSubjectId;
 
     /** Default constructor. **/
     public NotesEditFragment() {
@@ -64,12 +61,12 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
 
     /** Used when creating a new note.
      * @param title is the title of the new note, without subject.
-     * @param subject is the current subject that the note will save to. **/
+     * @param subjectId is the ID of the current subject that the note will save to. **/
     @NonNull
-    public static NotesEditFragment newInstance(String subject, String title) {
+    public static NotesEditFragment newInstance(int subjectId, String title) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, subject);
+        args.putInt(ARG_PARAM1, subjectId);
         args.putString(ARG_PARAM2, title);
         fragment.hasParent = false;
         fragment.setArguments(args);
@@ -77,14 +74,15 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Used when modifying an existing note.
-     * @param subject is the title of the selected subject.
-     * @param order is the order of the note in the subject. **/
+     * @param subjectId is the title of the selected subject.
+     * @param noteId is the order of the note in the subject.
+     * 1 Parameter cannot be used as the first parameter must be the ID for the subject. **/
     @NonNull
-    public static NotesEditFragment newInstance(String subject, int order) {
+    public static NotesEditFragment newInstance(int subjectId, int noteId) {
         NotesEditFragment fragment = new NotesEditFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, subject);
-        args.putInt(ARG_PARAM2, order);
+        args.putInt(ARG_PARAM1, subjectId);
+        args.putInt(ARG_PARAM2, noteId);
         fragment.hasParent = true;
         fragment.setArguments(args);
         return fragment;
@@ -97,20 +95,21 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
         if (getArguments() != null) {
             database = DatabaseFunctions.getSubjectDatabase(requireActivity());
             // Get values from newInstance
-            notesSubject = getArguments().getString(ARG_PARAM1);
-            subject = database.SubjectDao().search(notesSubject);
-            subjContents = subject.contents;
+            subjectId = getArguments().getInt(ARG_PARAM1);
+            subject = database.SubjectDao().searchById(subjectId);
+            noteList = database.ContentDao().searchBySubject(subjectId);
             if (hasParent) {
                 // Set title
-                notesOrder = getArguments().getInt(ARG_PARAM2);
-                if (subjContents != null && notesOrder < subjContents.size()) {
-                    notesTitle = subjContents.get(notesOrder).get(0);
-                }
+                int notesId = getArguments().getInt(ARG_PARAM2);
+                currentNote = database.ContentDao().search(notesId);
             } else {
-                // Get values from newInstance
-                notesTitle = getArguments().getString(ARG_PARAM2);
+                // Get values from newInstance and creates a note without inserting into database
+                String notesTitle = getArguments().getString(ARG_PARAM2);
+                currentNote = new NotesContent(DatabaseFunctions.generateValidId(database,
+                        DatabaseFunctions.ID_TYPE.NOTE), subjectId, notesTitle,
+                        "", null, new RandomString(40).nextString());
             }
-            requireActivity().setTitle(notesSubject);
+            requireActivity().setTitle(subject.title);
         }
         setHasOptionsMenu(true);
     }
@@ -130,11 +129,8 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
         View returnView = inflater.inflate(R.layout.fragment_notes_edit,
                 container, false);
         // Set content and title
-        ((EditText) returnView.findViewById(R.id.n4_title)).setText(notesTitle);
-        if (hasParent && notesOrder < subjContents.size() && subjContents.get(notesOrder).size() >= 3) {
-            ((EditText) returnView.findViewById(R.id.n4_edit)).setText(subjContents
-                    .get(notesOrder).get(2));
-        }
+        ((EditText) returnView.findViewById(R.id.n4_title)).setText(currentNote.noteTitle);
+        ((EditText) returnView.findViewById(R.id.n4_edit)).setText(currentNote.noteContent);
         setMinHeight(returnView);
         return returnView;
     }

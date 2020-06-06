@@ -13,13 +13,11 @@
 
 package com.pcchin.studyassistant.database.notes;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
-
-import java.util.ArrayList;
 
 /** The entity for each Subject. **/
 @Entity
@@ -47,11 +45,6 @@ public class NotesSubject {
     /** The title of the subject. **/
     public String title;
 
-    /** The contents of the subject. Contains the values of the notes.
-     * WARNING: This variable is outdated and will be replaced in future beta releases. **/
-    // TODO: Remove variable
-    public ArrayList<ArrayList<String>> contents;
-
     /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
     public int sortOrder;
 
@@ -63,11 +56,9 @@ public class NotesSubject {
     }
 
     /** Constructor used to create the subject. **/
-    public NotesSubject(@NonNull String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
-        // TODO: Change constructor to add ID
-        this.subjectId = 0;
+    public NotesSubject(int subjectId, String title, int sortOrder) {
+        this.subjectId = subjectId;
         this.title = title;
-        this.contents = contents;
         this.sortOrder = sortOrder;
     }
 }

@@ -34,6 +34,9 @@ public class NotesContent {
     /** The ID for the parent subject for the note. **/
     public int subjectId;
 
+    /** The title for the note. **/
+    public String noteTitle;
+
     /** The content for the note. **/
     public String noteContent;
 
@@ -61,14 +64,31 @@ public class NotesContent {
     }
 
     /** Constructor used to create the note. **/
-    public NotesContent(int noteId, int subjectId, String noteContent, Date lastEdited, String lockedSalt) {
+    public NotesContent(int noteId, int subjectId, String noteTitle, String noteContent,
+                        Date lastEdited, String lockedSalt) {
         this.noteId = noteId;
         this.subjectId = subjectId;
+        this.noteTitle = noteTitle;
         this.noteContent = noteContent;
         this.lastEdited = lastEdited;
         this.lockedSalt = lockedSalt;
         this.lockedPass = null;
         this.alertDate = null;
         this.alertCode = null;
+    }
+
+    /** Constructor used to create the note. Used when importing a new note. **/
+    public NotesContent(int noteId, int subjectId, String noteTitle, String noteContent,
+                        Date lastEdited, String lockedSalt, String lockedPass,
+                        Date alertDate, Integer alertCode) {
+        this.noteId = noteId;
+        this.subjectId = subjectId;
+        this.noteTitle = noteTitle;
+        this.noteContent = noteContent;
+        this.lastEdited = lastEdited;
+        this.lockedSalt = lockedSalt;
+        this.lockedPass = lockedPass;
+        this.alertDate = alertDate;
+        this.alertCode = alertCode;
     }
 }

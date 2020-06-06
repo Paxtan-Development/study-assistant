@@ -35,6 +35,10 @@ public interface ContentDao {
     @Query("SELECT _noteId from notesContent")
     List<Integer> getAllNoteId();
 
+    /** Deletes all of the notes which has a specific subject ID. **/
+    @Query("DELETE from notesContent WHERE subjectId = :subjectId")
+    void batchDeleteBySubject(int subjectId);
+
     /** Adds a new subject into the notes. **/
     @Insert
     void insert(NotesContent note);

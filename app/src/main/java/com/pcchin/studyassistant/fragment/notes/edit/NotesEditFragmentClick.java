@@ -13,12 +13,6 @@
 
 package com.pcchin.studyassistant.fragment.notes.edit;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -30,19 +24,13 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /** Functions used when the fragment is clicked. **/
 public final class NotesEditFragmentClick {
@@ -60,25 +48,33 @@ public final class NotesEditFragmentClick {
     /** Changes the fragment.subject that the note will be saved to. **/
     public void onSubjPressed() {
         final Spinner subjListSpinner = new Spinner(activity);
-        // Get all fragment.subject titles
+        // Add the current title
         List<String> subjTitleList = new ArrayList<>();
+        int currentSubject;
         if (fragment.subjModified) {
-            subjTitleList.add(fragment.targetNotesSubject);
+            currentSubject = fragment.targetSubjectId;
         } else {
-            subjTitleList.add(fragment.notesSubject);
+            currentSubject = fragment.subjectId;
         }
+        subjTitleList.add(fragment.database.SubjectDao().searchById(currentSubject).title);
+        // Add the remaining titles (Order different thus int[] is needed
         List<NotesSubject> allSubjList = fragment.database.SubjectDao().getAll();
+        int[] displayListArray = new int[allSubjList.size()];
+        int displayListCount = 0;
+        displayListArray[0] = currentSubject;
         for (NotesSubject subject : allSubjList) {
-            if ((fragment.subjModified && !Objects.equals(subject.title, fragment.targetNotesSubject))
-                    || (!fragment.subjModified && !Objects.equals(subject.title, fragment.notesSubject))) {
+            if (!(subject.subjectId == currentSubject)) {
                 subjTitleList.add(subject.title);
+                displayListCount++;
+                displayListArray[displayListCount] = subject.subjectId;
             }
         }
-        showSubjDialog(subjListSpinner, subjTitleList);
+        showSubjDialog(subjListSpinner, subjTitleList, displayListArray);
     }
     
     /** Show the dialog for changing the subject of the note. **/
-    private void showSubjDialog(@NonNull Spinner subjListSpinner, List<String> subjTitleList) {
+    private void showSubjDialog(@NonNull Spinner subjListSpinner, List<String> subjTitleList,
+                                int[] displayListArray) {
         // Set spinner adaptor
         ArrayAdapter<String> subjAdaptor = new ArrayAdapter<>
                 (activity, android.R.layout.simple_spinner_item, subjTitleList);
@@ -90,10 +86,8 @@ public final class NotesEditFragmentClick {
                 .setView(subjListSpinner)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     fragment.subjModified = true;
-                    fragment.targetNotesSubject = subjListSpinner.getSelectedItem().toString();
-                    activity.setTitle(fragment.targetNotesSubject);
-                    fragment.targetSubjContents = fragment.database.SubjectDao()
-                            .search(fragment.targetNotesSubject).contents;
+                    fragment.targetSubjectId = displayListArray[subjListSpinner.getSelectedItemPosition()];
+                    activity.setTitle(subjListSpinner.getSelectedItem().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create())
@@ -106,126 +100,31 @@ public final class NotesEditFragmentClick {
         if (fragmentView != null && ((EditText) fragmentView
                 .findViewById(R.id.n4_title)).getText().toString()
                 .replaceAll("\\s+", "").length() > 0) {
-            // Save original as ArrayList
-            ArrayList<String> previousNote;
-            if (fragment.hasParent) {
-                previousNote = fragment.subjContents.get(fragment.notesOrder);
-            } else {
-                previousNote = new ArrayList<>();
-            }
-            createUpdatedNote(previousNote);
+            createUpdatedNote();
         } else {
             Toast.makeText(activity, R.string.n2_error_note_title_empty, Toast.LENGTH_SHORT).show();
         }
     }
 
     /** Creates an updated note. **/
-    private void createUpdatedNote(ArrayList<String> previousNote) {
-        ArrayList<String> updatedNote = new ArrayList<>();
-        FileFunctions.checkNoteIntegrity(updatedNote);
-        updatedNote.set(0, ((EditText) fragmentView.findViewById(R.id.n4_title)).getText().toString());
-        updatedNote.set(1, ConverterFunctions.standardDateTimeFormat.format(new Date()));
-        updatedNote.set(2, ((EditText) fragmentView.findViewById(R.id.n4_edit)).getText().toString());
-
-        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        if (manager != null && previousNote.size() >= 6 && previousNote.get(5) != null) {
-            updateNoteNotif(manager, previousNote, updatedNote);
-        }
+    private void createUpdatedNote() {
+        fragment.currentNote.noteTitle = ((EditText) fragmentView.findViewById(R.id.n4_title)).getText().toString();
+        fragment.currentNote.lastEdited = new Date();
+        fragment.currentNote.noteContent = ((EditText) fragmentView.findViewById(R.id.n4_edit)).getText().toString();
 
         // Toast at start as different objects have different displayFragments
         Toast.makeText(activity, R.string.n4_note_saved, Toast.LENGTH_SHORT).show();
-        if (fragment.subjModified && !Objects.equals(fragment.targetNotesSubject, fragment.notesSubject)) {
-            modifyNoteSubject(updatedNote);
+        if (fragment.subjModified) {
+            fragment.currentNote.subjectId = fragment.targetSubjectId;
+        }
+        if (fragment.hasParent) {
+            fragment.database.ContentDao().update(fragment.currentNote);
         } else {
-            modifyNote(updatedNote);
+            fragment.database.ContentDao().insert(fragment.currentNote);
         }
         fragment.database.close();
-    }
-    
-    /** Updates the notification alert of the note. **/
-    private void updateNoteNotif(@NonNull AlarmManager manager, @NonNull ArrayList<String> previousNote,
-                                 @NonNull ArrayList<String> updatedNote) {
-        // Delete old notification
-        Intent previousIntent = new Intent(activity, NotesNotifyReceiver.class);
-        previousIntent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, previousNote.get(0));
-        previousIntent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, previousNote.get(2));
-        previousIntent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, fragment.notesSubject);
-        previousIntent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
-        manager.cancel(PendingIntent.getBroadcast(activity, Integer.parseInt(
-                previousNote.get(5)), previousIntent, 0));
-
-        // Set new notification
-        Intent newIntent = new Intent(activity, NotesNotifyReceiver.class);
-        newIntent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, updatedNote.get(0));
-        newIntent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, updatedNote.get(2));
-        newIntent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, fragment.targetNotesSubject);
-        newIntent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, previousNote.get(5));
-        try {
-            updateNoteAlert(manager, newIntent, previousNote, updatedNote);
-        } catch (ParseException e) {
-            Log.w(ActivityConstants.LOG_APP_NAME, "Parse Error: Date " + previousNote.get(4)
-                    + " could not be parsed under standard date time format.");
-        }
-    }
-    
-    /** Updates the alert of the note. **/
-    private void updateNoteAlert(AlarmManager manager, Intent newIntent,
-                                 @NonNull ArrayList<String> previousNote, ArrayList<String> updatedNote) throws ParseException {
-        Date targetDate = ConverterFunctions.standardDateTimeFormat.parse(previousNote.get(4));
-        if (targetDate != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                manager.setExactAndAllowWhileIdle(AlarmManager.RTC, targetDate.getTime(),
-                        PendingIntent.getBroadcast(activity,
-                                Integer.parseInt(previousNote.get(5)), newIntent, 0));
-            } else {
-                manager.setExact(AlarmManager.RTC, targetDate.getTime(), PendingIntent
-                        .getBroadcast(activity,
-                                Integer.parseInt(previousNote.get(5)), newIntent, 0));
-            }
-            // Updates value to note
-            updatedNote.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDate));
-            updatedNote.set(5, previousNote.get(5));
-        }
-    }
-    
-    /** Modifies a note whose subject have been changed. **/
-    private void modifyNoteSubject(ArrayList<String> updatedNote) {
-        if (fragment.hasParent) {
-            // Delete original
-            fragment.subjContents.remove(fragment.notesOrder);
-            fragment.subject.contents = fragment.subjContents;
-            fragment.database.SubjectDao().update(fragment.subject);
-        }
-        // Add new note to new fragment.subject
-        fragment.targetSubjContents.add(updatedNote);
-        NotesSubject targetSubject = fragment.database.SubjectDao().search(fragment.targetNotesSubject);
-        if (targetSubject != null) {
-            targetSubject.contents = fragment.targetSubjContents;
-        }
-        fragment.database.SubjectDao().update(targetSubject);
-
-        // Go to NotesViewFragment
-        activity.displayNotes(fragment.targetNotesSubject, fragment.targetSubjContents.size());
-        activity.pager.setCurrentItem(fragment.targetSubjContents.size() - 1);
-    }
-    
-    /** Modifies an existing note with the updated version. **/
-    private void modifyNote(ArrayList<String> updatedNote) {
-        if (fragment.hasParent) {
-            // Modify original
-            fragment.subjContents.set(fragment.notesOrder, updatedNote);
-            fragment.subject.contents = fragment.subjContents;
-            fragment.database.SubjectDao().update(fragment.subject);
-            activity.displayNotes(fragment.notesSubject, fragment.subjContents.size());
-            activity.pager.setCurrentItem(fragment.notesOrder);
-        } else {
-            // Add new note
-            fragment.subjContents.add(updatedNote);
-            fragment.subject.contents = fragment.subjContents;
-            fragment.database.SubjectDao().update(fragment.subject);
-            activity.displayNotes(fragment.notesSubject, fragment.subjContents.size());
-            activity.pager.setCurrentItem(fragment.subjContents.size() - 1);
-        }
+        activity.displayNotes(fragment.currentNote.subjectId);
+        activity.pager.setPagerOrder(fragment.currentNote.noteId);
     }
 
     /** Cancel all the changes and return to
@@ -233,11 +132,10 @@ public final class NotesEditFragmentClick {
     public void onCancelPressed() {
         // Go back to NotesViewFragment of fragment.subject
         if (fragment.hasParent) {
-            activity.displayNotes(fragment.notesSubject, fragment.subjContents.size());
-            activity.pager.setCurrentItem(fragment.notesOrder, false);
+            activity.displayNotes(fragment.subjectId);
+            activity.pager.setPagerOrder(fragment.currentNote.noteId);
         } else {
-            activity.displayFragment(NotesSubjectFragment
-                    .newInstance(fragment.notesSubject));
+            activity.displayFragment(NotesSubjectFragment.newInstance(fragment.subjectId));
         }
     }
 }

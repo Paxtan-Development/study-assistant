@@ -33,6 +33,8 @@ public final class ActivityConstants {
 
     // Intent constants for notes
     public static final String INTENT_VALUE_SUBJECT = "subject";
+    public static final String INTENT_VALUE_SUBJECT_ID = "subjectId";
+    public static final String INTENT_VALUE_NOTE_ID = "noteId";
     public static final String INTENT_VALUE_MESSAGE = "message";
     public static final String INTENT_VALUE_TITLE = "title";
 

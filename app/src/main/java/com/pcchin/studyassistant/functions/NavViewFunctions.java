@@ -90,7 +90,7 @@ public final class NavViewFunctions {
                 // Opens subject when clicked
                 activity.closeDrawer();
                 activity.safeOnBackPressed();
-                activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
+                activity.displayFragment(NotesSubjectFragment.newInstance(subject.subjectId));
                 return true;
             });
         }

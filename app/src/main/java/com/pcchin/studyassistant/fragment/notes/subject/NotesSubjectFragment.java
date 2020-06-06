@@ -13,37 +13,29 @@
 
 package com.pcchin.studyassistant.fragment.notes.subject;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.fragment.notes.SubjectSelectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.SortingComparators;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+import java.util.List;
 
 public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     private static final String ARG_SUBJECT = "noteSubject",
@@ -56,10 +48,9 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     static final int[] sortingImgs = new int[]{R.drawable.ic_sort_atz, R.drawable.ic_sort_zta,
             R.drawable.ic_sort_num_asc, R.drawable.ic_sort_num_des};
 
-    SubjectDatabase subjectDatabase;
-    ArrayList<ArrayList<String>> notesArray;
-    String notesSubject;
-    int previousOrder;
+    List<NotesContent> notesList;
+    NotesSubject currentSubject;
+    int previousNote;
 
     /** Default constructor. **/
     public NotesSubjectFragment() {
@@ -67,25 +58,25 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Used in all except when returning from a NotesViewFragment.
-     * @param subject is the subject that is displayed. **/
+     * @param subjectId is the subject that is displayed. **/
     @NonNull
-    public static NotesSubjectFragment newInstance(String subject) {
+    public static NotesSubjectFragment newInstance(int subjectId) {
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SUBJECT, subject);
+        args.putInt(ARG_SUBJECT, subjectId);
         fragment.setArguments(args);
         return fragment;
     }
 
     /** Used when returning from a NotesViewFragment.
-     * @param subject is the subject that is displayed.
-     * @param previousOrder is the order of the note that was shown. **/
+     * @param subjectId is the ID of the subject that is displayed.
+     * @param previousNote is the ID of the note that was shown. **/
     @NonNull
-    public static NotesSubjectFragment newInstance(String subject, int previousOrder) {
+    public static NotesSubjectFragment newInstance(int subjectId, int previousNote) {
         NotesSubjectFragment fragment = new NotesSubjectFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SUBJECT, subject);
-        args.putInt(ARG_PREV, previousOrder);
+        args.putInt(ARG_SUBJECT, subjectId);
+        args.putInt(ARG_PREV, previousNote);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,61 +85,30 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
-
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
         // Get basic info & set title
         if (getArguments() != null) {
-            notesSubject = getArguments().getString(ARG_SUBJECT);
-            previousOrder = getArguments().getInt(ARG_PREV);
+            int subjectId = getArguments().getInt(ARG_SUBJECT);
+            currentSubject = database.SubjectDao().searchById(subjectId);
+            notesList = database.ContentDao().searchBySubject(subjectId);
+            previousNote = getArguments().getInt(ARG_PREV);
+            checkExpiredNote();
+            sortNotes();
         }
-        checkSubjectExists(requireActivity());
+        requireActivity().setTitle(currentSubject.title);
+        database.close();
         setHasOptionsMenu(true);
     }
 
-    /** Check if the subject selected exists. **/
-    private void checkSubjectExists(Activity activity) {
-        NotesSubject currentSubject = subjectDatabase.SubjectDao().search(notesSubject);
-        if (currentSubject == null) {
-            Toast.makeText(requireContext(), R.string.n2_error_missing_subject,
-                    Toast.LENGTH_SHORT).show();
-            // Return to NotesSelectFragment if not
-            subjectDatabase.close();
-            ((MainActivity) activity).displayFragment(new NotesSelectFragment());
-
-        } else {
-            // Get notes from notes
-            activity.setTitle(notesSubject);
-            NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
-            notesArray = subject.contents;
-            if (notesArray != null) {
-                // Sort notes just in case
-                sortNotes(subject);
-                checkExpiredNote();
-            }
-            subjectDatabase.SubjectDao().update(subject);
-        }
-    }
-
-    /** Checks for any notes that are expired. **/
+    /** Checks for any alerts in notes that are expired. **/
     private void checkExpiredNote() {
-        for (ArrayList<String> note: notesArray) {
-            FileFunctions.checkNoteIntegrity(note);
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
+        for (NotesContent note: notesList) {
             Calendar storedDate = Calendar.getInstance();
-            if (note.get(4) != null) {
-                try {
-                    Date tempDate = ConverterFunctions.standardDateTimeFormat.parse(note.get(4));
-                    if (tempDate != null) {
-                        storedDate.setTime(tempDate);
-                        // Delete alert if time passed
-                        if (storedDate.before(Calendar.getInstance())) {
-                            note.set(4, null);
-                            note.set(5, null);
-                        }
-                    }
-                } catch (ParseException e) {
-                    Log.w(ActivityConstants.LOG_APP_NAME, "Parse Error: Failed to parse date "
-                            + note.get(4) + " as standard date time.");
-                }
+            if (note.alertDate != null && note.alertDate.before(storedDate.getTime())) {
+                note.alertDate = null;
+                note.alertCode = null;
+                database.ContentDao().update(note);
             }
         }
     }
@@ -169,37 +129,36 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Returns to
-     * @see NotesSelectFragment **/
+     * @see SubjectSelectFragment **/
     @Override
     public boolean onBackPressed() {
-        subjectDatabase.close();
-        ((MainActivity) requireActivity()).displayFragment(new NotesSelectFragment());
+        ((MainActivity) requireActivity()).displayFragment(new SubjectSelectFragment());
         return true;
     }
 
     /** Sort the notes based on the sorting format given.
      * @see NotesSubject
      * @see SortingComparators **/
-    void sortNotes(@NonNull NotesSubject subject) {
-        int sortOrder = subject.sortOrder;
+    void sortNotes() {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
+        int sortOrder = currentSubject.sortOrder;
         if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
             // Sort by alphabetical order, descending
-            Collections.sort(notesArray, SortingComparators.firstValComparator);
-            Collections.reverse(notesArray);
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
+            Collections.reverse(notesList);
         } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
-            Collections.sort(notesArray, SortingComparators.secondValDateComparator);
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
         } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
-            Collections.sort(notesArray, SortingComparators.secondValDateComparator);
-            Collections.reverse(notesArray);
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
+            Collections.reverse(notesList);
         } else {
             // Sort by alphabetical order, ascending
             if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
                 // Default to this if sortOrder is invalid
-                subject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
+                currentSubject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
             }
-            Collections.sort(notesArray, SortingComparators.firstValComparator);
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
         }
-        subject.contents = notesArray;
-        subjectDatabase.SubjectDao().update(subject);
+        database.close();
     }
 }

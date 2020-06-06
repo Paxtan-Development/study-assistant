@@ -46,7 +46,7 @@ final class ProjectCreateFragmentCreate {
                 adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                         ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                         customAdminName.getEditText().getText().toString(),
-                        adminSalt, SecurityFunctions.roleHash(customAdminPass1
+                        adminSalt, SecurityFunctions.passwordHash(customAdminPass1
                         .getEditText().getText().toString(), adminSalt));
             } else {
                 adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
@@ -113,7 +113,7 @@ final class ProjectCreateFragmentCreate {
             memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
                     ProjectCreateFragment.TYPE_ROLE, projectDatabase), projectID,
                     Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
-                    memberSalt, SecurityFunctions.roleHash(customMemberPass1
+                    memberSalt, SecurityFunctions.passwordHash(customMemberPass1
                     .getEditText().getText().toString(), memberSalt));
         } else {
             memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
@@ -138,8 +138,8 @@ final class ProjectCreateFragmentCreate {
                         .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER, projectDatabase),
                         projectID, memberName.getEditText().getText().toString(), "",
                         memberSalt,
-                        SecurityFunctions.memberHash(memberPass1.getEditText()
-                                .getText().toString(), memberSalt, projectSalt),
+                        SecurityFunctions.passwordHash(memberPass1.getEditText()
+                                .getText().toString(), memberSalt),
                         adminRoleID);
             } else {
                 initialMember = new MemberData(DatabaseFunctions

@@ -87,7 +87,8 @@ final class ProjectSettingsFragmentClick {
                 }
                 break;
             case PreferenceString.PREF_RELATED_SUBJECT:
-                ((ListPreference) preference).setValue(fragment.project.associatedSubject);
+                // TODO: Refactor
+                ((ListPreference) preference).setValue(String.valueOf(fragment.project.associatedSubject));
                 break;
         }
     }

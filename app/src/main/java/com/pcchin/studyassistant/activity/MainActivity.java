@@ -35,6 +35,8 @@ import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
@@ -49,15 +51,17 @@ import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
+import com.pcchin.studyassistant.ui.NoteViewPager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
-    public ViewPager pager;
+    public NoteViewPager pager;
     public Fragment currentFragment;
 
     // Values that are only used when processing the ID
@@ -192,20 +196,18 @@ public class MainActivity extends AppCompatActivity
 
     /** Go to the settings page if it is not at the settings for the imported project. **/
     private void startProjectSettings() {
-        if (currentFragment instanceof ProjectSettingsFragment
-                && Objects.equals(((ProjectSettingsFragment) currentFragment)
+        if (!(currentFragment instanceof ProjectSettingsFragment)
+                || !Objects.equals(((ProjectSettingsFragment) currentFragment)
                 .project.projectID, projectID)) {
-            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
-        } else {
             // Start the settings page for that project
             safeOnBackPressed();
             displayFragment(ProjectSettingsFragment.newInstance(projectID, id2, isMember));
-            ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
         }
+        ((ProjectSettingsFragment) currentFragment).displayPreference(PreferenceString.PREF_MENU_GENERAL);
     }
 
     /** Displays the fragment that is needed to be displayed.
-     * Keyboard will be hidden between fragments **/
+     * Keyboard will be hidden between fragments. **/
     public void displayFragment(Fragment fragment) {
         // Hides bottomNavView if the project comes from a project fragment
         // and to a non-project fragment
@@ -227,16 +229,19 @@ public class MainActivity extends AppCompatActivity
 
     /** Displays the notes for the subject through a custom PageAdaptor.
      * Keyboard will be hidden between the transition. **/
-    public void displayNotes(String subject, int size) {
+    public void displayNotes(int subjectId) {
         if (currentFragment != null && !(currentFragment instanceof NotesViewFragment)) {
             // Removes last fragment from the normal container if its not NotesViewFragment
             // as NotesViewFragment is not displayed using the normal container
             // This is to remove the menu from the bottom container and prevent double onBackPressed
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
-        FragmentStatePagerAdapter baseAdapter = new MainActivityFunctions(MainActivity.this).getNoteAdapter(subject, size);
+        SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(MainActivity.this);
+        List<NotesContent> notesList = subjectDatabase.ContentDao().searchBySubject(subjectId);
+        FragmentStatePagerAdapter baseAdapter = new MainActivityFunctions(MainActivity.this).getNoteAdapter(notesList);
         // Updates currentFragment to the current item
-        ViewPager.OnPageChangeListener baseAdapterPageChanger = new MainActivityFunctions(MainActivity.this).getNoteAdapterPageChanger(baseAdapter);
+        ViewPager.OnPageChangeListener baseAdapterPageChanger = new MainActivityFunctions(MainActivity.this)
+                .getNoteAdapterPageChanger(baseAdapter);
         pager.setAdapter(baseAdapter);
         pager.addOnPageChangeListener(baseAdapterPageChanger);
         new MainActivityFunctions(MainActivity.this).fadeToNote();

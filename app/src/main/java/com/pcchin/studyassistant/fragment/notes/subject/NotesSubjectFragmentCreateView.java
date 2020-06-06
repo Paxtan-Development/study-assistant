@@ -20,14 +20,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
-
-import java.util.ArrayList;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 
 /** Functions for handling the onCreateView function in
  * @see NotesSubjectFragment **/
@@ -48,51 +47,27 @@ class NotesSubjectFragmentCreateView {
                 container, false);
         LinearLayout returnView = returnScroll.findViewById(R.id.blank_linear);
 
-        // Check if stored data may be corrupt
-        if (fragment.notesArray == null) {
-            Toast.makeText(fragment.requireContext(), R.string.n_error_corrupt, Toast.LENGTH_SHORT).show();
-            fragment.notesArray = new ArrayList<>();
-        }
-
-        // Check if any of the notes is corrupt (Each note has 3 Strings: Title, Date, Contents)
-        boolean anyCorrupt = checkNoteCorrupt(returnScroll, returnView);
-
-        if (anyCorrupt) {
-            Toast.makeText(fragment.requireContext(), R.string.n2_error_some_corrupt, Toast.LENGTH_SHORT).show();
+        // Add each note to the view
+        for (int i = 0; i < fragment.notesList.size(); i++) {
+            NotesContent currentNote = fragment.notesList.get(i);
+            // Add note to view
+            @SuppressLint("InflateParams") LinearLayout miniNote = (LinearLayout) fragment.getLayoutInflater()
+                    .inflate(R.layout.n2_notes_mini, null);
+            initMiniNote(miniNote, currentNote);
+            initMiniNoteListener(miniNote, returnView, i);
+            if (currentNote.noteId == fragment.previousNote) {
+                returnScroll.post(() -> returnScroll.scrollTo(0, miniNote.getTop()));
+            }
         }
         return returnScroll;
     }
 
-    /** Check if there are any notes that are corrupt, and if there are, return true; **/
-    private boolean checkNoteCorrupt(ScrollView returnScroll, LinearLayout returnView) {
-        for (int i = 0; i < fragment.notesArray.size(); i++) {
-            ArrayList<String> note = fragment.notesArray.get(i);
-            if (note.size() < 3) {
-                // Filling in nonexistent values
-                for (int j = 0; j < 3 - note.size(); j++) note.add("");
-                return true;
-            }
-            // Implemented separately for backwards compatibility
-            if (note.size() < 6) note.add(null);
-
-            // Add note to view
-            @SuppressLint("InflateParams") LinearLayout miniNote = (LinearLayout) fragment.getLayoutInflater()
-                    .inflate(R.layout.n2_notes_mini, null);
-            initMiniNote(miniNote, note);
-            initMiniNoteListener(miniNote, returnView, i);
-
-            // Scroll to last seen view
-            if (fragment.previousOrder == i) returnScroll.post(() -> returnScroll.scrollTo(0, miniNote.getTop()));
-        }
-        return false;
-    }
-
     /** Initializes the mini note view. **/
-    private void initMiniNote(@NonNull LinearLayout miniNote, @NonNull ArrayList<String> note) {
-        ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.get(0));
+    private void initMiniNote(@NonNull LinearLayout miniNote, NotesContent note) {
+        ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.noteTitle);
         ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
-                fragment.getString(R.string.n_last_edited), note.get(1)));
-        String miniText = note.get(2).replace("\n* ", "\n ● ");
+                fragment.getString(R.string.n_last_edited), ConverterFunctions.standardDateTimeFormat.format(note.lastEdited)));
+        String miniText = note.noteContent.replace("\n* ", "\n ● ");
         if (miniText.startsWith("* ")) {
             miniText = miniText.replaceFirst("\\* ", " ● ");
         }
@@ -111,8 +86,7 @@ class NotesSubjectFragmentCreateView {
     private void initMiniNoteListener(@NonNull LinearLayout miniNote, @NonNull LinearLayout returnView, final int i) {
         // Set on click listener
         View.OnClickListener displayNoteListener = v -> {
-            fragment.subjectDatabase.close();
-            ((MainActivity) fragment.requireActivity()).displayNotes(fragment.notesSubject, fragment.notesArray.size());
+            ((MainActivity) fragment.requireActivity()).displayNotes(fragment.currentSubject.subjectId);
             ((MainActivity) fragment.requireActivity()).pager.setCurrentItem(i, false);
         };
 
@@ -122,16 +96,16 @@ class NotesSubjectFragmentCreateView {
     }
 
     /** Initializes the mini icons for the note. **/
-    private void initNoteIcons(LinearLayout miniNote, @NonNull ArrayList<String> note) {
+    private void initNoteIcons(LinearLayout miniNote, @NonNull NotesContent note) {
         // Check if note is locked
-        if (note.get(3) == null) {
+        if (note.lockedPass == null) {
             miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.GONE);
         } else {
             miniNote.findViewById(R.id.n2_mini_lock).setVisibility(View.VISIBLE);
         }
 
         // Check if note has a alert attached
-        if (note.get(4) == null) {
+        if (note.alertDate == null) {
             miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.GONE);
         } else {
             miniNote.findViewById(R.id.n2_mini_notif).setVisibility(View.VISIBLE);

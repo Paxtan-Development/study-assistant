@@ -40,11 +40,11 @@ import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.List;
 
-public class NotesSelectFragment extends Fragment implements ExtendedFragment {
+public class SubjectSelectFragment extends Fragment implements ExtendedFragment {
     private SubjectDatabase subjectDatabase;
 
     /** Default constructor. **/
-    public NotesSelectFragment() {
+    public SubjectSelectFragment() {
         // Default constructor.
     }
 
@@ -75,8 +75,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
                 // Go to notesSubjectFragment
                 subjectDatabase.close();
                 ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(
-                        subjectList.get(finalI).title
-                ));
+                        subjectList.get(finalI).subjectId));
             });
             ((LinearLayout) returnView.findViewById(R.id.blank_linear)).addView(subjectBtn, i);
         }

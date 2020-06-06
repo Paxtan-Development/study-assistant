@@ -157,8 +157,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                     project.projectID, usernameText, fullName, salt,
                     "", project.memberDefaultRole));
         } else {
-            String hashedPass = SecurityFunctions
-                    .memberHash(passwordText1, salt, project.salt);
+            String hashedPass = SecurityFunctions.passwordHash(passwordText1, salt);
             projectDatabase.MemberDao().insert(new MemberData(memberID,
                     project.projectID, usernameText, fullName, salt,
                     hashedPass, project.memberDefaultRole));

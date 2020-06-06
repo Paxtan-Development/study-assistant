@@ -35,6 +35,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
@@ -73,8 +74,11 @@ final class MainActivityCreate {
 
         // Get subject, if needed from Intent
         if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, false)) {
-            String targetSubject = activity.getIntent().getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
-            activity.displayFragment(NotesSubjectFragment.newInstance(targetSubject));
+            int targetNote = activity.getIntent().getIntExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, 0);
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+            int targetSubject = database.ContentDao().search(targetNote).subjectId;
+            database.close();
+            activity.displayFragment(NotesSubjectFragment.newInstance(targetSubject, targetNote));
         }
         initFragmentView();
         setNavigation();
@@ -87,7 +91,8 @@ final class MainActivityCreate {
         } else {
             NotesViewFragment currentNote = ((NotesViewFragment) activity.currentFragment);
             activity.findViewById(R.id.base).setVisibility(View.GONE);
-            activity.displayNotes(currentNote.notesSubject, currentNote.notesOrder);
+            activity.displayNotes(currentNote.note.subjectId);
+            activity.pager.setPagerOrder(currentNote.note.noteId);
         }
 
         if (!MainActivityFunctions.fragmentHasBottomNavView(activity.currentFragment)) {

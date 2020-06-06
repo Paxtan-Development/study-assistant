@@ -1,0 +1,120 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "e18b5c627f648972dfe62b4a3ed8996c",
+    "entities": [
+      {
+        "tableName": "NotesSubject",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_subjectId` INTEGER NOT NULL, `title` TEXT, `contents` TEXT, `sortOrder` INTEGER NOT NULL, PRIMARY KEY(`_subjectId`))",
+        "fields": [
+          {
+            "fieldPath": "subjectId",
+            "columnName": "_subjectId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contents",
+            "columnName": "contents",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_subjectId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "NotesContent",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_noteId` INTEGER NOT NULL, `subjectId` INTEGER NOT NULL, `noteTitle` TEXT, `noteContent` TEXT, `lastEdited` TEXT, `lockedSalt` TEXT, `lockedPass` TEXT, `alertDate` TEXT, `alertCode` INTEGER, PRIMARY KEY(`_noteId`))",
+        "fields": [
+          {
+            "fieldPath": "noteId",
+            "columnName": "_noteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subjectId",
+            "columnName": "subjectId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteTitle",
+            "columnName": "noteTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noteContent",
+            "columnName": "noteContent",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastEdited",
+            "columnName": "lastEdited",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lockedSalt",
+            "columnName": "lockedSalt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lockedPass",
+            "columnName": "lockedPass",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "alertDate",
+            "columnName": "alertDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "alertCode",
+            "columnName": "alertCode",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_noteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e18b5c627f648972dfe62b4a3ed8996c')"
+    ]
+  }
+}

@@ -35,17 +35,16 @@ import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectSubject;
 import com.pcchin.studyassistant.file.notes.exportsubj.ExportSubjectZip;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
+import com.pcchin.studyassistant.fragment.notes.SubjectSelectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.utils.misc.InputValidation;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
-
-import java.util.ArrayList;
 
 /** 2nd class for the functions for the onClickListeners in the fragment. **/
 public class NotesSubjectFragmentClick2 {
@@ -62,7 +61,7 @@ public class NotesSubjectFragmentClick2 {
                 fragment.getLayoutInflater().inflate(R.layout.popup_edittext, null);
         // End icon has been set in XML file
         if (popupView.getEditText() != null) {
-            popupView.getEditText().setText(fragment.notesSubject);
+            popupView.getEditText().setText(fragment.currentSubject.title);
         }
 
         DismissibleDialogFragment dismissibleDialog = new DismissibleDialogFragment(new AlertDialog.Builder(fragment.requireContext())
@@ -80,13 +79,18 @@ public class NotesSubjectFragmentClick2 {
         if (popupView.getEditText() != null) {
             String popupInputText = popupView.getEditText().getText().toString();
             // Check if input is blank
+            // No else statement as error is shown through InputValidation
             if (!new InputValidation(fragment.getContext()).inputIsBlank(
-                    popupInputText, popupView, R.string.n_error_subject_empty)
-                    && fragment.subjectDatabase.SubjectDao().search(popupInputText) != null) {
-                popupView.setErrorEnabled(true);
-                popupView.setError(fragment.getString(R.string.error_subject_exists));
-            } else {
-                moveSubject((MainActivity) fragment.requireActivity(), dismissibleDialog, popupInputText);
+                    popupInputText, popupView, R.string.n_error_subject_empty)) {
+                SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
+                NotesSubject targetSubject = database.SubjectDao().searchByTitle(popupInputText);
+                database.close();
+                if (targetSubject == null) {
+                    popupView.setErrorEnabled(true);
+                    popupView.setError(fragment.getString(R.string.error_subject_exists));
+                } else {
+                    moveSubject((MainActivity) fragment.requireActivity(), dismissibleDialog, popupInputText);
+                }
             }
         }
     }
@@ -96,24 +100,21 @@ public class NotesSubjectFragmentClick2 {
                              String popupInputText) {
         // Move subject
         dialogInterface.dismiss();
-        NotesSubject subject = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
-        NotesSubject newSubject = new NotesSubject(popupInputText,
-                subject.contents, subject.sortOrder);
-        fragment.subjectDatabase.SubjectDao().insert(newSubject);
-        fragment.subjectDatabase.SubjectDao().delete(subject);
-        fragment.subjectDatabase.close();
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
+        fragment.currentSubject.title = popupInputText;
+        database.SubjectDao().update(fragment.currentSubject);
+        database.close();
 
         // Display new subject
-        Toast.makeText(fragment.requireActivity(), R.string.n2_subject_renamed,
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(fragment.requireActivity(), R.string.n2_subject_renamed, Toast.LENGTH_SHORT).show();
         NavViewFunctions.updateNavView(activity);
-        activity.displayFragment(NotesSubjectFragment
-                .newInstance(popupInputText));
+        activity.displayFragment(NotesSubjectFragment.newInstance(fragment.currentSubject.subjectId));
     }
 
     /** Export all the notes of the subject into a ZIP file,
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
+        // TODO: Do with export
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
                 .checkSelfPermission(fragment.requireContext(), Manifest.permission
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -124,11 +125,10 @@ public class NotesSubjectFragmentClick2 {
                     .setTitle(R.string.n2_export_format)
                     .setItems(R.array.n_import_subject_format, (dialogInterface, i) ->
                             new Handler().post(() -> {
-                                if (i == 0) new ExportSubjectZip(fragment, fragment.subjectDatabase,
-                                        fragment.notesArray, fragment.notesSubject).askZipPassword();
-                                else new ExportSubjectSubject(fragment, fragment.notesSubject,
-                                        fragment.notesArray, fragment.subjectDatabase.SubjectDao()
-                                        .search(fragment.notesSubject).sortOrder).exportSubject();
+                                if (i == 0) new ExportSubjectZip(fragment, fragment.notesList,
+                                        fragment.currentSubject).askZipPassword();
+                                else new ExportSubjectSubject(fragment, fragment.currentSubject,
+                                        fragment.notesList).exportSubject();
                             }))
                     .setNegativeButton(android.R.string.cancel, null)
                     .create())
@@ -137,7 +137,7 @@ public class NotesSubjectFragmentClick2 {
     }
 
     /** Deletes the current subject and returns to
-     * @see NotesSelectFragment **/
+     * @see SubjectSelectFragment **/
     public void onDeletePressed() {
         new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
                 .setTitle(R.string.del)
@@ -154,32 +154,25 @@ public class NotesSubjectFragmentClick2 {
 
         // Deletes subject from database
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        NotesSubject delTarget = database.SubjectDao().search(fragment.notesSubject);
-        if (delTarget != null) {
-            database.SubjectDao().delete(delTarget);
-        }
+        database.SubjectDao().delete(fragment.currentSubject);
+        database.ContentDao().batchDeleteBySubject(fragment.currentSubject.subjectId);
         database.close();
-        // Return to NotesSelectFragment
+        // Return to SubjectSelectFragment
         Toast.makeText(fragment.requireContext(), R.string.n2_deleted, Toast.LENGTH_SHORT).show();
         NavViewFunctions.updateNavView((MainActivity) activity);
-        fragment.subjectDatabase.close();
-        ((MainActivity) activity).displayFragment(new NotesSelectFragment());
+        ((MainActivity) activity).displayFragment(new SubjectSelectFragment());
     }
 
     /** Deletes any alerts that belong to the subject. **/
     private void deletePhantomAlerts(Activity activity) {
-        for (ArrayList<String> note: fragment.notesArray) {
+        for (NotesContent note: fragment.notesList) {
             AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-            if (manager != null && note.size() >= 6 && note.get(5) != null
-                    && note.get(0) != null && note.get(2) != null) {
+            if (manager != null && note.alertDate != null) {
                 // Get PendingIntent for note alert
                 Intent intent = new Intent(fragment.requireActivity(), NotesNotifyReceiver.class);
-                intent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, note.get(0));
-                intent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, note.get(2));
-                intent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, note.get(5));
-                PendingIntent alertIntent = PendingIntent.getBroadcast(
-                        fragment.requireActivity(), Integer.parseInt(note.get(5)), intent, 0);
-
+                intent.putExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, note.noteId);
+                PendingIntent alertIntent = PendingIntent.getBroadcast(fragment.requireActivity(),
+                        note.alertCode, intent, 0);
                 manager.cancel(alertIntent);
             }
         }

@@ -52,7 +52,7 @@ class ImportSubject {
         if (title.length() > 0) {
             SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
             // Import to notes
-            if (database.SubjectDao().search(title) != null) {
+            if (database.SubjectDao().searchByTitle(title) != null) {
                 showConflictDialog(title, contents, sortOrder);
             } else {
                 database.SubjectDao().insert(new NotesSubject(title, contents, sortOrder));
@@ -117,7 +117,7 @@ class ImportSubject {
         if (inputLayout.getEditText() != null) {
             inputText = inputLayout.getEditText().getText().toString();
         }
-        if (inputText.length() > 0 && database.SubjectDao().search(inputText) == null) {
+        if (inputText.length() > 0 && database.SubjectDao().searchByTitle(inputText) == null) {
             // Import subject into notes
             database.SubjectDao().insert(new NotesSubject(inputText, contents, sortOrder));
             dismissibleFragment.dismiss();
@@ -138,7 +138,7 @@ class ImportSubject {
      * sort order will inherit the original subject stored on the notes. **/
     private void mergeSubjects(String title, ArrayList<ArrayList<String>> newContent) {
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        NotesSubject editSubject = database.SubjectDao().search(title);
+        NotesSubject editSubject = database.SubjectDao().searchByTitle(title);
         ArrayList<ArrayList<String>> oldContents = editSubject.contents;
 
         // Compare and add notes if necessary

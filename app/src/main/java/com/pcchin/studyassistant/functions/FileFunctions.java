@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
 /** Functions used in managing files. **/
 public final class FileFunctions {
@@ -117,16 +116,6 @@ public final class FileFunctions {
             e.printStackTrace();
         }
         return stringBuilder.toString();
-    }
-
-    /** Checks the integrity of a note. **/
-    public static void checkNoteIntegrity(@NonNull ArrayList<String> original) {
-        while (original.size() < 3) {
-            original.add("");
-        }
-        while (original.size() < 6) {
-            original.add(null);
-        }
     }
 
     /** Gets the number of bytes required of data from a file.

@@ -256,7 +256,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         if (project.associatedSubject != null) {
             // Opens subject database
             SubjectDatabase subjDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
-            NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
+            NotesSubject targetSubject = subjDatabase.SubjectDao().searchById(project.associatedSubject);
             if (targetSubject == null) {
                 // Ask the user whether to remove the associated subject
                 AlertDialog subjDialog = new AlertDialog.Builder(requireContext())
@@ -274,7 +274,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                 subjDatabase.close();
                 projectDatabase.close();
                 requireActivity();
-                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(project.associatedSubject));
+                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(String.valueOf(project.associatedSubject)));
             }
         }
     }

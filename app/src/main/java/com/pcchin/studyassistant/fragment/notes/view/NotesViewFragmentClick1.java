@@ -29,14 +29,12 @@ import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /** The 1st class of functions used when the fragment is clicked. **/
@@ -52,7 +50,7 @@ public class NotesViewFragmentClick1 {
      * @see NotesEditFragment **/
     public void onEditPressed() {
         ((MainActivity) fragment.requireActivity()).displayFragment(NotesEditFragment
-                .newInstance(fragment.notesSubject, fragment.notesOrder));
+                .newInstance(fragment.note.subjectId, fragment.note.noteId));
     }
 
     /** Exports the note to a txt file. **/
@@ -68,11 +66,12 @@ public class NotesViewFragmentClick1 {
                     .setMessage(R.string.n3_confirm_export_note)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        String outputText = FileFunctions.generateValidFile(FileFunctions.getDownloadDir(fragment.requireContext())
-                                + fragment.notesInfo.get(0), ".txt");
-                        FileFunctions.exportTxt(outputText, fragment.notesInfo.get(2));
+                        String outputFilePath = FileFunctions.generateValidFile(
+                                FileFunctions.getDownloadDir(fragment.requireContext())
+                                + fragment.note.noteTitle, ".txt");
+                        FileFunctions.exportTxt(outputFilePath, fragment.note.noteContent);
                         Toast.makeText(fragment.requireContext(), fragment.getString(R.string.n3_note_exported)
-                                        + outputText, Toast.LENGTH_SHORT).show();
+                                        + outputFilePath, Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .create())
@@ -107,50 +106,30 @@ public class NotesViewFragmentClick1 {
             inputText = inputLayout.getEditText().getText().toString();
         }
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
-        ArrayList<ArrayList<String>> contents = subject.contents;
-        writeNoteLock(database, subject, contents, inputText);
-        database.close();
-        fragment.isLocked = true;
-        fragment.requireActivity().invalidateOptionsMenu();
-    }
-
-    /** Updates the new values of the locked note to the database. **/
-    private void writeNoteLock(SubjectDatabase database, NotesSubject subject,
-                               ArrayList<ArrayList<String>> contents, String inputText) {
-        if (contents != null && contents.size() > fragment.notesOrder) {
-            FileFunctions.checkNoteIntegrity(contents.get(fragment.notesOrder));
-            if (inputText.length() == 0) {
-                contents.get(fragment.notesOrder).set(3, "");
-            } else {
-                contents.get(fragment.notesOrder).set(3, SecurityFunctions.notesHash(inputText));
-            }
-            subject.contents = contents;
-            database.SubjectDao().update(subject);
-            Toast.makeText(fragment.requireContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
+        if (inputText.length() == 0) {
+            fragment.note.lockedPass = "";
+        } else {
+            fragment.note.lockedPass = SecurityFunctions.notesHash(inputText);
         }
+        database.ContentDao().update(fragment.note);
+        Toast.makeText(fragment.requireContext(), R.string.n3_note_locked, Toast.LENGTH_SHORT).show();
+        database.close();
+        fragment.requireActivity().invalidateOptionsMenu();
     }
 
     /** Unlocks the note. If there is no password, the note will be unlocked immediately.
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
-        ArrayList<ArrayList<String>> contents = subject.contents;
-
-        if (contents != null && contents.size() > fragment.notesOrder) {
-            FileFunctions.checkNoteIntegrity(contents.get(fragment.notesOrder));
-            // Unlocks immediately if no password
-            if (contents.get(fragment.notesOrder).get(3) != null &&
-                    contents.get(fragment.notesOrder).get(3).length() > 0)
-                setUnlockDialogLayout(database, subject, contents);
-            else removeLock(contents, database, subject);
+        if (fragment.note.lockedPass != null && !fragment.note.lockedPass.equals("")) {
+            setUnlockDialogLayout(database);
+        } else {
+            removeLock(database);
         }
     }
 
     /** Sets the layout for the unlock dialog. **/
-    private void setUnlockDialogLayout(SubjectDatabase database, NotesSubject subject,
-                                       ArrayList<ArrayList<String>> contents) {
+    private void setUnlockDialogLayout(SubjectDatabase database) {
         @SuppressLint("InflateParams") TextInputLayout inputLayout =
                 (TextInputLayout) fragment.getLayoutInflater()
                         .inflate(R.layout.popup_edittext, null);
@@ -165,7 +144,7 @@ public class NotesViewFragmentClick1 {
                 .setView(inputLayout)
                 .create());
         dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok),
-                view -> setPositiveButton(dismissibleFragment, inputLayout, contents, database, subject));
+                view -> setPositiveButton(dismissibleFragment, inputLayout, database));
         dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
                 view -> dismissibleFragment.dismiss());
         dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesViewFragment.3");
@@ -173,17 +152,16 @@ public class NotesViewFragmentClick1 {
 
     /** Sets the positive button for the unlock dialog. **/
     private void setPositiveButton(DismissibleDialogFragment dismissibleFragment,
-                                   @NonNull TextInputLayout inputLayout, ArrayList<ArrayList<String>> contents,
-                                   SubjectDatabase database, NotesSubject subject) {
+                                   @NonNull TextInputLayout inputLayout, SubjectDatabase database) {
         String inputText = "";
         if (inputLayout.getEditText() != null) {
             inputText = inputLayout.getEditText().getText().toString();
         }
-        if (Objects.equals(SecurityFunctions.notesHash(inputText),
-                contents.get(fragment.notesOrder).get(3))) {
+        if (Objects.equals(SecurityFunctions.passwordHash(inputText, fragment.note.lockedSalt),
+                fragment.note.lockedPass)) {
             // Removes password
             dismissibleFragment.dismiss();
-            removeLock(contents, database, subject);
+            removeLock(database);
         } else {
             // Show error dialog
             inputLayout.setErrorEnabled(true);
@@ -192,15 +170,11 @@ public class NotesViewFragmentClick1 {
     }
 
     /** Removes the lock for the note and refreshes the menu.  **/
-    private void removeLock(@NonNull ArrayList<ArrayList<String>> contents,
-                            @NonNull SubjectDatabase database,
-                            @NonNull NotesSubject subject) {
-        contents.get(fragment.notesOrder).set(3, null);
-        subject.contents = contents;
-        database.SubjectDao().update(subject);
+    private void removeLock(@NonNull SubjectDatabase database) {
+        fragment.note.lockedPass = null;
+        database.ContentDao().update(fragment.note);
         database.close();
         Toast.makeText(fragment.requireActivity(), R.string.n3_note_unlocked, Toast.LENGTH_SHORT).show();
-        fragment.isLocked = false;
         fragment.requireActivity().invalidateOptionsMenu();
     }
 }

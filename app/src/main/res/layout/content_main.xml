@@ -22,7 +22,7 @@
     tools:context=".activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <androidx.viewpager.widget.ViewPager
+    <com.pcchin.studyassistant.ui.NoteViewPager
         android:id="@+id/base_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"

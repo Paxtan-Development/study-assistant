@@ -26,8 +26,9 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 
 import net.lingala.zip4j.ZipFile;
@@ -36,23 +37,22 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 /** Functions that export the subject as a ZIP file. **/
 public class ExportSubjectZip {
     private Fragment fragment;
-    private SubjectDatabase subjectDatabase;
-    private ArrayList<ArrayList<String>> notesArray;
-    private String notesSubject;
+    private List<NotesContent> notesList;
+    private NotesSubject notesSubject;
 
     /** The constructor for the functions. **/
-    public ExportSubjectZip(Fragment fragment, SubjectDatabase subjectDatabase,
-                            ArrayList<ArrayList<String>> notesArray, String notesSubject) {
+    public ExportSubjectZip(Fragment fragment, List<NotesContent> notesList, NotesSubject notesSubject) {
         this.fragment = fragment;
-        this.subjectDatabase = subjectDatabase;
-        this.notesArray = notesArray;
+        this.notesList = notesList;
         this.notesSubject = notesSubject;
     }
 
@@ -152,18 +152,18 @@ public class ExportSubjectZip {
     private void exportAllNotes(String tempExportFolder, ArrayList<File> exportFilesList) {
         // Export all the note's data to a text .subj file
         String infoTempOutputPath = FileFunctions.generateValidFile(
-                tempExportFolder + notesSubject, ".subj");
-        try (FileWriter infoTempOutput = new FileWriter(infoTempOutputPath)) {
-            NotesSubject subject = subjectDatabase.SubjectDao().search(notesSubject);
-            infoTempOutput.write(notesSubject + "\n" + subject.sortOrder + "\n");
-            exportNote(tempExportFolder, exportFilesList, infoTempOutput);
-            infoTempOutput.flush();
-            infoTempOutput.close();
+                tempExportFolder + notesSubject.title, ".subj");
+        try (FileOutputStream infoTempStream = new FileOutputStream(infoTempOutputPath);
+             DeflaterOutputStream deflatedInfoTemp = new DeflaterOutputStream(infoTempStream)) {
+            deflatedInfoTemp.write((notesSubject.title + "\n" + notesSubject.sortOrder + "\n").getBytes());
+            exportNote(tempExportFolder, exportFilesList, deflatedInfoTemp);
+            deflatedInfoTemp.flush();
+            deflatedInfoTemp.close();
 
             // Rename temp info output path to .subj file
             exportFilesList.add(new File(infoTempOutputPath));
         } catch (IOException e) {
-            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Writing subject " + notesSubject
+            Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Writing subject " + notesSubject.title
                     + " failed. Stack trace is");
             e.printStackTrace();
         }
@@ -172,27 +172,26 @@ public class ExportSubjectZip {
     /** Export a note to a txt file and add its info to the .subj file. **/
     private void exportNote(String tempExportFolder,
                             ArrayList<File> exportFilesList,
-                            FileWriter infoTempOutput) throws IOException {
-        for (int i = 0; i < notesArray.size(); i++) {
+                            DeflaterOutputStream infoTempOutput) throws IOException {
+        for (int i = 0; i < notesList.size(); i++) {
+            NotesContent currentNote = notesList.get(i);
             // Export the note to the output folder
             String currentPath = FileFunctions.generateValidFile(
-                    tempExportFolder + "/" + notesArray.get(i).get(0),
+                    tempExportFolder + "/" + currentNote.noteTitle,
                     ".txt");
-            FileFunctions.exportTxt(currentPath, notesArray.get(i).get(2));
+            FileFunctions.exportTxt(currentPath, currentNote.noteContent);
             exportFilesList.add(new File(currentPath));
 
             // Record info about the note to the .subj file
-            FileFunctions.checkNoteIntegrity(notesArray.get(i));
-            for (int j = 0; j < notesArray.get(i).size(); j++) {
-                // Convert null to "NULL" string for them to be understood when read
-                if (notesArray.get(i).get(j) == null) {
-                    notesArray.get(i).set(j, "NULL");
-                }
-            }
-            infoTempOutput.write(new File(currentPath).getName()
-                    + "\n" + notesArray.get(i).get(0) + "\n"
-                    + notesArray.get(i).get(3) + "\n" + notesArray.get(i).get(4) + "\n"
-                    + notesArray.get(i).get(5) + "\n");
+            // The format is in:
+            // title, lastEdited, salt, lockedPass, alertDate, alertCode
+            // The content is already in the txt files and
+            infoTempOutput.write((new File(currentPath).getName()
+                    + "\n" + currentNote.noteTitle + "\n"
+                    + ConverterFunctions.isoDateTimeFormat.format(currentNote.lastEdited) + "\n"
+                    + currentNote.lockedSalt + "\n" + currentNote.lockedPass + "\n"
+                    + ConverterFunctions.isoDateTimeFormat.format(currentNote.alertDate) + "\n"
+                    + currentNote.alertCode + "\n").getBytes());
         }
     }
 }

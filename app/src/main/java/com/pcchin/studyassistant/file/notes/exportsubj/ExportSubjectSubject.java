@@ -27,6 +27,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -35,23 +37,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 
 /** Functions that export the subject as a .subject file. **/
 public class ExportSubjectSubject {
     private Fragment fragment;
-    private String notesSubject;
-    private ArrayList<ArrayList<String>> notesArray;
-    private int sortOrder;
+    private NotesSubject notesSubject;
+    private List<NotesContent> notesList;
 
     /** The constructor for the functions. **/
-    public ExportSubjectSubject(Fragment fragment, String notesSubject,
-                                ArrayList<ArrayList<String>> notesArray, int sortOrder) {
+    public ExportSubjectSubject(Fragment fragment, NotesSubject notesSubject,
+                                List<NotesContent> notesList) {
         this.fragment = fragment;
         this.notesSubject = notesSubject;
-        this.notesArray = notesArray;
-        this.sortOrder = sortOrder;
+        this.notesList = notesList;
     }
 
     /** Export the subject as a password-protected byte[] as a .subject file,
@@ -144,15 +144,15 @@ public class ExportSubjectSubject {
         // The length of the title is exported first, followed by the title.
         // Then, the subject's sort order is listed and the encrypted contents are stored.
         // All the contents in the file are then compressed before exported
-        deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.getBytes().length));
-        deflatedOutput.write(notesSubject.getBytes());
-        deflatedOutput.write(ConverterFunctions.intToBytes(sortOrder));
+        deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.title.getBytes().length));
+        deflatedOutput.write(notesSubject.title.getBytes());
+        deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.sortOrder));
         if (finalResponseText1.length() >= 8) {
             deflatedOutput.write(1);
-            deflatedOutput.write(SecurityFunctions.subjectEncrypt(notesSubject, finalResponseText, notesArray));
+            deflatedOutput.write(SecurityFunctions.subjectEncrypt(notesSubject.title, finalResponseText, notesList));
         } else {
             deflatedOutput.write(0);
-            deflatedOutput.write(ConverterFunctions.doubleArrayToJson(notesArray).getBytes());
+            deflatedOutput.write(ConverterFunctions.notesListToString(notesList).getBytes());
         }
         deflatedOutput.flush();
         deflatedOutput.close();

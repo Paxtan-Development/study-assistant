@@ -121,7 +121,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                     projectPass = "";
                 } else {
-                    projectPass = SecurityFunctions.projectHash(projectPass1.getEditText()
+                    projectPass = SecurityFunctions.passwordHash(projectPass1.getEditText()
                             .getText().toString(), projectSalt);
                 }
 
@@ -172,7 +172,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
         } else {
             projectDatabase.ProjectDao().insert(new ProjectData(projectID,
                     Objects.requireNonNull(projectName.getEditText()).getText().toString(), projectSalt,
-                    SecurityFunctions.projectHash(projectPass1.getEditText().getText().toString(), projectSalt),
+                    SecurityFunctions.passwordHash(projectPass1.getEditText().getText().toString(), projectSalt),
                     enableRoles, adminRole, memberRole));
         }
         projectDatabase.close();

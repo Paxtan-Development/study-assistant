@@ -15,7 +15,6 @@ package com.pcchin.studyassistant.fragment.project.settings;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +25,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
@@ -74,7 +74,6 @@ final class ProjectSettingsFragmentChange {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
                 if ((boolean) newValue) {
-                    Log.d("Testing", "Called");
                     checkMemberExists();
                 } else {
                     fragment.project.membersEnabled = false;
@@ -96,7 +95,9 @@ final class ProjectSettingsFragmentChange {
                 updateStatusIcon((String) newValue);
                 break;
             case PreferenceString.PREF_RELATED_SUBJECT:
-                fragment.project.associatedSubject = (String) newValue;
+                SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+                fragment.project.associatedSubject = database.SubjectDao().searchByTitle((String) newValue).subjectId;
+                database.close();
                 break;
         }
         fragment.updateProject();

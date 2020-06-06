@@ -25,7 +25,12 @@ import java.util.List;
 public interface SubjectDao {
     /** Search for a subject based on its title. **/
     @Query("SELECT * FROM notesSubject WHERE title = :title")
-    NotesSubject search(String title);
+    NotesSubject searchByTitle(String title);
+
+    /** Search for a subject based on its ID.
+     * Integer is used instead of int as subjectId might be null. **/
+    @Query("SELECT * FROM notesSubject WHERE _subjectId = :subjectId")
+    NotesSubject searchById(Integer subjectId);
 
     /** Get all of the subjects. **/
     @Query("SELECT * FROM notesSubject ORDER BY title ASC")

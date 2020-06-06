@@ -24,8 +24,16 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
+import java.util.List;
+import java.util.Random;
+
 /** Database related functions used throughout the app. **/
 public final class DatabaseFunctions {
+    public enum ID_TYPE {
+        SUBJECT,
+        NOTE
+    }
+
     private DatabaseFunctions() {
         throw new IllegalStateException("Utility class");
     }
@@ -44,7 +52,7 @@ public final class DatabaseFunctions {
     public static ProjectDatabase getProjectDatabase(Context context) {
         return Room.databaseBuilder(context, ProjectDatabase.class,
                 ActivityConstants.DATABASE_PROJECT)
-                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5, 6)
                 .allowMainThreadQueries().build();
     }
 
@@ -54,7 +62,21 @@ public final class DatabaseFunctions {
         return context.getFilesDir() + "/icons/project/" + projectID + ".jpg";
     }
 
-    /** Generates a valid String based on its type. **/
+    /** Generates a valid subject ID to be used to create a new subject. **/
+    public static int generateValidId(@NonNull SubjectDatabase database, ID_TYPE type) {
+        List<Integer> idList;
+        if (type.equals(ID_TYPE.SUBJECT)) {
+            idList = database.SubjectDao().getAllSubjectId();
+        } else {
+            idList = database.ContentDao().getAllNoteId();
+        }
+        Random idRand = new Random();
+        int currentId = idRand.nextInt();
+        while (idList.contains(currentId)) currentId = idRand.nextInt();
+        return currentId;
+    }
+
+    /** Generates a valid random String based on the type specified. **/
     public static String generateValidProjectString(@NonNull RandomString rand, int type,
                                                     ProjectDatabase projectDatabase) {
         String returnString = rand.nextString();

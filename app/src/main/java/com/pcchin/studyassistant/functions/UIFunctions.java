@@ -86,19 +86,16 @@ public final class UIFunctions {
         if (inputText.replaceAll("\\s+", "").length() == 0) {
             popupView.setErrorEnabled(true);
             popupView.setError(activity.getString(R.string.n_error_subject_empty));
-        } else if (database.SubjectDao().search(inputText) != null) {
+        } else if (database.SubjectDao().searchByTitle(inputText) != null) {
             popupView.setErrorEnabled(true);
             popupView.setError(activity.getString(R.string.error_subject_exists));
         } else {
             // Create subject
-            database.SubjectDao().insert(
-                    new NotesSubject(inputText,
-                            new ArrayList<>(),
-                            NotesSubject.SORT_ALPHABETICAL_ASC));
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+            database.SubjectDao().insert(new NotesSubject(subjectId, inputText, NotesSubject.SORT_ALPHABETICAL_ASC));
             database.close();
             activity.safeOnBackPressed();
-            activity.displayFragment(
-                    NotesSubjectFragment.newInstance(inputText));
+            activity.displayFragment(NotesSubjectFragment.newInstance(subjectId));
             dismissibleFragment.dismiss();
             NavViewFunctions.updateNavView(activity);
         }

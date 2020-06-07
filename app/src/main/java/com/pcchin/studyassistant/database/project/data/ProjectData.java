@@ -107,7 +107,8 @@ public class ProjectData {
      * while if this is false, tasks and status have separate databases. **/
     public boolean mergeTaskStatus;
 
-    /** The info that is displayed at the bottom of the project info page. **/
+    /** The info that is displayed at the bottom of the project info page.
+     * Enums can't be used as there is no proper way to store them. **/
     public int displayedInfo;
 
     /** The ID of the note subject that is associated to the project.

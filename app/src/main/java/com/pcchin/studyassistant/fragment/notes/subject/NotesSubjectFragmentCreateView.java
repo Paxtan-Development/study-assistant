@@ -63,10 +63,11 @@ class NotesSubjectFragmentCreateView {
     }
 
     /** Initializes the mini note view. **/
-    private void initMiniNote(@NonNull LinearLayout miniNote, NotesContent note) {
+    private void initMiniNote(@NonNull LinearLayout miniNote, @NonNull NotesContent note) {
         ((TextView) miniNote.findViewById(R.id.n2_mini_title)).setText(note.noteTitle);
         ((TextView) miniNote.findViewById(R.id.n2_mini_date)).setText(String.format("%s%s",
-                fragment.getString(R.string.n_last_edited), ConverterFunctions.standardDateTimeFormat.format(note.lastEdited)));
+                fragment.getString(R.string.n_last_edited), ConverterFunctions
+                        .formatTime(note.lastEdited, ConverterFunctions.TimeFormat.DATETIME)));
         String miniText = note.noteContent.replace("\n* ", "\n ● ");
         if (miniText.startsWith("* ")) {
             miniText = miniText.replaceFirst("\\* ", " ● ");

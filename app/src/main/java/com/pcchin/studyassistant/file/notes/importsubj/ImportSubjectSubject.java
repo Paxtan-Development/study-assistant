@@ -111,7 +111,7 @@ public class ImportSubjectSubject {
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         // Generate subject
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
         database.close();
         NotesSubject subject = new NotesSubject(subjectId, title, sortOrder);
         // Show password dialog
@@ -135,8 +135,10 @@ public class ImportSubjectSubject {
             password = inputLayout.getEditText().getText().toString();
         }
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+        List<Integer> notesIdList = database.ContentDao().getAllNoteId();
+        database.close();
         List<NotesContent> subjectContents = SecurityFunctions
-                .subjectDecrypt(database, subject, salt, password, content);
+                .subjectDecrypt(notesIdList, subject, salt, password, content);
         if (subjectContents == null) {
             inputLayout.setErrorEnabled(true);
             inputLayout.setError(activity.getString(R.string.error_password_incorrect));
@@ -150,13 +152,13 @@ public class ImportSubjectSubject {
     private void importUnencryptedSubject(String title, int sortOrder, byte[] content) {
         // Subject is not encrypted, create NotesSubject
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
+        List<Integer> notesIdList = database.ContentDao().getAllNoteId();
+        database.close();
 
         String contentString = new String(content);
         NotesSubject subject = new NotesSubject(subjectId, title, sortOrder);
-        List<NotesContent> notesList = ConverterFunctions.stringToNotesList(database, subjectId, contentString);
-        database.close();
-
+        List<NotesContent> notesList = ConverterFunctions.stringToNotesList(notesIdList, subjectId, contentString);
 
         if (notesList == null) {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: A .subject file could not be imported as its content is incorrect.");

@@ -98,7 +98,7 @@ class ImportSubjectZipProcess {
             txtFileList = new ArrayList<>();
             File subjFile = null;
             SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
             database.close();
             // Populate subjFile and txtFileList
             for (File file : fileList) {
@@ -215,7 +215,7 @@ class ImportSubjectZipProcess {
                     titleHashMap.put(currentNotePath, currentLine);
                     break;
                 case 2:
-                    lastEditedHashMap.put(currentNotePath, ConverterFunctions.isoDateTimeFormat.parse(currentLine));
+                    lastEditedHashMap.put(currentNotePath, ConverterFunctions.parseTime(currentLine, ConverterFunctions.TimeFormat.ISO));
                     break;
                 case 3:
                     saltHashMap.put(currentNotePath, currentLine);
@@ -225,7 +225,7 @@ class ImportSubjectZipProcess {
                     break;
                 case 5:
                     if (currentLine.equals("NULL")) alertDateHashMap.put(currentNotePath, null);
-                    else alertDateHashMap.put(currentNotePath, ConverterFunctions.isoDateTimeFormat.parse(currentLine));
+                    else alertDateHashMap.put(currentNotePath, ConverterFunctions.parseTime(currentLine, ConverterFunctions.TimeFormat.ISO));
                     break;
                 case 6:
                     if (currentLine.equals("NULL")) alertCodeHashMap.put(currentLine, null);

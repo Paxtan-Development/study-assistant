@@ -21,7 +21,6 @@ import androidx.room.Room;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.List;
@@ -29,9 +28,15 @@ import java.util.Random;
 
 /** Database related functions used throughout the app. **/
 public final class DatabaseFunctions {
-    public enum ID_TYPE {
+    public enum SUBJ_ID_TYPE {
         SUBJECT,
         NOTE
+    }
+
+    public enum PROJ_ID_TYPE {
+        PROJECT,
+        ROLE,
+        MEMBER
     }
 
     private DatabaseFunctions() {
@@ -63,9 +68,9 @@ public final class DatabaseFunctions {
     }
 
     /** Generates a valid subject ID to be used to create a new subject. **/
-    public static int generateValidId(@NonNull SubjectDatabase database, ID_TYPE type) {
+    public static int generateValidId(@NonNull SubjectDatabase database, SUBJ_ID_TYPE type) {
         List<Integer> idList;
-        if (type.equals(ID_TYPE.SUBJECT)) {
+        if (type.equals(SUBJ_ID_TYPE.SUBJECT)) {
             idList = database.SubjectDao().getAllSubjectId();
         } else {
             idList = database.ContentDao().getAllNoteId();
@@ -77,21 +82,21 @@ public final class DatabaseFunctions {
     }
 
     /** Generates a valid random String based on the type specified. **/
-    public static String generateValidProjectString(@NonNull RandomString rand, int type,
+    public static String generateValidProjectString(@NonNull RandomString rand, @NonNull PROJ_ID_TYPE type,
                                                     ProjectDatabase projectDatabase) {
         String returnString = rand.nextString();
         switch (type) {
-            case ProjectCreateFragment.TYPE_PROJECT:
+            case PROJECT:
                 while (projectDatabase.ProjectDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }
                 break;
-            case ProjectCreateFragment.TYPE_MEMBER:
+            case MEMBER:
                 while (projectDatabase.MemberDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }
                 break;
-            case ProjectCreateFragment.TYPE_ROLE:
+            case ROLE:
                 while (projectDatabase.RoleDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }

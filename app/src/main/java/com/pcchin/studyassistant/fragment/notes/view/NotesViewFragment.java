@@ -112,8 +112,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             returnView.findViewById(R.id.n3_notif_time).setVisibility(View.GONE);
         } else {
             ((TextView) returnView.findViewById(R.id.n3_notif_time)).setText(String.format("%s%s",
-                    getString(R.string.n3_notif_time), ConverterFunctions.standardDateTimeFormat
-                            .format(note.alertDate)));
+                    getString(R.string.n3_notif_time), ConverterFunctions
+                            .formatTime(note.alertDate, ConverterFunctions.TimeFormat.DATETIME)));
         }
     }
 

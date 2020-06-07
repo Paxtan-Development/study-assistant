@@ -106,7 +106,7 @@ public class ExportSubjectZip {
     private void createZipFile(String tempExportFolder, @NonNull String password) throws ZipException {
         // Creates ZIP file
         String exportFilePath = FileFunctions.generateValidFile(
-                FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject, ".zip");
+                FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title, ".zip");
         ZipFile exportFile;
         if (password.length() >= 8) {
             exportFile = new ZipFile(exportFilePath, password.toCharArray());
@@ -188,7 +188,7 @@ public class ExportSubjectZip {
             // The content is already in the txt files
             infoStringBuilder.append(new File(currentPath).getName()).append("\n")
                     .append(currentNote.noteTitle).append("\n")
-                    .append(ConverterFunctions.isoDateTimeFormat.format(currentNote.lastEdited))
+                    .append(ConverterFunctions.formatTime(currentNote.lastEdited, ConverterFunctions.TimeFormat.ISO))
                     .append("\n").append(currentNote.lockedSalt).append("\n");
             appendNullableFields(infoStringBuilder, currentNote);
         }
@@ -199,7 +199,7 @@ public class ExportSubjectZip {
         if (currentNote.alertDate == null) {
             infoStringBuilder.append("NULL\n");
         } else {
-            infoStringBuilder.append(ConverterFunctions.isoDateTimeFormat.format(currentNote.alertDate));
+            infoStringBuilder.append(ConverterFunctions.formatTime(currentNote.alertDate, ConverterFunctions.TimeFormat.ISO));
         }
         if (currentNote.alertCode == null) {
             infoStringBuilder.append("NULL\n");

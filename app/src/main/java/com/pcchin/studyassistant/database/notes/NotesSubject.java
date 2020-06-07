@@ -46,7 +46,8 @@ public class NotesSubject {
     /** The title of the subject. **/
     public String title;
 
-    /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
+    /** The order in which the notes are sorted. The value is one of the 4 constants above.
+     * Enums can't be used here as there is no way to store them properly in the database. **/
     public int sortOrder;
 
     /** Default constructor. **/

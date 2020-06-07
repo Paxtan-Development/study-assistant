@@ -84,7 +84,7 @@ class AppUpdate2 {
             SharedPreferences.Editor editor =
                     activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
             editor.putString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
-                    .standardDateFormat.format(new Date()));
+                    .formatTime(new Date(), ConverterFunctions.TimeFormat.DATE));
             editor.apply();
 
             // Get latest version from releases page

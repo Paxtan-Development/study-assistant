@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
@@ -36,17 +37,11 @@ import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Objects;
 
 public class ProjectCreateFragment extends Fragment implements ExtendedFragment {
-    // Variables used in generateValidString
-    public static final int TYPE_PROJECT = 0;
-    public static final int TYPE_ROLE = 1;
-    public static final int TYPE_MEMBER = 2;
-
     private ProjectDatabase projectDatabase;
     boolean enableMembers = true, enableRoles = true, customAdmin = false, customMember = false;
 
@@ -107,7 +102,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 // Creates admin role
                 RandomString idRand = new RandomString(48),
                         saltRand = new RandomString(40);
-                String projectID = DatabaseFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
+                String projectID = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.PROJECT,
                         projectDatabase);
                 RoleData adminRole = ProjectCreateFragmentCreate.createAdminRole(customAdmin, idRand,
                             saltRand, projectID, customAdminName, customAdminPass1, projectDatabase),
@@ -116,7 +111,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 projectDatabase.RoleDao().insert(adminRole);
                 projectDatabase.RoleDao().insert(memberRole);
 
-                String projectSalt = DatabaseFunctions.generateValidProjectString(idRand, TYPE_PROJECT,
+                String projectSalt = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.PROJECT,
                         projectDatabase), projectPass;
                 if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                     projectPass = "";

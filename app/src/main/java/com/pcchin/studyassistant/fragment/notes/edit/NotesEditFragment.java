@@ -104,7 +104,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 // Get values from newInstance and creates a note without inserting into database
                 String notesTitle = getArguments().getString(ARG_PARAM2);
                 currentNote = new NotesContent(DatabaseFunctions.generateValidId(database,
-                        DatabaseFunctions.ID_TYPE.NOTE), subjectId, Objects.requireNonNull(notesTitle),
+                        DatabaseFunctions.SUBJ_ID_TYPE.NOTE), subjectId, Objects.requireNonNull(notesTitle),
                         "", new Date(), new RandomString(40).nextString());
             }
             requireActivity().setTitle(subject.title);

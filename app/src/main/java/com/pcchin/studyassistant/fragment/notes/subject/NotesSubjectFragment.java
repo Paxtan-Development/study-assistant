@@ -111,6 +111,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
                 database.ContentDao().update(note);
             }
         }
+        database.close();
     }
 
     /** Due to the large size of this function, this is passed on to a class of its own. **/

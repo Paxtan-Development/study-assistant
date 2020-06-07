@@ -87,11 +87,12 @@ public class ExportSubjectSubject {
                                           TextInputLayout inputText) {
         if (responseText.length() == 0 || responseText.length() >= 8) {
             // Set output file name
-            String outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject
+            String outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title
                     + ".subject";
             int count = 0;
             while (new File(outputFileName).exists()) {
-                outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject
+                count++;
+                outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title
                         + "(" + count + ").subject";
             }
 

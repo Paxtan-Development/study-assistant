@@ -65,7 +65,7 @@ public class TaskData {
     /** The ID of the member that is assigned to the list. **/
     public String assignedMember;
 
-    /** The status for each task. **/
+    /** The status for each task. Enums can't be used as there is no way to properly store them into the database. **/
     public int taskStatus;
 
     /** Custom status for each task, if needed. **/

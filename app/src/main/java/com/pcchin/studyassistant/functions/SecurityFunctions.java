@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -111,13 +110,13 @@ public final class SecurityFunctions {
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static List<NotesContent> subjectDecrypt(SubjectDatabase database, @NonNull NotesSubject subject,
+    public static List<NotesContent> subjectDecrypt(List<Integer> notesIdList, @NonNull NotesSubject subject,
                                                     byte[] salt, @NonNull String password,
                                                     byte[] content) {
         byte[] passwordByte = pbkdf2(password.getBytes(), salt, 11000);
         content = blowfish(content, passwordByte, false);
         content = aes(content, passwordByte, salt, false);
-        return ConverterFunctions.stringToNotesList(database, subject.subjectId, new String(content));
+        return ConverterFunctions.stringToNotesList(notesIdList, subject.subjectId, new String(content));
     }
 
     /** Encrypts the message sent to the server through its public RSA key (PKCS1-OAEP). **/

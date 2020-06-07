@@ -116,6 +116,11 @@ public final class MainActivityFunctions {
     void fadeToNote() {
         activity.findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(
                 activity.getApplicationContext(), R.anim.fadeout));
+        if (activity.pager.getAdapter() != null) {
+            // Set the current fragment as the first fragment in the pager adapter
+            activity.currentFragment = (Fragment) activity.pager.getAdapter()
+                    .instantiateItem(activity.findViewById(R.id.base), 0);
+        }
         activity.findViewById(R.id.base).setVisibility(View.GONE);
         activity.pager.setVisibility(View.VISIBLE);
         hideKeyboard();

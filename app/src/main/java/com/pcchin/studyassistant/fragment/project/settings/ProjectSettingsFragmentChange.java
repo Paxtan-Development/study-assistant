@@ -29,7 +29,6 @@ import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
@@ -131,7 +130,7 @@ final class ProjectSettingsFragmentChange {
             // Create member
             RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
             MemberData initialMember = new MemberData(DatabaseFunctions
-                    .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
+                    .generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.MEMBER,
                             fragment.projectDatabase), fragment.project.projectID,
                     memberName, "", saltRand.nextString(), "", fragment.role.roleID);
             fragment.projectDatabase.MemberDao().insert(initialMember);

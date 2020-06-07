@@ -90,6 +90,7 @@ public class NotesContent {
     }
 
     /** Constructor used to create the note. Used when importing a new note. **/
+    @Ignore
     public NotesContent(int noteId, int subjectId, @NonNull String noteTitle, @NonNull String noteContent,
                         @NonNull Date lastEdited, @NonNull String lockedSalt, @NonNull String lockedPass,
                         Date alertDate, Integer alertCode) {

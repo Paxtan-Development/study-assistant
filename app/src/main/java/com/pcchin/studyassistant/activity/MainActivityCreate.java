@@ -110,7 +110,7 @@ final class MainActivityCreate {
                 new Handler().post(() -> new AppUpdate(activity, true));
             } else if (!Objects.equals(activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
                             .getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.standardDateFormat.format(new Date()))) {
+                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
                 new Handler().post(() -> new AppUpdate(activity, false));
             }
         } else {

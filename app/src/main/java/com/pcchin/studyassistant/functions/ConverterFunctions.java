@@ -24,7 +24,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.database.notes.NotesContent;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 /** Functions specifically used to convert from one type of variable to another. **/
 public final class ConverterFunctions {
@@ -46,36 +46,74 @@ public final class ConverterFunctions {
         throw new IllegalStateException("Utility class");
     }
 
-    /** The ISO-8601 compliant date and time format.  **/
-    public static final SimpleDateFormat isoDateTimeFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.ENGLISH);
-    /** The standard date and time display format. **/
-    public static final SimpleDateFormat standardDateTimeFormat =
-            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
-    /** The standard date storage format. **/
-    public static final SimpleDateFormat standardDateFormat =
-            new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+    /** The time format available to be used.
+     * DATE is the standard format for displaying date,
+     * DATETIME is the standard format for displaying date and time,
+     * ISO is the time used internally when storing dates. **/
+    public enum TimeFormat {
+        ISO,
+        DATETIME,
+        DATE
+    }
+
+    /** Parse a time according to the required time format.
+     * DATETIME and DATE are not used for now but may be needed in the future. **/
+    public static Date parseTime(String original, @NonNull TimeFormat format) throws ParseException {
+        SimpleDateFormat dateFormat;
+        switch (format) {
+            case DATETIME:
+                dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+                break;
+            case DATE:
+                dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                break;
+            default:
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.ENGLISH);
+                break;
+        }
+        return dateFormat.parse(original);
+    }
+
+    /** Formats a time according to the required time format. **/
+    @NonNull
+    public static String formatTime(@NonNull Date original, @NonNull TimeFormat format) {
+        SimpleDateFormat dateFormat;
+        switch (format) {
+            case DATETIME:
+                dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+                break;
+            case DATE:
+                dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                break;
+            default:
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.ENGLISH);
+                break;
+        }
+        return dateFormat.format(original);
+    }
 
     private static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
 
-    /** Converts a date to a ISO-8601 compliant string. If the date is null, "null" is returned. **/
+    /** Converts a date to a ISO-8601 compliant string. If the date is null, "null" is returned.
+     * Test not implemented due to SimpleDateFormat being weird. **/
     @NonNull
     @TypeConverter
     public static String dateToString(Date original) {
         if (original == null) {
             return "null";
         } else {
-            return isoDateTimeFormat.format(original);
+            return formatTime(original, TimeFormat.ISO);
         }
     }
 
     /** Converts a ISO-8601 compliant string to a date,
-     * returns null if fails or if string is "null". **/
+     * returns null if fails or if string is "null".
+     * Test not implemented due to SimpleDateFormat being weird. **/
     @TypeConverter
     public static Date stringToDate(String original) {
         if (Objects.equals(original, "null")) return null;
         try {
-            return isoDateTimeFormat.parse(original);
+            return parseTime(original, TimeFormat.ISO);
         } catch (ParseException e) {
             return null;
         }
@@ -83,7 +121,7 @@ public final class ConverterFunctions {
 
     /** Converts a single layer integer ArrayList to a string JSON array.
      * GSON was used for backwards compatibility and is more secure. **/
-    static String singleIntArrayToJson(ArrayList<Integer> original) {
+    public static String singleIntArrayToJson(ArrayList<Integer> original) {
         return new Gson().toJson(original);
     }
 
@@ -92,7 +130,7 @@ public final class ConverterFunctions {
      * Returns an empty ArrayList if the original array is empty.
      * GSON was used for backwards compatibility and is more secure.**/
     @Nullable
-    static ArrayList<Integer> jsonToSingleIntegerArray(String original) {
+    public static ArrayList<Integer> jsonToSingleIntegerArray(String original) {
         Type listType = new TypeToken<ArrayList<Integer>>() {}.getType();
         if (isCorrectGson(original, listType)) {
             return new Gson().fromJson(original, listType);
@@ -108,14 +146,23 @@ public final class ConverterFunctions {
         for (NotesContent note: original) {
             // Each ArrayList would have 7 objects in the following order:
             // title, contents, last edited, lockedSalt, lockedPass, alertDate and alertCode
-            // The date would be in the ISO Date time format instead of the old standardDateTimeFormat
+            // The date would be in the ISO Date time format
             ArrayList<String> currentList = new ArrayList<>();
             currentList.add(note.noteTitle);
-            currentList.add(ConverterFunctions.isoDateTimeFormat.format(note.lastEdited));
             currentList.add(note.noteContent);
+            currentList.add(formatTime(note.lastEdited, TimeFormat.ISO));
+            currentList.add(note.lockedSalt);
             currentList.add(note.lockedPass);
-            currentList.add(ConverterFunctions.isoDateTimeFormat.format(note.alertDate));
-            currentList.add(String.valueOf(note.alertCode));
+            if (note.alertDate == null) {
+                currentList.add("NULL");
+            } else {
+                currentList.add(formatTime(note.alertDate, TimeFormat.ISO));
+            }
+            if (note.alertCode == null) {
+                currentList.add("NULL");
+            } else {
+                currentList.add(String.valueOf(note.alertCode));
+            }
             returnList.add(currentList);
         }
         return new Gson().toJson(returnList);
@@ -126,27 +173,30 @@ public final class ConverterFunctions {
      * The String is first converted into a double layered ArrayList,
      * which is then converted back to a list of NotesContent objects.
      * This function will not update the note into the database and must be done separately. */
-    public static ArrayList<NotesContent> stringToNotesList(SubjectDatabase database,
+    public static ArrayList<NotesContent> stringToNotesList(List<Integer> notesIdList,
                                                             int subjectId, String original) {
         Type listType = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
         if (isCorrectGson(original, listType)) {
             // Each ArrayList would have 7 objects in the following order:
             // title, contents, last edited, lockedSalt, lockedPass, alertDate and alertCode
+            Random rand = new Random();
             ArrayList<ArrayList<String>> importedContent = new Gson().fromJson(original, listType);
             ArrayList<NotesContent> returnList = new ArrayList<>();
             for (ArrayList<String> importedNote: importedContent) { // No checks for array size as error would be thrown
                 try {
-                    // Generate valid note ID
-                    int noteId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.NOTE);
-                    // Special case for alertCode
-                    Integer alertCode = importedNote.get(6) == null ? null : Integer.parseInt(importedNote.get(6));
+                    int noteId = rand.nextInt();
+                    while (notesIdList.contains(noteId)) noteId = rand.nextInt();
+                    // Special case for alertDate and alertCode
+                    Date alertDate = importedNote.get(5).equals("NULL") ? null : parseTime(importedNote.get(5), TimeFormat.ISO);
+                    Integer alertCode = importedNote.get(6).equals("NULL") ? null : Integer.parseInt(importedNote.get(6));
                     NotesContent currentNote = new NotesContent(noteId, subjectId, importedNote.get(0),
-                            importedNote.get(1), Objects.requireNonNull(isoDateTimeFormat.parse(importedNote.get(2))), importedNote.get(3),
-                            importedNote.get(4), isoDateTimeFormat.parse(importedNote.get(5)), alertCode);
+                            importedNote.get(1), Objects.requireNonNull(parseTime(importedNote.get(2), TimeFormat.ISO)), importedNote.get(3),
+                            importedNote.get(4), alertDate, alertCode);
                     returnList.add(currentNote);
                 } catch (NullPointerException | IndexOutOfBoundsException | ParseException | NumberFormatException e) {
                     Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Unable to parse " +
                             "notes of the imported file. The file may be corrupted.");
+                    e.printStackTrace();
                 }
             }
             return returnList;
@@ -154,7 +204,8 @@ public final class ConverterFunctions {
         return null;
     }
 
-    /** Checks if a string is formatted in the JSON format and of the correct list type. **/
+    /** Checks if a string is formatted in the JSON format and of the correct list type.
+     * Test not implemented as not used directly. **/
     private static boolean isCorrectGson(String Json, Type listType) {
         try {
             new JSONObject(Json);
@@ -199,7 +250,8 @@ public final class ConverterFunctions {
 
     /** Takes in a byte array
      * @param original and convert it into a hexadecimal string.
-     * From https://stackoverflow.com/a/9855338 **/
+     * From https://stackoverflow.com/a/9855338
+     * Test not implemented as not used directly. **/
     @NonNull
     static String bytesToHex(@NonNull byte[] original) {
         byte[] hexChars = new byte[original.length * 2];

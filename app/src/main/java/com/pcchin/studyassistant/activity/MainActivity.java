@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity
         }
         SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(MainActivity.this);
         List<NotesContent> notesList = subjectDatabase.ContentDao().searchBySubject(subjectId);
+        subjectDatabase.close();
         FragmentStatePagerAdapter baseAdapter = new MainActivityFunctions(MainActivity.this).getNoteAdapter(notesList);
         // Updates currentFragment to the current item
         ViewPager.OnPageChangeListener baseAdapterPageChanger = new MainActivityFunctions(MainActivity.this)

@@ -123,7 +123,7 @@ public class NotesViewFragmentClick2 {
     /** Inserts the alarm and resets the menu. **/
     private void insertAlarm(AlarmManager manager, PendingIntent alarmIntent, Calendar targetDateTime) {
         if (manager != null) {
-            Log.w(ActivityConstants.LOG_APP_NAME, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+            Log.w(ActivityConstants.LOG_APP_NAME, ConverterFunctions.formatTime(targetDateTime.getTime(), ConverterFunctions.TimeFormat.DATETIME));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // User may use note alert to do important things, so
                 // they would need to be called when when idle

@@ -91,7 +91,7 @@ public final class UIFunctions {
             popupView.setError(activity.getString(R.string.error_subject_exists));
         } else {
             // Create subject
-            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.ID_TYPE.SUBJECT);
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
             database.SubjectDao().insert(new NotesSubject(subjectId, inputText, NotesSubject.SORT_ALPHABETICAL_ASC));
             database.close();
             activity.safeOnBackPressed();

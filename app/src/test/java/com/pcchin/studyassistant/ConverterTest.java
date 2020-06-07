@@ -114,15 +114,8 @@ public class ConverterTest {
         // Initialize variables
         Random rand = new Random();
         ArrayList<NotesContent> originalList, convertedList;
-        List<Integer> notesIdList = new ArrayList<>();
-        int fakeId, subjectId;
-
-        // Populate notesIdList with mock notes
-        for (int j = 0; j < rand.nextInt(100); j++) {
-            fakeId = rand.nextInt();
-            while (notesIdList.contains(fakeId)) fakeId = rand.nextInt();
-            notesIdList.add(fakeId);
-        }
+        List<Integer> notesIdList = TestFunctions.generateIdList(rand, 100);
+        int subjectId;
 
         for (int i = 0; i < rand.nextInt(20); i++) {
             subjectId = rand.nextInt();

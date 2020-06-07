@@ -13,10 +13,16 @@
 
 package com.pcchin.studyassistant;
 
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /** Test local hashing & encryption/decryption functions. **/
 public class SecurityTest {
@@ -29,6 +35,35 @@ public class SecurityTest {
         } else {
             TEST_COUNT = 500;
         }
+    }
+
+    /** Test if the encryption for subjects is working. **/
+    @Test
+    public void testSubjectEncrypt() {
+        Random rand = new Random();
+        int subjectId = rand.nextInt();
+        String password = TestFunctions.randomString(1000);
+        byte[] salt = new byte[32];
+        rand.nextBytes(salt);
+        List<NotesContent> originalList = TestFunctions.generateRandomNotes(TEST_COUNT, subjectId);
+        byte[] encrypted = SecurityFunctions.subjectEncrypt(password, salt, originalList);
+        Assert.assertNotNull(encrypted);
+    }
+
+    /** Test if the encryption and the decryption for subjects is working. **/
+    @Test
+    public void testSubjectEncryptDecrypt() {
+        Random rand = new Random();
+        int subjectId = rand.nextInt();
+        String password = TestFunctions.randomString(1000);
+        byte[] salt = new byte[32];
+        rand.nextBytes(salt);
+        ArrayList<NotesContent> originalList = TestFunctions.generateRandomNotes(TEST_COUNT, subjectId);
+        List<Integer> notesIdList = TestFunctions.generateIdList(rand, 50);
+        List<NotesContent> convertedList = SecurityFunctions.subjectDecrypt(notesIdList,
+                new NotesSubject(subjectId, TestFunctions.randomString(10000), 1),
+                salt, password, SecurityFunctions.subjectEncrypt(password, salt, originalList));
+        TestFunctions.customNotesListAssert(originalList, (ArrayList<NotesContent>) convertedList);
     }
 
     /** Check if the AES algorithm is working. **/

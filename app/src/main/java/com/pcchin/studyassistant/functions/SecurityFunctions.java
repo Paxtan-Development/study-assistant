@@ -93,7 +93,8 @@ public final class SecurityFunctions {
     }
 
     /** Functions used to hash a password through PBKDF2. This function replaces notesHash,
-     * projectHash, roleHash and memberHash. **/
+     * projectHash, roleHash and memberHash.
+     * No need for test as it is just a wrapper around PBKDF2, which is covered in testPbkdf2. **/
     public static String passwordHash(@NonNull String original, @NonNull String salt) {
         return Base64.encodeToString(pbkdf2(original.getBytes(), salt.getBytes(), 10800),
                 Base64.DEFAULT);

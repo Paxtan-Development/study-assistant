@@ -23,6 +23,7 @@ import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /** Functions used in tests **/
@@ -77,5 +78,19 @@ class TestFunctions {
                     rand.nextBoolean() ? null : alertDate, alertCode));
         }
         return originalList;
+    }
+
+    /** Generates a random ArrayList of Integers based on the given bound. **/
+    @NonNull
+    static List<Integer> generateIdList(@NonNull Random rand, int bound) {
+        List<Integer> idList = new ArrayList<>();
+        int fakeId;
+        // Populate notesIdList with mock notes
+        for (int j = 0; j < rand.nextInt(bound); j++) {
+            fakeId = rand.nextInt();
+            while (idList.contains(fakeId)) fakeId = rand.nextInt();
+            idList.add(fakeId);
+        }
+        return idList;
     }
 }

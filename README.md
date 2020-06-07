@@ -21,6 +21,18 @@ If you wish to compile in a version other than debug, you would need to set up t
 You would also need to set up the public key to access the server in a PKCS8 PEM format (2048 bits) under `app/src/main/assets/public.pem` without its headers.
 A corresponding private key should be available on the server as seen [here](https://github.com/Paxtan-Development/api) with PKCS8 PEM format as well.
 
+## Data Collection
+An unique identifier, or UID, is assigned to each app to assist in error tracking.
+ This UID is randomly generated and does not contain any personal or device information of the user.
+
+Your UID and app version would be automatically recorded in the event of a crash.
+ If you wish to submit more information about a bug or to provide feedback,
+ you may do so through the **Bug Report** and **Feature Suggestion** page located in the **About** section of the app.
+
+Do note that when submitting a bug report manually, your UID, app version and device model would be sent out along with the bug report,
+ and when submitting a feature suggestion, your UID would be automatically recorded.
+ The name and email fields in both pages are optional.
+
 ## Contribution
 Any contribution is welcome, feel free to add any issues or pull requests to the repository.
 

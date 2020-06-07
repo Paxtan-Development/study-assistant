@@ -52,6 +52,7 @@ android {
             }
         }
         buildConfigField "boolean", "IS_LOCAL", "${(boolean) keystoreProperties.getProperty('isLocal')}"
+        buildConfigField "String", "SENTRY_DSN", "${keystoreProperties.getProperty('sentryDsn')}"
         resValue "string", "app_name", "Study Assistant"
     }
     buildTypes {
@@ -128,4 +129,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.10'
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
+
+    // External implementedd libs (.io)
+    implementation 'io.sentry:sentry:1.7.30'
 }

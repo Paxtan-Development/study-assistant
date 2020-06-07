@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FeedbackFragment extends Fragment implements ExtendedFragment {
+    // TODO: Convert to Sentry
     /** Default constructor. **/
     public FeedbackFragment() {
         // Default constructor.

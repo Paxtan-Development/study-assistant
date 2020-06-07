@@ -14,28 +14,26 @@
 package com.pcchin.studyassistant.fragment.about;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.license.LicenseFragment;
 import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
 import com.pcchin.studyassistant.fragment.about.server.BugReportFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
+import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.util.Calendar;
@@ -71,27 +69,11 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                 ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
         returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new RssLicenseFragment()));
-        //noinspection ConstantConditions
-        if (BuildConfig.BUILD_TYPE.equals("release")) {
-            // Do not allow release variants to submit bug report and feature suggestions directly
-            returnView.findViewById(R.id.m2_uid).setVisibility(View.GONE);
-            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
-                startActivity(intent);
-            });
-            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://forms.gle/vbWKoyQpyuSPhqPCA"));
-                startActivity(intent);
-            });
-        } else {
-            ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
-            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view ->
-                    ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
-            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
-                    ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
-        }
+        ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
+        returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
+        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
 
         // Set license text
         UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(

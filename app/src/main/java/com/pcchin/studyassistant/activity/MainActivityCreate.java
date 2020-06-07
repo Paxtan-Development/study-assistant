@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -51,8 +52,13 @@ import com.pcchin.studyassistant.network.update.AppUpdate;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
+import io.sentry.Sentry;
+import io.sentry.event.UserBuilder;
 
 /** Functions used within onCreate of
  * @see MainActivity **/
@@ -71,6 +77,7 @@ final class MainActivityCreate {
         activity.pager = activity.findViewById(R.id.base_pager);
         activity.bottomNavView = activity.findViewById(R.id.bottom_nav);
         setActivityInfo(savedInstanceState);
+        initSentry();
 
         // Get subject, if needed from Intent
         if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, false)) {
@@ -82,6 +89,19 @@ final class MainActivityCreate {
         }
         initFragmentView();
         setNavigation();
+    }
+
+    /** Initializes Sentry to be used in all build configs.
+     * The used is identified by their UID and their app version.
+     * Their device version is not recorded unless they submit a bug report manually. **/
+    private void initSentry() {
+        Map<String, Object> sentryData = new HashMap<>();
+        sentryData.put("Version", BuildConfig.VERSION_NAME);
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        Sentry.init(BuildConfig.SENTRY_DSN);
+        Sentry.getContext().setUser(new UserBuilder()
+                .setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, ""))
+                .setData(sentryData).build());
     }
 
     /** Display and hides the relevant views used by the current activity. **/

@@ -24,9 +24,9 @@ import androidx.fragment.app.Fragment;
 
 import com.pcchin.licenseview.LicenseView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{
@@ -56,6 +56,7 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
             // Updates license info & OnClickListeners
             String[] infoArray = getResources().getStringArray(licenseArray);
             licenseView.addLicense(infoArray);
+            // TODO: Add sentry.io license at https://github.com/getsentry/sentry/blob/master/LICENSE
         }
         return returnScroll;
     }

@@ -38,7 +38,7 @@ import java.util.List;
 
 /** Functions that are used in MainActivity. **/
 public final class MainActivityFunctions {
-    private MainActivity activity;
+    private final MainActivity activity;
 
     /** Constructor used as activity needs to be passed on. **/
     MainActivityFunctions(MainActivity activity) {
@@ -80,7 +80,7 @@ public final class MainActivityFunctions {
     /** A FragmentStatePagerAdapter which contains a notes list, which can then be passed on to
      * @see com.pcchin.studyassistant.ui.NoteViewPager **/
     public abstract static class NotePagerAdapter extends FragmentStatePagerAdapter {
-        public List<NotesContent> notesList;
+        public final List<NotesContent> notesList;
 
         public NotePagerAdapter(List<NotesContent> notesList, FragmentManager fm, int behavior) {
             super(fm, behavior);

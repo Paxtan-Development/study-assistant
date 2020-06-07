@@ -42,8 +42,8 @@ import java.util.Objects;
 /** Functions that are called when a preference is changed in
  * @see ProjectSettingsFragment **/
 final class ProjectSettingsFragmentChange {
-    private ProjectSettingsFragment fragment;
-    private MainActivity activity;
+    private final ProjectSettingsFragment fragment;
+    private final MainActivity activity;
 
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {

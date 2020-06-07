@@ -141,10 +141,10 @@ public final class ConverterFunctions {
                     // Special case for alertCode
                     Integer alertCode = importedNote.get(6) == null ? null : Integer.parseInt(importedNote.get(6));
                     NotesContent currentNote = new NotesContent(noteId, subjectId, importedNote.get(0),
-                            importedNote.get(1), isoDateTimeFormat.parse(importedNote.get(2)), importedNote.get(3),
+                            importedNote.get(1), Objects.requireNonNull(isoDateTimeFormat.parse(importedNote.get(2))), importedNote.get(3),
                             importedNote.get(4), isoDateTimeFormat.parse(importedNote.get(5)), alertCode);
                     returnList.add(currentNote);
-                } catch (IndexOutOfBoundsException | ParseException | NumberFormatException e) {
+                } catch (NullPointerException | IndexOutOfBoundsException | ParseException | NumberFormatException e) {
                     Log.w(ActivityConstants.LOG_APP_NAME, "File Error: Unable to parse " +
                             "notes of the imported file. The file may be corrupted.");
                 }

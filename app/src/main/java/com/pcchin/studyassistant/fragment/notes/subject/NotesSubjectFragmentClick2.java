@@ -48,7 +48,7 @@ import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
 /** 2nd class for the functions for the onClickListeners in the fragment. **/
 public class NotesSubjectFragmentClick2 {
-    private NotesSubjectFragment fragment;
+    private final NotesSubjectFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesSubjectFragmentClick2(NotesSubjectFragment fragment) {

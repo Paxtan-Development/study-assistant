@@ -33,8 +33,8 @@ import java.util.Objects;
 /** Functions that are called to customize preferences in
  * @see ProjectSettingsFragment **/
 final class ProjectSettingsFragmentCustomize {
-    private ProjectSettingsFragment fragment;
-    private MainActivity activity;
+    private final ProjectSettingsFragment fragment;
+    private final MainActivity activity;
     
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectSettingsFragmentCustomize(ProjectSettingsFragment fragment) {

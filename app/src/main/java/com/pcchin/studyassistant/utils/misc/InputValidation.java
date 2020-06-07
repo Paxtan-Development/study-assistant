@@ -23,7 +23,7 @@ import com.pcchin.studyassistant.activity.ActivityConstants;
 
 /** Functions to check if the inputs provided are correct, and display an error if not. **/
 public class InputValidation {
-    private Context context;
+    private final Context context;
 
     /** Constructor used as context needs to be passed on. **/
     public InputValidation(Context context) {

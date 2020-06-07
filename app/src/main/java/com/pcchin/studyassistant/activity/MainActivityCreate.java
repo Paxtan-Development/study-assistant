@@ -57,7 +57,7 @@ import java.util.UUID;
 /** Functions used within onCreate of
  * @see MainActivity **/
 final class MainActivityCreate {
-    private MainActivity activity;
+    private final MainActivity activity;
 
     /** Constructor used as activity needs to be passed on. **/
     MainActivityCreate(MainActivity activity) {

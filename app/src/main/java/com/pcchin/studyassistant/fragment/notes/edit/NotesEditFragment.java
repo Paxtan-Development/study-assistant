@@ -37,7 +37,6 @@ import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 public class NotesEditFragment extends Fragment implements ExtendedFragment {
@@ -46,12 +45,10 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
 
     SubjectDatabase database;
     NotesSubject subject;
-    List<NotesContent> noteList;
+    NotesContent currentNote;
 
     boolean hasParent;
     int subjectId;
-
-    NotesContent currentNote;
     boolean subjModified = false;
     // Used only if subjModified
     int targetSubjectId;
@@ -99,7 +96,6 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
             // Get values from newInstance
             subjectId = getArguments().getInt(ARG_PARAM1);
             subject = database.SubjectDao().searchById(subjectId);
-            noteList = database.ContentDao().searchBySubject(subjectId);
             if (hasParent) {
                 // Set title
                 int notesId = getArguments().getInt(ARG_PARAM2);

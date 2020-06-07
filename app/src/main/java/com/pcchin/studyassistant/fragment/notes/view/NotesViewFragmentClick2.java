@@ -45,7 +45,7 @@ import java.util.Random;
 
 /** The 2nd class of functions used when the fragment is clicked. **/
 public class NotesViewFragmentClick2 {
-    private NotesViewFragment fragment;
+    private final NotesViewFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesViewFragmentClick2(NotesViewFragment fragment) {

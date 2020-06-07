@@ -32,7 +32,7 @@ import com.pcchin.studyassistant.functions.ConverterFunctions;
  * @see NotesSubjectFragment **/
 class NotesSubjectFragmentCreateView {
     private static final int MAXLINES = 4;
-    private NotesSubjectFragment fragment;
+    private final NotesSubjectFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     NotesSubjectFragmentCreateView(NotesSubjectFragment fragment) {

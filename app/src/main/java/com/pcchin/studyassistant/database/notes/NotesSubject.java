@@ -20,6 +20,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /** The entity for each Subject. **/
+@SuppressWarnings("CanBeFinal")
 @Entity
 public class NotesSubject {
     /** Sort notes by alphabetical order, ascending. **/

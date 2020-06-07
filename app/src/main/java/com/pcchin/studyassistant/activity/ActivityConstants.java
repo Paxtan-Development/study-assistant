@@ -29,14 +29,7 @@ public final class ActivityConstants {
     // General intent constants
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
     public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";
-    public static final String INTENT_VALUE_REQUEST_CODE = "requestCode";
-
-    // Intent constants for notes
-    public static final String INTENT_VALUE_SUBJECT = "subject";
-    public static final String INTENT_VALUE_SUBJECT_ID = "subjectId";
     public static final String INTENT_VALUE_NOTE_ID = "noteId";
-    public static final String INTENT_VALUE_MESSAGE = "message";
-    public static final String INTENT_VALUE_TITLE = "title";
 
     // Intent codes
     public static final int SELECT_ZIP_FILE = 300;

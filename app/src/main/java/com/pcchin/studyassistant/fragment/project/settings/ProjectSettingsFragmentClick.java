@@ -21,6 +21,7 @@ import androidx.preference.Preference;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
 
@@ -30,8 +31,8 @@ import java.util.Objects;
 /** Functions that are used to handle preference clicks in
  * @see ProjectSettingsFragment **/
 final class ProjectSettingsFragmentClick {
-    private ProjectSettingsFragment fragment;
-    private MainActivity activity;
+    private final ProjectSettingsFragment fragment;
+    private final MainActivity activity;
 
     /** Constructor used as fragment needs to be passed on. **/
     ProjectSettingsFragmentClick(ProjectSettingsFragment fragment) {
@@ -87,8 +88,10 @@ final class ProjectSettingsFragmentClick {
                 }
                 break;
             case PreferenceString.PREF_RELATED_SUBJECT:
-                // TODO: Refactor
-                ((ListPreference) preference).setValue(String.valueOf(fragment.project.associatedSubject));
+                SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+                ((ListPreference) preference).setValue(database.SubjectDao()
+                        .searchById(fragment.project.associatedSubject).title);
+                database.close();
                 break;
         }
     }

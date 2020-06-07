@@ -274,7 +274,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                 subjDatabase.close();
                 projectDatabase.close();
                 requireActivity();
-                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(String.valueOf(project.associatedSubject)));
+                ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(project.associatedSubject));
             }
         }
     }

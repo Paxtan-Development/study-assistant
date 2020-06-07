@@ -32,7 +32,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.customdialog.DefaultDialogFragment;
@@ -67,8 +66,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class AppUpdate2 {
     private static final String STACK_TRACE_IS = ", stack trace is";
 
-    private MainActivity activity;
-    private boolean calledFromNotif;
+    private final MainActivity activity;
+    private final boolean calledFromNotif;
 
     /** Constructor for the functions. **/
     AppUpdate2(MainActivity activity, boolean calledFromNotif) {
@@ -190,7 +189,7 @@ class AppUpdate2 {
     @NonNull
     private VolleyFileDownloadRequest getDownloadRequest(DefaultDialogFragment downloadDialog,
                                                          RequestQueue queue, String downloadLink, String outputFileName) {
-        return new VolleyFileDownloadRequest(Request.Method.GET, downloadLink,
+        return new VolleyFileDownloadRequest(downloadLink,
                 response -> tryCreateApk(downloadDialog, queue, response, outputFileName), error -> {
             downloadDialog.dismiss();
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley file download request failed"

@@ -39,7 +39,7 @@ import java.util.Objects;
 
 /** The 1st class of functions used when the fragment is clicked. **/
 public class NotesViewFragmentClick1 {
-    private NotesViewFragment fragment;
+    private final NotesViewFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesViewFragmentClick1(NotesViewFragment fragment) {

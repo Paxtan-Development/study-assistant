@@ -149,6 +149,7 @@ public final class NetworkFunctions {
     }
 
     /** Class used for conversion of a String to a class to be parsed by GSON. **/
+    @SuppressWarnings("CanBeFinal")
     private static class PlaceholderJsonClass {
         String message;
         private PlaceholderJsonClass(String message) {

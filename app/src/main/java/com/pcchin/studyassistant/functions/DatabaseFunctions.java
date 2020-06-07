@@ -43,7 +43,7 @@ public final class DatabaseFunctions {
     public static SubjectDatabase getSubjectDatabase(Context context) {
         return Room.databaseBuilder(context, SubjectDatabase.class,
                 ActivityConstants.DATABASE_NOTES)
-                .fallbackToDestructiveMigrationFrom(1)
+                .fallbackToDestructiveMigrationFrom(1, 2, 3)
                 .allowMainThreadQueries().build();
     }
 

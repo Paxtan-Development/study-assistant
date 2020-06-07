@@ -34,9 +34,9 @@ import java.util.List;
 
 /** Functions used when the fragment is clicked. **/
 public final class NotesEditFragmentClick {
-    private NotesEditFragment fragment;
-    private View fragmentView;
-    private MainActivity activity;
+    private final NotesEditFragment fragment;
+    private final View fragmentView;
+    private final MainActivity activity;
     
     /** Constructor used as fragment needs to be passed on. **/
     public NotesEditFragmentClick(@NonNull NotesEditFragment fragment) {

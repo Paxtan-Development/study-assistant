@@ -36,9 +36,9 @@ import java.util.Objects;
 
 /** Handles the onCreateView functions from ProjectLoginFragment. **/
 class ProjectLoginFragmentView {
-    private MainActivity activity;
+    private final MainActivity activity;
     private ProjectDatabase projectDatabase;
-    private ProjectData project;
+    private final ProjectData project;
 
     /** The constructor for the class as activity and database needs to be passed on. **/
     ProjectLoginFragmentView(MainActivity activity, ProjectDatabase projectDatabase, ProjectData project) {

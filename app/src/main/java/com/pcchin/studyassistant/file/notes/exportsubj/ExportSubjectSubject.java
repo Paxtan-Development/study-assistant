@@ -43,9 +43,9 @@ import java.util.zip.DeflaterOutputStream;
 
 /** Functions that export the subject as a .subject file. **/
 public class ExportSubjectSubject {
-    private Fragment fragment;
-    private NotesSubject notesSubject;
-    private List<NotesContent> notesList;
+    private final Fragment fragment;
+    private final NotesSubject notesSubject;
+    private final List<NotesContent> notesList;
 
     /** The constructor for the functions. **/
     public ExportSubjectSubject(Fragment fragment, NotesSubject notesSubject,

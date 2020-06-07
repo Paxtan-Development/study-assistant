@@ -32,7 +32,7 @@ import com.pcchin.studyassistant.utils.notes.NotesSortAdaptor;
 
 /** 1st class for the functions for the onClickListeners in the fragment. **/
 public class NotesSubjectFragmentClick1 {
-    private NotesSubjectFragment fragment;
+    private final NotesSubjectFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesSubjectFragmentClick1(NotesSubjectFragment fragment) {

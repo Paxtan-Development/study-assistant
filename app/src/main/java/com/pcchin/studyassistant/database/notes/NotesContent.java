@@ -22,6 +22,7 @@ import androidx.room.PrimaryKey;
 import java.util.Date;
 
 /** The entity for each note. **/
+@SuppressWarnings("CanBeFinal")
 @Entity
 public class NotesContent {
     /** The ID for the note, serves as an unique key.

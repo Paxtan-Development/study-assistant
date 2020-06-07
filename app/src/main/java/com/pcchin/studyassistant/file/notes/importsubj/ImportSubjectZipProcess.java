@@ -24,6 +24,7 @@ import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.utils.misc.RandomString;
@@ -34,10 +35,12 @@ import net.lingala.zip4j.exception.ZipException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.zip.InflaterInputStream;
@@ -51,12 +54,12 @@ class ImportSubjectZipProcess {
 
     // HashMaps for processing .subj files
     // The key is the file name of the corresponding txt file
-    private HashMap<String, String> titleHashMap = new HashMap<>();
-    private HashMap<String, Date> lastEditedHashMap = new HashMap<>();
-    private HashMap<String, String> saltHashMap = new HashMap<>();
-    private HashMap<String, String> lockedPassHashMap = new HashMap<>();
-    private HashMap<String, Date> alertDateHashMap = new HashMap<>();
-    private HashMap<String, Integer> alertCodeHashMap = new HashMap<>();
+    private final HashMap<String, String> titleHashMap = new HashMap<>();
+    private final HashMap<String, Date> lastEditedHashMap = new HashMap<>();
+    private final HashMap<String, String> saltHashMap = new HashMap<>();
+    private final HashMap<String, String> lockedPassHashMap = new HashMap<>();
+    private final HashMap<String, Date> alertDateHashMap = new HashMap<>();
+    private final HashMap<String, Integer> alertCodeHashMap = new HashMap<>();
 
     /** The constructor for the class as activity needs to be passed on. **/
     ImportSubjectZipProcess(MainActivity activity) {
@@ -134,7 +137,8 @@ class ImportSubjectZipProcess {
     }
 
     /** Generates a note if the .subj file is not present,
-     * or if the note is not present within the .subj file itself. **/
+     * or if the note is not present within the .subj file itself.
+     * The note ID that is generated will be added to noteIdList. **/
     @NonNull
     private NotesContent generateNoteWithoutSubj (@NonNull Random rand, RandomString randString,
                                                   int subjectId, @NonNull List<Integer> notesIdList,
@@ -172,7 +176,6 @@ class ImportSubjectZipProcess {
      * If the format provided in the subj file is incorrect, it will fallback to
      * importZipWithoutSubj with fileName as the subject title. **/
     private void importZipWithSubj(int subjectId, String fileName, File subjFile) {
-        // TODO: Complete
         // Reads the subj file and maps it to a couple of HashMaps
         try (FileInputStream infoStream = new FileInputStream(subjFile);
              InflaterInputStream inflatedInfoStream = new InflaterInputStream(infoStream);
@@ -181,7 +184,7 @@ class ImportSubjectZipProcess {
             NotesSubject currentSubject = new NotesSubject(subjectId, infoFileScanner.nextLine(),
                     Integer.parseInt(infoFileScanner.nextLine()));
             parseSubjFile(infoFileScanner, currentSubject);
-        } catch (IOException | NumberFormatException e) {
+        } catch (NullPointerException | IOException | ParseException | NumberFormatException e) {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: An error occurred while " +
                     "attempting to parse a .subj file, falling back to importZipWithoutSubj, error is");
             e.printStackTrace();
@@ -195,14 +198,83 @@ class ImportSubjectZipProcess {
      * 2. title of note
      * 3. The last edited date of the note, in ISO format
      * 4. The salt of the note
-     * 5. The locked pass of the note (If any)
-     * 6. **/
+     * 5. The locked pass of the note
+     * 6. The alert date of the note, in ISO format, can be null
+     * 7. The alert code of the note, can be null **/
     private void parseSubjFile(@NonNull Scanner infoFileScanner, NotesSubject currentSubject)
-            throws NumberFormatException {
+            throws ParseException, NumberFormatException, NullPointerException {
         int index = 0;
+        String currentLine, currentNotePath = "";
         while (infoFileScanner.hasNext()) {
-            String currentLine = infoFileScanner.nextLine();
-            // TODO: Complete
+            currentLine = infoFileScanner.nextLine();
+            switch(index) {
+                case 0:
+                    currentNotePath = currentLine;
+                    break;
+                case 1:
+                    titleHashMap.put(currentNotePath, currentLine);
+                    break;
+                case 2:
+                    lastEditedHashMap.put(currentNotePath, ConverterFunctions.isoDateTimeFormat.parse(currentLine));
+                    break;
+                case 3:
+                    saltHashMap.put(currentNotePath, currentLine);
+                    break;
+                case 4:
+                    lockedPassHashMap.put(currentNotePath, currentLine);
+                    break;
+                case 5:
+                    if (currentLine.equals("NULL")) alertDateHashMap.put(currentNotePath, null);
+                    else alertDateHashMap.put(currentNotePath, ConverterFunctions.isoDateTimeFormat.parse(currentLine));
+                    break;
+                case 6:
+                    if (currentLine.equals("NULL")) alertCodeHashMap.put(currentLine, null);
+                    else alertCodeHashMap.put(currentNotePath, Integer.parseInt(currentLine));
+                    break;
+            }
+
+            index++;
+            if (index > 6) index = 0;
         }
+        processTxtFilesWithSubj(currentSubject);
+    }
+
+    /** Process all txt files after tbe data in the .subj file is processed. **/
+    private void processTxtFilesWithSubj(NotesSubject currentSubject) throws NullPointerException {
+        Random rand = new Random();
+        RandomString randString = new RandomString(40);
+        ArrayList<NotesContent> notesList = new ArrayList<>();
+        NotesContent currentNote;
+        // Get all the existing note IDs
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+        List<Integer> notesIdList = database.ContentDao().getAllNoteId();
+        database.close();
+        for (File txtFile: txtFileList) {
+            // Check if a note title with the corresponding file exists
+            // If not, fall back to generateNoteWihoutSubj
+            String title = titleHashMap.get(txtFile.getName());
+            if (title == null) {
+                currentNote = generateNoteWithoutSubj(rand, randString, currentSubject.subjectId, notesIdList, txtFile);
+            } else {
+                currentNote = generateNoteWithSubj(rand, currentSubject.subjectId, notesIdList, txtFile);
+            }
+            notesList.add(currentNote);
+        }
+        new ImportSubject(activity).importSubjectToDatabase(currentSubject, notesList);
+    }
+
+    /** Generates a note whose subject is present. **/
+    @NonNull
+    private NotesContent generateNoteWithSubj(@NonNull Random rand, int subjectId,
+                                              @NonNull List<Integer> notesIdList, @NonNull File txtFile)
+            throws NullPointerException {
+        // Generate the noteId
+        String fileName = txtFile.getName();
+        int noteId = rand.nextInt();
+        while (notesIdList.contains(noteId)) noteId = rand.nextInt();
+        return new NotesContent(noteId, subjectId, Objects.requireNonNull(titleHashMap.get(fileName)), getFileContents(txtFile),
+                Objects.requireNonNull(lastEditedHashMap.get(fileName)), Objects.requireNonNull(saltHashMap.get(fileName)),
+                Objects.requireNonNull(lockedPassHashMap.get(fileName)), alertDateHashMap.get(fileName),
+                alertCodeHashMap.get(fileName));
     }
 }

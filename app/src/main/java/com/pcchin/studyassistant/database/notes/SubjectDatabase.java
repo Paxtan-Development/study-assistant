@@ -20,7 +20,7 @@ import androidx.room.TypeConverters;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 
 /** The notes layer for the subjects. **/
-@Database(entities = {NotesSubject.class, NotesContent.class}, version = 3)
+@Database(entities = {NotesSubject.class, NotesContent.class}, version = 4)
 @TypeConverters({ConverterFunctions.class})
 public abstract class SubjectDatabase extends RoomDatabase {
     /** References the SQL requests in the interface. **/

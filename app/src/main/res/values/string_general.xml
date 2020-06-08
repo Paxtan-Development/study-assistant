@@ -81,6 +81,8 @@
     <string name="m2_rss_used">Resources Used</string>
     <string name="m2_bug_report">Bug Report</string>
     <string name="m2_feature_suggestion">Feature Suggestion</string>
+    <string name="m2_send_sentry_event">Send an Example Event</string>
+    <string name="event_sent">Event sent</string>
 
     <string name="m3_new_subject">New Subject…</string>
     <string name="m3_new_project">New Project…</string>

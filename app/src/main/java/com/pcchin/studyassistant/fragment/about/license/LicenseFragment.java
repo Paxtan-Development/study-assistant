@@ -32,7 +32,7 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{
             R.array.androiddevicenames_license,R.array.bouncycastle_license,
             R.array.customdialog_license, R.array.dtpreference_license, R.array.imagepicker_license,
-            R.array.jsoup_license, R.array.licenseview_license, R.array.zip4j_license};
+            R.array.jsoup_license, R.array.licenseview_license, R.array.sentry_sdk_license, R.array.zip4j_license};
 
     /** Default constructor. **/
     public LicenseFragment() {
@@ -56,7 +56,6 @@ public class LicenseFragment extends Fragment implements ExtendedFragment {
             // Updates license info & OnClickListeners
             String[] infoArray = getResources().getStringArray(licenseArray);
             licenseView.addLicense(infoArray);
-            // TODO: Add sentry.io license at https://github.com/getsentry/sentry/blob/master/LICENSE
         }
         return returnScroll;
     }

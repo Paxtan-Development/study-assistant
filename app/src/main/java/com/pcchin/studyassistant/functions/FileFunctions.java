@@ -36,6 +36,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import io.sentry.Sentry;
+
 /** Functions used in managing files. **/
 public final class FileFunctions {
     private FileFunctions() {
@@ -88,8 +90,17 @@ public final class FileFunctions {
         return dir.delete();
     }
 
-    /** Get the download directory of the project. **/
-    public static String getDownloadDir(@NonNull Context context) {
+    /** Gets the external download directory of the app.
+     * If it doesn't exist, fall back to getInternalDownloadDir. **/
+    public static String getExternalDownloadDir(@NonNull Context context) {
+        File downloadDir = new File("/storage/emulated/0/Downloads/");
+        return downloadDir.exists() && downloadDir.isDirectory() && downloadDir.canWrite()
+                ? "/storage/emulated/0/Downloads/" : getInternalDownloadDir(context);
+    }
+
+    /** Get the internal download directory of the app. **/
+    @NonNull
+    public static String getInternalDownloadDir(@NonNull Context context) {
         File downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         if (downloadDirFile == null) {
             downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -170,6 +181,7 @@ public final class FileFunctions {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Could not read from URI "
                     + uri.toString() + ". Stack trace is");
             e.printStackTrace();
+            Sentry.capture(e);
             return null;
         }
     }

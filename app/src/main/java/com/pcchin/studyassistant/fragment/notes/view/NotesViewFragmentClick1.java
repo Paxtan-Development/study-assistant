@@ -67,7 +67,7 @@ public class NotesViewFragmentClick1 {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                         dialogInterface.dismiss();
                         String outputFilePath = FileFunctions.generateValidFile(
-                                FileFunctions.getDownloadDir(fragment.requireContext())
+                                FileFunctions.getExternalDownloadDir(fragment.requireContext())
                                 + fragment.note.noteTitle, ".txt");
                         FileFunctions.exportTxt(outputFilePath, fragment.note.noteContent);
                         Toast.makeText(fragment.requireContext(), fragment.getString(R.string.n3_note_exported)

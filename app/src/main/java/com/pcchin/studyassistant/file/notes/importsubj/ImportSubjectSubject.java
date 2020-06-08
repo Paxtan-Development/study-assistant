@@ -41,6 +41,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.zip.InflaterInputStream;
 
+import io.sentry.Sentry;
+import io.sentry.event.EventBuilder;
+
 /** Functions for importing a subject from a .subject file. Yes, that's why it has this name. **/
 public class ImportSubjectSubject {
     private final MainActivity activity;
@@ -64,11 +67,14 @@ public class ImportSubjectSubject {
                         + " by FileInputStream. Stack trace is");
                 Toast.makeText(activity, R.string.error_subject_import, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
+                Sentry.capture(e);
             }
         } else {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + path + " is not found.");
             Toast.makeText(activity, "The file " + path + " appears to be missing.",
                     Toast.LENGTH_SHORT).show();
+            Sentry.capture(new EventBuilder().withMessage("File Error: The following file is not " +
+                    "found.").withExtra("path", path));
         }
     }
 

@@ -43,6 +43,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 
+import io.sentry.Sentry;
+import io.sentry.event.EventBuilder;
+
 /** Functions that export the subject as a ZIP file. **/
 public class ExportSubjectZip {
     private final Fragment fragment;
@@ -97,6 +100,7 @@ public class ExportSubjectZip {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File error: ZIP processing error occurred while " +
                         "exporting a subject. Stack trace is ");
                 e.printStackTrace();
+                Sentry.capture(e);
                 Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
             }
         }
@@ -106,7 +110,7 @@ public class ExportSubjectZip {
     private void createZipFile(String tempExportFolder, @NonNull String password) throws ZipException {
         // Creates ZIP file
         String exportFilePath = FileFunctions.generateValidFile(
-                FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title, ".zip");
+                FileFunctions.getExternalDownloadDir(fragment.requireContext()) + notesSubject.title, ".zip");
         ZipFile exportFile;
         if (password.length() >= 8) {
             exportFile = new ZipFile(exportFilePath, password.toCharArray());
@@ -119,6 +123,8 @@ public class ExportSubjectZip {
         } else {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Folder " + tempExportFolder
                     + " cannot be created.");
+            Sentry.capture(new EventBuilder().withMessage("File Error: The following folder " +
+                    "cannot be created").withExtra("tempExportFolder", tempExportFolder));
             Toast.makeText(fragment.requireContext(), R.string.file_error, Toast.LENGTH_SHORT).show();
         }
     }

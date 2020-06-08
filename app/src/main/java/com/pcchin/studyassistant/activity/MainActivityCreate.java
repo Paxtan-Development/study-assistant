@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.jaredrummler.android.device.DeviceName;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
@@ -52,8 +53,6 @@ import com.pcchin.studyassistant.network.update.AppUpdate;
 
 import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -95,13 +94,22 @@ final class MainActivityCreate {
      * The used is identified by their UID and their app version.
      * Their device version is not recorded unless they submit a bug report manually. **/
     private void initSentry() {
-        Map<String, Object> sentryData = new HashMap<>();
-        sentryData.put("Version", BuildConfig.VERSION_NAME);
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
-        Sentry.init(BuildConfig.SENTRY_DSN);
+        // Don't init if its in debug mode
+        //noinspection ConstantConditions
+        if (BuildConfig.BUILD_TYPE.equals("debug")) {
+            Sentry.init((String) null);
+        } else {
+            Sentry.init(BuildConfig.SENTRY_DSN);
+        }
         Sentry.getContext().setUser(new UserBuilder()
-                .setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, ""))
-                .setData(sentryData).build());
+                .setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).build());
+        Sentry.getContext().addExtra("App Version", BuildConfig.VERSION_NAME);
+        //noinspection ConstantConditions
+        if (!BuildConfig.BUILD_TYPE.equals("release")) {
+            Sentry.getContext().addExtra("Android Version", Build.VERSION.RELEASE);
+            Sentry.getContext().addExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")");
+        }
     }
 
     /** Display and hides the relevant views used by the current activity. **/

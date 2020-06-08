@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.zip.DeflaterOutputStream;
 
+import io.sentry.Sentry;
+import io.sentry.event.EventBuilder;
+
 /** Functions that export the subject as a .subject file. **/
 public class ExportSubjectSubject {
     private final Fragment fragment;
@@ -87,12 +90,12 @@ public class ExportSubjectSubject {
                                           TextInputLayout inputText) {
         if (responseText.length() == 0 || responseText.length() >= 8) {
             // Set output file name
-            String outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title
+            String outputFileName = FileFunctions.getExternalDownloadDir(fragment.requireContext()) + notesSubject.title
                     + ".subject";
             int count = 0;
             while (new File(outputFileName).exists()) {
                 count++;
-                outputFileName = FileFunctions.getDownloadDir(fragment.requireContext()) + notesSubject.title
+                outputFileName = FileFunctions.getExternalDownloadDir(fragment.requireContext()) + notesSubject.title
                         + "(" + count + ").subject";
             }
 
@@ -124,14 +127,18 @@ public class ExportSubjectSubject {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + finalOutputFileName + " cannot be created.");
                 Toast.makeText(fragment.requireContext(), R.string.n2_error_file_not_created,
                         Toast.LENGTH_SHORT).show();
+                Sentry.capture(new EventBuilder().withMessage("File Error: The following file " +
+                        "cannot be created.").withExtra("fileName", finalOutputFileName));
             }
         } catch (FileNotFoundException e) {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + finalOutputFileName + " not found, stack trace is");
             e.printStackTrace();
+            Sentry.capture(e);
             dialog.dismiss();
         } catch (IOException e) {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: An IO Exception" + " occurred on file " + finalOutputFileName + ", stack trace is");
             e.printStackTrace();
+            Sentry.capture(e);
             dialog.dismiss();
         }
     }

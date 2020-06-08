@@ -58,6 +58,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import io.sentry.Sentry;
+import io.sentry.event.EventBuilder;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public BottomNavigationView bottomNavView;
@@ -170,6 +173,9 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(MainActivity.this, R.string.file_error, Toast.LENGTH_SHORT).show();
             Log.e(ActivityConstants.LOG_APP_NAME,
                     String.format("File Error: The intent received with request code %s is unable to be processed", requestCode));
+            Sentry.capture(new EventBuilder().withMessage("File Error: The intent received with " +
+                    "the following request code is unable to be processed")
+                    .withExtra("requestCode", requestCode));
         }
     }
 
@@ -191,6 +197,7 @@ public class MainActivity extends AppCompatActivity
             Log.e(ActivityConstants.LOG_APP_NAME, String.format("File Error: Unable to be update " +
                     "the icon of project ID %s from targetFile %s", projectID, targetFile));
             e.printStackTrace();
+            Sentry.capture(e);
         }
     }
 

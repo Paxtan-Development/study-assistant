@@ -56,12 +56,11 @@ android {
         resValue "string", "app_name", "Study Assistant"
     }
     buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
+        /** Version differences:
+         * Debug: Used for local testing, does not send data to server, unsigned APK
+         * Alpha: Used for quick testing, sends data to server, unsigned APK
+         * Beta: Used for slower testing, sends data to server, signed APK
+         * Release: The release verion of the app. **/
         debug {
             applicationIdSuffix ".debug"
             debuggable true
@@ -71,11 +70,23 @@ android {
             }
             resValue "string", "app_name", "SA Debug"
         }
+        alpha {
+            initWith debug
+            applicationIdSuffix ".alpha"
+            versionNameSuffix = '-a'
+            resValue "string", "app_name", "SA Alpha"
+        }
         beta {
             initWith release
             applicationIdSuffix ".beta"
             versionNameSuffix = '-b'
             resValue "string", "app_name", "SA Beta"
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

@@ -14,36 +14,28 @@
 package com.pcchin.studyassistant.fragment.about.server;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
-import com.pcchin.studyassistant.functions.DataFunctions;
-import com.pcchin.studyassistant.functions.NetworkFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.utils.misc.InputValidation;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Objects;
 
+import io.sentry.Sentry;
+import io.sentry.event.EventBuilder;
+
 public class FeedbackFragment extends Fragment implements ExtendedFragment {
-    // TODO: Convert to Sentry
     /** Default constructor. **/
     public FeedbackFragment() {
         // Default constructor.
@@ -60,31 +52,14 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ArrayList<Integer> issueList = DataFunctions.getAllResponses(requireActivity(),
-                ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST);
         ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_about_feedback, container, false);
-        if (issueList.size() == 0) {
-            returnScroll.findViewById(R.id.m6_previous).setVisibility(View.GONE);
-            returnScroll.findViewById(R.id.m6_previous_divider).setVisibility(View.GONE);
-        } else {
-            returnScroll.findViewById(R.id.m6_previous).setOnClickListener(view ->
-                    UIFunctions.displayPreviousSubmissions(FeedbackFragment.this, issueList, ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST));
-        }
         returnScroll.findViewById(R.id.m6_return).setOnClickListener(view -> onBackPressed());
-        returnScroll.findViewById(R.id.m6_submit).setOnClickListener(view -> {
-            try {
-                submitFeedback(returnScroll);
-            } catch (JSONException e) {
-                Log.e(ActivityConstants.LOG_APP_NAME, "Network Error: Unable to create JSON object for feedback submission, stack trace is");
-                e.printStackTrace();
-            }
-        });
+        returnScroll.findViewById(R.id.m6_submit).setOnClickListener(view -> submitFeedback(returnScroll));
         return returnScroll;
     }
 
     /** Submit the feedback for the fragment. **/
-    private void submitFeedback(@NonNull ScrollView returnScroll) throws JSONException {
-        Button submitButton = returnScroll.findViewById(R.id.m6_submit);
+    private void submitFeedback(@NonNull ScrollView returnScroll) {
         TextInputLayout nameInput = returnScroll.findViewById(R.id.m6_name_input), emailInput = returnScroll.findViewById(R.id.m6_email_input),
             summaryInput = returnScroll.findViewById(R.id.m6_summary_input), descInput = returnScroll.findViewById(R.id.m6_description_input);
         String name = Objects.requireNonNull(nameInput.getEditText()).getText().toString(), email = Objects.requireNonNull(emailInput.getEditText()).getText().toString(),
@@ -97,18 +72,16 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
         if (validator.emailHasError(email, emailInput)) hasError = true;
         if (validator.inputIsBlank(summary, summaryInput, R.string.m_error_summary_blank)) hasError = true;
         if (validator.inputIsBlank(desc, descInput, R.string.m_error_desc_blank)) hasError = true;
-        if (!hasError) sendFeedback(name, email, summary, desc, submitButton);
+        if (!hasError) sendFeedback(name, email, summary, desc);
     }
 
     /** Send the feedback request to the server. **/
-    private void sendFeedback(String name, String email, String summary, String desc, Button submitButton) throws JSONException {
-        JSONObject uploadObject = new JSONObject();
-        uploadObject.put("name", name);
-        uploadObject.put("email", email);
-        uploadObject.put("summary", summary);
-        uploadObject.put("description", desc);
-        NetworkFunctions.sendPostRequest(((MainActivity) requireActivity()), NetworkConstants.FEEDBACK_PATH,
-                uploadObject, ActivityConstants.SHAREDPREF_FEEDBACK_ISSUE_LIST, submitButton);
+    private void sendFeedback(String name, String email, String summary, String desc) {
+        Sentry.capture(new EventBuilder().withMessage("Feedback Request: " + summary)
+                .withExtra("Name", name).withExtra("Email", email)
+                .withExtra("Summary", summary).withExtra("Description", desc));
+        Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
     }
 
     /** Returns to

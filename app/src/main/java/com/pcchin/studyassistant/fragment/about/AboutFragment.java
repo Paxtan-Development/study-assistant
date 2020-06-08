@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -38,6 +39,8 @@ import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.util.Calendar;
 import java.util.Locale;
+
+import io.sentry.Sentry;
 
 public class AboutFragment extends Fragment implements ExtendedFragment {
     /** Default Constructor. **/
@@ -75,11 +78,24 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
         returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
 
+        //noinspection ConstantConditions
+        if (BuildConfig.BUILD_TYPE.equals("release")) {
+            returnView.findViewById(R.id.m2_send_sentry_event).setVisibility(View.GONE);
+        } else {
+            returnView.findViewById(R.id.m2_send_sentry_event).setOnClickListener(view -> sendSentryEvent());
+        }
+
         // Set license text
         UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(
                 inflater.getContext(), "studyassistant_about.txt"));
 
         return returnView;
+    }
+
+    /** Send an example Sentry event to the server. **/
+    public void sendSentryEvent() {
+        Sentry.capture("Example event");
+        Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
     }
 
     /** Go back to

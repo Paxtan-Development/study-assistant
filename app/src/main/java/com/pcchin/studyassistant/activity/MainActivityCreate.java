@@ -104,8 +104,7 @@ final class MainActivityCreate {
         } else {
             Sentry.init(BuildConfig.SENTRY_DSN);
         }
-        Sentry.getContext().setUser(new UserBuilder()
-                .setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).build());
+        Sentry.getContext().setUser(new UserBuilder().setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).build());
         Sentry.getContext().addExtra("App Version", BuildConfig.VERSION_NAME);
         //noinspection ConstantConditions
         if (!BuildConfig.BUILD_TYPE.equals("release")) {
@@ -138,8 +137,7 @@ final class MainActivityCreate {
             // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
-            } else if (!Objects.equals(DataFunctions.getSharedPref(activity)
-                            .getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
+            } else if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
                     ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
                 new Handler().post(() -> new AppUpdate(activity, false));
             }
@@ -161,11 +159,9 @@ final class MainActivityCreate {
 
         // Get permission to read and write files
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                .checkSelfPermission(activity, Manifest.permission
-                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                .checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
         // No handlers used for them as they had to be completed first
         generateUID();
@@ -203,12 +199,10 @@ final class MainActivityCreate {
     private void setNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mainChannel = new NotificationChannel(activity.getString(
-                    R.string.notif_channel_notes_ID), activity.getString(R.string.notif_channel_notes),
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    R.string.notif_channel_notes_ID), activity.getString(R.string.notif_channel_notes), NotificationManager.IMPORTANCE_DEFAULT);
             mainChannel.setDescription(activity.getString(R.string.notif_channel_notes_desc));
             NotificationChannel updateChannel = new NotificationChannel(activity.getString(
-                    R.string.notif_channel_update_ID), activity.getString(R.string.notif_channel_update),
-                    NotificationManager.IMPORTANCE_LOW);
+                    R.string.notif_channel_update_ID), activity.getString(R.string.notif_channel_update), NotificationManager.IMPORTANCE_LOW);
             updateChannel.setDescription(activity.getString(R.string.notif_channel_update_desc));
             NotificationManager manager = activity.getSystemService(NotificationManager.class);
             if (manager != null) {
@@ -252,9 +246,7 @@ final class MainActivityCreate {
             // Deletes all children in the folder
             File[] dirFiles = apkInstallDir.listFiles();
             if (dirFiles != null) {
-                for (File child : dirFiles) {
-                    FileFunctions.deleteDir(child);
-                }
+                for (File child : dirFiles) FileFunctions.deleteDir(child);
             }
         } else if (!apkInstallDir.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -301,7 +293,6 @@ final class MainActivityCreate {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(activity);
-
         NavViewFunctions.updateNavView(activity);
     }
 

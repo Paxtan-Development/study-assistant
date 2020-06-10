@@ -87,9 +87,7 @@ final class ProjectPreferenceClick {
                 }
                 break;
             case PreferenceString.PREF_SET_RELATED_SUBJECT:
-                if (fragment.project.associatedSubject != null) {
-                    ((ListPreference) preference).setValue(fragment.project.associatedSubject.toString());
-                }
+                if (fragment.project.associatedSubject != null) ((ListPreference) preference).setValue(fragment.project.associatedSubject.toString());
                 break;
             case PreferenceString.PREF_REMOVE_RELATED_SUBJECT:
                 fragment.project.associatedSubject = null;

@@ -98,10 +98,13 @@ public final class FileFunctions {
     public static String getExternalDownloadDir(@NonNull Context context) {
         File downloadDir = new File("/storage/emulated/0/Download");
         File downloadDir2 = new File("/storage/emulated/0/Downloads");
-        return downloadDir.exists() && downloadDir.isDirectory() && downloadDir.canWrite()
-                ? "/storage/emulated/0/Download/" : downloadDir2.exists()
-                && downloadDir2.isDirectory() && downloadDir2.canWrite() ?
-                "/storage/emulated/0/Downloads/" : getInternalDownloadDir(context);
+        if (downloadDir.exists() && downloadDir.isDirectory() && downloadDir.canWrite()) {
+            return "/storage/emulated/0/Download/";
+        } else if (downloadDir2.exists() && downloadDir2.isDirectory() && downloadDir2.canWrite()) {
+            return "/storage/emulated/0/Downloads/";
+        } else {
+            return getInternalDownloadDir(context);
+        }
     }
 
     /** Get the internal download directory of the app.

@@ -122,7 +122,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
 
                 if (enableMembers) {
                     MemberData initialMember = ProjectCreateFragmentCreate.createInitialMember(idRand, saltRand,
-                            projectID, projectSalt, adminRole.roleID,
+                            projectID, adminRole.roleID,
                             memberName, memberPass1, projectDatabase);
                     projectDatabase.MemberDao().insert(initialMember);
                     createProjectWithMembers(returnView, adminRole, memberRole, initialMember,

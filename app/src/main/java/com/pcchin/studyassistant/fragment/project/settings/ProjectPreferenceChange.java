@@ -71,11 +71,8 @@ final class ProjectPreferenceChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
-                if ((boolean) newValue) {
-                    checkMemberExists();
-                } else {
-                    fragment.project.membersEnabled = false;
-                }
+                if ((boolean) newValue) checkMemberExists();
+                else fragment.project.membersEnabled = false;
                 break;
             case PreferenceString.PREF_ROLES:
                 fragment.project.rolesEnabled = (boolean) newValue;
@@ -93,8 +90,7 @@ final class ProjectPreferenceChange {
                 updateStatusIcon((String) newValue);
                 break;
             case PreferenceString.PREF_SET_RELATED_SUBJECT:
-                // The subject IDs are set in the customize sections already
-                fragment.project.associatedSubject = Integer.parseInt(newValue.toString());
+                fragment.project.associatedSubject = Integer.parseInt(newValue.toString()); // The subject IDs are set in the customize sections already
                 break;
         }
         fragment.updateProject();

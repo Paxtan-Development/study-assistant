@@ -114,7 +114,6 @@ public class NotesSubjectFragmentClick2 {
     /** Export all the notes of the subject into a ZIP file,
      * askZipPassword() and exportSubject() separated for clarity. **/
     public void onExportPressed() {
-        // TODO: Do with export
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
                 .checkSelfPermission(fragment.requireContext(), Manifest.permission
                         .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

@@ -90,7 +90,6 @@ public class NotesViewFragmentClick2 {
     /** Pass the alert time to updateNoteAlert. **/
     private void updateNoteAlertTime(@NonNull Calendar targetDateTime) {
         if (targetDateTime.after(Calendar.getInstance())) {
-            // TODO: Potential bug somewhere that keeps saying that the time selected has passed
             // Set alert
             Random rand = new Random();
             int requestCode = rand.nextInt();

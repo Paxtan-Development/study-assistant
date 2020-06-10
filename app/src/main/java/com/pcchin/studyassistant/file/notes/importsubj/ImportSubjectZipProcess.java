@@ -232,7 +232,6 @@ class ImportSubjectZipProcess {
                     else alertCodeHashMap.put(currentNotePath, Integer.parseInt(currentLine));
                     break;
             }
-
             index++;
             if (index > 6) index = 0;
         }

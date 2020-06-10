@@ -41,7 +41,7 @@ public class ConverterTest {
         if (BuildConfig.IS_LOCAL) {
             TEST_COUNT = 5000;
         } else {
-            TEST_COUNT = 1000;
+            TEST_COUNT = 500;
         }
     }
 

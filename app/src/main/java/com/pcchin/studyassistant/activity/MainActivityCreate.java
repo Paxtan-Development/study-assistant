@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
-import com.jaredrummler.android.device.DeviceName;
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
@@ -50,7 +49,6 @@ import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.network.update.AppUpdate;
-import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.io.File;
 import java.util.Date;
@@ -108,8 +106,8 @@ final class MainActivityCreate {
         Sentry.getContext().addExtra("App Version", BuildConfig.VERSION_NAME);
         //noinspection ConstantConditions
         if (!BuildConfig.BUILD_TYPE.equals("release")) {
-            Sentry.getContext().addExtra("Android Version", Build.VERSION.RELEASE);
-            Sentry.getContext().addExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")");
+            Sentry.getContext().addExtra("Android Version", Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")");
+            Sentry.getContext().addExtra("Device Model", ActivityConstants.DEVICE_MODEL);
         }
     }
 
@@ -137,8 +135,10 @@ final class MainActivityCreate {
             // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
-            } else if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
+            } else //noinspection ConstantConditions
+                if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))
+                        || BuildConfig.BUILD_TYPE.equals("debug")) {
                 new Handler().post(() -> new AppUpdate(activity, false));
             }
         } else {
@@ -165,7 +165,6 @@ final class MainActivityCreate {
         }
         // No handlers used for them as they had to be completed first
         generateUID();
-        initEncryptedSharedPref();
         new Handler().post(this::createDefaultRoles); // First database access in MainActivityCreate on runtime
         new Handler().post(this::deletePastExports);
     }
@@ -294,26 +293,5 @@ final class MainActivityCreate {
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(activity);
         NavViewFunctions.updateNavView(activity);
-    }
-
-    /** Checks whether the values required in the encrypted shared preferences are present, and generates them if not. **/
-    private void initEncryptedSharedPref() {
-        SharedPreferences encSharedPref;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            encSharedPref = DataFunctions.getEncSharedPref(activity);
-        } else {
-            encSharedPref = DataFunctions.getSharedPref(activity);
-        }
-        if (encSharedPref != null) {
-            RandomString randString = new RandomString(48);
-            SharedPreferences.Editor editor = encSharedPref.edit();
-            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, "")).length() == 0) {
-                editor.putString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, randString.nextString());
-            }
-            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, "")).length() == 0) {
-                editor.putString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, randString.nextString());
-            }
-            editor.apply();
-        }
     }
 }

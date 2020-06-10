@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 PC Chin. All rights reserved.
+  ~ Copyright 2020 PC Chin. All rights reserved.
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -14,4 +14,8 @@
 
 <paths>
     <files-path name="internal-files" path="."/>
+    <cache-path name="cache-files" path="./cache" />
+    <external-path name="external-files" path="/" />
+    <external-cache-path name="external-cache" path="." />
+    <external-media-path name="external-media" path="." />
 </paths>

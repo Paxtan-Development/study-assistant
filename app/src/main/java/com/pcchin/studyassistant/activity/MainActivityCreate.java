@@ -16,7 +16,6 @@ package com.pcchin.studyassistant.activity;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -46,10 +45,12 @@ import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.network.update.AppUpdate;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.io.File;
 import java.util.Date;
@@ -95,7 +96,7 @@ final class MainActivityCreate {
      * Their device version and Android Version is not recorded unless they submit a bug report
      * manually or are not in the release build. **/
     private void initSentry() {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
         // Don't init if its in debug mode
         //noinspection ConstantConditions
         if (BuildConfig.BUILD_TYPE.equals("debug")) {
@@ -137,7 +138,7 @@ final class MainActivityCreate {
             // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
-            } else if (!Objects.equals(activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
+            } else if (!Objects.equals(DataFunctions.getSharedPref(activity)
                             .getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
                     ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
                 new Handler().post(() -> new AppUpdate(activity, false));
@@ -166,15 +167,17 @@ final class MainActivityCreate {
                             Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
-        new Handler().post(this::generateUID);
-        new Handler().post(this::createDefaultRoles);
+        // No handlers used for them as they had to be completed first
+        generateUID();
+        initEncryptedSharedPref();
+        new Handler().post(this::createDefaultRoles); // First database access in MainActivityCreate on runtime
         new Handler().post(this::deletePastExports);
     }
 
     /** Generates a unique ID for the client if one does not exist. **/
     private void generateUID() {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
-        if (sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "").length() == 0) {
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
+        if (Objects.requireNonNull(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).length() == 0) {
             sharedPref.edit().putString(ActivityConstants.SHAREDPREF_UID, UUID.randomUUID().toString()).apply();
         }
     }
@@ -262,9 +265,9 @@ final class MainActivityCreate {
 
     /** Delete the previously downloaded APK files if they exist. **/
     private void deletePastApk() {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
         String pastUpdateFilePath = sharedPref.getString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, "");
-        if (pastUpdateFilePath.length() != 0) {
+        if (Objects.requireNonNull(pastUpdateFilePath).length() != 0) {
             File pastUpdateFile = new File(pastUpdateFilePath);
             if (pastUpdateFile.exists()) {
                 if (pastUpdateFile.delete()) {
@@ -300,5 +303,27 @@ final class MainActivityCreate {
         navigationView.setNavigationItemSelectedListener(activity);
 
         NavViewFunctions.updateNavView(activity);
+    }
+
+    /** Checks whether the values required in the encrypted shared preferences are present, and generates them if not. **/
+    private void initEncryptedSharedPref() {
+        SharedPreferences encSharedPref;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            encSharedPref = DataFunctions.getEncSharedPref(activity);
+        }
+        else {
+            encSharedPref = DataFunctions.getSharedPref(activity);
+        }
+        if (encSharedPref != null) {
+            RandomString randString = new RandomString(48);
+            SharedPreferences.Editor editor = encSharedPref.edit();
+            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, "")).length() == 0) {
+                editor.putString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, randString.nextString());
+            }
+            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, "")).length() == 0) {
+                editor.putString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, randString.nextString());
+            }
+            editor.apply();
+        }
     }
 }

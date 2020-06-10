@@ -24,9 +24,13 @@ public final class ActivityConstants {
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
-    // This ensures that the String will be different on a version change
-    public static final String SHAREDPREF_EVENT_SENT = "testEventSent" + BuildConfig.VERSION_NAME;
+    public static final String SHAREDPREF_EVENT_SENT = "testEventSent" + BuildConfig.VERSION_NAME; // This ensures that the String will be different on a version change
     public static final String SHAREDPREF_UID = "uid";
+
+    // Encrypted shared preference constants
+    public static final String ENC_SHAREDPREF_FILE_NAME = "encSharedPref";
+    public static final String ENC_SHAREDPREF_NOTES_DB_PASS = "encNotesDBPass";
+    public static final String ENC_SHAREDPREF_PROJECTS_DB_PASS = "encProjectsDBPass";
 
     // General intent constants
     public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
@@ -38,8 +42,8 @@ public final class ActivityConstants {
     public static final int SELECT_SUBJECT_FILE = 301;
 
     // Other constants
-    public static final String DATABASE_NOTES = "notesSubject";
-    public static final String DATABASE_PROJECT = "projectDatabase";
+    public static final String DATABASE_NOTES = "notesSubject2"; // Added 2 for encrypted database
+    public static final String DATABASE_PROJECT = "projectDatabase2"; // Added 2 for encrypted database
     public static final String LOG_APP_NAME = "StudyAssistant";
     public static final String EMAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+" +
             "/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|" +

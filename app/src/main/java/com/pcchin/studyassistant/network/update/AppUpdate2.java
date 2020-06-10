@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.network.update;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +40,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.network.VolleyFileDownloadRequest;
@@ -81,8 +81,7 @@ class AppUpdate2 {
     void showUpdateNotif(@NonNull JSONObject response, String host) {
         try {
             // Update so that it will not ask again on the same day
-            SharedPreferences.Editor editor =
-                    activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = DataFunctions.getSharedPref(activity).edit();
             editor.putString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
                     .formatTime(new Date(), ConverterFunctions.TimeFormat.DATE));
             editor.apply();
@@ -249,8 +248,7 @@ class AppUpdate2 {
 
     /** Writes the downloaded APK into the file. **/
     private void writeApk(byte[] response, String outputFileName, File outputFile) throws IOException {
-        SharedPreferences.Editor editor = activity.getSharedPreferences(
-                activity.getPackageName(), Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = DataFunctions.getSharedPref(activity).edit();
         editor.putString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
         editor.apply();
 

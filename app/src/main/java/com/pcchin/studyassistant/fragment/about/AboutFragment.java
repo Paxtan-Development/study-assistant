@@ -13,7 +13,6 @@
 
 package com.pcchin.studyassistant.fragment.about;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,6 +33,7 @@ import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
 import com.pcchin.studyassistant.fragment.about.server.BugReportFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
@@ -76,8 +76,7 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
 
     /** Set the onClickListeners for the buttons used in this Fragment. **/
     private void setButtons(@NonNull View returnView) {
-        SharedPreferences sharedPref = requireActivity().getSharedPreferences(requireActivity().
-                getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(requireActivity());
         String uid = sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "");
         returnView.findViewById(R.id.m2_library_license).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
@@ -101,8 +100,7 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
     public void sendSentryEvent() {
         Sentry.capture("Example event");
         Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
-        SharedPreferences sharedPref = requireActivity().getSharedPreferences(requireActivity()
-                .getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(requireActivity());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(ActivityConstants.SHAREDPREF_EVENT_SENT, true);
         editor.apply();

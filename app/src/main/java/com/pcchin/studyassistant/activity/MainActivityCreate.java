@@ -310,8 +310,7 @@ final class MainActivityCreate {
         SharedPreferences encSharedPref;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             encSharedPref = DataFunctions.getEncSharedPref(activity);
-        }
-        else {
+        } else {
             encSharedPref = DataFunctions.getSharedPref(activity);
         }
         if (encSharedPref != null) {

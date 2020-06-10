@@ -126,6 +126,7 @@ public final class MainActivityFunctions {
         }
         activity.findViewById(R.id.base).setVisibility(View.GONE);
         activity.pager.setVisibility(View.VISIBLE);
+        activity.pager.setCurrentItem(0, false);
         hideKeyboard();
     }
 

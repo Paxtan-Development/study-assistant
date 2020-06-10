@@ -16,7 +16,9 @@ steps:
       branch:
         include:
           - master
-      event: push
+      event:
+        - push
+        - pull_request
 
 trigger:
   event:

@@ -25,8 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.jaredrummler.android.device.DeviceName;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
@@ -82,8 +82,8 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
                 .withExtra("Name", name).withExtra("Email", email)
                 .withExtra("Summary", summary).withExtra("Description", desc)
                 .withExtra("Steps to Recreate Problem", steps)
-                .withExtra("Android Version", Build.VERSION.RELEASE)
-                .withExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")"));
+                .withExtra("Android Version", Build.VERSION.SDK_INT)
+                .withExtra("Device Model", ActivityConstants.DEVICE_MODEL));
         Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
         ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
     }

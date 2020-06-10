@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.functions;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.room.Room;
@@ -27,12 +26,8 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.utils.misc.RandomString;
 import com.pcchin.studyassistant.utils.misc.SortingComparators;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SupportFactory;
-
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 /** Database related functions used throughout the app. **/
@@ -55,12 +50,8 @@ public final class DatabaseFunctions {
     /** Returns the subject database. **/
     @NonNull
     public static SubjectDatabase getSubjectDatabase(Context context) {
-        SharedPreferences sharedPref = DataFunctions.getEncSharedPref(context);
         return Room.databaseBuilder(context, SubjectDatabase.class,
                 ActivityConstants.DATABASE_NOTES)
-                .openHelperFactory(new SupportFactory(SQLiteDatabase
-                        .getBytes(Objects.requireNonNull(Objects.requireNonNull(sharedPref).getString(ActivityConstants
-                                .ENC_SHAREDPREF_NOTES_DB_PASS, "")).toCharArray())))
                 .fallbackToDestructiveMigrationFrom(1, 2, 3)
                 .allowMainThreadQueries().build();
     }
@@ -68,14 +59,8 @@ public final class DatabaseFunctions {
     /** Returns the project database. **/
     @NonNull
     public static ProjectDatabase getProjectDatabase(Context context) {
-        SharedPreferences sharedPref = DataFunctions.getEncSharedPref(context);
         return Room.databaseBuilder(context, ProjectDatabase.class,
                 ActivityConstants.DATABASE_PROJECT)
-                // Yes, it needs double Objects.requireNonNull
-                .openHelperFactory(new SupportFactory(SQLiteDatabase
-                        .getBytes(Objects.requireNonNull(Objects.requireNonNull(sharedPref)
-                                .getString(ActivityConstants
-                                .ENC_SHAREDPREF_PROJECTS_DB_PASS, "")).toCharArray())))
                 .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5, 6)
                 .allowMainThreadQueries().build();
     }

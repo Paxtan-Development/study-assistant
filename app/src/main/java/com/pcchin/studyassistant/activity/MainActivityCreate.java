@@ -106,7 +106,7 @@ final class MainActivityCreate {
         Sentry.getContext().addExtra("App Version", BuildConfig.VERSION_NAME);
         //noinspection ConstantConditions
         if (!BuildConfig.BUILD_TYPE.equals("release")) {
-            Sentry.getContext().addExtra("Android Version", Build.VERSION.SDK_INT);
+            Sentry.getContext().addExtra("Android Version", Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")");
             Sentry.getContext().addExtra("Device Model", ActivityConstants.DEVICE_MODEL);
         }
     }
@@ -135,8 +135,10 @@ final class MainActivityCreate {
             // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
-            } else if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
+            } else //noinspection ConstantConditions
+                if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))
+                        || BuildConfig.BUILD_TYPE.equals("debug")) {
                 new Handler().post(() -> new AppUpdate(activity, false));
             }
         } else {

@@ -149,9 +149,8 @@ class AppUpdate2 {
         // Checks if the /files directory exists, if not it is created
         File filesDir = new File(activity.getFilesDir().getAbsolutePath() + "/temp");
         if (filesDir.exists() || filesDir.mkdir()) {
-            // Ask other APK files is deleted on startup, leftover files would not be checked here
-            String outputFileName = FileFunctions.generateValidFile(activity
-                    .getFilesDir().getAbsolutePath() + "/temp/studyassistant-update", ".apk");
+            // Download directory needs to be in a public directory, so getFilesDir() is not an option
+            String outputFileName = FileFunctions.generateValidFile(FileFunctions.getInternalDownloadDir(activity) + ".sa-" + BuildConfig.BUILD_TYPE, ".apk");
             RequestQueue queue = Volley.newRequestQueue(activity);
             // Boolean used as it is possible for user to cancel the dialog before the download starts
             AtomicBoolean continueDownload = new AtomicBoolean(true);

@@ -18,7 +18,6 @@ steps:
           - master
       event:
         - push
-        - pull_request
 
   - name: java-pr-test
     image: nextcloudci/android:android-54
@@ -30,9 +29,6 @@ steps:
     commands:
       - ./gradlew testDebugUnitTest
     when:
-      branch:
-        exclude:
-          - master
       event:
         - pull_request
 

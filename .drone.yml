@@ -13,24 +13,8 @@ steps:
     commands:
       - ./gradlew testDebugUnitTest
     when:
-      branch:
-        include:
-          - master
       event:
         - push
-
-  - name: java-pr-test
-    image: nextcloudci/android:android-54
-    # Keystore properties not included in order to trigger isLocal = false automatically
-    # Can only test with debug as other build configs require a keystore
-    environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
-      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
-    commands:
-      - ./gradlew testDebugUnitTest
-    when:
-      event:
-        - pull_request
 
 trigger:
   event:

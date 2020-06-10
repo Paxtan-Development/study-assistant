@@ -57,10 +57,10 @@ android {
     }
     buildTypes {
         /** Version differences:
-         * Debug: Used for local testing, does not send data to server, unsigned APK
-         * Alpha: Used for quick testing, sends data to server, unsigned APK
-         * Beta: Used for slower testing, sends data to server, signed APK
-         * Release: The release verion of the app. **/
+         * Debug: Used for local testing, does not send data to server, needs to be built and installed manually
+         * Alpha: Used for quick testing, sends data to server, needs to be built and installed manually
+         * Beta: Used for slower testing, sends data to server, can be installed through APK
+         * Release: The release version of the app, can be installed through APK **/
         debug {
             applicationIdSuffix ".debug"
             debuggable true
@@ -71,9 +71,12 @@ android {
             resValue "string", "app_name", "SA Debug"
         }
         alpha {
-            initWith debug
             applicationIdSuffix ".alpha"
+            debuggable true
             versionNameSuffix = '-a'
+            sourceSets {
+                androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            }
             resValue "string", "app_name", "SA Alpha"
         }
         beta {
@@ -141,6 +144,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
 
-    // External implementedd libs (.io)
+    // External implemented libs (.io)
     implementation 'io.sentry:sentry:1.7.30'
 }

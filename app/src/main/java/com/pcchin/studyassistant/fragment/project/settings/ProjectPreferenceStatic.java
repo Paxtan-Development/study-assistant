@@ -24,8 +24,8 @@ import java.util.Calendar;
 
 /** Static functions that are used in
  * @see ProjectSettingsFragment **/
-final class ProjectSettingsFragmentStatic {
-    private ProjectSettingsFragmentStatic() {
+final class ProjectPreferenceStatic {
+    private ProjectPreferenceStatic() {
         throw new IllegalStateException("Utility class");
     }
 

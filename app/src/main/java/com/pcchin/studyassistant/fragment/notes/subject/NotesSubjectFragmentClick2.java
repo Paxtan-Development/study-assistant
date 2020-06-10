@@ -86,10 +86,10 @@ public class NotesSubjectFragmentClick2 {
                 NotesSubject targetSubject = database.SubjectDao().searchByTitle(popupInputText);
                 database.close();
                 if (targetSubject == null) {
+                    moveSubject((MainActivity) fragment.requireActivity(), dismissibleDialog, popupInputText);
+                } else {
                     popupView.setErrorEnabled(true);
                     popupView.setError(fragment.getString(R.string.error_subject_exists));
-                } else {
-                    moveSubject((MainActivity) fragment.requireActivity(), dismissibleDialog, popupInputText);
                 }
             }
         }

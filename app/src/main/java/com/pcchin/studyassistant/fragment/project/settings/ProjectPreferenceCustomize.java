@@ -32,12 +32,12 @@ import java.util.Objects;
 
 /** Functions that are called to customize preferences in
  * @see ProjectSettingsFragment **/
-final class ProjectSettingsFragmentCustomize {
+final class ProjectPreferenceCustomize {
     private final ProjectSettingsFragment fragment;
     private final MainActivity activity;
     
     /** Constructor for the class as fragment needs to be passed on. **/
-    ProjectSettingsFragmentCustomize(ProjectSettingsFragment fragment) {
+    ProjectPreferenceCustomize(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
         this.activity = (MainActivity) fragment.requireActivity();
     }
@@ -68,15 +68,20 @@ final class ProjectSettingsFragmentCustomize {
         new Handler().postDelayed(() -> {
             SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
             List<NotesSubject> subjectList = database.SubjectDao().getAll();
+            database.close();
             CharSequence[] subjectNameList = new CharSequence[subjectList.size()];
+            CharSequence[] subjectIdList = new CharSequence[subjectList.size()];
             for (int i = 0; i < subjectList.size(); i++) {
                 subjectNameList[i] = subjectList.get(i).title;
+                subjectIdList[i] = String.valueOf(subjectList.get(i).subjectId);
             }
-            ListPreference subjectPreference = Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_RELATED_SUBJECT));
+            ListPreference subjectPreference = Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_SET_RELATED_SUBJECT));
             subjectPreference.setEntries(subjectNameList);
-            subjectPreference.setEntryValues(subjectNameList);
-            database.close();
+            subjectPreference.setEntryValues(subjectIdList);
         }, 0);
+        if (fragment.project.associatedSubject == null) {
+            ((Preference) Objects.requireNonNull(fragment.findPreference(PreferenceString.PREF_REMOVE_RELATED_SUBJECT))).setVisible(false);
+        }
     }
 
     /** Customize the date preferences. **/

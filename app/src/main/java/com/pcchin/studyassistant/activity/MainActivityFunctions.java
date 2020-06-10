@@ -65,9 +65,12 @@ public final class MainActivityFunctions {
             @Override
             // getItem does not correspond to the current item selected, DO NOT USE IT AS SUCH
             public Fragment getItem(int position) {
-                // Used to be an issue where NotesViewFragment would crash as menu is null,
-                // but it seems to had resolved itself
-                return NotesViewFragment.newInstance(notesList.get(position).noteId);
+                // This if else is used to prevent ArrayOutOfBoundsException for items outside the range
+                if (position < notesList.size() && position >= 0) {
+                    return NotesViewFragment.newInstance(notesList.get(position).noteId);
+                } else {
+                    return new Fragment();
+                }
             }
 
             @Override

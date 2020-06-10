@@ -33,6 +33,7 @@ import com.pcchin.studyassistant.utils.misc.InputValidation;
 import java.util.Objects;
 
 import io.sentry.Sentry;
+import io.sentry.event.Event;
 import io.sentry.event.EventBuilder;
 
 public class FeedbackFragment extends Fragment implements ExtendedFragment {
@@ -77,9 +78,10 @@ public class FeedbackFragment extends Fragment implements ExtendedFragment {
 
     /** Send the feedback request to the server. **/
     private void sendFeedback(String name, String email, String summary, String desc) {
-        Sentry.capture(new EventBuilder().withMessage("Feedback Request: " + summary)
-                .withExtra("Name", name).withExtra("Email", email)
-                .withExtra("Summary", summary).withExtra("Description", desc));
+        Sentry.capture(new EventBuilder().withLevel(Event.Level.INFO)
+                .withMessage("Feedback Request: " + summary).withExtra("Name", name)
+                .withExtra("Email", email).withExtra("Summary", summary)
+                .withExtra("Description", desc));
         Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
         ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
     }

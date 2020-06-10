@@ -31,10 +31,8 @@ import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.SubjectSelectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.utils.misc.SortingComparators;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
@@ -93,7 +91,7 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
             notesList = database.ContentDao().searchBySubject(subjectId);
             previousNote = getArguments().getInt(ARG_PREV);
             checkExpiredNote();
-            sortNotes();
+            DatabaseFunctions.sortNotes(getContext(), currentSubject, notesList);
         }
         requireActivity().setTitle(currentSubject.title);
         database.close();
@@ -137,29 +135,4 @@ public class NotesSubjectFragment extends Fragment implements ExtendedFragment {
         return true;
     }
 
-    /** Sort the notes based on the sorting format given.
-     * @see NotesSubject
-     * @see SortingComparators **/
-    void sortNotes() {
-        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
-        int sortOrder = currentSubject.sortOrder;
-        if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
-            // Sort by alphabetical order, descending
-            Collections.sort(notesList, SortingComparators.noteTitleComparator);
-            Collections.reverse(notesList);
-        } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
-            Collections.sort(notesList, SortingComparators.noteDateComparator);
-        } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
-            Collections.sort(notesList, SortingComparators.noteDateComparator);
-            Collections.reverse(notesList);
-        } else {
-            // Sort by alphabetical order, ascending
-            if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
-                // Default to this if sortOrder is invalid
-                currentSubject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
-            }
-            Collections.sort(notesList, SortingComparators.noteTitleComparator);
-        }
-        database.close();
-    }
 }

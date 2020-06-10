@@ -53,6 +53,8 @@
     <string name="submit">Submit</string>
     <string name="name">Name</string>
     <string name="email">Email</string>
+    <!-- android.R.string.no displays 'Cancel' instead of 'No' -->
+    <string name="string_no">No</string>
 
     <!-- String used in notifications -->
     <string name="notif_channel_notes_ID">notes</string>
@@ -82,7 +84,7 @@
     <string name="m2_bug_report">Bug Report</string>
     <string name="m2_feature_suggestion">Feature Suggestion</string>
     <string name="m2_send_sentry_event">Send an Example Event</string>
-    <string name="event_sent">Event sent</string>
+    <string name="event_sent">Thanks! Your report has been sent.</string>
 
     <string name="m3_new_subject">New Subject…</string>
     <string name="m3_new_project">New Project…</string>

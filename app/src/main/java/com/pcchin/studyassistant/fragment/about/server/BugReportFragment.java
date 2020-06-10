@@ -13,6 +13,7 @@
 
 package com.pcchin.studyassistant.fragment.about.server;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.jaredrummler.android.device.DeviceName;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
@@ -33,6 +35,7 @@ import com.pcchin.studyassistant.utils.misc.InputValidation;
 import java.util.Objects;
 
 import io.sentry.Sentry;
+import io.sentry.event.Event;
 import io.sentry.event.EventBuilder;
 
 public class BugReportFragment extends Fragment implements ExtendedFragment {
@@ -75,10 +78,12 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
 
     /** Creates the body for the bug request and sends it. **/
     private void sendBugReport(String name, String email, String summary, String desc, String steps) {
-        Sentry.capture(new EventBuilder().withMessage("Bug Report: " + summary)
+        Sentry.capture(new EventBuilder().withLevel(Event.Level.WARNING).withMessage("Bug Report: " + summary)
                 .withExtra("Name", name).withExtra("Email", email)
                 .withExtra("Summary", summary).withExtra("Description", desc)
-                .withExtra("Steps to Recreate Problem", steps));
+                .withExtra("Steps to Recreate Problem", steps)
+                .withExtra("Android Version", Build.VERSION.RELEASE)
+                .withExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")"));
         Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
         ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
     }

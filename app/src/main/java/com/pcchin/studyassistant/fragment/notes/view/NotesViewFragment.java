@@ -70,6 +70,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
             SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
             note = database.ContentDao().search(noteId);
             notesSubject = database.SubjectDao().searchById(note.subjectId);
+            database.close();
         }
         setHasOptionsMenu(true);
     }
@@ -107,7 +108,8 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
         }
         ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
-                getString(R.string.n_last_edited), note.lastEdited));
+                getString(R.string.n_last_edited), ConverterFunctions
+                        .formatTime(note.lastEdited, ConverterFunctions.TimeFormat.DATETIME)));
         if (note.alertDate == null) {
             returnView.findViewById(R.id.n3_notif_time).setVisibility(View.GONE);
         } else {

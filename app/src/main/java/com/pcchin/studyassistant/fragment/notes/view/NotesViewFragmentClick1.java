@@ -92,14 +92,14 @@ public class NotesViewFragmentClick1 {
         new DefaultDialogFragment(new AlertDialog.Builder(fragment.requireContext())
                 .setTitle(R.string.n3_lock_password)
                 .setView(inputLayout)
-                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> getLockedNoteValue(inputLayout))
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> setNotePassword(inputLayout))
                 .setNegativeButton(android.R.string.cancel, null)
                 .create())
                 .show(fragment.getParentFragmentManager(), "NotesViewFragment.2");
     }
 
     /** Gets the value of the note and update it to be locked. **/
-    private void getLockedNoteValue(@NonNull TextInputLayout inputLayout) {
+    private void setNotePassword(@NonNull TextInputLayout inputLayout) {
         // Get values from notes
         String inputText = "";
         if (inputLayout.getEditText() != null) {
@@ -107,7 +107,9 @@ public class NotesViewFragmentClick1 {
         }
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
         if (inputText.length() == 0) {
-            fragment.note.lockedPass = "";
+            // As lockedPass cannot be null and it would always be in Base 64 (With a = at the end)
+            // NONE would not clash with any possible base64 passwords
+            fragment.note.lockedPass = "NONE";
         } else {
             fragment.note.lockedPass = SecurityFunctions.passwordHash(fragment.note.lockedSalt, inputText);
         }
@@ -120,16 +122,15 @@ public class NotesViewFragmentClick1 {
     /** Unlocks the note. If there is no password, the note will be unlocked immediately.
      * Or else, a popup will display asking the user to enter the password. **/
     public void onUnlockPressed() {
-        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        if (!fragment.note.lockedPass.equals("")) {
-            setUnlockDialogLayout(database);
+        if (!fragment.note.lockedPass.equals("NONE")) {
+            setUnlockDialogLayout();
         } else {
-            removeLock(database);
+            removeLock();
         }
     }
 
     /** Sets the layout for the unlock dialog. **/
-    private void setUnlockDialogLayout(SubjectDatabase database) {
+    private void setUnlockDialogLayout() {
         @SuppressLint("InflateParams") TextInputLayout inputLayout =
                 (TextInputLayout) fragment.getLayoutInflater()
                         .inflate(R.layout.popup_edittext, null);
@@ -144,15 +145,15 @@ public class NotesViewFragmentClick1 {
                 .setView(inputLayout)
                 .create());
         dismissibleFragment.setPositiveButton(fragment.getString(android.R.string.ok),
-                view -> setPositiveButton(dismissibleFragment, inputLayout, database));
+                view -> setUnlockPositiveButton(dismissibleFragment, inputLayout));
         dismissibleFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
                 view -> dismissibleFragment.dismiss());
         dismissibleFragment.show(fragment.getParentFragmentManager(), "NotesViewFragment.3");
     }
 
     /** Sets the positive button for the unlock dialog. **/
-    private void setPositiveButton(DismissibleDialogFragment dismissibleFragment,
-                                   @NonNull TextInputLayout inputLayout, SubjectDatabase database) {
+    private void setUnlockPositiveButton(DismissibleDialogFragment dismissibleFragment,
+                                         @NonNull TextInputLayout inputLayout) {
         String inputText = "";
         if (inputLayout.getEditText() != null) {
             inputText = inputLayout.getEditText().getText().toString();
@@ -161,7 +162,7 @@ public class NotesViewFragmentClick1 {
                 fragment.note.lockedPass)) {
             // Removes password
             dismissibleFragment.dismiss();
-            removeLock(database);
+            removeLock();
         } else {
             // Show error dialog
             inputLayout.setErrorEnabled(true);
@@ -170,7 +171,8 @@ public class NotesViewFragmentClick1 {
     }
 
     /** Removes the lock for the note and refreshes the menu.  **/
-    private void removeLock(@NonNull SubjectDatabase database) {
+    private void removeLock() {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.getContext());
         fragment.note.lockedPass = "";
         database.ContentDao().update(fragment.note);
         database.close();

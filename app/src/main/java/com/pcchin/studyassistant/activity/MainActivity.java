@@ -36,6 +36,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
@@ -244,7 +245,9 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
         SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(MainActivity.this);
+        NotesSubject currentSubject = subjectDatabase.SubjectDao().searchById(subjectId);
         List<NotesContent> notesList = subjectDatabase.ContentDao().searchBySubject(subjectId);
+        DatabaseFunctions.sortNotes(MainActivity.this, currentSubject, notesList);
         subjectDatabase.close();
         FragmentStatePagerAdapter baseAdapter = new MainActivityFunctions(MainActivity.this).getNoteAdapter(notesList);
         // Updates currentFragment to the current item

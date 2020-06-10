@@ -14,6 +14,7 @@
 package com.pcchin.studyassistant.fragment.about;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.pcchin.studyassistant.fragment.about.server.BugReportFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
@@ -61,13 +63,22 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View returnView = inflater.inflate(R.layout.fragment_about, container, false);
-        String uid = requireActivity().getSharedPreferences(requireActivity().getPackageName(),
-                Context.MODE_PRIVATE).getString(ActivityConstants.SHAREDPREF_UID, "");
         ((TextView) returnView.findViewById(R.id.m2_version)).setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
         ((TextView) returnView.findViewById(R.id.m2_copyright)).setText(String.format(Locale.ENGLISH, "%s%d %s",
-                getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
-                getString(R.string.m2_copyright_p2)));
+                getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR), getString(R.string.m2_copyright_p2)));
+        setButtons(returnView);
+        // Set license text
+        UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(
+                inflater.getContext(), "studyassistant_about.txt"));
 
+        return returnView;
+    }
+
+    /** Set the onClickListeners for the buttons used in this Fragment. **/
+    private void setButtons(@NonNull View returnView) {
+        SharedPreferences sharedPref = requireActivity().getSharedPreferences(requireActivity().
+                getPackageName(), Context.MODE_PRIVATE);
+        String uid = sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "");
         returnView.findViewById(R.id.m2_library_license).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
         returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
@@ -77,25 +88,25 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                 ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
         returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
                 ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
-
+        // A sample report can only be sent once on each app version to prevent spamming
         //noinspection ConstantConditions
-        if (BuildConfig.BUILD_TYPE.equals("release")) {
+        if (BuildConfig.BUILD_TYPE.equals("release") || sharedPref.getBoolean(ActivityConstants.SHAREDPREF_EVENT_SENT, false)) {
             returnView.findViewById(R.id.m2_send_sentry_event).setVisibility(View.GONE);
         } else {
             returnView.findViewById(R.id.m2_send_sentry_event).setOnClickListener(view -> sendSentryEvent());
         }
-
-        // Set license text
-        UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(
-                inflater.getContext(), "studyassistant_about.txt"));
-
-        return returnView;
     }
 
     /** Send an example Sentry event to the server. **/
     public void sendSentryEvent() {
         Sentry.capture("Example event");
         Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPref = requireActivity().getSharedPreferences(requireActivity()
+                .getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(ActivityConstants.SHAREDPREF_EVENT_SENT, true);
+        editor.apply();
+        GeneralFunctions.reloadFragment(AboutFragment.this);
     }
 
     /** Go back to

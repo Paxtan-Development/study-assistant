@@ -43,7 +43,6 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1", ARG_PARAM2 = "param2";
 
-    SubjectDatabase database;
     NotesSubject subject;
     NotesContent currentNote;
 
@@ -92,7 +91,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            database = DatabaseFunctions.getSubjectDatabase(requireActivity());
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
             // Get values from newInstance
             subjectId = getArguments().getInt(ARG_PARAM1);
             subject = database.SubjectDao().searchById(subjectId);
@@ -108,6 +107,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                         "", new Date(), new RandomString(40).nextString());
             }
             requireActivity().setTitle(subject.title);
+            database.close();
         }
         setHasOptionsMenu(true);
     }
@@ -116,7 +116,6 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        database.close();
     }
 
     /** Creates the fragment. Sets the content and listeners for the note. **/
@@ -160,7 +159,7 @@ public class NotesEditFragment extends Fragment implements ExtendedFragment {
                 .setTitle(R.string.return_val)
                 .setMessage(R.string.n4_save_note)
                 .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onSavePressed())
-                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed())
+                .setNegativeButton(R.string.string_no, (dialogInterface, i) -> new NotesEditFragmentClick(NotesEditFragment.this).onCancelPressed())
                 .setNeutralButton(android.R.string.cancel, null)
                 .create())
                 .show(getParentFragmentManager(), "NotesEditFragment.2");

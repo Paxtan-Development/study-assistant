@@ -44,8 +44,7 @@ public final class UIFunctions {
     }
 
     /** Shows the dialog to add a new subject to the notes list **/
-    public static void showNewSubject(@NonNull final MainActivity activity,
-                               final SubjectDatabase database) {
+    public static void showNewSubject(@NonNull final MainActivity activity) {
         @SuppressLint("InflateParams") final TextInputLayout popupView = (TextInputLayout) activity
                 .getLayoutInflater().inflate(R.layout.popup_edittext, null);
         popupView.setHint(activity.getString(R.string.n1_subject_title));
@@ -60,7 +59,7 @@ public final class UIFunctions {
         dismissibleFragment.setPositiveButton(activity.getString(android.R.string.ok), v -> {
             String inputText = "";
             if (popupView.getEditText() != null) inputText = popupView.getEditText().getText().toString();
-            createSubject(dismissibleFragment, popupView, activity, database, inputText);
+            createSubject(dismissibleFragment, popupView, activity, inputText);
         });
         dismissibleFragment.setNegativeButton(activity.getString(android.R.string.cancel), v ->
                 dismissibleFragment.dismiss());
@@ -69,14 +68,17 @@ public final class UIFunctions {
 
     /** Creates the subject if the subject title is not taken. **/
     private static void createSubject(DismissibleDialogFragment dismissibleFragment, TextInputLayout popupView,
-                                      MainActivity activity, SubjectDatabase database, @NonNull String inputText) {
+                                      MainActivity activity, @NonNull String inputText) {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
         // Preliminary checks if subject name is taken or is empty
         if (inputText.replaceAll("\\s+", "").length() == 0) {
             popupView.setErrorEnabled(true);
             popupView.setError(activity.getString(R.string.n_error_subject_empty));
+            database.close();
         } else if (database.SubjectDao().searchByTitle(inputText) != null) {
             popupView.setErrorEnabled(true);
             popupView.setError(activity.getString(R.string.error_subject_exists));
+            database.close();
         } else {
             // Create subject
             int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);

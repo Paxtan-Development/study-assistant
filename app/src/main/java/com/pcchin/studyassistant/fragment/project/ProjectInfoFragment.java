@@ -267,7 +267,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                             projectDatabase.ProjectDao().update(project);
                             requireActivity().invalidateOptionsMenu();
                         })
-                        .setNegativeButton(android.R.string.no, null).create();
+                        .setNegativeButton(R.string.string_no, null).create();
                 subjDialog.setOnDismissListener(dialogInterface -> subjDatabase.close());
                 new DefaultDialogFragment(subjDialog).show(getParentFragmentManager(), "ProjectInfoFragment.1");
             } else {

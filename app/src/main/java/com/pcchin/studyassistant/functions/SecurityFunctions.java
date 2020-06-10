@@ -94,10 +94,11 @@ public final class SecurityFunctions {
 
     /** Functions used to hash a password through PBKDF2. This function replaces notesHash,
      * projectHash, roleHash and memberHash.
-     * No need for test as it is just a wrapper around PBKDF2, which is covered in testPbkdf2. **/
+     * No need for test as it is just a wrapper around PBKDF2, which is covered in testPbkdf2.
+     * Base64.NO_WRAP should be used to prevent trailing newlines. **/
     public static String passwordHash(@NonNull String original, @NonNull String salt) {
         return Base64.encodeToString(pbkdf2(original.getBytes(), salt.getBytes(), 10800),
-                Base64.DEFAULT);
+                Base64.NO_WRAP);
     }
 
     /** Encryption method used to protect subject contents in .subject files. **/
@@ -130,6 +131,7 @@ public final class SecurityFunctions {
                 while (scanner.hasNext()) contentBuilder.append(scanner.next());
             }
             // PEM needs to be decoded to X509 for it to be accepted by the RSA Engine
+            // Base64.DEFAULT is fine here as it's fine for it to have newlines
             byte[] decodedKey = Base64.decode(contentBuilder.toString(), Base64.DEFAULT);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
             ByteArrayOutputStream outputStream = getRSAStream(keySpec, original);

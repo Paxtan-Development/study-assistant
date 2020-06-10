@@ -92,7 +92,8 @@ final class MainActivityCreate {
 
     /** Initializes Sentry to be used in all build configs.
      * The used is identified by their UID and their app version.
-     * Their device version is not recorded unless they submit a bug report manually. **/
+     * Their device version and Android Version is not recorded unless they submit a bug report
+     * manually or are not in the release build. **/
     private void initSentry() {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
         // Don't init if its in debug mode
@@ -133,7 +134,7 @@ final class MainActivityCreate {
         // First time starting the app
         if (savedInstanceState == null) {
             firstStart();
-            // Only check for updates once a day for non-beta users
+            // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
             } else if (!Objects.equals(activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)

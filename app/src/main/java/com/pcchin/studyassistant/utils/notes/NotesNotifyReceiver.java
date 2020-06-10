@@ -47,6 +47,7 @@ public class NotesNotifyReceiver extends BroadcastReceiver {
         int noteId = intent.getIntExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, 0);
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
         NotesContent note = database.ContentDao().search(noteId);
+        database.close();
         if (note != null) {
             if (note.noteTitle.length() != 0) {
                 title = note.noteTitle;

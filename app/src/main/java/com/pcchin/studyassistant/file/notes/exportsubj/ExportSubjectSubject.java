@@ -103,7 +103,7 @@ public class ExportSubjectSubject {
             String finalOutputFileName = outputFileName;
             dialog.dismiss();
             new Handler().post(() -> handleExportSubjectError(dialog, finalOutputFileName,
-                            responseText, responseText));
+                            responseText));
         } else {
             inputText.setErrorEnabled(true);
             inputText.setError(fragment.getString(R.string.error_password_short));
@@ -113,15 +113,14 @@ public class ExportSubjectSubject {
     /** Handles any errors that occur while exporting the .subject file. **/
     private void handleExportSubjectError(DismissibleDialogFragment dialog,
                                           String finalOutputFileName,
-                                          String finalResponseText,
-                                          String finalResponseText1) {
+                                          String finalResponseText) {
         try {
             // Get permission to read and write files
             File outputFile = new File(finalOutputFileName);
             if (outputFile.createNewFile()) {
                 try (FileOutputStream outputStream = new FileOutputStream(outputFile);
                      DeflaterOutputStream deflatedStream = new DeflaterOutputStream(outputStream)) {
-                    exportSubjectFile(finalOutputFileName, finalResponseText, finalResponseText1, deflatedStream);
+                    exportSubjectFile(finalOutputFileName, finalResponseText, deflatedStream);
                 }
             } else {
                 Log.e(ActivityConstants.LOG_APP_NAME, "File Error: File " + finalOutputFileName + " cannot be created.");
@@ -144,8 +143,7 @@ public class ExportSubjectSubject {
     }
 
     /** Creates and export the .subject file. **/
-    private void exportSubjectFile(String finalOutputFileName, String finalResponseText,
-                                   @NonNull String finalResponseText1,
+    private void exportSubjectFile(String finalOutputFileName, @NonNull String finalResponseText,
                                    @NonNull DeflaterOutputStream deflatedOutput)
             throws IOException {
         Toast.makeText(fragment.requireContext(), R.string.n2_exporting_subject, Toast.LENGTH_SHORT).show();
@@ -156,11 +154,12 @@ public class ExportSubjectSubject {
         deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.title.getBytes().length));
         deflatedOutput.write(notesSubject.title.getBytes());
         deflatedOutput.write(ConverterFunctions.intToBytes(notesSubject.sortOrder));
-        if (finalResponseText1.length() >= 8) {
+        if (finalResponseText.length() >= 8) {
             deflatedOutput.write(1);
             // Create 32 bytes of salt
             byte[] salt = new byte[32];
             new Random().nextBytes(salt);
+            deflatedOutput.write(salt);
             deflatedOutput.write(SecurityFunctions.subjectEncrypt(finalResponseText, salt, notesList));
         } else {
             deflatedOutput.write(0);

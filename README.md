@@ -32,6 +32,8 @@ Your UID and app version would be automatically recorded in the event of a crash
 
 If you wish to submit more information about a bug or to provide feedback,
  you may do so through the **Bug Report** and **Feature Suggestion** page located in the **About** section of the app.
+ If you submit a **Bug Report** manually, your UID, app version, Android Version and device model would be sent as well,
+ even if you are not a beta tester.
 
  The name and email fields in both the **Bug Report** and **Feature Suggestion** pages are optional.
 

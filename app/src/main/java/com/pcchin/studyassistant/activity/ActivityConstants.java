@@ -13,6 +13,8 @@
 
 package com.pcchin.studyassistant.activity;
 
+import com.pcchin.studyassistant.BuildConfig;
+
 /** Constants used in MainActivity. **/
 public final class ActivityConstants {
     private ActivityConstants() {
@@ -22,8 +24,8 @@ public final class ActivityConstants {
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
     public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
-    public static final String SHAREDPREF_FEEDBACK_ISSUE_LIST = "feedbackIssueList";
-    public static final String SHAREDPREF_BUG_ISSUE_LIST = "bugIssueList";
+    // This ensures that the String will be different on a version change
+    public static final String SHAREDPREF_EVENT_SENT = "testEventSent" + BuildConfig.VERSION_NAME;
     public static final String SHAREDPREF_UID = "uid";
 
     // General intent constants

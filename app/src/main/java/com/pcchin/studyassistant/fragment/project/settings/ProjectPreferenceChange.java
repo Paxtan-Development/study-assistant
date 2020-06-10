@@ -25,7 +25,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
@@ -40,12 +39,12 @@ import java.util.Objects;
 
 /** Functions that are called when a preference is changed in
  * @see ProjectSettingsFragment **/
-final class ProjectSettingsFragmentChange {
+final class ProjectPreferenceChange {
     private final ProjectSettingsFragment fragment;
     private final MainActivity activity;
 
     /** Constructor for the class as fragment needs to be passed on. **/
-    ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {
+    ProjectPreferenceChange(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
         this.activity = (MainActivity) fragment.requireActivity();
     }
@@ -93,10 +92,9 @@ final class ProjectSettingsFragmentChange {
             case PreferenceString.PREF_STATUS_ICON:
                 updateStatusIcon((String) newValue);
                 break;
-            case PreferenceString.PREF_RELATED_SUBJECT:
-                SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-                fragment.project.associatedSubject = database.SubjectDao().searchByTitle((String) newValue).subjectId;
-                database.close();
+            case PreferenceString.PREF_SET_RELATED_SUBJECT:
+                // The subject IDs are set in the customize sections already
+                fragment.project.associatedSubject = Integer.parseInt(newValue.toString());
                 break;
         }
         fragment.updateProject();
@@ -118,7 +116,7 @@ final class ProjectSettingsFragmentChange {
             dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> onNewMemberCreate(initialMemberLayout));
             dialogFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
                     (view) -> dialogFragment.dismiss());
-            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectSettingsFragmentChange.1");
+            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectPreferenceChange.1");
         }
     }
 

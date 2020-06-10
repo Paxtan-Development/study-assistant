@@ -109,7 +109,7 @@ class AppUpdate2 {
             updateDialog.dismiss();
             updateViaGithub(downloadLink);
         });
-        updateDialog.setNegativeButton(activity.getString(android.R.string.no), view -> updateDialog.dismiss());
+        updateDialog.setNegativeButton(activity.getString(R.string.string_no), view -> updateDialog.dismiss());
         updateDialog.setNeutralButton(activity.getString(R.string.a_learn_more), view -> {
             // The user should be able to update after coming back from the website
             activity.safeOnBackPressed();

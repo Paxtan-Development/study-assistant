@@ -28,8 +28,6 @@ public final class NetworkConstants {
     @SuppressWarnings("ConstantConditions")
     public static final String UPDATE_PATH = BuildConfig.BUILD_TYPE.equals("beta")
             ? "/study-assistant/beta" : "/study-assistant/latest";
-    public static final String FEEDBACK_PATH = "/study-assistant/feedback";
-    public static final String BUG_PATH = "/study-assistant/bug";
     /* Example user agent: "Study-Assistant/1.5 (...)" */
     @SuppressWarnings("ConstantConditions")
     public static final String USER_AGENT = System.getProperty("http.agent","")

@@ -90,6 +90,7 @@ public class NotesViewFragmentClick2 {
     /** Pass the alert time to updateNoteAlert. **/
     private void updateNoteAlertTime(@NonNull Calendar targetDateTime) {
         if (targetDateTime.after(Calendar.getInstance())) {
+            // TODO: Potential bug somewhere that keeps saying that the time selected has passed
             // Set alert
             Random rand = new Random();
             int requestCode = rand.nextInt();
@@ -110,10 +111,9 @@ public class NotesViewFragmentClick2 {
     /** Updates the alert of the note. **/
     private void updateNoteAlert(@NonNull Activity activity, @NonNull Calendar targetDateTime, int requestCode) {
         AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent alarmIntent = getNotifyReceiverIntent();
-
         fragment.note.alertDate = new Date(targetDateTime.getTimeInMillis());
-        fragment.note.alertCode = requestCode;
+        fragment.note.alertCode = requestCode; // Needs to come first before getNotifyReeiverIntent
+        PendingIntent alarmIntent = getNotifyReceiverIntent();
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
         database.ContentDao().update(fragment.note);
         database.close();

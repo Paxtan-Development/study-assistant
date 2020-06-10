@@ -26,7 +26,9 @@ import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,9 +58,11 @@ public final class NotesEditFragmentClick {
         } else {
             currentSubject = fragment.subjectId;
         }
-        subjTitleList.add(fragment.database.SubjectDao().searchById(currentSubject).title);
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.getContext());
+        subjTitleList.add(database.SubjectDao().searchById(currentSubject).title);
         // Add the remaining titles (Order different thus int[] is needed
-        List<NotesSubject> allSubjList = fragment.database.SubjectDao().getAll();
+        List<NotesSubject> allSubjList = database.SubjectDao().getAll();
+        database.close();
         int[] displayListArray = new int[allSubjList.size()];
         int displayListCount = 0;
         displayListArray[0] = currentSubject;
@@ -117,12 +121,13 @@ public final class NotesEditFragmentClick {
         if (fragment.subjModified) {
             fragment.currentNote.subjectId = fragment.targetSubjectId;
         }
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.getContext());
         if (fragment.hasParent) {
-            fragment.database.ContentDao().update(fragment.currentNote);
+            database.ContentDao().update(fragment.currentNote);
         } else {
-            fragment.database.ContentDao().insert(fragment.currentNote);
+            database.ContentDao().insert(fragment.currentNote);
         }
-        fragment.database.close();
+        database.close();
         activity.displayNotes(fragment.currentNote.subjectId);
         activity.pager.setPagerOrder(fragment.currentNote.noteId);
     }

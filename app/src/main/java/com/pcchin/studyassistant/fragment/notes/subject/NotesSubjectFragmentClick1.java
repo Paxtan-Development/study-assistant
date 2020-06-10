@@ -107,7 +107,7 @@ public class NotesSubjectFragmentClick1 {
                     database.SubjectDao().update(fragment.currentSubject);
                     database.close();
                     dialogInterface.dismiss();
-                    fragment.sortNotes();
+                    DatabaseFunctions.sortNotes(fragment.getContext(), fragment.currentSubject, fragment.notesList);
                     GeneralFunctions.reloadFragment(fragment);
                 })
                 .setNegativeButton(android.R.string.cancel, null)

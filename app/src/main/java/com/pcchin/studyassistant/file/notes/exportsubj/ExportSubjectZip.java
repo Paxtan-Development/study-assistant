@@ -158,7 +158,7 @@ public class ExportSubjectZip {
     private void exportAllNotes(String tempExportFolder, ArrayList<File> exportFilesList) {
         // Export all the note's data to a text .subj file
         String infoTempOutputPath = FileFunctions.generateValidFile(
-                tempExportFolder + notesSubject.title, ".subj");
+                tempExportFolder + "/" + notesSubject.title, ".subj");
         try (FileOutputStream infoTempStream = new FileOutputStream(infoTempOutputPath);
              DeflaterOutputStream deflatedInfoTemp = new DeflaterOutputStream(infoTempStream)) {
             StringBuilder infoStringBuilder = new StringBuilder(notesSubject.title + "\n" + notesSubject.sortOrder + "\n");
@@ -195,7 +195,8 @@ public class ExportSubjectZip {
             infoStringBuilder.append(new File(currentPath).getName()).append("\n")
                     .append(currentNote.noteTitle).append("\n")
                     .append(ConverterFunctions.formatTime(currentNote.lastEdited, ConverterFunctions.TimeFormat.ISO))
-                    .append("\n").append(currentNote.lockedSalt).append("\n");
+                    .append("\n").append(currentNote.lockedSalt).append("\n")
+                    .append(currentNote.lockedPass).append("\n");
             appendNullableFields(infoStringBuilder, currentNote);
         }
     }
@@ -205,12 +206,12 @@ public class ExportSubjectZip {
         if (currentNote.alertDate == null) {
             infoStringBuilder.append("NULL\n");
         } else {
-            infoStringBuilder.append(ConverterFunctions.formatTime(currentNote.alertDate, ConverterFunctions.TimeFormat.ISO));
+            infoStringBuilder.append(ConverterFunctions.formatTime(currentNote.alertDate, ConverterFunctions.TimeFormat.ISO)).append("\n");
         }
         if (currentNote.alertCode == null) {
             infoStringBuilder.append("NULL\n");
         } else {
-            infoStringBuilder.append("\n").append(currentNote.alertCode).append("\n");
+            infoStringBuilder.append(currentNote.alertCode).append("\n");
         }
     }
 }

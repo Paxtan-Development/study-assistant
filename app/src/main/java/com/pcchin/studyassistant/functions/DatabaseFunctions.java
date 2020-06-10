@@ -19,10 +19,14 @@ import androidx.annotation.NonNull;
 import androidx.room.Room;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.utils.misc.RandomString;
+import com.pcchin.studyassistant.utils.misc.SortingComparators;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -105,5 +109,31 @@ public final class DatabaseFunctions {
                 returnString = "";
         }
         return returnString;
+    }
+
+    /** Sort the notes based on the sorting format given.
+     * @see NotesSubject
+     * @see SortingComparators **/
+    public static void sortNotes(Context context, @NonNull NotesSubject currentSubject, List<NotesContent> notesList) {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
+        int sortOrder = currentSubject.sortOrder;
+        if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
+            // Sort by alphabetical order, descending
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
+            Collections.reverse(notesList);
+        } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
+        } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
+            Collections.reverse(notesList);
+        } else {
+            // Sort by alphabetical order, ascending
+            if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
+                // Default to this if sortOrder is invalid
+                currentSubject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
+            }
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
+        }
+        database.close();
     }
 }

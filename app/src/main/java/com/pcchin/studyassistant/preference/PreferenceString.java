@@ -41,7 +41,8 @@ public final class PreferenceString {
             PREF_STATUS = "pref_status",
             PREF_MERGE_TASK_STATUS = "pref_merge_task_status",
             PREF_STATUS_ICON = "pref_status_icon",
-            PREF_RELATED_SUBJECT = "pref_related_subject";
+            PREF_SET_RELATED_SUBJECT = "pref_set_related_subject",
+            PREF_REMOVE_RELATED_SUBJECT = "pref_remove_related_subject";
 
     // String literals for date preferences
     public static final String PREF_SET_EXPECTED_START = "pref_set_expected_start",

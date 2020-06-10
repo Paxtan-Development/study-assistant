@@ -27,7 +27,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
+import com.pcchin.studyassistant.fragment.notes.SubjectSelectFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.activity.MainActivity;
 
@@ -53,7 +53,7 @@ public class MainFragment extends Fragment implements ExtendedFragment {
         // Inflate the layout for this fragment and set up listeners
         View returnView = inflater.inflate(R.layout.fragment_main, container, false);
         returnView.findViewById(R.id.m1_notes).setOnClickListener(v ->
-                ((MainActivity) requireActivity()).displayFragment(new NotesSelectFragment()));
+                ((MainActivity) requireActivity()).displayFragment(new SubjectSelectFragment()));
         returnView.findViewById(R.id.m1_projects).setOnClickListener(v ->
                 ((MainActivity) requireActivity()).displayFragment(new ProjectSelectFragment()));
         returnView.findViewById(R.id.m1_about).setOnClickListener(v ->

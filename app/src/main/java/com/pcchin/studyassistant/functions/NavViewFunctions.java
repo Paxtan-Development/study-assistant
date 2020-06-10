@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.navigation.NavigationView;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
@@ -31,7 +32,6 @@ import com.pcchin.studyassistant.fragment.about.AboutFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.fragment.project.verify.ProjectLoginFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.List;
 
@@ -60,13 +60,13 @@ public final class NavViewFunctions {
         // Subject menu
         final SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(activity);
         SubMenu subjMenu = currentMenu.addSubMenu(R.string.notes);
-        addSubjects(subjMenu, activity, subjectDatabase);
+        addSubjects(subjMenu, activity, subjectDatabase); // Database will be closed in function
 
         // Add New Subject button
         MenuItem newSubj = subjMenu.add(R.string.m3_new_subject);
         newSubj.setOnMenuItemClickListener(item -> {
             activity.closeDrawer();
-            UIFunctions.showNewSubject(activity, subjectDatabase);
+            UIFunctions.showNewSubject(activity);
             return true;
         });
 
@@ -83,6 +83,7 @@ public final class NavViewFunctions {
     private static void addSubjects(SubMenu subjMenu, MainActivity activity,
                                     @NonNull SubjectDatabase subjectDatabase) {
         List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
+        subjectDatabase.close();
         for (final NotesSubject subject: subjectList) {
             MenuItem subjItem = subjMenu.add(subject.title);
             // This is to prevent menu items from disappearing
@@ -90,7 +91,7 @@ public final class NavViewFunctions {
                 // Opens subject when clicked
                 activity.closeDrawer();
                 activity.safeOnBackPressed();
-                activity.displayFragment(NotesSubjectFragment.newInstance(subject.title));
+                activity.displayFragment(NotesSubjectFragment.newInstance(subject.subjectId));
                 return true;
             });
         }

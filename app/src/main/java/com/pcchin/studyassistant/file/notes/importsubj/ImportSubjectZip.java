@@ -30,6 +30,8 @@ import com.pcchin.studyassistant.activity.MainActivity;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
+import io.sentry.Sentry;
+
 /** Functions used to import ZIP files in ImportSubject. **/
 public class ImportSubjectZip {
     private final MainActivity activity;
@@ -46,7 +48,7 @@ public class ImportSubjectZip {
             if (new ZipFile(path).isValidZipFile()) {
                 displayZipDialog(path);
             } else {
-                Log.e(ActivityConstants.LOG_APP_NAME, "File Error: ZIP file " + path + " is invalid.");
+                Log.w(ActivityConstants.LOG_APP_NAME, "File Error: ZIP file " + path + " is invalid.");
                 Toast.makeText(activity, R.string.error_zip_corrupt, Toast.LENGTH_SHORT).show();
             }
         } catch (ZipException e) {
@@ -54,6 +56,7 @@ public class ImportSubjectZip {
                     + " importing a subject, stack trace is");
             Toast.makeText(activity, R.string.error_zip_import, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
+            Sentry.capture(e);
         }
     }
 

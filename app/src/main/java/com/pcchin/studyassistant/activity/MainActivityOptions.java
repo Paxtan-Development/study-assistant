@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
+import com.pcchin.studyassistant.fragment.notes.SubjectSelectFragment;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragmentClick;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragmentClick1;
@@ -38,17 +38,17 @@ final class MainActivityOptions {
     /** Process the options in the options menu of MainActivity. **/
     static void processOption(int itemId, Fragment currentFragment) {
         switch(itemId) {
-            // When NotesSelectFragment or ProjectSelectFragment is activated
+            // When SubjectSelectFragment or ProjectSelectFragment is activated
             case R.id.menu_new_subj:
-                if (currentFragment instanceof NotesSelectFragment) {
-                    ((NotesSelectFragment) currentFragment).onNewSubjectPressed();
+                if (currentFragment instanceof SubjectSelectFragment) {
+                    ((SubjectSelectFragment) currentFragment).onNewSubjectPressed();
                 } else {
                     ((ProjectSelectFragment) currentFragment).onNewProjectPressed();
                 }
                 break;
             case R.id.menu_import:
-                if (currentFragment instanceof  NotesSelectFragment) {
-                    ((NotesSelectFragment) currentFragment).onImportPressed();
+                if (currentFragment instanceof SubjectSelectFragment) {
+                    ((SubjectSelectFragment) currentFragment).onImportPressed();
                 } else {
                     ((ProjectSelectFragment) currentFragment).onImportPressed();
                 }

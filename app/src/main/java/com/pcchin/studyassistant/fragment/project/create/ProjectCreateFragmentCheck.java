@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /** Functions for checking whether the inputs in ProjectCreateFragment are valid. **/
 final class ProjectCreateFragmentCheck {
-    private Context context;
+    private final Context context;
 
     ProjectCreateFragmentCheck(Context context) {
         this.context = context;

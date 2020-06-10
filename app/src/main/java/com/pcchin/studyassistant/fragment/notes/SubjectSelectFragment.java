@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectStatic;
@@ -36,15 +37,12 @@ import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
 
 import java.util.List;
 
-public class NotesSelectFragment extends Fragment implements ExtendedFragment {
-    private SubjectDatabase subjectDatabase;
-
+public class SubjectSelectFragment extends Fragment implements ExtendedFragment {
     /** Default constructor. **/
-    public NotesSelectFragment() {
+    public SubjectSelectFragment() {
         // Default constructor.
     }
 
@@ -52,7 +50,6 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
         requireActivity().setTitle(R.string.notes);
         setHasOptionsMenu(true);
     }
@@ -65,7 +62,9 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
         View returnView = inflater.inflate(R.layout.blank_list, container, false);
 
         // Add existing subjects
+        SubjectDatabase subjectDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
         final List<NotesSubject> subjectList = subjectDatabase.SubjectDao().getAll();
+        subjectDatabase.close();
         for (int i = 0; i < subjectList.size(); i++) {
             @SuppressLint("InflateParams") Button subjectBtn = (Button) getLayoutInflater()
                     .inflate(R.layout.hyperlink_btn, null);
@@ -73,10 +72,8 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
             final int finalI = i;
             subjectBtn.setOnClickListener(v -> {
                 // Go to notesSubjectFragment
-                subjectDatabase.close();
                 ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment.newInstance(
-                        subjectList.get(finalI).title
-                ));
+                        subjectList.get(finalI).subjectId));
             });
             ((LinearLayout) returnView.findViewById(R.id.blank_linear)).addView(subjectBtn, i);
         }
@@ -92,7 +89,7 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
 
     /** Creates a new subject. **/
     public void onNewSubjectPressed() {
-        UIFunctions.showNewSubject(((MainActivity) requireActivity()), subjectDatabase);
+        UIFunctions.showNewSubject(((MainActivity) requireActivity()));
     }
 
     /** Imports an existing zip/.subject file. **/
@@ -104,7 +101,6 @@ public class NotesSelectFragment extends Fragment implements ExtendedFragment {
      * @see MainFragment **/
     @Override
     public boolean onBackPressed() {
-        subjectDatabase.close();
         ((MainActivity) requireActivity()).displayFragment(new MainFragment());
         return true;
     }

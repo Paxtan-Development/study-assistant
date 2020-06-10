@@ -13,39 +13,30 @@
 
 package com.pcchin.studyassistant.fragment.about.server;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ScrollView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ScrollView;
-
 import com.google.android.material.textfield.TextInputLayout;
 import com.jaredrummler.android.device.DeviceName;
-import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
-import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.AboutFragment;
-import com.pcchin.studyassistant.functions.DataFunctions;
-import com.pcchin.studyassistant.functions.NetworkFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 import com.pcchin.studyassistant.utils.misc.InputValidation;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Objects;
+
+import io.sentry.Sentry;
+import io.sentry.event.Event;
+import io.sentry.event.EventBuilder;
 
 public class BugReportFragment extends Fragment implements ExtendedFragment {
     /** Default constructor. **/
@@ -58,32 +49,14 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ArrayList<Integer> issueList = DataFunctions.getAllResponses(requireActivity(),
-                ActivityConstants.SHAREDPREF_BUG_ISSUE_LIST);
         ScrollView returnScroll = (ScrollView) inflater.inflate(R.layout.fragment_bug_report, container, false);
-        if (issueList.size() == 0) {
-            returnScroll.findViewById(R.id.m7_previous).setVisibility(View.GONE);
-            returnScroll.findViewById(R.id.m7_previous_divider).setVisibility(View.GONE);
-        } else {
-            returnScroll.findViewById(R.id.m7_previous).setOnClickListener(view ->
-                    UIFunctions.displayPreviousSubmissions(BugReportFragment.this, issueList,
-                            ActivityConstants.SHAREDPREF_BUG_ISSUE_LIST));
-        }
         returnScroll.findViewById(R.id.m7_return).setOnClickListener(view -> onBackPressed());
-        returnScroll.findViewById(R.id.m7_submit).setOnClickListener(view -> {
-            try {
-                submitReport(returnScroll);
-            } catch (JSONException e) {
-                Log.e(ActivityConstants.LOG_APP_NAME, "Network Error: Unable to create JSON object for feedback submission, stack trace is");
-                e.printStackTrace();
-            }
-        });
+        returnScroll.findViewById(R.id.m7_submit).setOnClickListener(view -> submitReport(returnScroll));
         return returnScroll;
     }
 
     /** Submits the bug report for the fragment. **/
-    private void submitReport(@NonNull ScrollView returnScroll) throws JSONException {
-        Button submitButton = returnScroll.findViewById(R.id.m7_submit);
+    private void submitReport(@NonNull ScrollView returnScroll) {
         TextInputLayout nameInput = returnScroll.findViewById(R.id.m7_name_input), emailInput = returnScroll.findViewById(R.id.m7_email_input),
                 summaryInput = returnScroll.findViewById(R.id.m7_summary_input), descInput = returnScroll.findViewById(R.id.m7_description_input),
                 stepsInput = returnScroll.findViewById(R.id.m7_steps_input);
@@ -100,24 +73,19 @@ public class BugReportFragment extends Fragment implements ExtendedFragment {
         if (validator.inputIsBlank(summary, summaryInput, R.string.m_error_summary_blank)) hasError = true;
         if (validator.inputIsBlank(desc, descInput, R.string.m_error_desc_blank)) hasError = true;
         if (validator.inputIsBlank(steps, stepsInput, R.string.m_error_steps_blank)) hasError = true;
-        if (!hasError) sendBugReport(name, email, summary, desc, steps, submitButton);
+        if (!hasError) sendBugReport(name, email, summary, desc, steps);
     }
 
     /** Creates the body for the bug request and sends it. **/
-    private void sendBugReport(String name, String email, String summary, String desc, String steps, Button submitButton) throws JSONException {
-        JSONObject uploadObject = new JSONObject();
-        uploadObject.put("name", name);
-        uploadObject.put("email", email);
-        uploadObject.put("uid", requireActivity().getSharedPreferences(
-                requireActivity().getPackageName(), Context.MODE_PRIVATE)
-                .getString(ActivityConstants.SHAREDPREF_UID, ""));
-        uploadObject.put("device", DeviceName.getDeviceName() + "(" + Build.MODEL + ")");
-        uploadObject.put("version", BuildConfig.VERSION_NAME);
-        uploadObject.put("summary", summary);
-        uploadObject.put("description", desc);
-        uploadObject.put("steps", steps);
-        NetworkFunctions.sendPostRequest(((MainActivity) requireActivity()), NetworkConstants.BUG_PATH,
-                uploadObject, ActivityConstants.SHAREDPREF_BUG_ISSUE_LIST, submitButton);
+    private void sendBugReport(String name, String email, String summary, String desc, String steps) {
+        Sentry.capture(new EventBuilder().withLevel(Event.Level.WARNING).withMessage("Bug Report: " + summary)
+                .withExtra("Name", name).withExtra("Email", email)
+                .withExtra("Summary", summary).withExtra("Description", desc)
+                .withExtra("Steps to Recreate Problem", steps)
+                .withExtra("Android Version", Build.VERSION.RELEASE)
+                .withExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")"));
+        Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
+        ((MainActivity) requireActivity()).displayFragment(new AboutFragment());
     }
 
     /** Returns to

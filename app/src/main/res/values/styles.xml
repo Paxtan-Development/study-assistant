@@ -11,7 +11,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="DefaultTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -31,7 +31,7 @@
     </style>
 
     <!-- Default TextView theme -->
-    <style name="AppTheme.TextView" parent="Widget.AppCompat.TextView">
+    <style name="AppTheme.TextView" parent="Widget.AppCompat.TextView" tools:ignore="UnusedResources">
         <item name="android:textColor">@android:color/black</item>
     </style>
 

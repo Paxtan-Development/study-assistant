@@ -20,6 +20,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -40,13 +42,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
@@ -56,10 +57,6 @@ import javax.crypto.NoSuchPaddingException;
 
 /** Functions used in hashing, encryption, decryption etc. **/
 public final class SecurityFunctions {
-    private static final String SHA_512 = "SHA-512";
-    private static final String SHA_MISSING_ERROR = "Cryptography Error: Algorithm SHA-512 " +
-            "not found in MessageDigest.";
-
     private SecurityFunctions() {
         throw new IllegalStateException("Utility class");
     }
@@ -95,108 +92,33 @@ public final class SecurityFunctions {
         return response;
     }
 
-    /** Hashing method used in the passwords that prevent notes from being edited.
-     * No need to be too secure as the contents of the notes can be easily found when exported. **/
-    public static String notesHash(@NonNull String original) {
-        byte[] originalByte = null;
-        // 1) SHA
-        try {
-            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
-            originalByte = shaDigest.digest(original.getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
-        }
-
-        // 2) Blowfish
-        originalByte = blowfish(originalByte, original.getBytes(), true);
-
-        return Base64.encodeToString(originalByte, Base64.DEFAULT);
+    /** Functions used to hash a password through PBKDF2. This function replaces notesHash,
+     * projectHash, roleHash and memberHash.
+     * No need for test as it is just a wrapper around PBKDF2, which is covered in testPbkdf2.
+     * Base64.NO_WRAP should be used to prevent trailing newlines. **/
+    public static String passwordHash(@NonNull String original, @NonNull String salt) {
+        return Base64.encodeToString(pbkdf2(original.getBytes(), salt.getBytes(), 10800),
+                Base64.NO_WRAP);
     }
 
-    /** Hashing method used in the passwords of projects when logging in. **/
-    @NonNull
-    public static String projectHash(@NonNull String original, @NonNull String salt) {
-        // 1) PBKDF2
-        byte[] originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10800);
-
-        // 2) SHA
-        try {
-            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
-            originalByte = shaDigest.digest(originalByte);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
-        }
-
-        // 3) Blowfish
-        originalByte = blowfish(originalByte, original.getBytes(), true);
-
-        return new String(originalByte);
-    }
-
-    /** Hashing method used in the passwords of roles when logging in. **/
-    public static String roleHash(@NonNull String original, @NonNull String salt){
-        byte[] originalByte = null, hashedPassword = null;
-        // 1) SHA
-        try {
-            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
-            originalByte = shaDigest.digest(original.getBytes());
-            hashedPassword = shaDigest.digest(salt.getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
-        }
-
-        // 2) PBKDF
-        try {
-            originalByte = pbkdf2(originalByte, salt.getBytes(), 10000);
-        } catch (NullPointerException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, "PBKDF2 cipher throws NullPointerException, " +
-                    "error is " + e.toString());
-        }
-
-        // 3) Blowfish
-        originalByte = blowfish(originalByte, hashedPassword, true);
-
-        return Base64.encodeToString(originalByte, Base64.DEFAULT);
-    }
-
-    /** Hashing method used in the passwords of members when logging in. **/
-    public static String memberHash(@NonNull String original, @NonNull String salt, @NonNull String iv) {
-        byte[] originalByte, ivBytes = null;
-        // 1) PBKDF
-        originalByte = pbkdf2(original.getBytes(), salt.getBytes(), 10000);
-
-        // 2) SHA
-        try {
-            MessageDigest shaDigest = MessageDigest.getInstance(SHA_512);
-            ivBytes = shaDigest.digest(iv.getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(ActivityConstants.LOG_APP_NAME, SHA_MISSING_ERROR);
-        }
-
-        // 3) AES
-        originalByte = aes(originalByte, salt.getBytes(), ivBytes, true);
-
-        return Base64.encodeToString(originalByte, Base64.DEFAULT);
-    }
-
-    /** Encryption method used to protect subject contents in .subject files **/
-    public static byte[] subjectEncrypt(@NonNull String title, @NonNull String password,
-                                        ArrayList<ArrayList<String>> content) {
-        byte[] responseByte = ConverterFunctions.doubleArrayToJson(content).getBytes();
-        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
-        responseByte = aes(responseByte, passwordByte, title.getBytes(), true);
+    /** Encryption method used to protect subject contents in .subject files. **/
+    public static byte[] subjectEncrypt(@NonNull String password, byte[] salt,
+                                        List<NotesContent> content) {
+        byte[] responseByte = ConverterFunctions.notesListToString(content).getBytes();
+        byte[] passwordByte = pbkdf2(password.getBytes(), salt, 11000);
+        responseByte = aes(responseByte, passwordByte, salt, true);
         responseByte = blowfish(responseByte, passwordByte, true);
-
         return responseByte;
     }
 
     /** Decryption method used to protect subject contents in .subject files. **/
-    public static ArrayList<ArrayList<String>> subjectDecrypt(@NonNull String title, @NonNull String password,
-                                                              byte[] content) {
-        byte[] passwordByte = pbkdf2(password.getBytes(), title.getBytes(), 12000);
+    public static List<NotesContent> subjectDecrypt(List<Integer> notesIdList, @NonNull NotesSubject subject,
+                                                    byte[] salt, @NonNull String password,
+                                                    byte[] content) {
+        byte[] passwordByte = pbkdf2(password.getBytes(), salt, 11000);
         content = blowfish(content, passwordByte, false);
-        content = aes(content, passwordByte, title.getBytes(), false);
-        return ConverterFunctions.doubleJsonToArray(new String(content));
+        content = aes(content, passwordByte, salt, false);
+        return ConverterFunctions.stringToNotesList(notesIdList, subject.subjectId, new String(content));
     }
 
     /** Encrypts the message sent to the server through its public RSA key (PKCS1-OAEP). **/
@@ -209,6 +131,7 @@ public final class SecurityFunctions {
                 while (scanner.hasNext()) contentBuilder.append(scanner.next());
             }
             // PEM needs to be decoded to X509 for it to be accepted by the RSA Engine
+            // Base64.DEFAULT is fine here as it's fine for it to have newlines
             byte[] decodedKey = Base64.decode(contentBuilder.toString(), Base64.DEFAULT);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
             ByteArrayOutputStream outputStream = getRSAStream(keySpec, original);
@@ -227,7 +150,8 @@ public final class SecurityFunctions {
     }
 
     /** Get the ByteArrayOutputStream for the RSA stream. **/
-    private static ByteArrayOutputStream getRSAStream(X509EncodedKeySpec keySpec, String original)
+    @NonNull
+    private static ByteArrayOutputStream getRSAStream(X509EncodedKeySpec keySpec, @NonNull String original)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeySpecException,
             BadPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
         Security.addProvider(new BouncyCastleProvider());
@@ -249,7 +173,8 @@ public final class SecurityFunctions {
     }
 
     /** AES encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.
-     * IV added as additional security measure. **/
+     * IV added as additional security measure.
+     * This function should not be used by itself outside of this class except for unit testing. **/
     public static byte[] aes(byte[] original, byte[] key, byte[] iv, boolean isEncrypt) {
         key = trimByte(key, 32);
         iv = trimByte(iv, 16);
@@ -267,7 +192,8 @@ public final class SecurityFunctions {
         return original;
     }
 
-    /** Blowfish encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle. **/
+    /** Blowfish encryption/decryption via PaddedBufferedBlockCipher in BouncyCastle.
+     * This function should not be used by itself outside of this class except for unit testing. **/
     public static byte[] blowfish(byte[] original, byte[] key, boolean isEncrypt) {
         key = trimByte(key, 56);
         PaddedBufferedBlockCipher blowfish = new PaddedBufferedBlockCipher(new CBCBlockCipher(
@@ -287,8 +213,9 @@ public final class SecurityFunctions {
 
     /** PBKDF2 hashing method with SHA 256.
      * @param iterations should be >=100000 to ensure that the hash is secure.
-     * @return A byte[] of the hashed String. If an cryptography error occurs during encryption,
-     * original.getBytes() would be returned. **/
+     * @return A byte[] of the hashed String.
+     * If an cryptography error occurs during encryption, original.getBytes() would be returned.
+     * This function should not be used by itself outside of this class except for unit testing.**/
     public static byte[] pbkdf2(byte[] original, byte[] salt, int iterations) {
         PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA256Digest());
         pbkdf2.init(original, salt, iterations);

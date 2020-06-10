@@ -12,14 +12,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPrimaryDark">#294462</color>
     <color name="colorPrimary">#215D8E</color>
     <color name="colorPrimaryLight">#00e5ed</color>
     <color name="colorAccent">@android:color/holo_red_dark</color>
     <color name="colorDrawable">@android:color/white</color>
 
-    <color name="ucrop_color_toolbar">@color/colorPrimary</color>
-    <color name="ucrop_color_statusbar">@color/colorPrimaryDark</color>
-    <color name="ucrop_color_widget_active">@color/colorPrimary</color>
+    <color name="ucrop_color_toolbar" tools:ignore="UnusedResources">@color/colorPrimary</color>
+    <color name="ucrop_color_statusbar" tools:ignore="UnusedResources">@color/colorPrimaryDark</color>
+    <color name="ucrop_color_widget_active" tools:ignore="UnusedResources">@color/colorPrimary</color>
 </resources>

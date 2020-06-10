@@ -1,5 +1,7 @@
-# Public key files
+# Public key file
 app/src/main/assets/public.pem
+# Private key file (Used in testing)
+/app/src/androidTest/resources/private.pem
 
 # Testing only files
 src/test/resources/
@@ -52,6 +54,7 @@ captures/
 .idea/assetWizardSettings.xml
 .idea/dictionaries
 .idea/libraries
+.idea/discord.xml
 # Android Studio 3 in .gitignore file.
 .idea/caches
 .idea/modules.xml

@@ -31,7 +31,6 @@ import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.database.project.data.ProjectData;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
-import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
 import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
@@ -157,8 +156,7 @@ public class ProjectSignupFragment extends Fragment implements ExtendedFragment 
                     project.projectID, usernameText, fullName, salt,
                     "", project.memberDefaultRole));
         } else {
-            String hashedPass = SecurityFunctions
-                    .memberHash(passwordText1, salt, project.salt);
+            String hashedPass = SecurityFunctions.passwordHash(passwordText1, salt);
             projectDatabase.MemberDao().insert(new MemberData(memberID,
                     project.projectID, usernameText, fullName, salt,
                     hashedPass, project.memberDefaultRole));

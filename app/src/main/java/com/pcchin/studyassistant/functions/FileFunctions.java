@@ -35,7 +35,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+
+import io.sentry.Sentry;
 
 /** Functions used in managing files. **/
 public final class FileFunctions {
@@ -46,14 +47,14 @@ public final class FileFunctions {
     /** Generates a .txt file based on a path and its contents. **/
     public static void exportTxt(String path, String contents) {
         // Get permission to read and write files
-            try (FileWriter outputNote = new FileWriter(path)) {
-                outputNote.write(contents);
-                outputNote.flush();
-            } catch (IOException e) {
-                Log.d(ActivityConstants.LOG_APP_NAME, "File Error: IO Exception occurred when exporting "
+        try (FileWriter outputNote = new FileWriter(path)) {
+            outputNote.write(contents);
+            outputNote.flush();
+        } catch (IOException e) {
+            Log.d(ActivityConstants.LOG_APP_NAME, "File Error: IO Exception occurred when exporting "
                         + "note with path , stack trace is");
-                e.printStackTrace();
-            }
+            e.printStackTrace();
+        }
     }
 
     /** Generates a valid file in the required directory.
@@ -89,8 +90,28 @@ public final class FileFunctions {
         return dir.delete();
     }
 
-    /** Get the download directory of the project. **/
-    public static String getDownloadDir(@NonNull Context context) {
+    /** Gets the external download directory of the app.
+     * The download directory is assumed to be /storage/emulated/0/Download or /storage/emulated/0/Downloads.
+     * If it doesn't exist, fall back to getInternalDownloadDir.
+     * The path will always end in '/'. **/
+    @NonNull
+    public static String getExternalDownloadDir(@NonNull Context context) {
+        File downloadDir = new File("/storage/emulated/0/Download");
+        File downloadDir2 = new File("/storage/emulated/0/Downloads");
+        if (downloadDir.exists() && downloadDir.isDirectory() && downloadDir.canWrite()) {
+            return "/storage/emulated/0/Download/";
+        } else if (downloadDir2.exists() && downloadDir2.isDirectory() && downloadDir2.canWrite()) {
+            return "/storage/emulated/0/Downloads/";
+        } else {
+            return getInternalDownloadDir(context);
+        }
+    }
+
+    /** Get the internal download directory of the app.
+     * Falls back to the root directory if no such download directory could be found.
+     * The path will always end in '/'. **/
+    @NonNull
+    public static String getInternalDownloadDir(@NonNull Context context) {
         File downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         if (downloadDirFile == null) {
             downloadDirFile = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -119,16 +140,6 @@ public final class FileFunctions {
         return stringBuilder.toString();
     }
 
-    /** Checks the integrity of a note. **/
-    public static void checkNoteIntegrity(@NonNull ArrayList<String> original) {
-        while (original.size() < 3) {
-            original.add("");
-        }
-        while (original.size() < 6) {
-            original.add(null);
-        }
-    }
-
     /** Gets the number of bytes required of data from a file.
      * A Toast is created when it fails and it returns an empty array. **/
     @NonNull
@@ -140,7 +151,7 @@ public final class FileFunctions {
             return returnByte;
         } catch (IOException e) {
             Log.w(ActivityConstants.LOG_APP_NAME, "File Error: byte[] of size " + byteAmt + " could not "
-                    + "be retrieved from input stream of file " + stream + ". Stack trace is");
+                    + "be retrieved from input stream of file. Stack trace is");
             e.printStackTrace();
             return new byte[0];
         }
@@ -173,7 +184,7 @@ public final class FileFunctions {
                 return null;
             } else {
                 String outputFile = generateValidFile(context.getFilesDir().getAbsolutePath()
-                        + "/temp/importedFile ", getFileNameFromUri(context, uri));
+                        + "/temp/", getFileNameFromUri(context, uri));
                 copyFile(inputStream, new File(outputFile));
                 return outputFile;
             }
@@ -181,6 +192,7 @@ public final class FileFunctions {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: Could not read from URI "
                     + uri.toString() + ". Stack trace is");
             e.printStackTrace();
+            Sentry.capture(e);
             return null;
         }
     }
@@ -230,5 +242,23 @@ public final class FileFunctions {
             }
         }
         return result;
+    }
+
+    /** Gets the name of the file without its trailing extension.
+     * The file name is first reversed, then the first value of the array split by . is taken,
+     * then the string is reversed back.
+     * If the file name is blank, its extension would be returned. **/
+    @NonNull
+    public static String getFileName(String fileName) {
+        String[] splitString = new StringBuilder(fileName)
+                .reverse().toString()
+                .split("\\.", 2);
+        if (splitString.length > 1) {
+            return new StringBuilder(splitString[1]).reverse().toString();
+        } else if (splitString.length == 1) {
+            return new StringBuilder(splitString[0]).reverse().toString();
+        } else {
+            return "";
+        }
     }
 }

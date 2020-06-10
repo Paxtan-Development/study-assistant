@@ -13,33 +13,36 @@
 
 package com.pcchin.studyassistant.fragment.about;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
+import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.about.license.LicenseFragment;
 import com.pcchin.studyassistant.fragment.about.license.RssLicenseFragment;
 import com.pcchin.studyassistant.fragment.about.server.BugReportFragment;
 import com.pcchin.studyassistant.fragment.about.server.FeedbackFragment;
-import com.pcchin.studyassistant.functions.FileFunctions;
-import com.pcchin.studyassistant.functions.UIFunctions;
-import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
+import com.pcchin.studyassistant.functions.DataFunctions;
+import com.pcchin.studyassistant.functions.FileFunctions;
+import com.pcchin.studyassistant.functions.GeneralFunctions;
+import com.pcchin.studyassistant.functions.UIFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 import java.util.Calendar;
 import java.util.Locale;
+
+import io.sentry.Sentry;
 
 public class AboutFragment extends Fragment implements ExtendedFragment {
     /** Default Constructor. **/
@@ -60,44 +63,48 @@ public class AboutFragment extends Fragment implements ExtendedFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View returnView = inflater.inflate(R.layout.fragment_about, container, false);
-        String uid = requireActivity().getSharedPreferences(requireActivity().getPackageName(),
-                Context.MODE_PRIVATE).getString(ActivityConstants.SHAREDPREF_UID, "");
         ((TextView) returnView.findViewById(R.id.m2_version)).setText(String.format("%s%s", getString(R.string.m2_version), BuildConfig.VERSION_NAME));
         ((TextView) returnView.findViewById(R.id.m2_copyright)).setText(String.format(Locale.ENGLISH, "%s%d %s",
-                getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR),
-                getString(R.string.m2_copyright_p2)));
-
-        returnView.findViewById(R.id.m2_library_license).setOnClickListener(view ->
-                ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
-        returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
-                ((MainActivity) requireActivity()).displayFragment(new RssLicenseFragment()));
-        //noinspection ConstantConditions
-        if (BuildConfig.BUILD_TYPE.equals("release")) {
-            // Do not allow release variants to submit bug report and feature suggestions directly
-            returnView.findViewById(R.id.m2_uid).setVisibility(View.GONE);
-            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://gitreports.com/issue/Paxtan-Development/study-assistant"));
-                startActivity(intent);
-            });
-            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://forms.gle/vbWKoyQpyuSPhqPCA"));
-                startActivity(intent);
-            });
-        } else {
-            ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
-            returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view ->
-                    ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
-            returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
-                    ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
-        }
-
+                getString(R.string.m2_copyright_p1), Calendar.getInstance().get(Calendar.YEAR), getString(R.string.m2_copyright_p2)));
+        setButtons(returnView);
         // Set license text
         UIFunctions.setHtml(returnView.findViewById(R.id.m2_apache), FileFunctions.getTxt(
                 inflater.getContext(), "studyassistant_about.txt"));
 
         return returnView;
+    }
+
+    /** Set the onClickListeners for the buttons used in this Fragment. **/
+    private void setButtons(@NonNull View returnView) {
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(requireActivity());
+        String uid = sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "");
+        returnView.findViewById(R.id.m2_library_license).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new LicenseFragment()));
+        returnView.findViewById(R.id.m2_rss_license).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new RssLicenseFragment()));
+        ((TextView) returnView.findViewById(R.id.m2_uid)).setText(String.format("%s%s", getString(R.string.m2_uid), uid));
+        returnView.findViewById(R.id.m2_bug_report).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new BugReportFragment()));
+        returnView.findViewById(R.id.m2_feature_suggestion).setOnClickListener(view ->
+                ((MainActivity) requireActivity()).displayFragment(new FeedbackFragment()));
+        // A sample report can only be sent once on each app version to prevent spamming
+        //noinspection ConstantConditions
+        if (BuildConfig.BUILD_TYPE.equals("release") || sharedPref.getBoolean(ActivityConstants.SHAREDPREF_EVENT_SENT, false)) {
+            returnView.findViewById(R.id.m2_send_sentry_event).setVisibility(View.GONE);
+        } else {
+            returnView.findViewById(R.id.m2_send_sentry_event).setOnClickListener(view -> sendSentryEvent());
+        }
+    }
+
+    /** Send an example Sentry event to the server. **/
+    public void sendSentryEvent() {
+        Sentry.capture("Example event");
+        Toast.makeText(getContext(), R.string.event_sent, Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(requireActivity());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(ActivityConstants.SHAREDPREF_EVENT_SENT, true);
+        editor.apply();
+        GeneralFunctions.reloadFragment(AboutFragment.this);
     }
 
     /** Go back to

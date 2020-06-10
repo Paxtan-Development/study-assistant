@@ -36,9 +36,9 @@ import java.util.Objects;
 
 /** Handles the onCreateView functions from ProjectLoginFragment. **/
 class ProjectLoginFragmentView {
-    private MainActivity activity;
+    private final MainActivity activity;
     private ProjectDatabase projectDatabase;
-    private ProjectData project;
+    private final ProjectData project;
 
     /** The constructor for the class as activity and database needs to be passed on. **/
     ProjectLoginFragmentView(MainActivity activity, ProjectDatabase projectDatabase, ProjectData project) {
@@ -97,7 +97,7 @@ class ProjectLoginFragmentView {
                                  @NonNull MemberData targetMember) {
         String inputPassword = Objects.requireNonNull(passwordInputLayout.getEditText()).getText().toString();
         // Check if password entered is correct
-        String hashedPassword = SecurityFunctions.memberHash(inputPassword, targetMember.salt, project.salt);
+        String hashedPassword = SecurityFunctions.passwordHash(inputPassword, targetMember.salt);
         // Allows logging in with blank password if the password for the member is blank as well
         if (Objects.equals(hashedPassword, targetMember.memberPass) ||
                 (inputPassword.length() == 0 && targetMember.memberPass.length() == 0)) {
@@ -165,7 +165,7 @@ class ProjectLoginFragmentView {
     /** Check if the password entered for the role is correct. **/
     private void checkRolePass(TextInputLayout passwordInputLayout,
                                String inputPassword, @NonNull RoleData roleSelected) {
-        String hashedPassword = SecurityFunctions.roleHash(
+        String hashedPassword = SecurityFunctions.passwordHash(
                 inputPassword, roleSelected.salt);
         if (Objects.equals(hashedPassword, roleSelected.rolePass)) {
             projectDatabase.close();

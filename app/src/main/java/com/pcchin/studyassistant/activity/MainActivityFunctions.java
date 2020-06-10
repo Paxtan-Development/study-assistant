@@ -20,10 +20,12 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectInfoFragment;
 import com.pcchin.studyassistant.fragment.project.ProjectMediaFragment;
@@ -32,9 +34,11 @@ import com.pcchin.studyassistant.fragment.project.role.ProjectRoleFragment;
 import com.pcchin.studyassistant.fragment.project.status.ProjectStatusFragment;
 import com.pcchin.studyassistant.fragment.project.task.ProjectTaskFragment;
 
+import java.util.List;
+
 /** Functions that are used in MainActivity. **/
-final class MainActivityFunctions {
-    private MainActivity activity;
+public final class MainActivityFunctions {
+    private final MainActivity activity;
 
     /** Constructor used as activity needs to be passed on. **/
     MainActivityFunctions(MainActivity activity) {
@@ -54,23 +58,37 @@ final class MainActivityFunctions {
 
     /** Gets the pager adapter for the notes. **/
     @NonNull
-    FragmentStatePagerAdapter getNoteAdapter(String subject, int size) {
-        return new FragmentStatePagerAdapter(activity.getSupportFragmentManager(),
+    FragmentStatePagerAdapter getNoteAdapter(List<NotesContent> notesList) {
+        return new NotePagerAdapter(notesList, activity.getSupportFragmentManager(),
                 FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @NonNull
             @Override
             // getItem does not correspond to the current item selected, DO NOT USE IT AS SUCH
             public Fragment getItem(int position) {
-                // Used to be an issue where NotesViewFragment would crash as menu is null,
-                // but it seems to had resolved itself
-                return NotesViewFragment.newInstance(subject, position);
+                // This if else is used to prevent ArrayOutOfBoundsException for items outside the range
+                if (position < notesList.size() && position >= 0) {
+                    return NotesViewFragment.newInstance(notesList.get(position).noteId);
+                } else {
+                    return new Fragment();
+                }
             }
 
             @Override
             public int getCount() {
-                return size;
+                return notesList.size();
             }
         };
+    }
+
+    /** A FragmentStatePagerAdapter which contains a notes list, which can then be passed on to
+     * @see com.pcchin.studyassistant.ui.NoteViewPager **/
+    public abstract static class NotePagerAdapter extends FragmentStatePagerAdapter {
+        public final List<NotesContent> notesList;
+
+        public NotePagerAdapter(List<NotesContent> notesList, FragmentManager fm, int behavior) {
+            super(fm, behavior);
+            this.notesList = notesList;
+        }
     }
 
     /** Returns the page change listener for the note adapter. **/
@@ -101,8 +119,14 @@ final class MainActivityFunctions {
     void fadeToNote() {
         activity.findViewById(R.id.base).startAnimation(AnimationUtils.loadAnimation(
                 activity.getApplicationContext(), R.anim.fadeout));
+        if (activity.pager.getAdapter() != null) {
+            // Set the current fragment as the first fragment in the pager adapter
+            activity.currentFragment = (Fragment) activity.pager.getAdapter()
+                    .instantiateItem(activity.findViewById(R.id.base), 0);
+        }
         activity.findViewById(R.id.base).setVisibility(View.GONE);
         activity.pager.setVisibility(View.VISIBLE);
+        activity.pager.setCurrentItem(0, false);
         hideKeyboard();
     }
 

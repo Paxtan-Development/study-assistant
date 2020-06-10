@@ -26,7 +26,7 @@ import com.pcchin.studyassistant.R;
 /** Functions used in the onCreateView function of
  * @see ProjectCreateFragment **/
 final class ProjectCreateFragmentView {
-    private ProjectCreateFragment fragment;
+    private final ProjectCreateFragment fragment;
 
     /** Constructor for the class as fragment needs to be passed on. **/
     ProjectCreateFragmentView(ProjectCreateFragment fragment) {

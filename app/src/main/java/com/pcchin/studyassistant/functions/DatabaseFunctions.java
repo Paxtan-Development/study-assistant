@@ -14,19 +14,40 @@
 package com.pcchin.studyassistant.functions;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.room.Room;
 
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubjectMigration;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.utils.misc.RandomString;
+import com.pcchin.studyassistant.utils.misc.SortingComparators;
+
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SupportFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 /** Database related functions used throughout the app. **/
 public final class DatabaseFunctions {
+    public enum SUBJ_ID_TYPE {
+        SUBJECT,
+        NOTE
+    }
+
+    public enum PROJ_ID_TYPE {
+        PROJECT,
+        ROLE,
+        MEMBER
+    }
+
     private DatabaseFunctions() {
         throw new IllegalStateException("Utility class");
     }
@@ -34,17 +55,28 @@ public final class DatabaseFunctions {
     /** Returns the subject database. **/
     @NonNull
     public static SubjectDatabase getSubjectDatabase(Context context) {
+        SharedPreferences sharedPref = DataFunctions.getEncSharedPref(context);
         return Room.databaseBuilder(context, SubjectDatabase.class,
-                ActivityConstants.DATABASE_NOTES).allowMainThreadQueries()
-                .addMigrations(NotesSubjectMigration.MIGRATION_1_2).build();
+                ActivityConstants.DATABASE_NOTES)
+                .openHelperFactory(new SupportFactory(SQLiteDatabase
+                        .getBytes(Objects.requireNonNull(Objects.requireNonNull(sharedPref).getString(ActivityConstants
+                                .ENC_SHAREDPREF_NOTES_DB_PASS, "")).toCharArray())))
+                .fallbackToDestructiveMigrationFrom(1, 2, 3)
+                .allowMainThreadQueries().build();
     }
 
     /** Returns the project database. **/
     @NonNull
     public static ProjectDatabase getProjectDatabase(Context context) {
+        SharedPreferences sharedPref = DataFunctions.getEncSharedPref(context);
         return Room.databaseBuilder(context, ProjectDatabase.class,
                 ActivityConstants.DATABASE_PROJECT)
-                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+                // Yes, it needs double Objects.requireNonNull
+                .openHelperFactory(new SupportFactory(SQLiteDatabase
+                        .getBytes(Objects.requireNonNull(Objects.requireNonNull(sharedPref)
+                                .getString(ActivityConstants
+                                .ENC_SHAREDPREF_PROJECTS_DB_PASS, "")).toCharArray())))
+                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5, 6)
                 .allowMainThreadQueries().build();
     }
 
@@ -54,22 +86,36 @@ public final class DatabaseFunctions {
         return context.getFilesDir() + "/icons/project/" + projectID + ".jpg";
     }
 
-    /** Generates a valid String based on its type. **/
-    public static String generateValidProjectString(@NonNull RandomString rand, int type,
+    /** Generates a valid subject ID to be used to create a new subject. **/
+    public static int generateValidId(@NonNull SubjectDatabase database, @NonNull SUBJ_ID_TYPE type) {
+        List<Integer> idList;
+        if (type.equals(SUBJ_ID_TYPE.SUBJECT)) {
+            idList = database.SubjectDao().getAllSubjectId();
+        } else {
+            idList = database.ContentDao().getAllNoteId();
+        }
+        Random idRand = new Random();
+        int currentId = idRand.nextInt();
+        while (idList.contains(currentId)) currentId = idRand.nextInt();
+        return currentId;
+    }
+
+    /** Generates a valid random String based on the type specified. **/
+    public static String generateValidProjectString(@NonNull RandomString rand, @NonNull PROJ_ID_TYPE type,
                                                     ProjectDatabase projectDatabase) {
         String returnString = rand.nextString();
         switch (type) {
-            case ProjectCreateFragment.TYPE_PROJECT:
+            case PROJECT:
                 while (projectDatabase.ProjectDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }
                 break;
-            case ProjectCreateFragment.TYPE_MEMBER:
+            case MEMBER:
                 while (projectDatabase.MemberDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }
                 break;
-            case ProjectCreateFragment.TYPE_ROLE:
+            case ROLE:
                 while (projectDatabase.RoleDao().searchByID(returnString) != null) {
                     returnString = rand.nextString();
                 }
@@ -78,5 +124,31 @@ public final class DatabaseFunctions {
                 returnString = "";
         }
         return returnString;
+    }
+
+    /** Sort the notes based on the sorting format given.
+     * @see NotesSubject
+     * @see SortingComparators **/
+    public static void sortNotes(Context context, @NonNull NotesSubject currentSubject, List<NotesContent> notesList) {
+        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
+        int sortOrder = currentSubject.sortOrder;
+        if (sortOrder == NotesSubject.SORT_ALPHABETICAL_DES) {
+            // Sort by alphabetical order, descending
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
+            Collections.reverse(notesList);
+        } else if (sortOrder == NotesSubject.SORT_DATE_ASC) {
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
+        } else if (sortOrder == NotesSubject.SORT_DATE_DES) {
+            Collections.sort(notesList, SortingComparators.noteDateComparator);
+            Collections.reverse(notesList);
+        } else {
+            // Sort by alphabetical order, ascending
+            if (sortOrder != NotesSubject.SORT_ALPHABETICAL_ASC) {
+                // Default to this if sortOrder is invalid
+                currentSubject.sortOrder = NotesSubject.SORT_ALPHABETICAL_ASC;
+            }
+            Collections.sort(notesList, SortingComparators.noteTitleComparator);
+        }
+        database.close();
     }
 }

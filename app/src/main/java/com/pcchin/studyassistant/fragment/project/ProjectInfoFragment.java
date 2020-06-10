@@ -186,22 +186,22 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         if (project.expectedStartDate != null) {
             ((TextView) returnView.findViewById(R.id.p2_expected_start)).setText(
                     String.format("Expected Start Date: %s",
-                            ConverterFunctions.standardDateFormat.format(project.expectedStartDate)));
+                            ConverterFunctions.formatTime(project.expectedStartDate, ConverterFunctions.TimeFormat.DATE)));
         }
         if (project.expectedEndDate != null) {
             ((TextView) returnView.findViewById(R.id.p2_expected_end)).setText(
                     String.format("Expected End Date: %s",
-                            ConverterFunctions.standardDateFormat.format(project.expectedEndDate)));
+                            ConverterFunctions.formatTime(project.expectedEndDate, ConverterFunctions.TimeFormat.DATE)));
         }
         if (project.actualStartDate != null) {
             ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
                     String.format("Actual Start Date: %s",
-                            ConverterFunctions.standardDateFormat.format(project.actualStartDate)));
+                            ConverterFunctions.formatTime(project.actualStartDate, ConverterFunctions.TimeFormat.DATE)));
         }
         if (project.actualEndDate != null) {
             ((TextView) returnView.findViewById(R.id.p2_actual_start)).setText(
                     String.format("Actual End Date: %s",
-                            ConverterFunctions.standardDateFormat.format(project.actualEndDate)));
+                            ConverterFunctions.formatTime(project.actualEndDate, ConverterFunctions.TimeFormat.DATE)));
         }
     }
 
@@ -256,7 +256,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
         if (project.associatedSubject != null) {
             // Opens subject database
             SubjectDatabase subjDatabase = DatabaseFunctions.getSubjectDatabase(requireActivity());
-            NotesSubject targetSubject = subjDatabase.SubjectDao().search(project.associatedSubject);
+            NotesSubject targetSubject = subjDatabase.SubjectDao().searchById(project.associatedSubject);
             if (targetSubject == null) {
                 // Ask the user whether to remove the associated subject
                 AlertDialog subjDialog = new AlertDialog.Builder(requireContext())
@@ -267,7 +267,7 @@ public class ProjectInfoFragment extends Fragment implements ExtendedFragment {
                             projectDatabase.ProjectDao().update(project);
                             requireActivity().invalidateOptionsMenu();
                         })
-                        .setNegativeButton(android.R.string.no, null).create();
+                        .setNegativeButton(R.string.string_no, null).create();
                 subjDialog.setOnDismissListener(dialogInterface -> subjDatabase.close());
                 new DefaultDialogFragment(subjDialog).show(getParentFragmentManager(), "ProjectInfoFragment.1");
             } else {

@@ -15,7 +15,6 @@ package com.pcchin.studyassistant.fragment.project.settings;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,7 +28,6 @@ import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.MemberData;
 import com.pcchin.studyassistant.fragment.project.ProjectSelectFragment;
-import com.pcchin.studyassistant.fragment.project.create.ProjectCreateFragment;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.preference.PreferenceString;
@@ -41,12 +39,12 @@ import java.util.Objects;
 
 /** Functions that are called when a preference is changed in
  * @see ProjectSettingsFragment **/
-final class ProjectSettingsFragmentChange {
-    private ProjectSettingsFragment fragment;
-    private MainActivity activity;
+final class ProjectPreferenceChange {
+    private final ProjectSettingsFragment fragment;
+    private final MainActivity activity;
 
     /** Constructor for the class as fragment needs to be passed on. **/
-    ProjectSettingsFragmentChange(ProjectSettingsFragment fragment) {
+    ProjectPreferenceChange(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
         this.activity = (MainActivity) fragment.requireActivity();
     }
@@ -73,12 +71,8 @@ final class ProjectSettingsFragmentChange {
     void featurePrefChanged(@NonNull Preference preference, Object newValue) {
         switch(preference.getKey()) {
             case PreferenceString.PREF_MEMBERS:
-                if ((boolean) newValue) {
-                    Log.d("Testing", "Called");
-                    checkMemberExists();
-                } else {
-                    fragment.project.membersEnabled = false;
-                }
+                if ((boolean) newValue) checkMemberExists();
+                else fragment.project.membersEnabled = false;
                 break;
             case PreferenceString.PREF_ROLES:
                 fragment.project.rolesEnabled = (boolean) newValue;
@@ -95,8 +89,8 @@ final class ProjectSettingsFragmentChange {
             case PreferenceString.PREF_STATUS_ICON:
                 updateStatusIcon((String) newValue);
                 break;
-            case PreferenceString.PREF_RELATED_SUBJECT:
-                fragment.project.associatedSubject = (String) newValue;
+            case PreferenceString.PREF_SET_RELATED_SUBJECT:
+                fragment.project.associatedSubject = Integer.parseInt(newValue.toString()); // The subject IDs are set in the customize sections already
                 break;
         }
         fragment.updateProject();
@@ -118,7 +112,7 @@ final class ProjectSettingsFragmentChange {
             dialogFragment.setPositiveButton(fragment.getString(R.string.create), (view) -> onNewMemberCreate(initialMemberLayout));
             dialogFragment.setNegativeButton(fragment.getString(android.R.string.cancel),
                     (view) -> dialogFragment.dismiss());
-            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectSettingsFragmentChange.1");
+            dialogFragment.show(fragment.getParentFragmentManager(), "ProjectPreferenceChange.1");
         }
     }
 
@@ -130,7 +124,7 @@ final class ProjectSettingsFragmentChange {
             // Create member
             RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
             MemberData initialMember = new MemberData(DatabaseFunctions
-                    .generateValidProjectString(idRand, ProjectCreateFragment.TYPE_MEMBER,
+                    .generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.MEMBER,
                             fragment.projectDatabase), fragment.project.projectID,
                     memberName, "", saltRand.nextString(), "", fragment.role.roleID);
             fragment.projectDatabase.MemberDao().insert(initialMember);

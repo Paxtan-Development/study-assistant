@@ -14,7 +14,6 @@
 package com.pcchin.studyassistant.network.update;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +31,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.pcchin.customdialog.DefaultDialogFragment;
@@ -42,6 +40,7 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.network.NetworkConstants;
 import com.pcchin.studyassistant.network.VolleyFileDownloadRequest;
@@ -67,8 +66,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class AppUpdate2 {
     private static final String STACK_TRACE_IS = ", stack trace is";
 
-    private MainActivity activity;
-    private boolean calledFromNotif;
+    private final MainActivity activity;
+    private final boolean calledFromNotif;
 
     /** Constructor for the functions. **/
     AppUpdate2(MainActivity activity, boolean calledFromNotif) {
@@ -82,10 +81,9 @@ class AppUpdate2 {
     void showUpdateNotif(@NonNull JSONObject response, String host) {
         try {
             // Update so that it will not ask again on the same day
-            SharedPreferences.Editor editor =
-                    activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = DataFunctions.getSharedPref(activity).edit();
             editor.putString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ConverterFunctions
-                    .standardDateFormat.format(new Date()));
+                    .formatTime(new Date(), ConverterFunctions.TimeFormat.DATE));
             editor.apply();
 
             // Get latest version from releases page
@@ -110,7 +108,7 @@ class AppUpdate2 {
             updateDialog.dismiss();
             updateViaGithub(downloadLink);
         });
-        updateDialog.setNegativeButton(activity.getString(android.R.string.no), view -> updateDialog.dismiss());
+        updateDialog.setNegativeButton(activity.getString(R.string.string_no), view -> updateDialog.dismiss());
         updateDialog.setNeutralButton(activity.getString(R.string.a_learn_more), view -> {
             // The user should be able to update after coming back from the website
             activity.safeOnBackPressed();
@@ -190,7 +188,7 @@ class AppUpdate2 {
     @NonNull
     private VolleyFileDownloadRequest getDownloadRequest(DefaultDialogFragment downloadDialog,
                                                          RequestQueue queue, String downloadLink, String outputFileName) {
-        return new VolleyFileDownloadRequest(Request.Method.GET, downloadLink,
+        return new VolleyFileDownloadRequest(downloadLink,
                 response -> tryCreateApk(downloadDialog, queue, response, outputFileName), error -> {
             downloadDialog.dismiss();
             Log.d(ActivityConstants.LOG_APP_NAME, "Network Error: Volley file download request failed"
@@ -250,8 +248,7 @@ class AppUpdate2 {
 
     /** Writes the downloaded APK into the file. **/
     private void writeApk(byte[] response, String outputFileName, File outputFile) throws IOException {
-        SharedPreferences.Editor editor = activity.getSharedPreferences(
-                activity.getPackageName(), Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = DataFunctions.getSharedPref(activity).edit();
         editor.putString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, outputFileName);
         editor.apply();
 

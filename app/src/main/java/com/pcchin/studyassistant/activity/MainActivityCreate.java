@@ -16,7 +16,6 @@ package com.pcchin.studyassistant.activity;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -34,7 +33,10 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.jaredrummler.android.device.DeviceName;
+import com.pcchin.studyassistant.BuildConfig;
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.database.project.ProjectDatabase;
 import com.pcchin.studyassistant.database.project.data.RoleData;
 import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectSubject;
@@ -43,20 +45,25 @@ import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
+import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
 import com.pcchin.studyassistant.network.update.AppUpdate;
+import com.pcchin.studyassistant.utils.misc.RandomString;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import io.sentry.Sentry;
+import io.sentry.event.UserBuilder;
+
 /** Functions used within onCreate of
  * @see MainActivity **/
 final class MainActivityCreate {
-    private MainActivity activity;
+    private final MainActivity activity;
 
     /** Constructor used as activity needs to be passed on. **/
     MainActivityCreate(MainActivity activity) {
@@ -70,14 +77,40 @@ final class MainActivityCreate {
         activity.pager = activity.findViewById(R.id.base_pager);
         activity.bottomNavView = activity.findViewById(R.id.bottom_nav);
         setActivityInfo(savedInstanceState);
+        initSentry();
 
         // Get subject, if needed from Intent
         if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, false)) {
-            String targetSubject = activity.getIntent().getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
-            activity.displayFragment(NotesSubjectFragment.newInstance(targetSubject));
+            int targetNote = activity.getIntent().getIntExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, 0);
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
+            int targetSubject = database.ContentDao().search(targetNote).subjectId;
+            database.close();
+            activity.displayFragment(NotesSubjectFragment.newInstance(targetSubject, targetNote));
         }
         initFragmentView();
         setNavigation();
+    }
+
+    /** Initializes Sentry to be used in all build configs.
+     * The used is identified by their UID and their app version.
+     * Their device version and Android Version is not recorded unless they submit a bug report
+     * manually or are not in the release build. **/
+    private void initSentry() {
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
+        // Don't init if its in debug mode
+        //noinspection ConstantConditions
+        if (BuildConfig.BUILD_TYPE.equals("debug")) {
+            Sentry.init((String) null);
+        } else {
+            Sentry.init(BuildConfig.SENTRY_DSN);
+        }
+        Sentry.getContext().setUser(new UserBuilder().setId(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).build());
+        Sentry.getContext().addExtra("App Version", BuildConfig.VERSION_NAME);
+        //noinspection ConstantConditions
+        if (!BuildConfig.BUILD_TYPE.equals("release")) {
+            Sentry.getContext().addExtra("Android Version", Build.VERSION.RELEASE);
+            Sentry.getContext().addExtra("Device Model", DeviceName.getDeviceName() + "(" + Build.MODEL + ")");
+        }
     }
 
     /** Display and hides the relevant views used by the current activity. **/
@@ -87,7 +120,8 @@ final class MainActivityCreate {
         } else {
             NotesViewFragment currentNote = ((NotesViewFragment) activity.currentFragment);
             activity.findViewById(R.id.base).setVisibility(View.GONE);
-            activity.displayNotes(currentNote.notesSubject, currentNote.notesOrder);
+            activity.displayNotes(currentNote.note.subjectId);
+            activity.pager.setPagerOrder(currentNote.note.noteId);
         }
 
         if (!MainActivityFunctions.fragmentHasBottomNavView(activity.currentFragment)) {
@@ -100,12 +134,11 @@ final class MainActivityCreate {
         // First time starting the app
         if (savedInstanceState == null) {
             firstStart();
-            // Only check for updates once a day for non-beta users
+            // Only check for updates once a day
             if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
                 new Handler().post(() -> new AppUpdate(activity, true));
-            } else if (!Objects.equals(activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
-                            .getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.standardDateFormat.format(new Date()))) {
+            } else if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
+                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))) {
                 new Handler().post(() -> new AppUpdate(activity, false));
             }
         } else {
@@ -126,21 +159,21 @@ final class MainActivityCreate {
 
         // Get permission to read and write files
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat
-                .checkSelfPermission(activity, Manifest.permission
-                        .WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                .checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, ActivityConstants.EXTERNAL_STORAGE_PERMISSION);
         }
-        new Handler().post(this::generateUID);
-        new Handler().post(this::createDefaultRoles);
+        // No handlers used for them as they had to be completed first
+        generateUID();
+        initEncryptedSharedPref();
+        new Handler().post(this::createDefaultRoles); // First database access in MainActivityCreate on runtime
         new Handler().post(this::deletePastExports);
     }
 
     /** Generates a unique ID for the client if one does not exist. **/
     private void generateUID() {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
-        if (sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "").length() == 0) {
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
+        if (Objects.requireNonNull(sharedPref.getString(ActivityConstants.SHAREDPREF_UID, "")).length() == 0) {
             sharedPref.edit().putString(ActivityConstants.SHAREDPREF_UID, UUID.randomUUID().toString()).apply();
         }
     }
@@ -166,12 +199,10 @@ final class MainActivityCreate {
     private void setNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mainChannel = new NotificationChannel(activity.getString(
-                    R.string.notif_channel_notes_ID), activity.getString(R.string.notif_channel_notes),
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    R.string.notif_channel_notes_ID), activity.getString(R.string.notif_channel_notes), NotificationManager.IMPORTANCE_DEFAULT);
             mainChannel.setDescription(activity.getString(R.string.notif_channel_notes_desc));
             NotificationChannel updateChannel = new NotificationChannel(activity.getString(
-                    R.string.notif_channel_update_ID), activity.getString(R.string.notif_channel_update),
-                    NotificationManager.IMPORTANCE_LOW);
+                    R.string.notif_channel_update_ID), activity.getString(R.string.notif_channel_update), NotificationManager.IMPORTANCE_LOW);
             updateChannel.setDescription(activity.getString(R.string.notif_channel_update_desc));
             NotificationManager manager = activity.getSystemService(NotificationManager.class);
             if (manager != null) {
@@ -215,9 +246,7 @@ final class MainActivityCreate {
             // Deletes all children in the folder
             File[] dirFiles = apkInstallDir.listFiles();
             if (dirFiles != null) {
-                for (File child : dirFiles) {
-                    FileFunctions.deleteDir(child);
-                }
+                for (File child : dirFiles) FileFunctions.deleteDir(child);
             }
         } else if (!apkInstallDir.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -228,9 +257,9 @@ final class MainActivityCreate {
 
     /** Delete the previously downloaded APK files if they exist. **/
     private void deletePastApk() {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = DataFunctions.getSharedPref(activity);
         String pastUpdateFilePath = sharedPref.getString(ActivityConstants.SHAREDPREF_APP_UPDATE_PATH, "");
-        if (pastUpdateFilePath.length() != 0) {
+        if (Objects.requireNonNull(pastUpdateFilePath).length() != 0) {
             File pastUpdateFile = new File(pastUpdateFilePath);
             if (pastUpdateFile.exists()) {
                 if (pastUpdateFile.delete()) {
@@ -264,7 +293,27 @@ final class MainActivityCreate {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(activity);
-
         NavViewFunctions.updateNavView(activity);
+    }
+
+    /** Checks whether the values required in the encrypted shared preferences are present, and generates them if not. **/
+    private void initEncryptedSharedPref() {
+        SharedPreferences encSharedPref;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            encSharedPref = DataFunctions.getEncSharedPref(activity);
+        } else {
+            encSharedPref = DataFunctions.getSharedPref(activity);
+        }
+        if (encSharedPref != null) {
+            RandomString randString = new RandomString(48);
+            SharedPreferences.Editor editor = encSharedPref.edit();
+            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, "")).length() == 0) {
+                editor.putString(ActivityConstants.ENC_SHAREDPREF_NOTES_DB_PASS, randString.nextString());
+            }
+            if (Objects.requireNonNull(encSharedPref.getString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, "")).length() == 0) {
+                editor.putString(ActivityConstants.ENC_SHAREDPREF_PROJECTS_DB_PASS, randString.nextString());
+            }
+            editor.apply();
+        }
     }
 }

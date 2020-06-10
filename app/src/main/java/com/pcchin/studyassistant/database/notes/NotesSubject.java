@@ -13,15 +13,14 @@
 
 package com.pcchin.studyassistant.database.notes;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
-
-import java.util.ArrayList;
 
 /** The entity for each Subject. **/
+@SuppressWarnings("CanBeFinal")
 @Entity
 public class NotesSubject {
     /** Sort notes by alphabetical order, ascending. **/
@@ -37,29 +36,31 @@ public class NotesSubject {
     @Ignore
     public static final int SORT_DATE_DES = 4;
 
-    /** The title of the subject. Serves as a unique key. **/
-    @SuppressWarnings("NullableProblems")
+    /** The ID for the subject, serves as an unique key.
+     * Integer used instead of int as it would not be able to annotate NonNull otherwise. **/
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name = "_title")
+    @ColumnInfo(name = "_subjectId")
+    public Integer subjectId;
+
+    /** The title of the subject. **/
     public String title;
 
-    /** The contents of the subject. Contains the values of the notes. **/
-    public ArrayList<ArrayList<String>> contents;
-
-    /** The order in which the notes are sorted. The value is one of the 4 constants above. **/
+    /** The order in which the notes are sorted. The value is one of the 4 constants above.
+     * Enums can't be used here as there is no way to store them properly in the database. **/
     public int sortOrder;
 
     /** Default constructor. **/
     @Ignore
     NotesSubject() {
         // Default constructor.
+        this.subjectId = 0;
     }
 
-    /** Constructor used in the current version. **/
-    public NotesSubject(@NonNull String title, ArrayList<ArrayList<String>> contents, int sortOrder) {
+    /** Constructor used to create the subject. **/
+    public NotesSubject(int subjectId, String title, int sortOrder) {
+        this.subjectId = subjectId;
         this.title = title;
-        this.contents = contents;
         this.sortOrder = sortOrder;
     }
 }

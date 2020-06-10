@@ -112,7 +112,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     /** Delegates the preference click listeners to their own functions. **/
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        ProjectSettingsFragmentClick click = new ProjectSettingsFragmentClick(ProjectSettingsFragment.this);
+        ProjectPreferenceClick click = new ProjectPreferenceClick(ProjectSettingsFragment.this);
         switch (currentPrefRoot) {
             case PreferenceString.PREF_MENU_ROOT:
                 click.rootPreferenceClick(preference);
@@ -144,10 +144,10 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Delegates the show/hide of preferences to their own functions within
-     * @see ProjectSettingsFragmentCustomize
+     * @see ProjectPreferenceCustomize
      * No need to customize PREF_ROOT as there is nothing to customize. **/
     public void displayPreference(@NonNull String key) {
-        ProjectSettingsFragmentCustomize customize = new ProjectSettingsFragmentCustomize(ProjectSettingsFragment.this);
+        ProjectPreferenceCustomize customize = new ProjectPreferenceCustomize(ProjectSettingsFragment.this);
         switch (key) {
             case PreferenceString.PREF_MENU_ROOT:
                 setPreferencesFromResource(R.xml.p3_preference_list, key);
@@ -189,11 +189,11 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
     }
 
     /** Delegates the value change of preferences to their own functions within
-     * @see ProjectSettingsFragmentChange **/
+     * @see ProjectPreferenceChange **/
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         // No need for PREF_ROOT as it is handled in the tree click listeners
-        ProjectSettingsFragmentChange change = new ProjectSettingsFragmentChange(ProjectSettingsFragment.this);
+        ProjectPreferenceChange change = new ProjectPreferenceChange(ProjectSettingsFragment.this);
         switch (currentPrefRoot) {
             case PreferenceString.PREF_MENU_GENERAL:
                 change.generalPrefChanged(preference, newValue);
@@ -219,7 +219,7 @@ public class ProjectSettingsFragment extends PreferenceFragmentCompat implements
         // DatePreference, TimePreference or DateTimePreference
         DialogFragment dialogFragment = null;
         if (preference instanceof DatePreference) {
-            dialogFragment = ProjectSettingsFragmentStatic.getDatePreferenceDialog(ProjectSettingsFragment.this, (DatePreference) preference);
+            dialogFragment = ProjectPreferenceStatic.getDatePreferenceDialog(ProjectSettingsFragment.this, (DatePreference) preference);
         } else if (preference instanceof PasswordPreference) {
             dialogFragment = PasswordPreferenceDialog.newInstance(preference.getKey(), project.salt);
         } else if (preference instanceof DefaultDialogPreference) {

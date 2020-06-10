@@ -21,60 +21,55 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
-import com.pcchin.studyassistant.activity.MainActivity;
 
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 
 /** Notification receiver when the alert of a note is triggered. **/
 public class NotesNotifyReceiver extends BroadcastReceiver {
     /** Displays a notification with the message of the note as the title. **/
     @Override
-    public void onReceive(Context context, Intent intent) {
-        // Show notification
-        String title = intent.getStringExtra(ActivityConstants.INTENT_VALUE_TITLE);
-        String message = intent.getStringExtra(ActivityConstants.INTENT_VALUE_MESSAGE);
-        String subjectTitle = intent.getStringExtra(ActivityConstants.INTENT_VALUE_SUBJECT);
-        String requestCode = intent.getStringExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE);
-        if (title == null || title.length() == 0) {
-            title = context.getPackageName();
-        }
-        if (message == null || message.length() == 0) {
-            message = context.getString(R.string.n_new_alert);
-        }
+    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
+        // Variables that are used in the notification
+        String title = context.getPackageName(), message = context.getString(R.string.n_new_alert);
+        int alertCode = 0;
 
-        // Clear data from database
+        // Show notification
+        int noteId = intent.getIntExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, 0);
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(context);
-        NotesSubject subject = database.SubjectDao().search(subjectTitle);
-        if (subject != null) {
-            ArrayList<ArrayList<String>> notesList = subject.contents;
-            for (ArrayList<String> note: notesList) {
-                if (note != null && note.size() >= 6 && Objects.equals(note.get(0), title) &&
-                        Objects.equals(note.get(5), requestCode)) {
-                    note.set(4, null);
-                    note.set(5, null);
-                }
-            }
-            database.SubjectDao().update(subject);
-        }
+        NotesContent note = database.ContentDao().search(noteId);
         database.close();
+        if (note != null) {
+            if (note.noteTitle.length() != 0) {
+                title = note.noteTitle;
+            }
+            if (note.noteContent.length() != 0) {
+                message = note.noteContent;
+            }
+            if (note.alertCode != null) {
+                alertCode = note.alertCode;
+            }
+
+            note.alertCode = null;
+            note.alertDate = null;
+        }
 
         // Display a notification
         Intent startIntent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(ActivityConstants.INTENT_VALUE_START_FRAGMENT, true);
-        intent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, subjectTitle);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, noteId);
         PendingIntent pendingIntent = PendingIntent
-                .getActivity(context, 0, startIntent, 0);
+                .getActivity(context, alertCode, startIntent, 0);
         NotificationCompat.Builder notif = new NotificationCompat.Builder(context, context.getPackageName())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)

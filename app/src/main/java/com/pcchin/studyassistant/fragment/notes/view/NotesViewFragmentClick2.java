@@ -32,23 +32,20 @@ import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
-import com.pcchin.studyassistant.fragment.notes.NotesSelectFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.utils.notes.NotesNotifyReceiver;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /** The 2nd class of functions used when the fragment is clicked. **/
 public class NotesViewFragmentClick2 {
-    private NotesViewFragment fragment;
+    private final NotesViewFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesViewFragmentClick2(NotesViewFragment fragment) {
@@ -113,18 +110,11 @@ public class NotesViewFragmentClick2 {
     /** Updates the alert of the note. **/
     private void updateNoteAlert(@NonNull Activity activity, @NonNull Calendar targetDateTime, int requestCode) {
         AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent alarmIntent = getNotifyReceiverIntent(requestCode);
-
-        FileFunctions.checkNoteIntegrity(fragment.notesInfo);
-        fragment.notesInfo.set(4, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
-        fragment.notesInfo.set(5, String.valueOf(requestCode));
+        fragment.note.alertDate = new Date(targetDateTime.getTimeInMillis());
+        fragment.note.alertCode = requestCode; // Needs to come first before getNotifyReeiverIntent
+        PendingIntent alarmIntent = getNotifyReceiverIntent();
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
-        if (subject != null) {
-            ArrayList<ArrayList<String>> updateArray = subject.contents;
-            updateArray.set(fragment.notesOrder, fragment.notesInfo);
-            database.SubjectDao().update(subject);
-        }
+        database.ContentDao().update(fragment.note);
         database.close();
         insertAlarm(manager, alarmIntent, targetDateTime);
     }
@@ -132,7 +122,7 @@ public class NotesViewFragmentClick2 {
     /** Inserts the alarm and resets the menu. **/
     private void insertAlarm(AlarmManager manager, PendingIntent alarmIntent, Calendar targetDateTime) {
         if (manager != null) {
-            Log.w(ActivityConstants.LOG_APP_NAME, ConverterFunctions.standardDateTimeFormat.format(targetDateTime.getTime()));
+            Log.w(ActivityConstants.LOG_APP_NAME, ConverterFunctions.formatTime(targetDateTime.getTime(), ConverterFunctions.TimeFormat.DATETIME));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // User may use note alert to do important things, so
                 // they would need to be called when when idle
@@ -142,7 +132,6 @@ public class NotesViewFragmentClick2 {
                 manager.setExact(AlarmManager.RTC,
                         targetDateTime.getTimeInMillis(), alarmIntent);
             }
-            fragment.hasAlert = true;
             Toast.makeText(fragment.requireContext(), R.string.n3_alert_set, Toast.LENGTH_SHORT).show();
         }
         GeneralFunctions.reloadFragment(fragment);
@@ -151,29 +140,18 @@ public class NotesViewFragmentClick2 {
     /** Cancels the existing alert. **/
     public void onCancelAlertPressed() {
         AlarmManager manager = (AlarmManager) fragment.requireContext().getSystemService(Context.ALARM_SERVICE);
-        PendingIntent cancelIntent = getNotifyReceiverIntent(Integer.parseInt(fragment.notesInfo.get(5)));
-
+        PendingIntent cancelIntent = getNotifyReceiverIntent();
         if (manager != null) {
             manager.cancel(cancelIntent);
-            updateNoteAlertValues();
-            fragment.hasAlert = false;
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
+            // Updates the note value in the database
+            fragment.note.alertCode = null;
+            fragment.note.alertDate = null;
+            database.ContentDao().update(fragment.note);
+            database.close();
+            fragment.requireActivity().invalidateOptionsMenu();
             Toast.makeText(fragment.requireContext(), R.string.n3_alert_cancelled, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    /** Update the alert value of the note. **/
-    private void updateNoteAlertValues() {
-        fragment.notesInfo.set(4, null);
-        fragment.notesInfo.set(5, null);
-        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        NotesSubject subject = database.SubjectDao().search(fragment.notesSubject);
-        if (subject != null) {
-            ArrayList<ArrayList<String>> updateArray = subject.contents;
-            updateArray.set(fragment.notesOrder, fragment.notesInfo);
-            database.SubjectDao().update(subject);
-        }
-        database.close();
-        fragment.requireActivity().invalidateOptionsMenu();
     }
 
     /** Deletes the note from the subject. **/
@@ -192,47 +170,25 @@ public class NotesViewFragmentClick2 {
         // Delete listener
         AlarmManager manager = (AlarmManager) fragment.requireActivity()
                 .getSystemService(Context.ALARM_SERVICE);
-        if (manager != null && fragment.notesInfo.size() >= 5 && fragment.notesInfo.get(5) != null) {
-            PendingIntent alertIntent = getNotifyReceiverIntent(
-                    Integer.parseInt(fragment.notesInfo.get(5)));
+        if (manager != null && fragment.note.alertDate != null) {
+            PendingIntent alertIntent = getNotifyReceiverIntent();
             manager.cancel(alertIntent);
         }
 
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
-        NotesSubject currentSubject = database.SubjectDao().search(fragment.notesSubject);
-        // If the note does not have a subject, fall back to NotesSelectFragment
-        if (fragment.notesSubject != null) deleteNoteFromDatabase(database, currentSubject, (MainActivity) fragment.requireActivity());
-        else ((MainActivity) fragment.requireActivity()).displayFragment(new NotesSelectFragment());
-        Toast.makeText(fragment.requireActivity(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
-    }
-
-    /** Deletes the note from the database. **/
-    private void deleteNoteFromDatabase(SubjectDatabase database, @NonNull NotesSubject currentSubject,
-                                        MainActivity activity) {
-        // Check if contents is valid
-        ArrayList<ArrayList<String>> contents = currentSubject.contents;
-        if (contents != null) {
-            if (fragment.notesOrder < contents.size()) {
-                contents.remove(fragment.notesOrder);
-            }
-        } else {
-            contents = new ArrayList<>();
-        }
-        // Update value in notes
-        currentSubject.contents = contents;
-        database.SubjectDao().update(currentSubject);
+        // Delete the note from the fragment and return to NotesSubjectFragment
+        database.ContentDao().delete(fragment.note);
         database.close();
-        activity.displayFragment(NotesSubjectFragment.newInstance(fragment.notesSubject));
+        ((MainActivity) fragment.requireActivity()).displayFragment(NotesSubjectFragment
+                .newInstance(fragment.note.subjectId));
+        Toast.makeText(fragment.requireActivity(), R.string.n3_deleted, Toast.LENGTH_SHORT).show();
     }
 
     /** An intent that passes on the information of the note to the notification receiver.
      * @see NotesNotifyReceiver **/
-    private PendingIntent getNotifyReceiverIntent(int requestCode) {
+    private PendingIntent getNotifyReceiverIntent() {
         Intent intent = new Intent(fragment.requireActivity(), NotesNotifyReceiver.class);
-        intent.putExtra(ActivityConstants.INTENT_VALUE_TITLE, fragment.notesInfo.get(0));
-        intent.putExtra(ActivityConstants.INTENT_VALUE_MESSAGE, fragment.notesInfo.get(2));
-        intent.putExtra(ActivityConstants.INTENT_VALUE_SUBJECT, fragment.notesSubject);
-        intent.putExtra(ActivityConstants.INTENT_VALUE_REQUEST_CODE, fragment.notesInfo.get(5));
-        return PendingIntent.getBroadcast(fragment.requireActivity(), requestCode, intent, 0);
+        intent.putExtra(ActivityConstants.INTENT_VALUE_NOTE_ID, fragment.note.noteId);
+        return PendingIntent.getBroadcast(fragment.requireActivity(), fragment.note.alertCode, intent, 0);
     }
 }

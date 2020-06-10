@@ -29,12 +29,12 @@ import java.util.Objects;
 
 /** Functions that are used to handle preference clicks in
  * @see ProjectSettingsFragment **/
-final class ProjectSettingsFragmentClick {
-    private ProjectSettingsFragment fragment;
-    private MainActivity activity;
+final class ProjectPreferenceClick {
+    private final ProjectSettingsFragment fragment;
+    private final MainActivity activity;
 
     /** Constructor used as fragment needs to be passed on. **/
-    ProjectSettingsFragmentClick(ProjectSettingsFragment fragment) {
+    ProjectPreferenceClick(ProjectSettingsFragment fragment) {
         this.fragment = fragment;
         this.activity = (MainActivity) fragment.requireActivity();
     }
@@ -86,8 +86,12 @@ final class ProjectSettingsFragmentClick {
                         ((ListPreference) preference).setValue("Square");
                 }
                 break;
-            case PreferenceString.PREF_RELATED_SUBJECT:
-                ((ListPreference) preference).setValue(fragment.project.associatedSubject);
+            case PreferenceString.PREF_SET_RELATED_SUBJECT:
+                if (fragment.project.associatedSubject != null) ((ListPreference) preference).setValue(fragment.project.associatedSubject.toString());
+                break;
+            case PreferenceString.PREF_REMOVE_RELATED_SUBJECT:
+                fragment.project.associatedSubject = null;
+                fragment.updateProject();
                 break;
         }
     }

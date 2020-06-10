@@ -107,11 +107,13 @@ public class ProjectData {
      * while if this is false, tasks and status have separate databases. **/
     public boolean mergeTaskStatus;
 
-    /** The info that is displayed at the bottom of the project info page. **/
+    /** The info that is displayed at the bottom of the project info page.
+     * Enums can't be used as there is no proper way to store them. **/
     public int displayedInfo;
 
-    /** The title of the note subject that is associated to the project. **/
-    public String associatedSubject;
+    /** The ID of the note subject that is associated to the project.
+     * Integer is used instead of int so that it can be null. **/
+    public Integer associatedSubject;
 
     /** Whether the project is still ongoing. **/
     public boolean projectOngoing;
@@ -153,6 +155,7 @@ public class ProjectData {
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
         this.projectOngoing = true;
+        this.associatedSubject = null;
     }
 
     /** Constructor used when creating a new project without members.
@@ -184,5 +187,6 @@ public class ProjectData {
         this.mergeTaskStatus = false;
         this.displayedInfo = DISPLAYED_TASKS;
         this.projectOngoing = true;
+        this.associatedSubject = null;
     }
 }

@@ -24,3 +24,6 @@ plugins:
       # Check if the string "password" is in string constants, triggered too many false positives
       squid:S2068:
         enabled: false
+      # Recommends usage of Files.delete, which is not available until API level 26
+      squid:S4042:
+        enabled: false

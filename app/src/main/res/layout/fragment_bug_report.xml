@@ -26,25 +26,6 @@
         android:orientation="vertical"
         android:padding="20sp">
 
-        <Button
-            android:id="@+id/m7_previous"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="5sp"
-            android:layout_weight="0.08"
-            android:background="@android:color/transparent"
-            android:text="@string/view_previous"
-            android:textSize="18sp" />
-
-        <View
-            android:id="@+id/m7_previous_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="5sp"
-            android:layout_marginBottom="5sp"
-            android:background="@android:color/darker_gray" />
-
         <TextView
             android:id="@+id/m7_title"
             android:layout_width="match_parent"
@@ -157,6 +138,7 @@
             android:id="@+id/m7_steps_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5sp"
             app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -165,26 +147,6 @@
                 android:hint="@string/blank"
                 android:inputType="textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/m7_warning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5sp"
-            android:layout_marginBottom="5sp"
-            android:text="@string/submission_info_warning"
-            android:textColor="@color/colorAccent"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/m7_data_warning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5sp"
-            android:layout_marginBottom="5sp"
-            android:text="@string/m7_data_collection"
-            android:textColor="@color/colorAccent"
-            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="match_parent"

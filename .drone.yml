@@ -3,32 +3,19 @@ kind: pipeline
 name: sa-ci-test
 
 steps:
-  - name: java-pr-test
-    image: nextcloudci/android:android-49
-    # Keystore properties not included in order to trigger isLocal = false automatically
-    # Can only test with debug as other build configs require a keystore
-    environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
-      _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
-    commands:
-      - ./gradlew testDebugUnitTest
-    when:
-      branch: master
-      event: pull_request
-
   - name: java-push-test
-    image: nextcloudci/android:android-49
+    image: nextcloudci/android:android-54
     # Keystore properties not included in order to trigger isLocal = false automatically
     # Can only test with debug as other build configs require a keystore
     environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
       _JAVA_OPTIONS: "-Xms512m -Xmx1536m"
     commands:
       - ./gradlew testDebugUnitTest
     when:
-      event: push
+      event:
+        - push
 
 trigger:
   event:
-    - pull_request
     - push

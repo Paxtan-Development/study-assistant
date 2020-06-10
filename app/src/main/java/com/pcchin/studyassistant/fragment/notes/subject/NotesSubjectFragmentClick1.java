@@ -24,14 +24,15 @@ import com.pcchin.customdialog.DefaultDialogFragment;
 import com.pcchin.customdialog.DismissibleDialogFragment;
 import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.MainActivity;
-import com.pcchin.studyassistant.database.notes.NotesSubject;
+import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.edit.NotesEditFragment;
+import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.GeneralFunctions;
 import com.pcchin.studyassistant.utils.notes.NotesSortAdaptor;
 
 /** 1st class for the functions for the onClickListeners in the fragment. **/
 public class NotesSubjectFragmentClick1 {
-    private NotesSubjectFragment fragment;
+    private final NotesSubjectFragment fragment;
 
     /** The constructor for the class as fragment needs to be passed on. **/
     public NotesSubjectFragmentClick1(NotesSubjectFragment fragment) {
@@ -70,9 +71,8 @@ public class NotesSubjectFragmentClick1 {
         } else {
             // Edit new note
             dismissibleFragment.dismiss();
-            fragment.subjectDatabase.close();
             ((MainActivity) fragment.requireActivity()).displayFragment
-                    (NotesEditFragment.newInstance(fragment.notesSubject, popupInputText));
+                    (NotesEditFragment.newInstance(fragment.currentSubject.subjectId, popupInputText));
         }
     }
 
@@ -84,8 +84,7 @@ public class NotesSubjectFragmentClick1 {
         // Get current order
         sortingSpinner.setAdapter(new NotesSortAdaptor(fragment.requireContext(),
                 NotesSubjectFragment.sortingTitles, NotesSubjectFragment.sortingImgs));
-        NotesSubject subject = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
-        int currentOrder = subject.sortOrder;
+        int currentOrder = fragment.currentSubject.sortOrder;
         for (int i = 0; i < NotesSubjectFragment.sortingList.length; i++) {
             // Sort spinner to current order
             if (NotesSubjectFragment.sortingList[i] == currentOrder) {
@@ -102,11 +101,13 @@ public class NotesSubjectFragmentClick1 {
                 .setView(sortingSpinner)
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     // Update value in notes
-                    NotesSubject subject1 = fragment.subjectDatabase.SubjectDao().search(fragment.notesSubject);
-                    subject1.sortOrder = NotesSubjectFragment.sortingList[sortingSpinner.getSelectedItemPosition()];
-                    fragment.subjectDatabase.SubjectDao().update(subject1);
+                    fragment.currentSubject.sortOrder = NotesSubjectFragment
+                            .sortingList[sortingSpinner.getSelectedItemPosition()];
+                    SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(fragment.requireActivity());
+                    database.SubjectDao().update(fragment.currentSubject);
+                    database.close();
                     dialogInterface.dismiss();
-                    fragment.sortNotes(subject1);
+                    DatabaseFunctions.sortNotes(fragment.getContext(), fragment.currentSubject, fragment.notesList);
                     GeneralFunctions.reloadFragment(fragment);
                 })
                 .setNegativeButton(android.R.string.cancel, null)

@@ -42,8 +42,11 @@
         android:title="@string/p3_features_status_icon" />
     <ListPreference
         android:defaultValue="false"
-        android:key="pref_related_subject"
+        android:key="pref_set_related_subject"
         android:entries="@array/blank_array"
         android:entryValues="@array/blank_array"
         android:title="@string/p3_features_related_subject" />
+    <Preference
+        android:key="pref_remove_related_subject"
+        android:title="@string/p3_features_remove_related_subject" />
 </PreferenceScreen>

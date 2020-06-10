@@ -64,6 +64,14 @@
         <item>Copyright © 2020 &lt;a href=&quot;https://github.com/pc-chin&quot;&gt;PC Chin&lt;/a&gt;</item>
     </string-array>
 
+    <string-array name="sentry_sdk_license">
+        <item>Sentry Android SDK</item>
+        <item>@string/license_mit</item>
+        <item>Copyright © 2019 &lt;a href=&quot;https://sentry.io/&quot;&gt;Sentry&lt;/a&gt;
+            &lt;br&gt;Copyright © 2015 &lt;a href=&quot;
+            https://github.com/SalomonBrys/ANR-WatchDog&quot;&gt;Salomon BRYS for Android ANRWatchDog&lt;/a&gt;</item>
+    </string-array>
+
     <string-array name="zip4j_license">
         <item>Zip4j</item>
         <item>@string/license_apache_2</item>

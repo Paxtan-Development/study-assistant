@@ -28,6 +28,8 @@ import com.pcchin.studyassistant.R;
 import com.pcchin.studyassistant.activity.ActivityConstants;
 import com.pcchin.studyassistant.activity.MainActivity;
 
+import io.sentry.Sentry;
+
 /** Static functions used  in ImportSubject. **/
 public final class ImportSubjectStatic {
     private ImportSubjectStatic() {
@@ -71,6 +73,7 @@ public final class ImportSubjectStatic {
             Log.e(ActivityConstants.LOG_APP_NAME, "File Error: This device appears to "
                     + "not have a file manager. Stack trace is");
             e.printStackTrace();
+            Sentry.capture(e);
         }
     }
 }

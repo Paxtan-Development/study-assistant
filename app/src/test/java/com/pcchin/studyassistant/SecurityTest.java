@@ -13,12 +13,16 @@
 
 package com.pcchin.studyassistant;
 
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.functions.SecurityFunctions;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /** Test local hashing & encryption/decryption functions. **/
 public class SecurityTest {
@@ -29,108 +33,37 @@ public class SecurityTest {
         if (BuildConfig.IS_LOCAL) {
             TEST_COUNT = 8000;
         } else {
-            TEST_COUNT = 500;
+            TEST_COUNT = 400;
         }
     }
 
-    /** Check if the encryption function for the .subject files work. **/
+    /** Test if the encryption for subjects is working. **/
     @Test
     public void testSubjectEncrypt() {
-        // Normal input
-        byte[] responseArray = SecurityFunctions.subjectEncrypt(
-                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomArray(TEST_COUNT));
-        Assert.assertNotNull(responseArray);
-
-        // Minimal input
-        responseArray = SecurityFunctions.subjectEncrypt(TestFunctions.randomString(2),
-                TestFunctions.randomString(2), null);
-        Assert.assertNotNull(responseArray);
+        Random rand = new Random();
+        int subjectId = rand.nextInt();
+        String password = TestFunctions.randomString(1000);
+        byte[] salt = new byte[32];
+        rand.nextBytes(salt);
+        List<NotesContent> originalList = TestFunctions.generateRandomNotes(TEST_COUNT, subjectId);
+        byte[] encrypted = SecurityFunctions.subjectEncrypt(password, salt, originalList);
+        Assert.assertNotNull(encrypted);
     }
 
-    /** Check if the encryption & decryption function for the .subject files work. **/
+    /** Test if the encryption and the decryption for subjects is working. **/
     @Test
     public void testSubjectEncryptDecrypt() {
-        // Normal input
-        String testTitle = TestFunctions.randomString(TEST_COUNT),
-                testPassword = TestFunctions.randomString(TEST_COUNT);
-        ArrayList<ArrayList<String>> testContents = TestFunctions.randomArray(TEST_COUNT);
-        byte[] testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
-        Assert.assertNotNull(testOutput);
-
-        ArrayList<ArrayList<String>> testResponse = SecurityFunctions.subjectDecrypt(testTitle,
-                testPassword, testOutput);
-        Assert.assertEquals(testContents, testResponse);
-
-        // Normal input
-        testTitle = TestFunctions.randomString(2);
-        testPassword = TestFunctions.randomString(2);
-        testContents = TestFunctions.randomArray(2);
-        testOutput = SecurityFunctions.subjectEncrypt(testTitle, testPassword, testContents);
-        Assert.assertNotNull(testOutput);
-
-        testResponse = SecurityFunctions.subjectDecrypt(testTitle,
-                testPassword, testOutput);
-        Assert.assertEquals(testContents, testResponse);
-    }
-
-    /** Check if the hashing function for locking notes works. **/
-    @Test
-    public void testNotesHash() {
-        // Normal input
-        String responseString = TestFunctions.randomString(TEST_COUNT);
-        responseString = SecurityFunctions.notesHash(responseString);
-        Assert.assertNotNull(responseString);
-
-        // Minimal input
-        responseString = TestFunctions.randomString(2);
-        responseString = SecurityFunctions.notesHash(responseString);
-        Assert.assertNotNull(responseString);
-    }
-
-    /** Check if the hashing function for protecting projects works. **/
-    @Test
-    public void testProjectHash() {
-        // Normal input
-        String responseString;
-        responseString = SecurityFunctions.projectHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT));
-        Assert.assertNotNull(responseString);
-
-        // Minimal input
-        responseString = SecurityFunctions.projectHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT));
-        Assert.assertNotNull(responseString);
-    }
-
-    /** Check if the hashing function for project roles works. **/
-    @Test
-    public void testRoleHash() {
-        // Normal input
-        String responseString;
-        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT));
-        Assert.assertNotNull(responseString);
-
-        // Minimal input
-        responseString = SecurityFunctions.roleHash(TestFunctions.randomString(2),
-                TestFunctions.randomString(2));
-        Assert.assertNotNull(responseString);
-    }
-
-    /** Check if the hashing function for project members works. **/
-    @Test
-    public void testMemberHash() {
-        // Normal input
-        String responseString;
-        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(TEST_COUNT),
-                TestFunctions.randomString(TEST_COUNT), TestFunctions.randomString(TEST_COUNT));
-        Assert.assertNotNull(responseString);
-
-        // Minimal input
-        responseString = SecurityFunctions.memberHash(TestFunctions.randomString(2),
-                TestFunctions.randomString(2), TestFunctions.randomString(2));
-        Assert.assertNotNull(responseString);
+        Random rand = new Random();
+        int subjectId = rand.nextInt();
+        String password = TestFunctions.randomString(1000);
+        byte[] salt = new byte[32];
+        rand.nextBytes(salt);
+        ArrayList<NotesContent> originalList = TestFunctions.generateRandomNotes(TEST_COUNT, subjectId);
+        List<Integer> notesIdList = TestFunctions.generateIdList(rand, 50);
+        List<NotesContent> convertedList = SecurityFunctions.subjectDecrypt(notesIdList,
+                new NotesSubject(subjectId, TestFunctions.randomString(10000), 1),
+                salt, password, SecurityFunctions.subjectEncrypt(password, salt, originalList));
+        TestFunctions.customNotesListAssert(originalList, (ArrayList<NotesContent>) convertedList);
     }
 
     /** Check if the AES algorithm is working. **/

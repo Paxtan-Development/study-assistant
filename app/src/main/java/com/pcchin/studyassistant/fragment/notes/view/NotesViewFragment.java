@@ -25,30 +25,25 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pcchin.studyassistant.R;
+import com.pcchin.studyassistant.activity.MainActivity;
+import com.pcchin.studyassistant.database.notes.NotesContent;
+import com.pcchin.studyassistant.database.notes.NotesSubject;
 import com.pcchin.studyassistant.database.notes.SubjectDatabase;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
+import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
-import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.ui.ExtendedFragment;
-import com.pcchin.studyassistant.activity.MainActivity;
-
-import java.util.ArrayList;
 
 public class NotesViewFragment extends Fragment implements ExtendedFragment {
-    private static final String ARG_SUBJECT = "noteSubject";
-    private static final String ARG_ORDER = "noteOrder";
+    private static final String ARG_NOTE = "noteId";
 
-    ArrayList<String> notesInfo;
-    public String notesSubject;
-    public int notesOrder;
-    boolean isLocked;
-    boolean hasAlert;
+    public NotesContent note;
+    public NotesSubject notesSubject;
 
     /** Default constructor. **/
     public NotesViewFragment() {
@@ -56,14 +51,12 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     }
 
     /** Used when viewing a note.
-     * @param subject is the title of the subject.
-     * @param order is the order of the note in the notes list of the subject. **/
+     * @param noteId is the ID of the note. **/
     @NonNull
-    public static NotesViewFragment newInstance(String subject, int order) {
+    public static NotesViewFragment newInstance(int noteId) {
         NotesViewFragment fragment = new NotesViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SUBJECT, subject);
-        args.putInt(ARG_ORDER, order);
+        args.putInt(ARG_NOTE, noteId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,35 +66,13 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            notesSubject = getArguments().getString(ARG_SUBJECT);
-            notesOrder = getArguments().getInt(ARG_ORDER);
+            int noteId = getArguments().getInt(ARG_NOTE);
+            SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
+            note = database.ContentDao().search(noteId);
+            notesSubject = database.SubjectDao().searchById(note.subjectId);
+            database.close();
         }
-        getNotesRequired();
-
         setHasOptionsMenu(true);
-    }
-
-    /** Sets up the notes required and falls back to NotesSubjectFragment if an error occured. **/
-    private void getNotesRequired() {
-        SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(requireActivity());
-        ArrayList<ArrayList<String>> allNotes = database
-                .SubjectDao().search(notesSubject).contents;
-
-        // Check if notesOrder exists
-        if (notesOrder < allNotes.size()) {
-            notesInfo = allNotes.get(notesOrder);
-            // Error message not shown as it is displayed in NotesSubjectFragment
-            FileFunctions.checkNoteIntegrity(notesInfo);
-            isLocked = (notesInfo.get(3) != null);
-            hasAlert = (notesInfo.get(4) != null);
-        } else {
-            // Return to subject
-            Toast.makeText(requireActivity(), R.string.n_error_corrupt,
-                    Toast.LENGTH_SHORT).show();
-            ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
-                    .newInstance(notesSubject));
-        }
-        database.close();
     }
 
     /** Creates the fragment. The height of the content is updated based on the screen size. **/
@@ -114,7 +85,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
         displayFragmentData(returnView);
 
         // Set min height corresponding to screen height
-        requireActivity().setTitle(notesSubject);
+        requireActivity().setTitle(notesSubject.title);
         Point endPt = new Point();
         requireActivity().getWindowManager().getDefaultDisplay().getSize(endPt);
         // Height is set by Total height - bottom of last edited - navigation header height
@@ -130,19 +101,21 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
 
     /** Display the data for the fragment. **/
     private void displayFragmentData(@NonNull View returnView) {
-        ((TextView) returnView.findViewById(R.id.n3_title)).setText(notesInfo.get(0));
-        String contentText = notesInfo.get(2).replace("\n* ", "\n ● ");
+        ((TextView) returnView.findViewById(R.id.n3_title)).setText(note.noteTitle);
+        String contentText = note.noteContent.replace("\n* ", "\n ● ");
         if (contentText.startsWith("* ")) {
             contentText = contentText.replaceFirst("\\* ", " ● ");
         }
         ((TextView) returnView.findViewById(R.id.n3_text)).setText(contentText);
         ((TextView) returnView.findViewById(R.id.n3_last_edited)).setText(String.format("%s%s",
-                getString(R.string.n_last_edited), notesInfo.get(1)));
-        if (notesInfo.size() >= 5 && notesInfo.get(4) != null && notesInfo.get(4).length() > 0) {
-            ((TextView) returnView.findViewById(R.id.n3_notif_time)).setText(String.format("%s%s",
-                    getString(R.string.n3_notif_time), notesInfo.get(4)));
-        } else {
+                getString(R.string.n_last_edited), ConverterFunctions
+                        .formatTime(note.lastEdited, ConverterFunctions.TimeFormat.DATETIME)));
+        if (note.alertDate == null) {
             returnView.findViewById(R.id.n3_notif_time).setVisibility(View.GONE);
+        } else {
+            ((TextView) returnView.findViewById(R.id.n3_notif_time)).setText(String.format("%s%s",
+                    getString(R.string.n3_notif_time), ConverterFunctions
+                            .formatTime(note.alertDate, ConverterFunctions.TimeFormat.DATETIME)));
         }
     }
 
@@ -172,13 +145,13 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     /** Sets up the menu for the fragment. **/
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        if (isLocked) {
-            inflater.inflate(R.menu.menu_n3_locked, menu);
-        } else {
+        if (note.lockedPass.length() == 0) {
             inflater.inflate(R.menu.menu_n3_unlocked, menu);
+        } else {
+            inflater.inflate(R.menu.menu_n3_locked, menu);
         }
 
-        if (!hasAlert) {
+        if (note.alertDate == null) {
             menu.findItem(R.id.n3_notif).setVisible(true);
             menu.findItem(R.id.n3_cancel_notif).setVisible(false);
         } else {
@@ -193,7 +166,7 @@ public class NotesViewFragment extends Fragment implements ExtendedFragment {
     @Override
     public boolean onBackPressed() {
         ((MainActivity) requireActivity()).displayFragment(NotesSubjectFragment
-                .newInstance(notesSubject, notesOrder));
+                .newInstance(notesSubject.subjectId, note.noteId));
         return true;
     }
 }

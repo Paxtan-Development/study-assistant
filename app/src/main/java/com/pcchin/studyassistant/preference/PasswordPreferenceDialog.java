@@ -83,7 +83,7 @@ public final class PasswordPreferenceDialog extends PreferenceDialogFragmentComp
     public void onDialogClosed(boolean positiveResult) {
         if (positiveResult && input1.getEditText() != null) {
             ((PasswordPreference) getPreference()).setPassword(
-                    SecurityFunctions.projectHash(input1.getEditText().getText().toString(), salt));
+                    SecurityFunctions.passwordHash(input1.getEditText().getText().toString(), salt));
         }
     }
 }

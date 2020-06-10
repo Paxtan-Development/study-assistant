@@ -132,7 +132,7 @@ public class ProjectLoginFragment extends Fragment implements ExtendedFragment {
     /** Check whether the password for the project is correct. **/
     private void checkProjectPass(DismissibleDialogFragment dismissibleFragment, MainActivity activity,
                                   @NonNull TextInputLayout passwordLayout) {
-        if (Objects.equals(SecurityFunctions.projectHash(Objects.requireNonNull(
+        if (Objects.equals(SecurityFunctions.passwordHash(Objects.requireNonNull(
                 passwordLayout.getEditText()).getText().toString(), project.salt), project.projectPass)) {
             // Password is correct
             dismissibleFragment.dismiss();

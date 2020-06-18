@@ -76,3 +76,20 @@ Versions below this follow the major-minor-patch release version.
 ## [1.1] - 2019-06-26
 
 ## [1.0] - 2019-06-09
+
+[2.0.0-beta.5]: https://github.com/Paxtan-Development/study-assistant/compare/v2.0.0.3-b...HEAD
+[2.0.0.3-b]: https://github.com/Paxtan-Development/study-assistant/compare/v2.0.0.2-b...v2.0.0.3-b
+[2.0.0.2-b]: https://github.com/Paxtan-Development/study-assistant/compare/v2.0.0.1-b...v2.0.0.2-b
+[2.0.0.1-b]: https://github.com/Paxtan-Development/study-assistant/compare/v2.0.0.0-b...v2.0.0.1-b
+[2.0.0.0-b]: https://github.com/Paxtan-Development/study-assistant/compare/v1.4.4...v2.0.0.0-b
+[1.4.4]: https://github.com/Paxtan-Development/study-assistant/compare/v1.4.3...v1.4.4
+[1.4.3]: https://github.com/Paxtan-Development/study-assistant/compare/v1.4.2...v1.4.3
+[1.4.2]: https://github.com/Paxtan-Development/study-assistant/compare/v1.4.1...v1.4.2
+[1.4.1]: https://github.com/Paxtan-Development/study-assistant/compare/v1.4...v1.4.1
+[1.4]: https://github.com/Paxtan-Development/study-assistant/compare/v1.3.1...v1.4
+[1.3.1]: https://github.com/Paxtan-Development/study-assistant/compare/v1.3...v1.3.1
+[1.3]: https://github.com/Paxtan-Development/study-assistant/compare/v1.2...v1.3
+[1.2]: https://github.com/Paxtan-Development/study-assistant/compare/v1.11...v1.2
+[1.11]: https://github.com/Paxtan-Development/study-assistant/compare/v1.1...v1.11
+[1.1]: https://github.com/Paxtan-Development/study-assistant/compare/v1.0...v1.1
+[1.0]: https://github.com/Paxtan-Development/study-assistant/releases/tag/v1.0

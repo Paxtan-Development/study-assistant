@@ -30,7 +30,7 @@ import com.pcchin.studyassistant.ui.ExtendedFragment;
 
 public class LicenseFragment extends Fragment implements ExtendedFragment {
     private static final int[] licenseArrays = new int[]{
-            R.array.androiddevicenames_license,R.array.bouncycastle_license,
+            R.array.androiddevicenames_license, R.array.auto_app_updater_license, R.array.bouncycastle_license,
             R.array.customdialog_license, R.array.dtpreference_license, R.array.imagepicker_license,
             R.array.jsoup_license, R.array.licenseview_license, R.array.sentry_sdk_license, R.array.zip4j_license};
 

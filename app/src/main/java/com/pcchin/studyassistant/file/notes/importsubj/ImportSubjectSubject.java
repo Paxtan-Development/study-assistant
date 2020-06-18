@@ -117,7 +117,7 @@ public class ImportSubjectSubject {
         inputLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         // Generate subject
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
+        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SubjIdType.SUBJECT);
         database.close();
         NotesSubject subject = new NotesSubject(subjectId, title, sortOrder);
         // Show password dialog
@@ -158,7 +158,7 @@ public class ImportSubjectSubject {
     private void importUnencryptedSubject(String title, int sortOrder, byte[] content) {
         // Subject is not encrypted, create NotesSubject
         SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
+        int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SubjIdType.SUBJECT);
         List<Integer> notesIdList = database.ContentDao().getAllNoteId();
         database.close();
 

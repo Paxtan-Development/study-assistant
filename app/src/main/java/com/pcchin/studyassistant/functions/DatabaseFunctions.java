@@ -32,12 +32,12 @@ import java.util.Random;
 
 /** Database related functions used throughout the app. **/
 public final class DatabaseFunctions {
-    public enum SUBJ_ID_TYPE {
+    public enum SubjIdType {
         SUBJECT,
         NOTE
     }
 
-    public enum PROJ_ID_TYPE {
+    public enum ProjIdType {
         PROJECT,
         ROLE,
         MEMBER
@@ -72,9 +72,9 @@ public final class DatabaseFunctions {
     }
 
     /** Generates a valid subject ID to be used to create a new subject. **/
-    public static int generateValidId(@NonNull SubjectDatabase database, @NonNull SUBJ_ID_TYPE type) {
+    public static int generateValidId(@NonNull SubjectDatabase database, @NonNull SubjIdType type) {
         List<Integer> idList;
-        if (type.equals(SUBJ_ID_TYPE.SUBJECT)) {
+        if (type.equals(SubjIdType.SUBJECT)) {
             idList = database.SubjectDao().getAllSubjectId();
         } else {
             idList = database.ContentDao().getAllNoteId();
@@ -86,7 +86,7 @@ public final class DatabaseFunctions {
     }
 
     /** Generates a valid random String based on the type specified. **/
-    public static String generateValidProjectString(@NonNull RandomString rand, @NonNull PROJ_ID_TYPE type,
+    public static String generateValidProjectString(@NonNull RandomString rand, @NonNull ProjIdType type,
                                                     ProjectDatabase projectDatabase) {
         String returnString = rand.nextString();
         switch (type) {

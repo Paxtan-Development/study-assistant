@@ -13,11 +13,19 @@
 
 package com.pcchin.studyassistant.functions;
 
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.os.Build;
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.pcchin.auto_app_updater.AutoAppUpdater;
+import com.pcchin.auto_app_updater.endpoint.custom.JSONObjectEndpoint;
+import com.pcchin.auto_app_updater.endpoint.repo.GitHubEndpoint;
+import com.pcchin.studyassistant.BuildConfig;
+import com.pcchin.studyassistant.network.NetworkConstants;
+
+import java.util.Arrays;
+import java.util.List;
 
 /** Functions used for network related tasks within the app. **/
 public final class NetworkFunctions {
@@ -25,22 +33,51 @@ public final class NetworkFunctions {
         throw new IllegalStateException("Utility class");
     }
 
-    /** Get the connection status from the connectivity manager. **/
-    public static boolean getConnected(ConnectivityManager cm) {
-        if (Build.VERSION.SDK_INT < 23) {
-            final NetworkInfo ni = cm.getActiveNetworkInfo();
-            if (ni != null) {
-                return ni.isConnected();
-            }
-        } else {
-            final Network n = cm.getActiveNetwork();
-            if (n != null) {
-                final NetworkCapabilities nc = cm.getNetworkCapabilities(n);
-                if (nc != null) {
-                    return nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-                }
-            }
+    /** Starts the AutoAppUpdater which checks for updates to the app. **/
+    public static void checkForUpdates(AppCompatActivity activity) {
+        if (!isFromPlayStore(activity)) {
+            // Creates the updater
+            AutoAppUpdater.Builder builder = new AutoAppUpdater.Builder(activity,
+                    activity.getSupportFragmentManager(),
+                    activity.getPackageName() + ".ContentProvider");
+            // Sets the attributes
+            builder.setUpdateType(AutoAppUpdater.UpdateType.DIFFERENCE);
+            builder.setCurrentVersion(BuildConfig.VERSION_NAME);
+            addEndpoints(builder);
+            // Sets the update interval
+            //noinspection ConstantConditions
+            if (BuildConfig.BUILD_TYPE.equals("debug")) builder.setUpdateInterval(0);
+            else builder.setUpdateInterval(60 * 60 * 24);
+            // Runs the updater
+            builder.build().run();
         }
-        return false;
+    }
+
+    /** Adds the endpoints that is used by the updater. **/
+    private static void addEndpoints(@NonNull AutoAppUpdater.Builder builder) {
+        JSONObjectEndpoint mainApi = getApiEndpoint(NetworkConstants.MAIN_API);
+        JSONObjectEndpoint secondaryApi = getApiEndpoint(NetworkConstants.BACKUP_API);
+        JSONObjectEndpoint tertiaryApi = getApiEndpoint(NetworkConstants.SEC_BACKUP_API);
+        //noinspection ConstantConditions
+        GitHubEndpoint gitHubEndpoint = new GitHubEndpoint("Paxtan-Development/study-assistant",
+                BuildConfig.BUILD_TYPE.equals("beta"));
+        builder.addEndpoints(mainApi, secondaryApi, tertiaryApi, gitHubEndpoint);
+    }
+
+    /** Gets the endpoint from the given website that is used to update the app. **/
+    @NonNull
+    private static JSONObjectEndpoint getApiEndpoint(String apiPath) {
+        return new JSONObjectEndpoint(apiPath + NetworkConstants.UPDATE_PATH,
+                "version", "download", "page");
+    }
+
+    /** Checks if the app is downloaded from the Play Store, separated for clarity. **/
+    private static boolean isFromPlayStore(@NonNull Context context) {
+        // A list with valid installers package name
+        List<String> validInstallers = Arrays.asList("com.android.vending", "com.google.android.feedback");
+        // The package name of the app that has installed your app
+        final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        // true if your app has been downloaded from Play Store
+        return installer != null && validInstallers.contains(installer);
     }
 }

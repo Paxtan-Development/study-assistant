@@ -44,18 +44,18 @@ final class ProjectCreateFragmentCreate {
                 // Admin with password
                 String adminSalt = saltRand.nextString();
                 adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                        DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                        DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                         customAdminName.getEditText().getText().toString(),
                         adminSalt, SecurityFunctions.passwordHash(customAdminPass1
                         .getEditText().getText().toString(), adminSalt));
             } else {
                 adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                        DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                        DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                         customAdminName.getEditText().getText().toString(), saltRand.nextString(), "");
             }
         } else {
             adminRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                    DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                    DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                     "Admin", saltRand.nextString(), "");
         }
         setAdminPrivileges(adminRole);
@@ -95,7 +95,7 @@ final class ProjectCreateFragmentCreate {
                     customMemberName, customMemberPass1);
         } else {
             memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                    DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                    DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                     "Member", saltRand.nextString(), "");
         }
         return memberRole;
@@ -111,13 +111,13 @@ final class ProjectCreateFragmentCreate {
             // Admin with password
             String memberSalt = saltRand.nextString();
             memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                    DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                    DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                     Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
                     memberSalt, SecurityFunctions.passwordHash(customMemberPass1
                     .getEditText().getText().toString(), memberSalt));
         } else {
             memberRole = new RoleData(DatabaseFunctions.generateValidProjectString(idRand,
-                    DatabaseFunctions.PROJ_ID_TYPE.ROLE, projectDatabase), projectID,
+                    DatabaseFunctions.ProjIdType.ROLE, projectDatabase), projectID,
                     Objects.requireNonNull(customMemberName.getEditText()).getText().toString(),
                     saltRand.nextString(), "");
         }
@@ -135,7 +135,7 @@ final class ProjectCreateFragmentCreate {
         if (memberName.getEditText() != null && memberPass1.getEditText() != null) {
             if (memberPass1.getEditText().getText().length() > 0) {
                 initialMember = new MemberData(DatabaseFunctions
-                        .generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.MEMBER, projectDatabase),
+                        .generateValidProjectString(idRand, DatabaseFunctions.ProjIdType.MEMBER, projectDatabase),
                         projectID, memberName.getEditText().getText().toString(), "",
                         memberSalt,
                         SecurityFunctions.passwordHash(memberPass1.getEditText()
@@ -143,7 +143,7 @@ final class ProjectCreateFragmentCreate {
                         adminRoleID);
             } else {
                 initialMember = new MemberData(DatabaseFunctions
-                        .generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.MEMBER, projectDatabase),
+                        .generateValidProjectString(idRand, DatabaseFunctions.ProjIdType.MEMBER, projectDatabase),
                         projectID, memberName.getEditText().getText().toString(), "",
                         memberSalt, "", adminRoleID);
             }

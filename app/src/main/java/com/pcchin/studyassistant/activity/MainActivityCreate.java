@@ -43,15 +43,13 @@ import com.pcchin.studyassistant.file.notes.importsubj.ImportSubjectZip;
 import com.pcchin.studyassistant.fragment.main.MainFragment;
 import com.pcchin.studyassistant.fragment.notes.subject.NotesSubjectFragment;
 import com.pcchin.studyassistant.fragment.notes.view.NotesViewFragment;
-import com.pcchin.studyassistant.functions.ConverterFunctions;
 import com.pcchin.studyassistant.functions.DataFunctions;
 import com.pcchin.studyassistant.functions.DatabaseFunctions;
 import com.pcchin.studyassistant.functions.FileFunctions;
 import com.pcchin.studyassistant.functions.NavViewFunctions;
-import com.pcchin.studyassistant.network.update.AppUpdate;
+import com.pcchin.studyassistant.functions.NetworkFunctions;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -132,15 +130,7 @@ final class MainActivityCreate {
         // First time starting the app
         if (savedInstanceState == null) {
             firstStart();
-            // Only check for updates once a day
-            if (activity.getIntent().getBooleanExtra(ActivityConstants.INTENT_VALUE_DISPLAY_UPDATE, false)) {
-                new Handler().post(() -> new AppUpdate(activity, true));
-            } else //noinspection ConstantConditions
-                if (!Objects.equals(DataFunctions.getSharedPref(activity).getString(ActivityConstants.SHAREDPREF_LAST_UPDATE_CHECK, ""),
-                    ConverterFunctions.formatTime(new Date(), ConverterFunctions.TimeFormat.DATE))
-                        || BuildConfig.BUILD_TYPE.equals("debug")) {
-                new Handler().post(() -> new AppUpdate(activity, false));
-            }
+            new Handler().post(() -> NetworkFunctions.checkForUpdates(activity));
         } else {
             // Set currentFragment, pager and bottomNavView which had been cleared when rotating
             activity.currentFragment = activity.getSupportFragmentManager().getFragments()

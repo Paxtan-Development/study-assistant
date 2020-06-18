@@ -98,7 +98,7 @@ class ImportSubjectZipProcess {
             txtFileList = new ArrayList<>();
             File subjFile = null;
             SubjectDatabase database = DatabaseFunctions.getSubjectDatabase(activity);
-            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SubjIdType.SUBJECT);
             database.close();
             // Populate subjFile and txtFileList
             for (File file : fileList) {

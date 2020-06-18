@@ -124,7 +124,7 @@ final class ProjectPreferenceChange {
             // Create member
             RandomString idRand = new RandomString(48), saltRand = new RandomString(40);
             MemberData initialMember = new MemberData(DatabaseFunctions
-                    .generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.MEMBER,
+                    .generateValidProjectString(idRand, DatabaseFunctions.ProjIdType.MEMBER,
                             fragment.projectDatabase), fragment.project.projectID,
                     memberName, "", saltRand.nextString(), "", fragment.role.roleID);
             fragment.projectDatabase.MemberDao().insert(initialMember);

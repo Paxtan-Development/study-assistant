@@ -81,7 +81,7 @@ public final class UIFunctions {
             database.close();
         } else {
             // Create subject
-            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SUBJ_ID_TYPE.SUBJECT);
+            int subjectId = DatabaseFunctions.generateValidId(database, DatabaseFunctions.SubjIdType.SUBJECT);
             database.SubjectDao().insert(new NotesSubject(subjectId, inputText, NotesSubject.SORT_ALPHABETICAL_ASC));
             database.close();
             activity.safeOnBackPressed();

@@ -26,12 +26,10 @@ public final class ActivityConstants {
 
     // Shared preference constants
     public static final String SHAREDPREF_APP_UPDATE_PATH = "AppUpdatePath";
-    public static final String SHAREDPREF_LAST_UPDATE_CHECK = "lastUpdateCheck";
     public static final String SHAREDPREF_EVENT_SENT = "testEventSent" + BuildConfig.VERSION_NAME; // This ensures that the String will be different on a version change
     public static final String SHAREDPREF_UID = "uid";
 
-    // General intent constants
-    public static final String INTENT_VALUE_DISPLAY_UPDATE = "displayUpdate";
+    // Intent values
     public static final String INTENT_VALUE_START_FRAGMENT = "startFragment";
     public static final String INTENT_VALUE_NOTE_ID = "noteId";
 

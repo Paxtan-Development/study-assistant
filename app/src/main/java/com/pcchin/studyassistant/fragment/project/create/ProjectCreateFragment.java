@@ -102,7 +102,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 // Creates admin role
                 RandomString idRand = new RandomString(48),
                         saltRand = new RandomString(40);
-                String projectID = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.PROJECT,
+                String projectID = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.ProjIdType.PROJECT,
                         projectDatabase);
                 RoleData adminRole = ProjectCreateFragmentCreate.createAdminRole(customAdmin, idRand,
                             saltRand, projectID, customAdminName, customAdminPass1, projectDatabase),
@@ -111,7 +111,7 @@ public class ProjectCreateFragment extends Fragment implements ExtendedFragment 
                 projectDatabase.RoleDao().insert(adminRole);
                 projectDatabase.RoleDao().insert(memberRole);
 
-                String projectSalt = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.PROJ_ID_TYPE.PROJECT,
+                String projectSalt = DatabaseFunctions.generateValidProjectString(idRand, DatabaseFunctions.ProjIdType.PROJECT,
                         projectDatabase), projectPass;
                 if (Objects.requireNonNull(projectPass1.getEditText()).getText().length() == 0) {
                     projectPass = "";

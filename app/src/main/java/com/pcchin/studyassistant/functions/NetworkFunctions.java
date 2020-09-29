@@ -41,6 +41,7 @@ public final class NetworkFunctions {
                     activity.getSupportFragmentManager(),
                     activity.getPackageName() + ".ContentProvider");
             // Sets the attributes
+            // Change to UpdateType.SEMANTIC on release 2.0.0
             builder.setUpdateType(AutoAppUpdater.UpdateType.DIFFERENCE);
             builder.setCurrentVersion(BuildConfig.VERSION_NAME);
             addEndpoints(builder);
